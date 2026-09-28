@@ -1189,6 +1189,259 @@
       document.getElementById('txtActivos').innerText = `${projectsData.length}`;
     }
 
+    function recalcularTodo() {
+      if (projectsData.length > 0) {
+        if (selectedProjectIdx < 0 || selectedProjectIdx >= projectsData.length) {
+          selectedProjectIdx = 0;
+        }
+        const p = projectsData[selectedProjectIdx];
+        const comprasProj = calcularComprasProyecto(p);
+        const gananciaProj = p.cobrado - comprasProj;
+        const saldoProj = p.total - p.cobrado;
+
+        if (document.getElementById('mProjTitle')) document.getElementById('mProjTitle').innerText = p.name;
+        if (document.getElementById('mProjClient')) document.getElementById('mProjClient').innerText = `Cliente: ${p.client} • ${p.phone}`;
+        if (document.getElementById('mCobrado')) document.getElementById('mCobrado').innerText = `$${p.cobrado.toLocaleString('es-CO')}`;
+        if (document.getElementById('mGastos')) document.getElementById('mGastos').innerText = `$${comprasProj.toLocaleString('es-CO')}`;
+        if (document.getElementById('mGanancia')) document.getElementById('mGanancia').innerText = `$${gananciaProj.toLocaleString('es-CO')}`;
+        if (document.getElementById('mSaldo')) document.getElementById('mSaldo').innerText = `$${saldoProj.toLocaleString('es-CO')}`;
+        if (document.getElementById('mTotal')) document.getElementById('mTotal').innerText = `$${p.total.toLocaleString('es-CO')}`;
+
+        actualizarChipsEstado(p.status || 'Diseño');
+        renderTasksList();
+      }
+
+      // Consolidado del Negocio
+      const totalAbonosProyectos = projectsData.reduce((s, proj) => s + proj.cobrado, 0);
+      const totalOtrosIngresos = generalIncomes.reduce((s, i) => s + i.amount, 0);
+      const totalIngresosGlobal = totalAbonosProyectos + totalOtrosIngresos;
+
+      const totalComprasProyectos = projectsData.reduce((s, proj) => s + calcularComprasProyecto(proj), 0);
+      const totalGastosGenerales = generalExpenses.reduce((s, g) => s + g.amount, 0);
+      const totalGastosGlobal = totalComprasProyectos + totalGastosGenerales;
+
+      const gananciaNetaGlobal = totalIngresosGlobal - totalGastosGlobal;
+
+      // Actualizar tarjetas del Dashboard
+      if (document.getElementById('txtIngresos')) document.getElementById('txtIngresos').innerText = `$${totalIngresosGlobal.toLocaleString('es-CO')}`;
+      if (document.getElementById('txtGastos')) document.getElementById('txtGastos').innerText = `$${totalGastosGlobal.toLocaleString('es-CO')}`;
+      if (document.getElementById('txtGanancia')) document.getElementById('txtGanancia').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+
+      // Actualizar modal de desglose
+      if (document.getElementById('dIngresosProyectos')) document.getElementById('dIngresosProyectos').innerText = `$${totalAbonosProyectos.toLocaleString('es-CO')}`;
+      if (document.getElementById('dIngresosGenerales')) document.getElementById('dIngresosGenerales').innerText = `$${totalOtrosIngresos.toLocaleString('es-CO')}`;
+      if (document.getElementById('dComprasProyectos')) document.getElementById('dComprasProyectos').innerText = `-$${totalComprasProyectos.toLocaleString('es-CO')}`;
+      if (document.getElementById('dGastosGenerales')) document.getElementById('dGastosGenerales').innerText = `-$${totalGastosGenerales.toLocaleString('es-CO')}`;
+      if (document.getElementById('dGananciaNeta')) document.getElementById('dGananciaNeta').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+
+      renderProjectsList();
+    }
+
+    function verDetalleProyecto(idx) {
+      if (idx < 0 || idx >= projectsData.length) return;
+      selectedProjectIdx = idx;
+      recalcularTodo();
+      document.getElementById('projectModal').style.display = 'flex';
+    }
+
+    function closeProjectModal() {
+      document.getElementById('projectModal').style.display = 'none';
+    }
+
+    // Modal de entrada genérico para registrar datos reales
+    function abrirModalGenerico(action, title, subtitle, btnText) {
+      currentFormAction = action;
+      document.getElementById('fModalTitle').innerText = title;
+      document.getElementById('fModalSubtitle').innerText = subtitle;
+      document.getElementById('fModalBtnSave').innerText = btnText;
+      document.getElementById('fInpConcepto').value = '';
+      document.getElementById('fInpValor').value = '';
+      document.getElementById('formModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('fInpConcepto').focus(), 100);
+    }
+
+    function cerrarFormModal() {
+      document.getElementById('formModal').style.display = 'none';
+    }
+
+    function guardarFormModal() {
+      const concepto = document.getElementById('fInpConcepto').value.trim();
+      const valor = parseFloat(document.getElementById('fInpValor').value);
+
+      if (!concepto || isNaN(valor) || valor <= 0) {
+        showToast('Por favor escribe un concepto y un valor válido.');
+        return;
+      }
+
+      const p = projectsData[selectedProjectIdx];
+      if (currentFormAction === 'compra_proyecto') {
+        p.directCompras = (p.directCompras || 0) + valor;
+        showToast(`✓ Compra registrada en ${p.name}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+      } else if (currentFormAction === 'abono_proyecto') {
+        p.cobrado += valor;
+        showToast(`✓ Abono recibido de ${p.client}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+      } else if (currentFormAction === 'gasto_general') {
+        generalExpenses.unshift({ desc: concepto, amount: valor });
+        showToast(`✓ Gasto general registrado: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+      } else if (currentFormAction === 'otro_ingreso') {
+        generalIncomes.unshift({ desc: concepto, amount: valor });
+        showToast(`✓ Ingreso general registrado: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+      }
+
+      cerrarFormModal();
+      recalcularTodo();
+    }
+
+    function abrirModalCompraProyecto() {
+      const p = projectsData[selectedProjectIdx];
+      abrirModalGenerico(
+        'compra_proyecto',
+        'Registrar Compra de Insumo',
+        `Esta compra afectará únicamente las cuentas de "${p.name}".`,
+        'Guardar Compra'
+      );
+    }
+
+    function abrirModalAbonoProyecto() {
+      const p = projectsData[selectedProjectIdx];
+      abrirModalGenerico(
+        'abono_proyecto',
+        'Registrar Abono del Cliente',
+        `Registrar anticipo o abono de ${p.client}.`,
+        'Registrar Abono'
+      );
+    }
+
+    function abrirModalGastoGeneral() {
+      abrirModalGenerico(
+        'gasto_general',
+        'Registrar Gasto General',
+        'Gasto del negocio independiente de proyectos (Arriendo, Servicios, etc.)',
+        'Guardar Gasto'
+      );
+    }
+
+    function abrirModalOtroIngreso() {
+      abrirModalGenerico(
+        'otro_ingreso',
+        'Registrar Otro Ingreso',
+        'Ingreso del negocio no perteneciente a un encargo en particular.',
+        'Guardar Ingreso'
+      );
+    }
+
+    // Modal de Datos del Negocio
+    function openBusinessProfileModal() {
+      document.getElementById('bizNameInp').value = bizProfile.name;
+      document.getElementById('bizOwnerInp').value = bizProfile.owner;
+      document.getElementById('bizPhoneInp').value = bizProfile.phone;
+      document.getElementById('bizNequiInp').value = bizProfile.nequi;
+      document.getElementById('bizBankInp').value = bizProfile.bancolombia;
+      document.getElementById('bizModal').style.display = 'flex';
+    }
+
+    function cerrarBusinessProfileModal() {
+      document.getElementById('bizModal').style.display = 'none';
+    }
+
+    function guardarDatosNegocio() {
+      const name = document.getElementById('bizNameInp').value.trim();
+      if (!name) {
+        showToast('El negocio debe tener un nombre.');
+        return;
+      }
+      bizProfile.name = name;
+      bizProfile.owner = document.getElementById('bizOwnerInp').value.trim();
+      bizProfile.phone = document.getElementById('bizPhoneInp').value.trim();
+      bizProfile.nequi = document.getElementById('bizNequiInp').value.trim();
+      bizProfile.bancolombia = document.getElementById('bizBankInp').value.trim();
+
+      document.getElementById('headerTitle').innerText = `${bizProfile.name} • Servicios`;
+      cerrarBusinessProfileModal();
+      showToast(`¡Datos actualizados para "${bizProfile.name}"!`);
+    }
+
+    // Modal de Nuevo Pedido / Proyecto de Cliente
+    function abrirModalNuevoPedido() {
+      document.getElementById('orderNameInp').value = '';
+      document.getElementById('orderClientInp').value = '';
+      document.getElementById('orderPhoneInp').value = '';
+      document.getElementById('orderServicesInp').value = '';
+      document.getElementById('orderTotalInp').value = '';
+      document.getElementById('orderAdvanceInp').value = '';
+      document.getElementById('orderDaysInp').value = '5';
+      document.getElementById('newOrderModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('orderNameInp').focus(), 100);
+    }
+
+    function cerrarNuevoPedidoModal() {
+      document.getElementById('newOrderModal').style.display = 'none';
+    }
+
+    function guardarNuevoPedido() {
+      const name = document.getElementById('orderNameInp').value.trim();
+      const client = document.getElementById('orderClientInp').value.trim();
+      const phone = document.getElementById('orderPhoneInp').value.trim() || '312 000 0000';
+      const services = document.getElementById('orderServicesInp').value.trim() || 'Servicio personalizado';
+      const total = parseFloat(document.getElementById('orderTotalInp').value) || 0;
+      const advance = parseFloat(document.getElementById('orderAdvanceInp').value) || 0;
+      const days = parseInt(document.getElementById('orderDaysInp').value) || 5;
+
+      if (!name || !client || total <= 0) {
+        showToast('Ingresa nombre del pedido, cliente y valor total.');
+        return;
+      }
+
+      const newProj = {
+        id: projectsData.length,
+        name: name,
+        client: client,
+        phone: phone,
+        services: services,
+        total: total,
+        cobrado: advance,
+        directCompras: 0,
+        daysLeft: days,
+        status: 'Diseño',
+        tasks: [
+          { id: Date.now() + 1, title: 'Definir requerimientos y boceto inicial', isDone: false, isPurchase: false, cost: 0 },
+          { id: Date.now() + 2, title: 'Comprar materiales o insumos específicos', isDone: false, isPurchase: true, cost: 0 },
+          { id: Date.now() + 3, title: 'Producción y confección del pedido', isDone: false, isPurchase: false, cost: 0 },
+          { id: Date.now() + 4, title: 'Empaque final y entrega al cliente', isDone: false, isPurchase: false, cost: 0 }
+        ]
+      };
+
+      projectsData.unshift(newProj);
+      selectedProjectIdx = 0;
+      cerrarNuevoPedidoModal();
+      recalcularTodo();
+      verDetalleProyecto(0);
+      showToast(`✓ ¡Pedido "${name}" de ${client} creado!`);
+    }
+
+    // Desglose
+    function verDesgloseGlobal() {
+      document.getElementById('desgloseModal').style.display = 'flex';
+    }
+
+    function cerrarDesgloseGlobal() {
+      document.getElementById('desgloseModal').style.display = 'none';
+    }
+
+    function copiarWhatsAppCotizacion() {
+      const p = projectsData[selectedProjectIdx];
+      const saldo = p.total - p.cobrado;
+      const msg = `✨ *${bizProfile.name.toUpperCase()}* ✨\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Proyecto:* ${p.name}\n👤 *Cliente:* ${p.client}\n📦 *Servicios:* ${p.services}\n\n💰 *RESUMEN DE CUENTA:*\n• *Total Cotizado:* $${p.total.toLocaleString('es-CO')}\n• *Abonado a la fecha:* $${p.cobrado.toLocaleString('es-CO')}\n• *SALDO PENDIENTE:* $${saldo.toLocaleString('es-CO')}\n\n🏦 *CUENTAS DE COBRO:*\n• Nequi: ${bizProfile.nequi}\n• Bancolombia: ${bizProfile.bancolombia}\n📞 Contacto: ${bizProfile.phone}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n¡Muchas gracias por apoyar nuestro talento local! 🌸`;
+
+      navigator.clipboard.writeText(msg).catch(() => {});
+      showToast(`¡Cotización de "${bizProfile.name}" copiada para WhatsApp!`);
+    }
+
+    function verPedidosPorVencer() {
+      verDetalleProyecto(0);
+      showToast('⚠️ "15 años Maria" vence en 2 días');
+    }
+
     function renderTasksList() {
       const container = document.getElementById('mTasksList');
       if (!container) return;

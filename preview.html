@@ -97,6 +97,28 @@
       z-index: 100;
     }
 
+    /* Adaptación nativa a pantalla completa cuando se abre en un celular real */
+    @media (max-width: 500px) {
+      body {
+        padding: 0;
+        background-color: var(--bg);
+        align-items: stretch;
+      }
+      .phone-container {
+        width: 100vw;
+        height: 100dvh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+      }
+      .notch {
+        display: none;
+      }
+      .app-header {
+        padding-top: max(16px, env(safe-area-inset-top, 16px)) !important;
+      }
+    }
+
     /* Header de la App */
     .app-header {
       padding: 34px 18px 12px;

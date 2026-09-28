@@ -19,9 +19,9 @@ class ProjectDetailScreen extends StatelessWidget {
   });
 
   final List<String> _estados = const [
-    'En Diseño',
-    'En Producción',
-    'Listo para Entregar',
+    'Diseño',
+    'Producción',
+    'Empaque',
     'Entregado',
   ];
 
@@ -170,34 +170,76 @@ class ProjectDetailScreen extends StatelessWidget {
 
   void _showAddTaskDialog(BuildContext context, ProjectsProvider provider, String projectId) {
     final taskController = TextEditingController();
+    final costController = TextEditingController();
+    bool isPurchase = false;
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Nueva Tarea'),
-        content: TextField(
-          controller: taskController,
-          autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'Descripción de la tarea',
-            hintText: 'Ej: Comprar cinta dorada, Enviar boceto',
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
+          title: const Text('Agregar Ítem al Checklist'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: taskController,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Descripción del ítem *',
+                    hintText: 'Ej: Comprar cinta dorada, Enviar bocetos',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  title: const Text(
+                    '¿Es compra de insumo / material?',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                  subtitle: const Text(
+                    'Al marcar el check se asumirá realizada y se restará del balance',
+                    style: TextStyle(fontSize: 11, color: Colors.grey),
+                  ),
+                  value: isPurchase,
+                  onChanged: (val) => setState(() => isPurchase = val),
+                ),
+                if (isPurchase) ...[
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: costController,
+                    keyboardType: TextInputType.number,
+                    decoration: const InputDecoration(
+                      labelText: 'Costo de la compra (\$ COP) *',
+                      prefixIcon: Icon(Icons.attach_money),
+                      hintText: 'Ej: 35000',
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('CANCELAR'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final title = taskController.text.trim();
+                if (title.isNotEmpty) {
+                  final cost = isPurchase
+                      ? (double.tryParse(costController.text.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0.0)
+                      : 0.0;
+                  provider.addTask(projectId, title, isPurchase: isPurchase, cost: cost);
+                  Navigator.pop(ctx);
+                }
+              },
+              child: const Text('AGREGAR ÍTEM'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('CANCELAR'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (taskController.text.trim().isNotEmpty) {
-                provider.addTask(projectId, taskController.text.trim());
-                Navigator.pop(ctx);
-              }
-            },
-            child: const Text('AGREGAR TAREA'),
-          ),
-        ],
       ),
     );
   }
@@ -409,26 +451,43 @@ class ProjectDetailScreen extends StatelessWidget {
                 ),
               ),
             ],
-            const Divider(height: 22),
-            Row(
+            const Divider(height: 20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Estado: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: DropdownButtonFormField<String>(
-                    value: project.status,
-                    decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    ),
-                    items: _estados
-                        .map((st) => DropdownMenuItem(value: st, child: Text(st, style: const TextStyle(fontSize: 13))))
-                        .toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        provider.updateStatus(project.id, val);
-                      }
-                    },
-                  ),
+                const Text('Fase / Estado del Proyecto:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  children: _estados.map((st) {
+                    final isSelected = project.status == st ||
+                        (st == 'Diseño' && project.status == 'En Diseño') ||
+                        (st == 'Producción' && project.status == 'En Producción');
+                    String icon = '🎨';
+                    if (st == 'Producción') icon = '✂️';
+                    if (st == 'Empaque') icon = '📦';
+                    if (st == 'Entregado') icon = '✅';
+
+                    return ChoiceChip(
+                      label: Text(
+                        '$icon $st',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isSelected ? Colors.white : theme.textDark,
+                        ),
+                      ),
+                      selected: isSelected,
+                      selectedColor: theme.secondary,
+                      backgroundColor: theme.background,
+                      onSelected: (selected) {
+                        if (selected) {
+                          provider.updateStatus(project.id, st);
+                        }
+                      },
+                    );
+                  }).toList(),
                 ),
               ],
             ),
@@ -600,30 +659,93 @@ class ProjectDetailScreen extends StatelessWidget {
             if (project.tasks.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Text('Sin tareas asignadas. Toca "+ Tarea" para crear tu checklist.'),
+                child: Text('Sin ítems en el checklist. Toca "+ Ítem" para planear tareas o compras.'),
               )
             else
               ...project.tasks.map(
-                (task) => CheckboxListTile(
-                  contentPadding: EdgeInsets.zero,
-                  dense: true,
-                  value: task.isCompleted,
-                  activeColor: theme.secondary,
-                  title: Text(
-                    task.title,
-                    style: TextStyle(
-                      decoration: task.isCompleted ? TextDecoration.lineThrough : null,
-                      color: task.isCompleted ? Colors.grey : theme.textDark,
-                      fontWeight: task.isCompleted ? FontWeight.normal : FontWeight.w500,
+                (task) {
+                  final isPurchase = task.isPurchase;
+                  final costFormatted = NumberFormat.currency(
+                    locale: 'es_CO',
+                    symbol: '\$',
+                    decimalDigits: 0,
+                  ).format(task.cost);
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    decoration: BoxDecoration(
+                      color: task.isCompleted
+                          ? (isPurchase ? Colors.green.withOpacity(0.06) : Colors.black.withOpacity(0.02))
+                          : (isPurchase ? Colors.orange.withOpacity(0.06) : Colors.transparent),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isPurchase
+                            ? (task.isCompleted ? Colors.green.withOpacity(0.3) : Colors.orange.withOpacity(0.3))
+                            : Colors.grey.withOpacity(0.2),
+                      ),
                     ),
-                  ),
-                  secondary: IconButton(
-                    icon: const Icon(Icons.close, size: 16, color: Colors.grey),
-                    tooltip: 'Eliminar tarea',
-                    onPressed: () => provider.deleteTask(project.id, task.id),
-                  ),
-                  onChanged: (_) => provider.toggleTask(project.id, task.id),
-                ),
+                    child: CheckboxListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                      dense: true,
+                      value: task.isCompleted,
+                      activeColor: isPurchase ? const Color(0xFF38A169) : theme.secondary,
+                      title: Text(
+                        task.title,
+                        style: TextStyle(
+                          decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+                          color: task.isCompleted ? Colors.grey : theme.textDark,
+                          fontWeight: task.isCompleted ? FontWeight.normal : FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                      subtitle: isPurchase
+                          ? Row(
+                              children: [
+                                Icon(
+                                  task.isCompleted ? Icons.check_circle_outline : Icons.shopping_bag_outlined,
+                                  size: 13,
+                                  color: task.isCompleted ? const Color(0xFF38A169) : const Color(0xFFE07A5F),
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    task.isCompleted
+                                        ? 'Compra realizada: $costFormatted (restado del balance)'
+                                        : 'Compra pendiente: $costFormatted (marca check para contarla)',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: task.isCompleted ? const Color(0xFF38A169) : const Color(0xFFE07A5F),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : null,
+                      secondary: IconButton(
+                        icon: const Icon(Icons.close, size: 16, color: Colors.grey),
+                        tooltip: 'Eliminar ítem',
+                        onPressed: () => provider.deleteTask(project.id, task.id),
+                      ),
+                      onChanged: (_) {
+                        provider.toggleTask(project.id, task.id);
+                        if (isPurchase) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                !task.isCompleted
+                                    ? '✓ Compra de $costFormatted imputada al costo del proyecto'
+                                    : 'Compra de $costFormatted revertida del costo',
+                              ),
+                              duration: const Duration(seconds: 2),
+                              backgroundColor: !task.isCompleted ? const Color(0xFF38A169) : Colors.orange,
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  );
+                },
               ),
           ],
         ),

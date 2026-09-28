@@ -8,6 +8,7 @@ import 'features/login/screens/login_screen.dart';
 import 'features/projects/providers/projects_provider.dart';
 import 'features/retail/providers/retail_provider.dart';
 import 'features/profile/providers/business_profile_provider.dart';
+import 'features/inventory/providers/inventory_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +35,7 @@ class ZentraApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BusinessProfileProvider()),
         ChangeNotifierProvider(create: (_) => ProjectsProvider()),
         ChangeNotifierProvider(create: (_) => RetailProvider()),
+        ChangeNotifierProvider(create: (_) => InventoryProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

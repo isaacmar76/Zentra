@@ -263,6 +263,38 @@
       gap: 6px;
     }
 
+    .status-chip {
+      flex: 1;
+      padding: 7px 4px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1.5px solid var(--surface-border);
+      background: var(--bg);
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .status-chip.active {
+      background: var(--secondary);
+      color: #fff;
+      border-color: var(--secondary);
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .catalog-item-card {
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid var(--surface-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     /* Lista de Proyectos / Catálogo */
     .section-title {
       font-size: 14px;
@@ -541,6 +573,10 @@
           <button onclick="abrirModalOtroIngreso()" style="background:var(--bg); border:1.5px solid var(--success); color:var(--success); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Otro Ingreso</button>
         </div>
 
+        <button onclick="abrirModalCatalogoInventario()" style="width:100%; background:var(--bg); border:1.5px solid var(--secondary); color:var(--secondary); padding:11px; border-radius:14px; font-weight:700; font-size:12.5px; cursor:pointer; margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <span>📦</span> CATÁLOGO E INVENTARIO (PRODUCTOS TERMINADOS)
+        </button>
+
         <button class="alert-btn" onclick="verPedidosPorVencer()">⚠️ PEDIDOS PRONTO A VENCER (1)</button>
 
         <div class="section-title">
@@ -705,6 +741,17 @@
           <button onclick="closeProjectModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
         </div>
 
+        <!-- Selector de Estados del Proyecto -->
+        <div style="margin: 10px 0 12px;">
+          <div style="font-size: 11px; font-weight: 700; margin-bottom: 6px;">Fase / Estado del Proyecto:</div>
+          <div style="display: flex; gap: 6px;" id="mStatusChips">
+            <button class="status-chip" id="chip-diseno" onclick="setProjectStatus('Diseño')">🎨 Diseño</button>
+            <button class="status-chip" id="chip-produccion" onclick="setProjectStatus('Producción')">✂️ Producción</button>
+            <button class="status-chip" id="chip-empaque" onclick="setProjectStatus('Empaque')">📦 Empaque</button>
+            <button class="status-chip" id="chip-entregado" onclick="setProjectStatus('Entregado')">✅ Entregado</button>
+          </div>
+        </div>
+
         <div style="background:var(--bg); border:1.5px solid var(--primary); border-radius:18px; padding:14px; margin:14px 0;">
           <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
             <span style="font-size:12px; font-weight:700;">Balance del Proyecto (Cobrado - Compras)</span>
@@ -730,24 +777,16 @@
           </div>
         </div>
 
-        <!-- Tareas / Checklist -->
-        <div style="font-size:13px; font-weight:700; margin-bottom:8px; display:flex; justify-content:space-between;">
-          <span>Tareas / Checklist</span>
-          <span style="font-size:11px; color:var(--secondary);" id="mTaskRatio">2/4 listas</span>
+        <!-- Tareas / Checklist con Compras -->
+        <div style="font-size:13px; font-weight:700; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <span>Checklist & Compras de Insumos</span>
+            <span style="font-size:11px; color:var(--secondary); margin-left:6px;" id="mTaskRatio">2/4 listas</span>
+          </div>
+          <button onclick="abrirModalNuevaTarea()" style="background:none; border:1px solid var(--secondary); color:var(--secondary); padding:4px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">+ Ítem / Compra</button>
         </div>
-        <div id="mTasksList" style="background:var(--bg); border-radius:14px; padding:10px; margin-bottom:14px; font-size:12px;">
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;">
-            <input type="checkbox" checked onchange="toggleTaskPreview(this)"> <span>Comprar cartulina blush y cinta oro</span>
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;">
-            <input type="checkbox" checked onchange="toggleTaskPreview(this)"> <span>Imprimir 50 invitaciones</span>
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;">
-            <input type="checkbox" onchange="toggleTaskPreview(this)"> <span>Armar centros de mesa con flor seca</span>
-          </label>
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <input type="checkbox" onchange="toggleTaskPreview(this)"> <span>Empacar con etiqueta de entrega</span>
-          </label>
+        <div id="mTasksList" style="margin-bottom:14px; font-size:12px;">
+          <!-- Se renderiza dinámicamente -->
         </div>
 
         <!-- Botones de Acción (Compras vs Abonos) -->
@@ -912,6 +951,102 @@
       </div>
     </div>
 
+    <!-- Modal: Agregar Ítem / Compra al Checklist -->
+    <div id="taskItemModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:350; align-items:center; justify-content:center; padding:18px;">
+      <div style="background:var(--card-bg); width:100%; max-width:340px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <div style="font-size:16px; font-weight:700; margin-bottom:4px;">Agregar al Checklist</div>
+        <div style="font-size:11.5px; color:#777; margin-bottom:14px;">Planea una tarea o compra de material para este pedido</div>
+
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:4px;">Descripción del ítem *</label>
+          <input type="text" id="taskDescInp" placeholder="Ej: Comprar cinta satinada, Enviar bocetos" style="width:100%; padding:10px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:12px; background:var(--bg); padding:10px; border-radius:12px;">
+          <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; cursor:pointer;">
+            <input type="checkbox" id="taskIsPurchaseChk" onchange="togglePurchaseFields(this.checked)">
+            <span>¿Es una compra de insumo / material?</span>
+          </label>
+          <div style="font-size:10.5px; color:#777; margin-top:4px;">Al marcarla con check se asumirá realizada y se sumará a los costos del proyecto.</div>
+        </div>
+
+        <div id="taskCostContainer" style="display:none; margin-bottom:14px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:4px;">Costo de la compra ($ COP) *</label>
+          <input type="number" id="taskCostInp" placeholder="Ej: 35000" style="width:100%; padding:10px; border-radius:12px; border:1px solid var(--alert); background:var(--bg); color:var(--text); font-size:14px; font-weight:700; box-sizing:border-box;">
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button onclick="cerrarModalNuevaTarea()" style="flex:1; padding:10px; border-radius:12px; border:1px solid #ccc; background:transparent; font-weight:600; cursor:pointer;">Cancelar</button>
+          <button onclick="guardarNuevaTarea()" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--secondary); color:#fff; font-weight:700; cursor:pointer;">Guardar Ítem</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Catálogo e Inventario -->
+    <div id="catalogModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:300; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div>
+            <div style="font-size:17px; font-weight:700;">📦 Catálogo & Inventario</div>
+            <div style="font-size:11px; color:#777;">Control de stock y venta de productos terminados</div>
+          </div>
+          <button onclick="cerrarModalCatalogoInventario()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
+        </div>
+
+        <!-- Selector de pestaña de catálogo -->
+        <div style="display:flex; gap:6px; margin-bottom:12px;">
+          <button id="catTabServicios" onclick="filtrarCatalogo('servicios')" style="flex:1; padding:8px; border-radius:12px; font-size:11.5px; font-weight:700; border:1px solid var(--secondary); background:var(--secondary); color:#fff; cursor:pointer;">TM Diseños (Servicios)</button>
+          <button id="catTabRetail" onclick="filtrarCatalogo('retail')" style="flex:1; padding:8px; border-radius:12px; font-size:11.5px; font-weight:600; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); cursor:pointer;">Don Pedro (Retail)</button>
+        </div>
+
+        <button onclick="abrirModalNuevoProducto()" style="width:100%; background:transparent; border:1.5px dashed var(--secondary); color:var(--secondary); padding:9px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; margin-bottom:14px;">+ AGREGAR NUEVO PRODUCTO AL CATÁLOGO</button>
+
+        <div id="catalogItemsList">
+          <!-- Renderizado dinámico de productos -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Nuevo Producto al Catálogo -->
+    <div id="newProductModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:350; align-items:center; justify-content:center; padding:18px;">
+      <div style="background:var(--card-bg); width:100%; max-width:340px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <div style="font-size:16px; font-weight:700; margin-bottom:4px;">Nuevo Producto al Catálogo</div>
+        <div style="font-size:11.5px; color:#777; margin-bottom:12px;">Ingresa los datos para control de stock y venta</div>
+
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Nombre del Producto *</label>
+          <input type="text" id="prodNameInp" placeholder="Ej: Agendas 2026, Cake Topper" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Precio Venta ($ COP) *</label>
+            <input type="number" id="prodPriceInp" placeholder="45000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Costo Elaboración ($)</label>
+            <input type="number" id="prodCostInp" placeholder="18000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Stock Inicial *</label>
+            <input type="number" id="prodStockInp" value="10" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Categoría</label>
+            <input type="text" id="prodCatInp" placeholder="Papelería" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button onclick="cerrarModalNuevoProducto()" style="flex:1; padding:10px; border-radius:12px; border:1px solid #ccc; background:transparent; font-weight:600; cursor:pointer;">Cancelar</button>
+          <button onclick="guardarNuevoProducto()" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--secondary); color:#fff; font-weight:700; cursor:pointer;">Guardar</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toastMsg">Venta registrada</div>
   </div>
@@ -946,11 +1081,16 @@
         services: '50 Invitaciones + 10 Centros de mesa',
         total: 400000,
         cobrado: 160000,
-        compras: 80000,
+        directCompras: 0,
         daysLeft: 2,
-        status: 'En Producción',
-        tasks: 4,
-        tasksDone: 2
+        status: 'Producción',
+        tasks: [
+          { id: 1, title: 'Diseño digital y paleta blush', isDone: true, isPurchase: false, cost: 0 },
+          { id: 2, title: 'Comprar cartulinas blush y cintas doradas', isDone: true, isPurchase: true, cost: 50000 },
+          { id: 3, title: 'Comprar bases de madera y flor seca', isDone: true, isPurchase: true, cost: 30000 },
+          { id: 4, title: 'Impresión y armado de 50 invitaciones', isDone: false, isPurchase: false, cost: 0 },
+          { id: 5, title: 'Empaque en cajas con lazo y sello lacre', isDone: false, isPurchase: false, cost: 0 }
+        ]
       },
       {
         id: 1,
@@ -960,15 +1100,34 @@
         services: 'Banderines + Invitaciones',
         total: 250000,
         cobrado: 115000,
-        compras: 28000,
+        directCompras: 0,
         daysLeft: 8,
-        status: 'En Diseño',
-        tasks: 3,
-        tasksDone: 1
+        status: 'Diseño',
+        tasks: [
+          { id: 1, title: 'Diseño tipográfico de banderines', isDone: true, isPurchase: false, cost: 0 },
+          { id: 2, title: 'Comprar papel hilo y cordel yute', isDone: true, isPurchase: true, cost: 28000 },
+          { id: 3, title: 'Empaque para entrega', isDone: false, isPurchase: false, cost: 0 }
+        ]
       }
     ];
 
     let selectedProjectIdx = 0;
+
+    // Catálogo e Inventario unificado (Tatiana + Don Pedro)
+    let catalogFilter = 'servicios';
+    let catalogItems = [
+      // Tatiana (Modo Servicios - Productos terminados)
+      { id: 'c1', name: 'Agendas 2026 Personalizadas', price: 45000, cost: 18000, stock: 12, cat: 'Papelería', mode: 'servicios' },
+      { id: 'c2', name: 'Cake Topper Acrílico & Foil', price: 22000, cost: 7000, stock: 8, cat: 'Fiestas', mode: 'servicios' },
+      { id: 'c3', name: 'Cajas Sorpresa Ensambladas', price: 35000, cost: 12000, stock: 5, cat: 'Empaques', mode: 'servicios' },
+      { id: 'c4', name: 'Cuadro Decorativo en Foil', price: 55000, cost: 20000, stock: 4, cat: 'Decoración', mode: 'servicios' },
+      // Don Pedro (Modo Retail)
+      { id: 'c5', name: 'Arroz Diana 1kg', price: 4200, cost: 3400, stock: 24, cat: 'Granos', mode: 'retail' },
+      { id: 'c6', name: 'Aceite Premier 1L', price: 9500, cost: 7800, stock: 12, cat: 'Abarrotes', mode: 'retail' },
+      { id: 'c7', name: 'Leche Alquería 1L', price: 4800, cost: 3900, stock: 18, cat: 'Lácteos', mode: 'retail' },
+      { id: 'c8', name: 'Huevos AA x 30', price: 18000, cost: 15200, stock: 3, cat: 'Abarrotes', mode: 'retail' },
+      { id: 'c9', name: 'Pan Tajado Bimbo', price: 6500, cost: 5200, stock: 8, cat: 'Panadería', mode: 'retail' }
+    ];
 
     // Gastos generales del negocio (independientes de proyectos: ej. Arriendo, Internet)
     let generalExpenses = [
@@ -984,15 +1143,29 @@
     let cart = [];
     let currentMode = 'servicios';
 
+    function calcularComprasProyecto(p) {
+      const checklistCompras = p.tasks
+        ? p.tasks.filter(t => t.isPurchase && t.isDone).reduce((s, t) => s + t.cost, 0)
+        : 0;
+      return (p.directCompras || 0) + checklistCompras;
+    }
+
     function renderProjectsList() {
       const container = document.getElementById('projectsList');
       if (!container) return;
       container.innerHTML = '';
       projectsData.forEach((p, idx) => {
-        const ganancia = p.cobrado - p.compras;
-        const isUrgent = p.daysLeft <= 3;
+        const compras = calcularComprasProyecto(p);
+        const ganancia = p.cobrado - compras;
+        const isUrgent = p.daysLeft <= 3 && p.status !== 'Entregado';
         const badgeClass = isUrgent ? 'badge badge-urgent' : 'badge';
         const badgeText = isUrgent ? `Vence en ${p.daysLeft} días` : `Vence en ${p.daysLeft} días`;
+
+        let statusIcon = '🎨';
+        if (p.status === 'Producción') statusIcon = '✂️';
+        if (p.status === 'Empaque') statusIcon = '📦';
+        if (p.status === 'Entregado') statusIcon = '✅';
+
         const card = document.createElement('div');
         card.className = 'card-item';
         card.onclick = () => verDetalleProyecto(idx);
@@ -1007,7 +1180,7 @@
           </div>
           <div class="item-detail" style="margin-top: 4px;">
             <span>Servicios: ${p.services}</span>
-            <span class="badge" style="font-size: 9px;">${p.status}</span>
+            <span class="badge" style="font-size: 9px; font-weight:700;">${statusIcon} ${p.status}</span>
           </div>
         `;
         container.appendChild(card);
@@ -1016,252 +1189,268 @@
       document.getElementById('txtActivos').innerText = `${projectsData.length}`;
     }
 
-    function recalcularTodo() {
-      if (!projectsData[selectedProjectIdx]) selectedProjectIdx = 0;
+    function renderTasksList() {
+      const container = document.getElementById('mTasksList');
+      if (!container) return;
       const p = projectsData[selectedProjectIdx];
-      const gananciaProj = p.cobrado - p.compras;
-      const saldoProj = p.total - p.cobrado;
+      container.innerHTML = '';
 
-      document.getElementById('mProjTitle').innerText = p.name;
-      document.getElementById('mProjClient').innerText = `Cliente: ${p.client} • ${p.phone}`;
-      document.getElementById('mCobrado').innerText = `$${p.cobrado.toLocaleString('es-CO')}`;
-      document.getElementById('mGastos').innerText = `$${p.compras.toLocaleString('es-CO')}`;
-      document.getElementById('mGanancia').innerText = `$${gananciaProj.toLocaleString('es-CO')}`;
-      document.getElementById('mSaldo').innerText = `$${saldoProj.toLocaleString('es-CO')}`;
-      document.getElementById('mTotal').innerText = `$${p.total.toLocaleString('es-CO')}`;
-      document.getElementById('mTaskRatio').innerText = `${p.tasksDone}/${p.tasks} listas`;
+      if (!p.tasks || p.tasks.length === 0) {
+        container.innerHTML = '<div style="color:#777; font-size:11px; padding:6px 0;">Sin ítems en el checklist. Presiona "+ Ítem / Compra".</div>';
+        document.getElementById('mTaskRatio').innerText = '0/0 listas';
+        return;
+      }
 
-      // 2. Métricas consolidadas del negocio
-      const totalAbonosProyectos = projectsData.reduce((s, proj) => s + proj.cobrado, 0);
-      const totalOtrosIngresos = generalIncomes.reduce((s, i) => s + i.amount, 0);
-      const totalIngresosGlobal = totalAbonosProyectos + totalOtrosIngresos;
+      const completed = p.tasks.filter(t => t.isDone).length;
+      document.getElementById('mTaskRatio').innerText = `${completed}/${p.tasks.length} listas`;
 
-      const totalComprasProyectos = projectsData.reduce((s, proj) => s + proj.compras, 0);
-      const totalGastosGenerales = generalExpenses.reduce((s, g) => s + g.amount, 0);
-      const totalGastosGlobal = totalComprasProyectos + totalGastosGenerales;
+      p.tasks.forEach((t, i) => {
+        const itemEl = document.createElement('div');
+        const isPurchase = t.isPurchase;
+        const costStr = t.cost ? `$${t.cost.toLocaleString('es-CO')}` : '$0';
 
-      const gananciaNetaGlobal = totalIngresosGlobal - totalGastosGlobal;
+        itemEl.style.cssText = `
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          padding: 8px 10px;
+          margin-bottom: 6px;
+          border-radius: 10px;
+          background: ${t.isDone ? (isPurchase ? 'rgba(56,161,105,0.08)' : 'rgba(0,0,0,0.03)') : (isPurchase ? 'rgba(224,122,95,0.08)' : 'var(--bg)')};
+          border: 1px solid ${isPurchase ? (t.isDone ? '#38A169' : '#E07A5F') : '#e0d8cf'};
+        `;
 
-      // Actualizar tarjetas del Dashboard
-      document.getElementById('txtIngresos').innerText = `$${totalIngresosGlobal.toLocaleString('es-CO')}`;
-      document.getElementById('txtGastos').innerText = `$${totalGastosGlobal.toLocaleString('es-CO')}`;
-      document.getElementById('txtGanancia').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+        itemEl.innerHTML = `
+          <label style="display:flex; align-items:flex-start; gap:8px; cursor:pointer; flex:1;">
+            <input type="checkbox" ${t.isDone ? 'checked' : ''} onchange="toggleTaskItem(${i})" style="margin-top:2px;">
+            <div>
+              <div style="font-weight:${t.isDone ? 'normal' : '600'}; color:${t.isDone ? '#888' : 'var(--text)'}; text-decoration:${t.isDone ? 'line-through' : 'none'}; font-size:12px;">
+                ${t.title}
+              </div>
+              ${isPurchase ? `
+                <div style="font-size:10px; font-weight:700; color:${t.isDone ? '#38A169' : '#E07A5F'}; margin-top:2px;">
+                  ${t.isDone ? '✓ Compra realizada: ' + costStr + ' (sumado al costo)' : '🛒 Compra pendiente: ' + costStr + ' (marca check para sumar a costos)'}
+                </div>
+              ` : ''}
+            </div>
+          </label>
+          <button onclick="eliminarTareaItem(${i})" style="background:none; border:none; color:#999; font-size:14px; cursor:pointer; margin-left:6px;">✕</button>
+        `;
+        container.appendChild(itemEl);
+      });
+    }
 
-      // Actualizar modal de desglose
-      document.getElementById('dIngresosProyectos').innerText = `$${totalAbonosProyectos.toLocaleString('es-CO')}`;
-      document.getElementById('dIngresosGenerales').innerText = `$${totalOtrosIngresos.toLocaleString('es-CO')}`;
-      document.getElementById('dComprasProyectos').innerText = `-$${totalComprasProyectos.toLocaleString('es-CO')}`;
-      document.getElementById('dGastosGenerales').innerText = `-$${totalGastosGenerales.toLocaleString('es-CO')}`;
-      document.getElementById('dGananciaNeta').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+    function toggleTaskItem(idx) {
+      const p = projectsData[selectedProjectIdx];
+      const task = p.tasks[idx];
+      task.isDone = !task.isDone;
 
+      recalcularTodo();
+
+      if (task.isPurchase) {
+        if (task.isDone) {
+          showToast(`✓ Compra de $${task.cost.toLocaleString('es-CO')} imputada al costo del proyecto`);
+        } else {
+          showToast(`Compra de $${task.cost.toLocaleString('es-CO')} revertida`);
+        }
+      }
+    }
+
+    function eliminarTareaItem(idx) {
+      const p = projectsData[selectedProjectIdx];
+      p.tasks.splice(idx, 1);
+      recalcularTodo();
+      showToast('Ítem eliminado del checklist');
+    }
+
+    function setProjectStatus(newStatus) {
+      const p = projectsData[selectedProjectIdx];
+      p.status = newStatus;
+      actualizarChipsEstado(newStatus);
       renderProjectsList();
+      showToast(`✓ Estado actualizado a: ${newStatus}`);
     }
 
-    // Modal de entrada genérico para registrar datos reales
-    function abrirModalGenerico(action, title, subtitle, btnText) {
-      currentFormAction = action;
-      document.getElementById('fModalTitle').innerText = title;
-      document.getElementById('fModalSubtitle').innerText = subtitle;
-      document.getElementById('fModalBtnSave').innerText = btnText;
-      document.getElementById('fInpConcepto').value = '';
-      document.getElementById('fInpValor').value = '';
-      document.getElementById('formModal').style.display = 'flex';
-      setTimeout(() => document.getElementById('fInpConcepto').focus(), 100);
+    function actualizarChipsEstado(currentStatus) {
+      ['diseno', 'produccion', 'empaque', 'entregado'].forEach(id => {
+        const el = document.getElementById(`chip-${id}`);
+        if (el) el.classList.remove('active');
+      });
+      if (currentStatus === 'Diseño' && document.getElementById('chip-diseno')) {
+        document.getElementById('chip-diseno').classList.add('active');
+      } else if (currentStatus === 'Producción' && document.getElementById('chip-produccion')) {
+        document.getElementById('chip-produccion').classList.add('active');
+      } else if (currentStatus === 'Empaque' && document.getElementById('chip-empaque')) {
+        document.getElementById('chip-empaque').classList.add('active');
+      } else if (currentStatus === 'Entregado' && document.getElementById('chip-entregado')) {
+        document.getElementById('chip-entregado').classList.add('active');
+      }
     }
 
-    function cerrarFormModal() {
-      document.getElementById('formModal').style.display = 'none';
+    function togglePurchaseFields(checked) {
+      document.getElementById('taskCostContainer').style.display = checked ? 'block' : 'none';
+      if (checked) {
+        document.getElementById('taskCostInp').focus();
+      }
     }
 
-    function guardarFormModal() {
-      const concepto = document.getElementById('fInpConcepto').value.trim();
-      const valor = parseFloat(document.getElementById('fInpValor').value);
+    function abrirModalNuevaTarea() {
+      document.getElementById('taskDescInp').value = '';
+      document.getElementById('taskCostInp').value = '';
+      document.getElementById('taskIsPurchaseChk').checked = false;
+      document.getElementById('taskCostContainer').style.display = 'none';
+      document.getElementById('taskItemModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('taskDescInp').focus(), 100);
+    }
 
-      if (!concepto || isNaN(valor) || valor <= 0) {
-        showToast('Por favor escribe un concepto y un valor válido.');
+    function cerrarModalNuevaTarea() {
+      document.getElementById('taskItemModal').style.display = 'none';
+    }
+
+    function guardarNuevaTarea() {
+      const desc = document.getElementById('taskDescInp').value.trim();
+      const isPurchase = document.getElementById('taskIsPurchaseChk').checked;
+      const cost = isPurchase ? (parseFloat(document.getElementById('taskCostInp').value) || 0) : 0;
+
+      if (!desc) {
+        showToast('Escribe una descripción para el ítem.');
         return;
       }
 
       const p = projectsData[selectedProjectIdx];
-      if (currentFormAction === 'compra_proyecto') {
-        p.compras += valor;
-        showToast(`✓ Compra registrada en ${p.name}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
-      } else if (currentFormAction === 'abono_proyecto') {
-        p.cobrado += valor;
-        showToast(`✓ Abono recibido de ${p.client}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
-      } else if (currentFormAction === 'gasto_general') {
-        generalExpenses.unshift({ desc: concepto, amount: valor });
-        showToast(`✓ Gasto general registrado: ${concepto} ($${valor.toLocaleString('es-CO')})`);
-      } else if (currentFormAction === 'otro_ingreso') {
-        generalIncomes.unshift({ desc: concepto, amount: valor });
-        showToast(`✓ Ingreso general registrado: ${concepto} ($${valor.toLocaleString('es-CO')})`);
-      }
+      if (!p.tasks) p.tasks = [];
 
-      cerrarFormModal();
+      p.tasks.push({
+        id: Date.now(),
+        title: desc,
+        isDone: false,
+        isPurchase: isPurchase,
+        cost: cost
+      });
+
+      cerrarModalNuevaTarea();
       recalcularTodo();
+      showToast(isPurchase ? `✓ Compra "${desc}" ($${cost.toLocaleString('es-CO')}) añadida al checklist` : `✓ Tarea "${desc}" añadida`);
     }
 
-    function abrirModalCompraProyecto() {
-      const p = projectsData[selectedProjectIdx];
-      abrirModalGenerico(
-        'compra_proyecto',
-        'Registrar Compra de Insumo',
-        `Esta compra afectará únicamente las cuentas de "${p.name}".`,
-        'Guardar Compra'
-      );
+    // Modal de Catálogo e Inventario
+    function abrirModalCatalogoInventario() {
+      renderCatalogItems();
+      document.getElementById('catalogModal').style.display = 'flex';
     }
 
-    function abrirModalAbonoProyecto() {
-      const p = projectsData[selectedProjectIdx];
-      abrirModalGenerico(
-        'abono_proyecto',
-        'Registrar Abono del Cliente',
-        `Registrar anticipo o abono de ${p.client}.`,
-        'Registrar Abono'
-      );
+    function cerrarModalCatalogoInventario() {
+      document.getElementById('catalogModal').style.display = 'none';
     }
 
-    function abrirModalGastoGeneral() {
-      abrirModalGenerico(
-        'gasto_general',
-        'Registrar Gasto General',
-        'Gasto del negocio independiente de proyectos (Arriendo, Servicios, etc.)',
-        'Guardar Gasto'
-      );
+    function filtrarCatalogo(mode) {
+      catalogFilter = mode;
+      document.getElementById('catTabServicios').style.background = mode === 'servicios' ? 'var(--secondary)' : 'var(--bg)';
+      document.getElementById('catTabServicios').style.color = mode === 'servicios' ? '#fff' : 'var(--text)';
+      document.getElementById('catTabRetail').style.background = mode === 'retail' ? 'var(--secondary)' : 'var(--bg)';
+      document.getElementById('catTabRetail').style.color = mode === 'retail' ? '#fff' : 'var(--text)';
+      renderCatalogItems();
     }
 
-    function abrirModalOtroIngreso() {
-      abrirModalGenerico(
-        'otro_ingreso',
-        'Registrar Otro Ingreso',
-        'Ingreso del negocio no perteneciente a un encargo en particular.',
-        'Guardar Ingreso'
-      );
-    }
+    function renderCatalogItems() {
+      const container = document.getElementById('catalogItemsList');
+      if (!container) return;
+      container.innerHTML = '';
 
-    // Modal de Datos del Negocio
-    function openBusinessProfileModal() {
-      document.getElementById('bizNameInp').value = bizProfile.name;
-      document.getElementById('bizOwnerInp').value = bizProfile.owner;
-      document.getElementById('bizPhoneInp').value = bizProfile.phone;
-      document.getElementById('bizNequiInp').value = bizProfile.nequi;
-      document.getElementById('bizBankInp').value = bizProfile.bancolombia;
-      document.getElementById('bizModal').style.display = 'flex';
-    }
+      const items = catalogItems.filter(i => i.mode === catalogFilter);
 
-    function cerrarBusinessProfileModal() {
-      document.getElementById('bizModal').style.display = 'none';
-    }
-
-    function guardarDatosNegocio() {
-      const name = document.getElementById('bizNameInp').value.trim();
-      if (!name) {
-        showToast('El negocio debe tener un nombre.');
-        return;
-      }
-      bizProfile.name = name;
-      bizProfile.owner = document.getElementById('bizOwnerInp').value.trim();
-      bizProfile.phone = document.getElementById('bizPhoneInp').value.trim();
-      bizProfile.nequi = document.getElementById('bizNequiInp').value.trim();
-      bizProfile.bancolombia = document.getElementById('bizBankInp').value.trim();
-
-      document.getElementById('headerTitle').innerText = `${bizProfile.name} • Servicios`;
-      cerrarBusinessProfileModal();
-      showToast(`¡Datos actualizados para "${bizProfile.name}"!`);
-    }
-
-    // Modal de Nuevo Pedido / Proyecto de Cliente
-    function abrirModalNuevoPedido() {
-      document.getElementById('orderNameInp').value = '';
-      document.getElementById('orderClientInp').value = '';
-      document.getElementById('orderPhoneInp').value = '';
-      document.getElementById('orderServicesInp').value = '';
-      document.getElementById('orderTotalInp').value = '';
-      document.getElementById('orderAdvanceInp').value = '';
-      document.getElementById('orderDaysInp').value = '5';
-      document.getElementById('newOrderModal').style.display = 'flex';
-      setTimeout(() => document.getElementById('orderNameInp').focus(), 100);
-    }
-
-    function cerrarNuevoPedidoModal() {
-      document.getElementById('newOrderModal').style.display = 'none';
-    }
-
-    function guardarNuevoPedido() {
-      const name = document.getElementById('orderNameInp').value.trim();
-      const client = document.getElementById('orderClientInp').value.trim();
-      const phone = document.getElementById('orderPhoneInp').value.trim() || '312 000 0000';
-      const services = document.getElementById('orderServicesInp').value.trim() || 'Servicio personalizado';
-      const total = parseFloat(document.getElementById('orderTotalInp').value) || 0;
-      const advance = parseFloat(document.getElementById('orderAdvanceInp').value) || 0;
-      const days = parseInt(document.getElementById('orderDaysInp').value) || 5;
-
-      if (!name || !client || total <= 0) {
-        showToast('Ingresa nombre del pedido, cliente y valor total.');
+      if (items.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:20px; color:#777;">No hay productos en esta categoría.</div>';
         return;
       }
 
-      const newProj = {
-        id: projectsData.length,
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'catalog-item-card';
+        const isLow = item.stock <= 5;
+        const gananciaUnidad = item.price - item.cost;
+
+        card.innerHTML = `
+          <div>
+            <div style="font-weight:700; font-size:13px; color:var(--text);">${item.name}</div>
+            <div style="font-size:11px; color:#777;">Cat: ${item.cat} • Costo: $${item.cost.toLocaleString('es-CO')}</div>
+            <div style="font-size:13px; font-weight:700; color:var(--secondary); margin-top:2px;">
+              $${item.price.toLocaleString('es-CO')} 
+              <span style="font-size:10px; font-weight:500; color:#38A169;">(Ganancia: +$${gananciaUnidad.toLocaleString('es-CO')})</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:11px; font-weight:700; margin-bottom:6px; color:${isLow ? 'var(--alert)' : '#38A169'};">
+              ${isLow ? '⚠️ ' : ''}${item.stock} disp
+            </div>
+            <button onclick="venderProductoCatalogo('${item.id}')" style="background:#38A169; color:#fff; border:none; padding:6px 12px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+              Vender 1
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function venderProductoCatalogo(id) {
+      const item = catalogItems.find(i => i.id === id);
+      if (!item) return;
+
+      if (item.stock <= 0) {
+        showToast(`¡Agotado! No hay unidades disponibles de ${item.name}`);
+        return;
+      }
+
+      item.stock--;
+      generalIncomes.unshift({
+        desc: `Venta catálogo: ${item.name}`,
+        amount: item.price
+      });
+
+      renderCatalogItems();
+      recalcularTodo();
+      showToast(`✓ Venta de 1 ${item.name} registrada (+$${item.price.toLocaleString('es-CO')} COP en ingresos)`);
+    }
+
+    function abrirModalNuevoProducto() {
+      document.getElementById('prodNameInp').value = '';
+      document.getElementById('prodPriceInp').value = '';
+      document.getElementById('prodCostInp').value = '';
+      document.getElementById('prodStockInp').value = '10';
+      document.getElementById('prodCatInp').value = catalogFilter === 'servicios' ? 'Papelería' : 'Abarrotes';
+      document.getElementById('newProductModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('prodNameInp').focus(), 100);
+    }
+
+    function cerrarModalNuevoProducto() {
+      document.getElementById('newProductModal').style.display = 'none';
+    }
+
+    function guardarNuevoProducto() {
+      const name = document.getElementById('prodNameInp').value.trim();
+      const price = parseFloat(document.getElementById('prodPriceInp').value) || 0;
+      const cost = parseFloat(document.getElementById('prodCostInp').value) || 0;
+      const stock = parseInt(document.getElementById('prodStockInp').value) || 1;
+      const cat = document.getElementById('prodCatInp').value.trim() || 'General';
+
+      if (!name || price <= 0) {
+        showToast('Ingresa nombre y precio de venta válido.');
+        return;
+      }
+
+      catalogItems.unshift({
+        id: 'c_' + Date.now(),
         name: name,
-        client: client,
-        phone: phone,
-        services: services,
-        total: total,
-        cobrado: advance,
-        compras: 0,
-        daysLeft: days,
-        status: 'En Producción',
-        tasks: 4,
-        tasksDone: 0
-      };
+        price: price,
+        cost: cost,
+        stock: stock,
+        cat: cat,
+        mode: catalogFilter
+      });
 
-      projectsData.unshift(newProj);
-      selectedProjectIdx = 0;
-      cerrarNuevoPedidoModal();
-      recalcularTodo();
-      showToast(`✓ ¡Pedido "${name}" de ${client} creado!`);
-    }
-
-    // Desglose
-    function verDesgloseGlobal() {
-      document.getElementById('desgloseModal').style.display = 'flex';
-    }
-
-    function cerrarDesgloseGlobal() {
-      document.getElementById('desgloseModal').style.display = 'none';
-    }
-
-    function toggleTaskPreview(chk) {
-      const p = projectsData[selectedProjectIdx];
-      if (chk.checked) p.tasksDone++;
-      else p.tasksDone--;
-      recalcularTodo();
-      showToast(chk.checked ? '✓ Tarea completada' : 'Tarea pendiente');
-    }
-
-    function copiarWhatsAppCotizacion() {
-      const p = projectsData[selectedProjectIdx];
-      const saldo = p.total - p.cobrado;
-      const msg = `✨ *${bizProfile.name.toUpperCase()}* ✨\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Proyecto:* ${p.name}\n👤 *Cliente:* ${p.client}\n📦 *Servicios:* ${p.services}\n\n💰 *RESUMEN DE CUENTA:*\n• *Total Cotizado:* $${p.total.toLocaleString('es-CO')}\n• *Abonado a la fecha:* $${p.cobrado.toLocaleString('es-CO')}\n• *SALDO PENDIENTE:* $${saldo.toLocaleString('es-CO')}\n\n🏦 *CUENTAS DE COBRO:*\n• Nequi: ${bizProfile.nequi}\n• Bancolombia: ${bizProfile.bancolombia}\n📞 Contacto: ${bizProfile.phone}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n¡Muchas gracias por apoyar nuestro talento local! 🌸`;
-
-      navigator.clipboard.writeText(msg).catch(() => {});
-      showToast(`¡Cotización de "${bizProfile.name}" copiada para WhatsApp!`);
-    }
-
-    function verPedidosPorVencer() {
-      verDetalleProyecto(0);
-      showToast('⚠️ "15 años Maria" vence en 2 días');
-    }
-
-    function verDetalleProyecto(idx) {
-      selectedProjectIdx = idx;
-      recalcularTodo();
-      document.getElementById('projectModal').style.display = 'flex';
-    }
-
-    function closeProjectModal() {
-      document.getElementById('projectModal').style.display = 'none';
+      cerrarModalNuevoProducto();
+      renderCatalogItems();
+      showToast(`✓ Producto "${name}" agregado al catálogo con ${stock} unidades`);
     }
 
     function renderPos() {

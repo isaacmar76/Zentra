@@ -8,6 +8,7 @@ import '../../projects/screens/project_detail_screen.dart';
 import '../../mode_selection/screens/mode_selection_screen.dart';
 import '../../profile/providers/business_profile_provider.dart';
 import '../../profile/screens/business_profile_screen.dart';
+import '../../inventory/screens/catalog_inventory_screen.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../core/theme/theme_selector_modal.dart';
 
@@ -405,6 +406,27 @@ class DashboardServicesScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 10),
+
+                // 3.1 Botón Catálogo & Inventario (Productos terminados de Tatiana)
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CatalogInventoryScreen(initialMode: 'servicios'),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.inventory_2_outlined, size: 18, color: theme.secondary),
+                  label: const Text('📦 CATÁLOGO E INVENTARIO', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: theme.secondary,
+                    side: BorderSide(color: theme.secondary.withOpacity(0.6), width: 1.2),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                 ),
                 const SizedBox(height: 10),
 

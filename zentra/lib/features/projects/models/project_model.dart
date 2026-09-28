@@ -76,11 +76,15 @@ class ProjectTaskModel {
   final String id;
   final String title;
   final bool isCompleted;
+  final bool isPurchase;
+  final double cost;
 
   ProjectTaskModel({
     required this.id,
     required this.title,
     this.isCompleted = false,
+    this.isPurchase = false,
+    this.cost = 0.0,
   });
 
   Map<String, dynamic> toMap() {
@@ -88,6 +92,8 @@ class ProjectTaskModel {
       'id': id,
       'title': title,
       'isCompleted': isCompleted,
+      'isPurchase': isPurchase,
+      'cost': cost,
     };
   }
 
@@ -96,6 +102,8 @@ class ProjectTaskModel {
       id: map['id'] ?? '',
       title: map['title'] ?? '',
       isCompleted: map['isCompleted'] ?? false,
+      isPurchase: map['isPurchase'] ?? false,
+      cost: (map['cost'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -103,11 +111,15 @@ class ProjectTaskModel {
     String? id,
     String? title,
     bool? isCompleted,
+    bool? isPurchase,
+    double? cost,
   }) {
     return ProjectTaskModel(
       id: id ?? this.id,
       title: title ?? this.title,
       isCompleted: isCompleted ?? this.isCompleted,
+      isPurchase: isPurchase ?? this.isPurchase,
+      cost: cost ?? this.cost,
     );
   }
 }
@@ -142,10 +154,19 @@ class ProjectModel {
   });
 
   // Métricas financieras calculadas según las Reglas de Oro de Zentra:
-  // Ganancia Real = Total Cobrado - Total Gastos
+  // Ganancia Real = Total Cobrado - Total Compras (Directas + Compras Checklist marcadas como realizadas)
   double get totalPaid => payments.fold(0.0, (sum, p) => sum + p.amount);
-  double get totalExpenses => expenses.fold(0.0, (sum, e) => sum + e.amount);
+  
+  double get directPurchasesTotal => expenses.fold(0.0, (sum, e) => sum + e.amount);
+  
+  double get checklistPurchasesTotal => tasks
+      .where((t) => t.isPurchase && t.isCompleted && t.cost > 0)
+      .fold(0.0, (sum, t) => sum + t.cost);
+
+  double get totalExpenses => directPurchasesTotal + checklistPurchasesTotal;
+  
   double get netProfit => totalPaid - totalExpenses;
+  
   double get pendingBalance {
     final target = totalPrice > 0 ? totalPrice : totalPaid;
     final diff = target - totalPaid;

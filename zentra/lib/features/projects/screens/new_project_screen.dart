@@ -128,10 +128,28 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 
     // Tareas sugeridas iniciales
     final defaultTasks = [
-      ProjectTaskModel(id: 't_${DateTime.now().millisecondsSinceEpoch}_1', title: 'Comprar materiales e insumos', isCompleted: false),
-      ProjectTaskModel(id: 't_${DateTime.now().millisecondsSinceEpoch}_2', title: 'Diseño e impresión de muestras', isCompleted: false),
-      ProjectTaskModel(id: 't_${DateTime.now().millisecondsSinceEpoch}_3', title: 'Producción y armado', isCompleted: false),
-      ProjectTaskModel(id: 't_${DateTime.now().millisecondsSinceEpoch}_4', title: 'Empaque y entrega final', isCompleted: false),
+      ProjectTaskModel(
+        id: 't_${DateTime.now().millisecondsSinceEpoch}_1',
+        title: 'Comprar materiales e insumos principales',
+        isCompleted: false,
+        isPurchase: true,
+        cost: 0.0,
+      ),
+      ProjectTaskModel(
+        id: 't_${DateTime.now().millisecondsSinceEpoch}_2',
+        title: 'Diseño y aprobación de boceto digital',
+        isCompleted: false,
+      ),
+      ProjectTaskModel(
+        id: 't_${DateTime.now().millisecondsSinceEpoch}_3',
+        title: 'Producción, corte y ensamblado',
+        isCompleted: false,
+      ),
+      ProjectTaskModel(
+        id: 't_${DateTime.now().millisecondsSinceEpoch}_4',
+        title: 'Empaque final y control de calidad',
+        isCompleted: false,
+      ),
     ];
 
     final newProject = ProjectModel(
@@ -141,7 +159,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
       clientPhone: _phoneController.text.trim(),
       notes: _notesController.text.trim(),
       deliveryDate: _deliveryDate!,
-      status: 'En Diseño',
+      status: 'Diseño',
       services: servicesList,
       totalPrice: parsedTotal,
       payments: paymentsList,

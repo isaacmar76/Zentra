@@ -6,6 +6,7 @@ import '../models/retail_models.dart';
 import '../../mode_selection/screens/mode_selection_screen.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../core/theme/theme_selector_modal.dart';
+import '../../inventory/screens/catalog_inventory_screen.dart';
 
 /// Pantalla Principal del Modo Retail (Tiendas y Minimercados) en Zentra.
 /// Incluye Punto de Venta (POS) rápido, Arqueo de Caja e Inventario con alertas.
@@ -467,10 +468,38 @@ class _RetailMainScreenState extends State<RetailMainScreen> {
 
   // 3. Pestaña de Inventario
   Widget _buildInventoryTab(BuildContext context, RetailProvider provider) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: provider.products.length,
-      itemBuilder: (context, index) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CatalogInventoryScreen(initialMode: 'retail'),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.add_box_outlined, color: Colors.white),
+                  label: const Text('ADMINISTRAR CATÁLOGO E INVENTARIO', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2C7A7B),
+                    padding: const EdgeInsets.symmetric(vertical: 11),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: provider.products.length,
+            itemBuilder: (context, index) {
         final prod = provider.products[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 10),
@@ -496,6 +525,9 @@ class _RetailMainScreenState extends State<RetailMainScreen> {
           ),
         );
       },
-    );
-  }
+    ),
+  ),
+  ],
+);
+}
 }

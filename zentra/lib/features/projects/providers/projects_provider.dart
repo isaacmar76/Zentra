@@ -353,8 +353,13 @@ class ProjectsProvider with ChangeNotifier {
     }
   }
 
-  // Gestión de tareas del proyecto (Checklist)
-  Future<void> addTask(String projectId, String title) async {
+  // Gestión de tareas del proyecto (Checklist con soporte de compras)
+  Future<void> addTask(
+    String projectId,
+    String title, {
+    bool isPurchase = false,
+    double cost = 0.0,
+  }) async {
     final index = _projects.indexWhere((p) => p.id == projectId);
     if (index != -1) {
       final project = _projects[index];
@@ -362,6 +367,8 @@ class ProjectsProvider with ChangeNotifier {
         id: 'task_${DateTime.now().millisecondsSinceEpoch}',
         title: title,
         isCompleted: false,
+        isPurchase: isPurchase,
+        cost: cost,
       );
       final updatedTasks = List<ProjectTaskModel>.from(project.tasks)..add(newTask);
       await updateProject(project.copyWith(tasks: updatedTasks));

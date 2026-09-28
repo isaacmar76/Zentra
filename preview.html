@@ -534,7 +534,7 @@
           </div>
         </div>
 
-        <button class="primary-btn" onclick="crearNuevoProyecto()">+ NUEVO PROYECTO</button>
+        <button class="primary-btn" onclick="abrirModalNuevoPedido()">+ NUEVO PEDIDO / PROYECTO</button>
         
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
           <button onclick="abrirModalGastoGeneral()" style="background:var(--bg); border:1.5px solid var(--alert); color:var(--alert); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Gasto General</button>
@@ -861,6 +861,57 @@
       </div>
     </div>
 
+    <!-- Modal Nuevo Pedido / Proyecto (Cliente) -->
+    <div id="newOrderModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:300; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div>
+            <div style="font-size:17px; font-weight:700;">+ Nuevo Pedido / Proyecto</div>
+            <div style="font-size:11.5px; color:#777;">Registra un nuevo encargo o trabajo de un cliente</div>
+          </div>
+          <button onclick="cerrarNuevoPedidoModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Nombre del Pedido / Proyecto *</label>
+          <input type="text" id="orderNameInp" placeholder="Ej: Baby Shower Lucas, Grados San José" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Nombre del Cliente *</label>
+          <input type="text" id="orderClientInp" placeholder="Ej: Marcela Gómez" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Teléfono WhatsApp</label>
+          <input type="text" id="orderPhoneInp" placeholder="Ej: 310 987 6543" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Servicios / Productos Incluidos</label>
+          <input type="text" id="orderServicesInp" placeholder="Ej: 40 Invitaciones + 1 Libro de firmas" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <div>
+            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Total Cotizado ($ COP) *</label>
+            <input type="number" id="orderTotalInp" placeholder="350000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Abono Inicial Recibido ($ COP)</label>
+            <input type="number" id="orderAdvanceInp" placeholder="150000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Días para Entrega</label>
+          <input type="number" id="orderDaysInp" value="5" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <button onclick="guardarNuevoPedido()" class="primary-btn">GUARDAR PEDIDO / PROYECTO</button>
+      </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toastMsg">Venta registrada</div>
   </div>
@@ -885,23 +936,39 @@
       bancolombia: 'Ahorros 123-456789-01'
     };
 
-    // Proyecto individual de prueba (Tatiana)
-    let demoProject = {
-      name: '15 años Maria',
-      client: 'Maria Rodriguez',
-      phone: '312 456 7890',
-      total: 400000,
-      cobrado: 160000,
-      compras: 80000,
-      tasks: 4,
-      tasksDone: 2
-    };
+    // Lista interactiva de Pedidos / Proyectos de Clientes (TM Diseños Creativos)
+    let projectsData = [
+      {
+        id: 0,
+        name: '15 años Maria',
+        client: 'Maria Rodriguez',
+        phone: '312 456 7890',
+        services: '50 Invitaciones + 10 Centros de mesa',
+        total: 400000,
+        cobrado: 160000,
+        compras: 80000,
+        daysLeft: 2,
+        status: 'En Producción',
+        tasks: 4,
+        tasksDone: 2
+      },
+      {
+        id: 1,
+        name: 'Bautizo Santiago',
+        client: 'Camila Duque',
+        phone: '315 222 3344',
+        services: 'Banderines + Invitaciones',
+        total: 250000,
+        cobrado: 115000,
+        compras: 28000,
+        daysLeft: 8,
+        status: 'En Diseño',
+        tasks: 3,
+        tasksDone: 1
+      }
+    ];
 
-    // Segundo proyecto
-    let secondProject = {
-      cobrado: 115000,
-      compras: 28000
-    };
+    let selectedProjectIdx = 0;
 
     // Gastos generales del negocio (independientes de proyectos: ej. Arriendo, Internet)
     let generalExpenses = [
@@ -917,24 +984,59 @@
     let cart = [];
     let currentMode = 'servicios';
 
-    function recalcularTodo() {
-      // 1. Métricas del proyecto individual
-      const gananciaProj = demoProject.cobrado - demoProject.compras;
-      const saldoProj = demoProject.total - demoProject.cobrado;
+    function renderProjectsList() {
+      const container = document.getElementById('projectsList');
+      if (!container) return;
+      container.innerHTML = '';
+      projectsData.forEach((p, idx) => {
+        const ganancia = p.cobrado - p.compras;
+        const isUrgent = p.daysLeft <= 3;
+        const badgeClass = isUrgent ? 'badge badge-urgent' : 'badge';
+        const badgeText = isUrgent ? `Vence en ${p.daysLeft} días` : `Vence en ${p.daysLeft} días`;
+        const card = document.createElement('div');
+        card.className = 'card-item';
+        card.onclick = () => verDetalleProyecto(idx);
+        card.innerHTML = `
+          <div class="item-header">
+            <span class="item-title">${p.name}</span>
+            <span class="${badgeClass}">${badgeText}</span>
+          </div>
+          <div class="item-detail">
+            <span>Cliente: ${p.client}</span>
+            <span style="font-weight: 600;">Ganancia: $${ganancia.toLocaleString('es-CO')}</span>
+          </div>
+          <div class="item-detail" style="margin-top: 4px;">
+            <span>Servicios: ${p.services}</span>
+            <span class="badge" style="font-size: 9px;">${p.status}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      document.getElementById('lblProyectosCount').innerText = `${projectsData.length} activos`;
+      document.getElementById('txtActivos').innerText = `${projectsData.length}`;
+    }
 
-      document.getElementById('mCobrado').innerText = `$${demoProject.cobrado.toLocaleString('es-CO')}`;
-      document.getElementById('mGastos').innerText = `$${demoProject.compras.toLocaleString('es-CO')}`;
+    function recalcularTodo() {
+      if (!projectsData[selectedProjectIdx]) selectedProjectIdx = 0;
+      const p = projectsData[selectedProjectIdx];
+      const gananciaProj = p.cobrado - p.compras;
+      const saldoProj = p.total - p.cobrado;
+
+      document.getElementById('mProjTitle').innerText = p.name;
+      document.getElementById('mProjClient').innerText = `Cliente: ${p.client} • ${p.phone}`;
+      document.getElementById('mCobrado').innerText = `$${p.cobrado.toLocaleString('es-CO')}`;
+      document.getElementById('mGastos').innerText = `$${p.compras.toLocaleString('es-CO')}`;
       document.getElementById('mGanancia').innerText = `$${gananciaProj.toLocaleString('es-CO')}`;
       document.getElementById('mSaldo').innerText = `$${saldoProj.toLocaleString('es-CO')}`;
-      document.getElementById('mTotal').innerText = `$${demoProject.total.toLocaleString('es-CO')}`;
-      document.getElementById('mTaskRatio').innerText = `${demoProject.tasksDone}/${demoProject.tasks} listas`;
+      document.getElementById('mTotal').innerText = `$${p.total.toLocaleString('es-CO')}`;
+      document.getElementById('mTaskRatio').innerText = `${p.tasksDone}/${p.tasks} listas`;
 
       // 2. Métricas consolidadas del negocio
-      const totalAbonosProyectos = demoProject.cobrado + secondProject.cobrado;
+      const totalAbonosProyectos = projectsData.reduce((s, proj) => s + proj.cobrado, 0);
       const totalOtrosIngresos = generalIncomes.reduce((s, i) => s + i.amount, 0);
       const totalIngresosGlobal = totalAbonosProyectos + totalOtrosIngresos;
 
-      const totalComprasProyectos = demoProject.compras + secondProject.compras;
+      const totalComprasProyectos = projectsData.reduce((s, proj) => s + proj.compras, 0);
       const totalGastosGenerales = generalExpenses.reduce((s, g) => s + g.amount, 0);
       const totalGastosGlobal = totalComprasProyectos + totalGastosGenerales;
 
@@ -951,6 +1053,8 @@
       document.getElementById('dComprasProyectos').innerText = `-$${totalComprasProyectos.toLocaleString('es-CO')}`;
       document.getElementById('dGastosGenerales').innerText = `-$${totalGastosGenerales.toLocaleString('es-CO')}`;
       document.getElementById('dGananciaNeta').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+
+      renderProjectsList();
     }
 
     // Modal de entrada genérico para registrar datos reales
@@ -978,12 +1082,13 @@
         return;
       }
 
+      const p = projectsData[selectedProjectIdx];
       if (currentFormAction === 'compra_proyecto') {
-        demoProject.compras += valor;
-        showToast(`✓ Compra registrada en ${demoProject.name}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+        p.compras += valor;
+        showToast(`✓ Compra registrada en ${p.name}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
       } else if (currentFormAction === 'abono_proyecto') {
-        demoProject.cobrado += valor;
-        showToast(`✓ Abono recibido de ${demoProject.client}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+        p.cobrado += valor;
+        showToast(`✓ Abono recibido de ${p.client}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
       } else if (currentFormAction === 'gasto_general') {
         generalExpenses.unshift({ desc: concepto, amount: valor });
         showToast(`✓ Gasto general registrado: ${concepto} ($${valor.toLocaleString('es-CO')})`);
@@ -997,19 +1102,21 @@
     }
 
     function abrirModalCompraProyecto() {
+      const p = projectsData[selectedProjectIdx];
       abrirModalGenerico(
         'compra_proyecto',
         'Registrar Compra de Insumo',
-        `Esta compra afectará únicamente las cuentas de "${demoProject.name}".`,
+        `Esta compra afectará únicamente las cuentas de "${p.name}".`,
         'Guardar Compra'
       );
     }
 
     function abrirModalAbonoProyecto() {
+      const p = projectsData[selectedProjectIdx];
       abrirModalGenerico(
         'abono_proyecto',
         'Registrar Abono del Cliente',
-        `Registrar anticipo o abono de ${demoProject.client}.`,
+        `Registrar anticipo o abono de ${p.client}.`,
         'Registrar Abono'
       );
     }
@@ -1063,6 +1170,59 @@
       showToast(`¡Datos actualizados para "${bizProfile.name}"!`);
     }
 
+    // Modal de Nuevo Pedido / Proyecto de Cliente
+    function abrirModalNuevoPedido() {
+      document.getElementById('orderNameInp').value = '';
+      document.getElementById('orderClientInp').value = '';
+      document.getElementById('orderPhoneInp').value = '';
+      document.getElementById('orderServicesInp').value = '';
+      document.getElementById('orderTotalInp').value = '';
+      document.getElementById('orderAdvanceInp').value = '';
+      document.getElementById('orderDaysInp').value = '5';
+      document.getElementById('newOrderModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('orderNameInp').focus(), 100);
+    }
+
+    function cerrarNuevoPedidoModal() {
+      document.getElementById('newOrderModal').style.display = 'none';
+    }
+
+    function guardarNuevoPedido() {
+      const name = document.getElementById('orderNameInp').value.trim();
+      const client = document.getElementById('orderClientInp').value.trim();
+      const phone = document.getElementById('orderPhoneInp').value.trim() || '312 000 0000';
+      const services = document.getElementById('orderServicesInp').value.trim() || 'Servicio personalizado';
+      const total = parseFloat(document.getElementById('orderTotalInp').value) || 0;
+      const advance = parseFloat(document.getElementById('orderAdvanceInp').value) || 0;
+      const days = parseInt(document.getElementById('orderDaysInp').value) || 5;
+
+      if (!name || !client || total <= 0) {
+        showToast('Ingresa nombre del pedido, cliente y valor total.');
+        return;
+      }
+
+      const newProj = {
+        id: projectsData.length,
+        name: name,
+        client: client,
+        phone: phone,
+        services: services,
+        total: total,
+        cobrado: advance,
+        compras: 0,
+        daysLeft: days,
+        status: 'En Producción',
+        tasks: 4,
+        tasksDone: 0
+      };
+
+      projectsData.unshift(newProj);
+      selectedProjectIdx = 0;
+      cerrarNuevoPedidoModal();
+      recalcularTodo();
+      showToast(`✓ ¡Pedido "${name}" de ${client} creado!`);
+    }
+
     // Desglose
     function verDesgloseGlobal() {
       document.getElementById('desgloseModal').style.display = 'flex';
@@ -1073,15 +1233,17 @@
     }
 
     function toggleTaskPreview(chk) {
-      if (chk.checked) demoProject.tasksDone++;
-      else demoProject.tasksDone--;
+      const p = projectsData[selectedProjectIdx];
+      if (chk.checked) p.tasksDone++;
+      else p.tasksDone--;
       recalcularTodo();
       showToast(chk.checked ? '✓ Tarea completada' : 'Tarea pendiente');
     }
 
     function copiarWhatsAppCotizacion() {
-      const saldo = demoProject.total - demoProject.cobrado;
-      const msg = `✨ *${bizProfile.name.toUpperCase()}* ✨\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Proyecto:* ${demoProject.name}\n👤 *Cliente:* ${demoProject.client}\n📦 *Servicios:* 50 Invitaciones + 10 Centros de mesa\n\n💰 *RESUMEN DE CUENTA:*\n• *Total Cotizado:* $${demoProject.total.toLocaleString('es-CO')}\n• *Abonado a la fecha:* $${demoProject.cobrado.toLocaleString('es-CO')}\n• *SALDO PENDIENTE:* $${saldo.toLocaleString('es-CO')}\n\n🏦 *CUENTAS DE COBRO:*\n• Nequi: ${bizProfile.nequi}\n• Bancolombia: ${bizProfile.bancolombia}\n📞 Contacto: ${bizProfile.phone}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n¡Muchas gracias por apoyar nuestro talento local! 🌸`;
+      const p = projectsData[selectedProjectIdx];
+      const saldo = p.total - p.cobrado;
+      const msg = `✨ *${bizProfile.name.toUpperCase()}* ✨\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Proyecto:* ${p.name}\n👤 *Cliente:* ${p.client}\n📦 *Servicios:* ${p.services}\n\n💰 *RESUMEN DE CUENTA:*\n• *Total Cotizado:* $${p.total.toLocaleString('es-CO')}\n• *Abonado a la fecha:* $${p.cobrado.toLocaleString('es-CO')}\n• *SALDO PENDIENTE:* $${saldo.toLocaleString('es-CO')}\n\n🏦 *CUENTAS DE COBRO:*\n• Nequi: ${bizProfile.nequi}\n• Bancolombia: ${bizProfile.bancolombia}\n📞 Contacto: ${bizProfile.phone}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n¡Muchas gracias por apoyar nuestro talento local! 🌸`;
 
       navigator.clipboard.writeText(msg).catch(() => {});
       showToast(`¡Cotización de "${bizProfile.name}" copiada para WhatsApp!`);
@@ -1092,11 +1254,8 @@
       showToast('⚠️ "15 años Maria" vence en 2 días');
     }
 
-    function crearNuevoProyecto() {
-      showToast('✨ Formulario de nuevo encargo listo con catálogo Tatiana.');
-    }
-
     function verDetalleProyecto(idx) {
+      selectedProjectIdx = idx;
       recalcularTodo();
       document.getElementById('projectModal').style.display = 'flex';
     }

@@ -191,7 +191,7 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('NUEVO PROYECTO'),
+        title: const Text('NUEVO PEDIDO (PROYECTO)'),
         actions: [
           TextButton.icon(
             onPressed: _loadTatianaExample,
@@ -212,8 +212,8 @@ class _NewProjectScreenState extends State<NewProjectScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Nombre del Proyecto / Ocasión *',
-                  hintText: 'Ej: 15 años Maria, Bautizo Mateo',
+                  labelText: 'Nombre del Pedido / Proyecto *',
+                  hintText: 'Ej: 15 años Maria, Bautizo Mateo, Boda Andrea',
                   prefixIcon: Icon(Icons.celebration_outlined),
                 ),
                 validator: (val) => val == null || val.trim().isEmpty ? 'Ingresa el nombre del encargo' : null,

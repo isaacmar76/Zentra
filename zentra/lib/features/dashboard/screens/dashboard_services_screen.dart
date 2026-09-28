@@ -355,7 +355,7 @@ class DashboardServicesScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 18),
 
-                // 2. Botón principal: Nuevo Proyecto
+                // 2. Botón principal: Nuevo Pedido / Proyecto de Cliente
                 ElevatedButton.icon(
                   onPressed: () {
                     Navigator.push(
@@ -365,8 +365,8 @@ class DashboardServicesScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.add_circle_outline, color: Colors.white),
-                  label: const Text('NUEVO PROYECTO', style: TextStyle(fontWeight: FontWeight.bold)),
+                  icon: const Icon(Icons.add_shopping_cart_outlined, color: Colors.white),
+                  label: const Text('NUEVO PEDIDO / PROYECTO', style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 0.5)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: theme.secondary,
                     padding: const EdgeInsets.symmetric(vertical: 14),

@@ -687,6 +687,74 @@
       </div>
     </div>
 
+    <!-- Modal Detalle Proyecto (Tatiana) -->
+    <div id="projectModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:250; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <div>
+            <div style="font-size:18px; font-weight:700;" id="mProjTitle">15 años Maria</div>
+            <div style="font-size:12px; color:var(--secondary); font-weight:600;" id="mProjClient">Cliente: Maria Rodriguez • 312 456 7890</div>
+          </div>
+          <button onclick="closeProjectModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
+        </div>
+
+        <div style="background:var(--bg); border:1.5px solid var(--primary); border-radius:18px; padding:14px; margin:14px 0;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+            <span style="font-size:12px; font-weight:700;">Ganancia Real (Cobrado - Gastos)</span>
+            <span style="background:var(--success); color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:8px;">Rentable</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; text-align:center;">
+            <div>
+              <div style="font-size:10px; opacity:0.8;">Cobrado</div>
+              <div style="font-size:14px; font-weight:700; color:var(--success);" id="mCobrado">$160.000</div>
+            </div>
+            <div>
+              <div style="font-size:10px; opacity:0.8;">Gastos</div>
+              <div style="font-size:14px; font-weight:700; color:var(--alert);" id="mGastos">$80.000</div>
+            </div>
+            <div>
+              <div style="font-size:10px; opacity:0.8;">Ganancia</div>
+              <div style="font-size:14px; font-weight:700; color:var(--text);" id="mGanancia">$80.000</div>
+            </div>
+          </div>
+          <div style="margin-top:10px; font-size:11px; display:flex; justify-content:space-between;">
+            <span>Saldo por cobrar: <b id="mSaldo" style="color:var(--alert);">$240.000</b></span>
+            <span>Total: <b id="mTotal">$400.000</b></span>
+          </div>
+        </div>
+
+        <!-- Tareas / Checklist -->
+        <div style="font-size:13px; font-weight:700; margin-bottom:8px; display:flex; justify-content:space-between;">
+          <span>Tareas / Checklist</span>
+          <span style="font-size:11px; color:var(--secondary);" id="mTaskRatio">2/4 listas</span>
+        </div>
+        <div id="mTasksList" style="background:var(--bg); border-radius:14px; padding:10px; margin-bottom:14px; font-size:12px;">
+          <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;">
+            <input type="checkbox" checked onchange="toggleTaskPreview(this)"> <span>Comprar cartulina blush y cinta oro</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;">
+            <input type="checkbox" checked onchange="toggleTaskPreview(this)"> <span>Imprimir 50 invitaciones</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; margin-bottom:6px; cursor:pointer;">
+            <input type="checkbox" onchange="toggleTaskPreview(this)"> <span>Armar centros de mesa con flor seca</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <input type="checkbox" onchange="toggleTaskPreview(this)"> <span>Empacar con etiqueta de entrega</span>
+          </label>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <button onclick="agregarGastoDemo()" style="background:var(--bg); border:1.5px solid var(--alert); color:var(--alert); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Gasto</button>
+          <button onclick="agregarAbonoDemo()" style="background:var(--bg); border:1.5px solid var(--success); color:var(--success); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Abono</button>
+        </div>
+
+        <button onclick="copiarWhatsAppCotizacion()" style="width:100%; background:#25D366; color:#fff; border:none; padding:12px; border-radius:14px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px;">
+          <span>📱</span> COPIAR MENSAJE PARA WHATSAPP
+        </button>
+      </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toastMsg">Venta registrada</div>
   </div>
@@ -700,6 +768,17 @@
       { id: 5, name: 'Pan Tajado Bimbo', price: 6500, stock: 8, cat: 'Panadería' },
       { id: 6, name: 'Azúcar Incauca 1kg', price: 4000, stock: 20, cat: 'Granos' },
     ];
+
+    let demoProject = {
+      name: '15 años Maria',
+      client: 'Maria Rodriguez',
+      phone: '312 456 7890',
+      total: 400000,
+      cobrado: 160000,
+      gastos: 80000,
+      tasks: 4,
+      tasksDone: 2
+    };
 
     let cart = [];
     let currentMode = 'servicios';
@@ -782,15 +861,62 @@
     }
 
     function verPedidosPorVencer() {
-      showToast('Proyecto "15 años Maria" vence en 2 días');
+      verDetalleProyecto(0);
+      showToast('⚠️ "15 años Maria" vence en 2 días');
     }
 
     function crearNuevoProyecto() {
-      showToast('Abriendo formulario de Nuevo Proyecto...');
+      showToast('✨ Formulario de nuevo proyecto abierto con catálogo Tatiana.');
     }
 
     function verDetalleProyecto(idx) {
-      showToast(idx === 0 ? 'Abriendo 15 años Maria (Tatiana)' : 'Abriendo Bautizo Santiago');
+      updateProjectModalUI();
+      document.getElementById('projectModal').style.display = 'flex';
+    }
+
+    function closeProjectModal() {
+      document.getElementById('projectModal').style.display = 'none';
+    }
+
+    function updateProjectModalUI() {
+      const ganancia = demoProject.cobrado - demoProject.gastos;
+      const saldo = demoProject.total - demoProject.cobrado;
+      document.getElementById('mCobrado').innerText = `$${demoProject.cobrado.toLocaleString('es-CO')}`;
+      document.getElementById('mGastos').innerText = `$${demoProject.gastos.toLocaleString('es-CO')}`;
+      document.getElementById('mGanancia').innerText = `$${ganancia.toLocaleString('es-CO')}`;
+      document.getElementById('mSaldo').innerText = `$${saldo.toLocaleString('es-CO')}`;
+      document.getElementById('mTotal').innerText = `$${demoProject.total.toLocaleString('es-CO')}`;
+      document.getElementById('mTaskRatio').innerText = `${demoProject.tasksDone}/${demoProject.tasks} listas`;
+    }
+
+    function toggleTaskPreview(chk) {
+      if (chk.checked) demoProject.tasksDone++;
+      else demoProject.tasksDone--;
+      updateProjectModalUI();
+      showToast(chk.checked ? '✓ Tarea completada' : 'Tarea pendiente');
+    }
+
+    function agregarGastoDemo() {
+      demoProject.gastos += 25000;
+      updateProjectModalUI();
+      showToast('-$25.000 COP en insumos registrado');
+    }
+
+    function agregarAbonoDemo() {
+      if (demoProject.cobrado < demoProject.total) {
+        demoProject.cobrado += 100000;
+        updateProjectModalUI();
+        showToast('+$100.000 COP de abono registrado');
+      } else {
+        showToast('¡El proyecto ya está 100% cobrado!');
+      }
+    }
+
+    function copiarWhatsAppCotizacion() {
+      const saldo = demoProject.total - demoProject.cobrado;
+      const msg = `✨ *PAPELERÍA CREATIVA - DETALLE DE PEDIDO* ✨\n📋 *Proyecto:* ${demoProject.name}\n👤 *Cliente:* ${demoProject.client}\n📦 *Servicios:* 50 Invitaciones + 10 Centros de mesa\n💰 *Total:* $${demoProject.total.toLocaleString('es-CO')}\n✓ *Abonado:* $${demoProject.cobrado.toLocaleString('es-CO')}\n⚠️ *Saldo Pendiente:* $${saldo.toLocaleString('es-CO')}\n🏦 Nequi/Daviplata: 312 456 7890\n¡Gracias por tu apoyo! 🌸`;
+      navigator.clipboard.writeText(msg).catch(() => {});
+      showToast('¡Copiado! Listo para pegar en WhatsApp');
     }
 
     function showToast(msg) {

@@ -72,27 +72,73 @@ class ProjectPaymentModel {
   }
 }
 
+class ProjectTaskModel {
+  final String id;
+  final String title;
+  final bool isCompleted;
+
+  ProjectTaskModel({
+    required this.id,
+    required this.title,
+    this.isCompleted = false,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'isCompleted': isCompleted,
+    };
+  }
+
+  factory ProjectTaskModel.fromMap(Map<String, dynamic> map) {
+    return ProjectTaskModel(
+      id: map['id'] ?? '',
+      title: map['title'] ?? '',
+      isCompleted: map['isCompleted'] ?? false,
+    );
+  }
+
+  ProjectTaskModel copyWith({
+    String? id,
+    String? title,
+    bool? isCompleted,
+  }) {
+    return ProjectTaskModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      isCompleted: isCompleted ?? this.isCompleted,
+    );
+  }
+}
+
 class ProjectModel {
   final String id;
   final String name;
   final String clientName;
+  final String clientPhone;
+  final String notes;
   final DateTime deliveryDate;
   final String status;
   final List<String> services;
   final double totalPrice;
   final List<ProjectExpenseModel> expenses;
   final List<ProjectPaymentModel> payments;
+  final List<ProjectTaskModel> tasks;
 
   ProjectModel({
     required this.id,
     required this.name,
     required this.clientName,
+    this.clientPhone = '',
+    this.notes = '',
     required this.deliveryDate,
     required this.status,
     required this.services,
     this.totalPrice = 0.0,
     this.expenses = const [],
     this.payments = const [],
+    this.tasks = const [],
   });
 
   // Métricas financieras calculadas según las Reglas de Oro de Zentra:
@@ -105,52 +151,70 @@ class ProjectModel {
     final diff = target - totalPaid;
     return diff > 0 ? diff : 0.0;
   }
+  double get paymentProgress {
+    if (totalPrice <= 0) return totalPaid > 0 ? 1.0 : 0.0;
+    final progress = totalPaid / totalPrice;
+    return progress > 1.0 ? 1.0 : progress;
+  }
 
   ProjectModel copyWith({
     String? id,
     String? name,
     String? clientName,
+    String? clientPhone,
+    String? notes,
     DateTime? deliveryDate,
     String? status,
     List<String>? services,
     double? totalPrice,
     List<ProjectExpenseModel>? expenses,
     List<ProjectPaymentModel>? payments,
+    List<ProjectTaskModel>? tasks,
   }) {
     return ProjectModel(
       id: id ?? this.id,
       name: name ?? this.name,
       clientName: clientName ?? this.clientName,
+      clientPhone: clientPhone ?? this.clientPhone,
+      notes: notes ?? this.notes,
       deliveryDate: deliveryDate ?? this.deliveryDate,
       status: status ?? this.status,
       services: services ?? this.services,
       totalPrice: totalPrice ?? this.totalPrice,
       expenses: expenses ?? this.expenses,
       payments: payments ?? this.payments,
+      tasks: tasks ?? this.tasks,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
+      'id': id,
       'name': name,
       'clientName': clientName,
+      'clientPhone': clientPhone,
+      'notes': notes,
       'deliveryDate': deliveryDate.toIso8601String(),
       'status': status,
       'services': services,
       'totalPrice': totalPrice,
       'expenses': expenses.map((e) => e.toMap()).toList(),
       'payments': payments.map((p) => p.toMap()).toList(),
+      'tasks': tasks.map((t) => t.toMap()).toList(),
     };
   }
 
   factory ProjectModel.fromMap(Map<String, dynamic> map, String documentId) {
     var rawExpenses = map['expenses'] as List<dynamic>? ?? [];
     var rawPayments = map['payments'] as List<dynamic>? ?? [];
+    var rawTasks = map['tasks'] as List<dynamic>? ?? [];
 
     return ProjectModel(
-      id: documentId,
+      id: documentId.isNotEmpty ? documentId : (map['id'] ?? ''),
       name: map['name'] ?? '',
       clientName: map['clientName'] ?? '',
+      clientPhone: map['clientPhone'] ?? '',
+      notes: map['notes'] ?? '',
       deliveryDate: map['deliveryDate'] != null
           ? DateTime.parse(map['deliveryDate'])
           : DateTime.now(),
@@ -162,6 +226,9 @@ class ProjectModel {
           .toList(),
       payments: rawPayments
           .map((p) => ProjectPaymentModel.fromMap(Map<String, dynamic>.from(p)))
+          .toList(),
+      tasks: rawTasks
+          .map((t) => ProjectTaskModel.fromMap(Map<String, dynamic>.from(t)))
           .toList(),
     );
   }

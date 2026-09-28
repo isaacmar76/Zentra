@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/services/firebase_auth_service.dart';
-import '../../mode_selection/screens/mode_selection_screen.dart';
-import '../../../../core/layout/main_layout_screen.dart';
-import '../../retail/screens/retail_main_screen.dart';
-import '../../../../core/theme/theme_provider.dart';
-import '../../../../core/theme/theme_selector_modal.dart';
+import 'package:zentra/core/services/firebase_auth_service.dart';
+import 'package:zentra/features/mode_selection/screens/mode_selection_screen.dart';
+import 'package:zentra/core/layout/main_layout_screen.dart';
+import 'package:zentra/features/retail/screens/retail_main_screen.dart';
+import 'package:zentra/core/theme/theme_provider.dart';
+import 'package:zentra/core/theme/theme_selector_modal.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

@@ -1,7 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../core/theme/theme_provider.dart';
-import '../../features/dashboard/screens/dashboard_services_screen.dart';
-import '../../features/projects/screens/projects_list_screen.dart';
+import 'package:zentra/core/theme/theme_provider.dart';
+import 'package:zentra/features/dashboard/screens/dashboard_services_screen.dart';
+import 'package:zentra/features/projects/screens/projects_list_screen.dart';
 
 class MainLayoutScreen extends StatefulWidget {
   const MainLayoutScreen({super.key});

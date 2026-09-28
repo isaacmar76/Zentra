@@ -1,0 +1,21 @@
+# Flutter & Dart
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+**/build/
+.history
+.gradle/
+**/android/.gradle/
+**/android/app/build/
+
+# IDEs y Editores
+.idea/
+*.iml
+.vscode/
+
+# Sistema Operativo
+.DS_Store
+Thumbs.db
+desktop.ini

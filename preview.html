@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zentra - Demostración Interactiva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Tema 1 por defecto: Nude & Blush */
+      --bg: #F5EFE6;
+      --primary: #E8C4C4;
+      --secondary: #D4A5A5;
+      --text: #5C4A3E;
+      --success: #A3B18A;
+      --alert: #E07A5F;
+      --card-bg: #FFFFFF;
+      --surface-border: #E8C4C4;
+    }
+
+    [data-theme="esmeralda"] {
+      --bg: #F0F7F4;
+      --primary: #A7D7C5;
+      --secondary: #2C7A7B;
+      --text: #13322B;
+      --success: #38A169;
+      --alert: #E53E3E;
+      --card-bg: #FFFFFF;
+      --surface-border: #A7D7C5;
+    }
+
+    [data-theme="lavanda"] {
+      --bg: #F8F5FA;
+      --primary: #D6C7E2;
+      --secondary: #7B5294;
+      --text: #2E2036;
+      --success: #48BB78;
+      --alert: #ED8936;
+      --card-bg: #FFFFFF;
+      --surface-border: #D6C7E2;
+    }
+
+    [data-theme="oceano"] {
+      --bg: #F1F5F9;
+      --primary: #BAE6FD;
+      --secondary: #1D4ED8;
+      --text: #0F172A;
+      --success: #059669;
+      --alert: #EA580C;
+      --card-bg: #FFFFFF;
+      --surface-border: #BAE6FD;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    body {
+      background-color: #212529;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* Marco de teléfono móvil simulado */
+    .phone-container {
+      width: 390px;
+      height: 844px;
+      background-color: var(--bg);
+      border-radius: 44px;
+      border: 12px solid #333333;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Notch superior */
+    .notch {
+      width: 140px;
+      height: 24px;
+      background: #333333;
+      border-radius: 0 0 16px 16px;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+    }
+
+    /* Header de la App */
+    .app-header {
+      padding: 34px 18px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg);
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .app-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: rgba(0,0,0,0.06);
+    }
+
+    /* Selector de Modos */
+    .mode-tabs {
+      display: flex;
+      background: rgba(0,0,0,0.04);
+      padding: 4px;
+      margin: 12px 18px;
+      border-radius: 14px;
+      gap: 4px;
+    }
+
+    .mode-tab {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .mode-tab.active {
+      background: var(--card-bg);
+      color: var(--secondary);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* Contenido desplazable */
+    .app-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 18px 80px;
+    }
+
+    /* Tarjetas y Estadísticas */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      padding: 14px;
+      border-radius: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    .stat-title {
+      font-size: 11px;
+      color: var(--text);
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .val-income { color: var(--success); }
+    .val-expense { color: var(--alert); }
+    .val-profit { color: var(--text); }
+    .val-projects { color: var(--secondary); }
+
+    /* Botón de Acción Principal */
+    .primary-btn {
+      width: 100%;
+      background: var(--secondary);
+      color: #FFFFFF;
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .alert-btn {
+      width: 100%;
+      background: transparent;
+      color: var(--alert);
+      border: 1.5px solid var(--alert);
+      padding: 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Lista de Proyectos / Catálogo */
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 14px 0 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-item {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .card-item:hover {
+      border-color: var(--surface-border);
+    }
+
+    .item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    .item-title {
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-weight: 700;
+      background: rgba(0,0,0,0.06);
+      color: var(--text);
+    }
+
+    .badge-urgent {
+      background: rgba(224, 122, 95, 0.15);
+      color: var(--alert);
+    }
+
+    .badge-done {
+      background: rgba(163, 177, 138, 0.2);
+      color: var(--success);
+    }
+
+    .item-detail {
+      font-size: 11px;
+      color: var(--text);
+      opacity: 0.75;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Modo Retail POS */
+    .pos-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .pos-product {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 105px;
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+
+    .pos-product:active {
+      transform: scale(0.97);
+    }
+
+    .pos-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .pos-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .pos-price {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+
+    .pos-stock {
+      font-size: 10px;
+      color: var(--text);
+      opacity: 0.6;
+    }
+
+    .stock-warning {
+      color: var(--alert);
+      font-weight: 700;
+      opacity: 1;
+    }
+
+    /* Modal de Selección de Temas */
+    .theme-modal {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      justify-content: flex-end;
+      flex-direction: column;
+    }
+
+    .theme-sheet {
+      background: var(--card-bg);
+      border-radius: 28px 28px 0 0;
+      padding: 24px 20px;
+      max-height: 80%;
+      overflow-y: auto;
+    }
+
+    .theme-option {
+      display: flex;
+      align-items: center;
+      padding: 12px;
+      border: 1.5px solid rgba(0,0,0,0.08);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      gap: 12px;
+    }
+
+    .theme-option.active {
+      border-color: var(--secondary);
+      background: rgba(0,0,0,0.02);
+    }
+
+    .dots-preview {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: rgba(0,0,0,0.05);
+      border-radius: 10px;
+    }
+
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    /* Barra inferior */
+    .bottom-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background: var(--card-bg);
+      border-top: 1px solid rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text);
+      opacity: 0.5;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .nav-btn.active {
+      color: var(--secondary);
+      opacity: 1;
+    }
+
+    /* Notificación Toast */
+    .toast {
+      position: absolute;
+      bottom: 75px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333333;
+      color: #FFFFFF;
+      padding: 10px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      z-index: 300;
+      white-space: nowrap;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone-container" id="appRoot">
+    <div class="notch"></div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-title" id="headerTitle">Zentra - Servicios</div>
+      <div class="header-actions">
+        <button class="icon-btn" id="btnThemePicker" title="Cambiar tema de color" onclick="openThemeModal()">🎨</button>
+        <button class="icon-btn" id="btnModeSwitch" title="Alternar modo" onclick="toggleMode()">🔄</button>
+      </div>
+    </header>
+
+    <!-- Pestañas de modo -->
+    <div class="mode-tabs">
+      <button class="mode-tab active" id="tabServicios" onclick="setMode('servicios')">Modo Tatiana (Servicios)</button>
+      <button class="mode-tab" id="tabRetail" onclick="setMode('retail')">Modo Don Pedro (Retail)</button>
+    </div>
+
+    <!-- Contenido dinámico -->
+    <main class="app-content">
+      
+      <!-- VISTA SERVICIOS -->
+      <section id="viewServicios">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-title">Ingresos Mes</div>
+            <div class="stat-value val-income" id="txtIngresos">$275.000</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Gastos Insumos</div>
+            <div class="stat-value val-expense" id="txtGastos">$108.000</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Ganancia Real</div>
+            <div class="stat-value val-profit" id="txtGanancia">$167.000</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Proyectos Activos</div>
+            <div class="stat-value val-projects" id="txtActivos">2</div>
+          </div>
+        </div>
+
+        <button class="primary-btn" onclick="crearNuevoProyecto()">+ NUEVO PROYECTO</button>
+        <button class="alert-btn" onclick="verPedidosPorVencer()">⚠️ PEDIDOS PRONTO A VENCER (1)</button>
+
+        <div class="section-title">
+          <span>Proyectos en Curso</span>
+          <span style="font-size: 11px; color: var(--secondary);" id="lblProyectosCount">2 activos</span>
+        </div>
+
+        <div id="projectsList">
+          <!-- Tarjeta 1 -->
+          <div class="card-item" onclick="verDetalleProyecto(0)">
+            <div class="item-header">
+              <span class="item-title">15 años Maria</span>
+              <span class="badge badge-urgent">Vence en 2 días</span>
+            </div>
+            <div class="item-detail">
+              <span>Cliente: Maria Rodriguez</span>
+              <span style="font-weight: 600;">Ganancia: $80.000</span>
+            </div>
+            <div class="item-detail" style="margin-top: 4px;">
+              <span>Servicios: Invitaciones + Centros</span>
+              <span class="badge" style="font-size: 9px;">En Producción</span>
+            </div>
+          </div>
+
+          <!-- Tarjeta 2 -->
+          <div class="card-item" onclick="verDetalleProyecto(1)">
+            <div class="item-header">
+              <span class="item-title">Bautizo Santiago</span>
+              <span class="badge">Vence en 8 días</span>
+            </div>
+            <div class="item-detail">
+              <span>Cliente: Camila Duque</span>
+              <span style="font-weight: 600;">Ganancia: $87.000</span>
+            </div>
+            <div class="item-detail" style="margin-top: 4px;">
+              <span>Servicios: Banderines + Invitaciones</span>
+              <span class="badge" style="font-size: 9px;">En Diseño</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VISTA RETAIL -->
+      <section id="viewRetail" style="display: none;">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-title">Ventas Hoy</div>
+            <div class="stat-value val-income" id="txtVentasHoy">$84.500</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">En Caja (Base+Ventas)</div>
+            <div class="stat-value val-profit" id="txtCajaHoy">$184.500</div>
+          </div>
+        </div>
+
+        <div class="section-title">
+          <span>Punto de Venta (Toca para cobrar)</span>
+          <span style="font-size: 11px; color: var(--alert);" id="lblStockAviso">2 con bajo stock</span>
+        </div>
+
+        <div class="pos-grid" id="posGrid">
+          <!-- Productos inyectados por JS -->
+        </div>
+
+        <div style="margin-top: 14px;">
+          <button class="primary-btn" style="background: var(--success);" onclick="cobrarCarrito()">🛒 COBRAR CARRITO (<span id="cartCount">0</span>)</button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Barra de navegación inferior -->
+    <nav class="bottom-bar">
+      <button class="nav-btn active" onclick="setMode('servicios')">
+        <span>📋</span>
+        <span>Servicios</span>
+      </button>
+      <button class="nav-btn" onclick="setMode('retail')">
+        <span>🏪</span>
+        <span>Retail</span>
+      </button>
+      <button class="nav-btn" onclick="openThemeModal()">
+        <span>🎨</span>
+        <span>Temas</span>
+      </button>
+    </nav>
+
+    <!-- Modal de Selección de Temas -->
+    <div class="theme-modal" id="themeModal" onclick="closeThemeModal(event)">
+      <div class="theme-sheet" onclick="event.stopPropagation()">
+        <h3 style="font-size: 15px; margin-bottom: 4px; color: var(--text);">Paletas de Colores (4 Themes)</h3>
+        <p style="font-size: 11px; color: #666; margin-bottom: 14px;">Elige el tema que mejor represente a tu negocio:</p>
+
+        <!-- Tema 1 -->
+        <div class="theme-option active" id="opt-nude" onclick="applyTheme('nude')">
+          <div class="dots-preview">
+            <div class="color-dot" style="background: #F5EFE6;"></div>
+            <div class="color-dot" style="background: #E8C4C4;"></div>
+            <div class="color-dot" style="background: #D4A5A5;"></div>
+            <div class="color-dot" style="background: #5C4A3E;"></div>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700;">Nude & Blush (Tatiana)</div>
+            <div style="font-size: 10px; color: #777;">Artesanal, papelerías creativas, eventos</div>
+          </div>
+        </div>
+
+        <!-- Tema 2 -->
+        <div class="theme-option" id="opt-esmeralda" onclick="applyTheme('esmeralda')">
+          <div class="dots-preview">
+            <div class="color-dot" style="background: #F0F7F4;"></div>
+            <div class="color-dot" style="background: #A7D7C5;"></div>
+            <div class="color-dot" style="background: #2C7A7B;"></div>
+            <div class="color-dot" style="background: #13322B;"></div>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700;">Esmeralda & Menta (Don Pedro)</div>
+            <div style="font-size: 10px; color: #777;">Minimercados, víveres, confianza comercial</div>
+          </div>
+        </div>
+
+        <!-- Tema 3 -->
+        <div class="theme-option" id="opt-lavanda" onclick="applyTheme('lavanda')">
+          <div class="dots-preview">
+            <div class="color-dot" style="background: #F8F5FA;"></div>
+            <div class="color-dot" style="background: #D6C7E2;"></div>
+            <div class="color-dot" style="background: #7B5294;"></div>
+            <div class="color-dot" style="background: #2E2036;"></div>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700;">Lavanda & Ciruela (Elegancia)</div>
+            <div style="font-size: 10px; color: #777;">Salones de belleza, estética, floristerías</div>
+          </div>
+        </div>
+
+        <!-- Tema 4 -->
+        <div class="theme-option" id="opt-oceano" onclick="applyTheme('oceano')">
+          <div class="dots-preview">
+            <div class="color-dot" style="background: #F1F5F9;"></div>
+            <div class="color-dot" style="background: #BAE6FD;"></div>
+            <div class="color-dot" style="background: #1D4ED8;"></div>
+            <div class="color-dot" style="background: #0F172A;"></div>
+          </div>
+          <div>
+            <div style="font-size: 12px; font-weight: 700;">Océano & Medianoche (Corporativo)</div>
+            <div style="font-size: 10px; color: #777;">Servicios profesionales, sobrio y ejecutivo</div>
+          </div>
+        </div>
+
+        <button class="primary-btn" style="margin-top: 10px;" onclick="closeThemeModal()">APLICAR TEMA</button>
+      </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toastMsg">Venta registrada</div>
+  </div>
+
+  <script>
+    const products = [
+      { id: 1, name: 'Arroz Diana 1kg', price: 4200, stock: 24, cat: 'Granos' },
+      { id: 2, name: 'Aceite Premier 1L', price: 9500, stock: 12, cat: 'Abarrotes' },
+      { id: 3, name: 'Leche Alquería 1L', price: 4800, stock: 18, cat: 'Lácteos' },
+      { id: 4, name: 'Huevos AA x 30', price: 18000, stock: 3, cat: 'Abarrotes' },
+      { id: 5, name: 'Pan Tajado Bimbo', price: 6500, stock: 8, cat: 'Panadería' },
+      { id: 6, name: 'Azúcar Incauca 1kg', price: 4000, stock: 20, cat: 'Granos' },
+    ];
+
+    let cart = [];
+    let currentMode = 'servicios';
+
+    function renderPos() {
+      const grid = document.getElementById('posGrid');
+      grid.innerHTML = '';
+      products.forEach(p => {
+        const isLow = p.stock <= 5;
+        const el = document.createElement('div');
+        el.className = 'pos-product';
+        el.innerHTML = `
+          <div>
+            <span style="font-size: 9px; opacity: 0.6;">${p.cat}</span>
+            <div class="pos-name">${p.name}</div>
+          </div>
+          <div class="pos-bottom">
+            <span class="pos-price">$${p.price.toLocaleString('es-CO')}</span>
+            <span class="pos-stock ${isLow ? 'stock-warning' : ''}">${isLow ? '⚠️ ' : ''}${p.stock} disp</span>
+          </div>
+        `;
+        el.onclick = () => addToCart(p);
+        grid.appendChild(el);
+      });
+    }
+
+    function addToCart(p) {
+      if (p.stock <= 0) {
+        showToast(`¡Agotado! No hay existencias de ${p.name}`);
+        return;
+      }
+      p.stock--;
+      cart.push(p);
+      document.getElementById('cartCount').innerText = cart.length;
+      renderPos();
+      showToast(`+ ${p.name} agregado al carrito`);
+    }
+
+    function cobrarCarrito() {
+      if (cart.length === 0) {
+        showToast('El carrito está vacío. Toca un producto para agregar.');
+        return;
+      }
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      showToast(`¡Cobro exitoso de $${total.toLocaleString('es-CO')} COP en Caja!`);
+      cart = [];
+      document.getElementById('cartCount').innerText = '0';
+    }
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('tabServicios').classList.toggle('active', mode === 'servicios');
+      document.getElementById('tabRetail').classList.toggle('active', mode === 'retail');
+      document.getElementById('viewServicios').style.display = mode === 'servicios' ? 'block' : 'none';
+      document.getElementById('viewRetail').style.display = mode === 'retail' ? 'block' : 'none';
+      document.getElementById('headerTitle').innerText = mode === 'servicios' ? 'Zentra - Papelería Creativa' : 'Zentra - Tienda Don Pedro';
+    }
+
+    function toggleMode() {
+      setMode(currentMode === 'servicios' ? 'retail' : 'servicios');
+    }
+
+    function openThemeModal() {
+      document.getElementById('themeModal').style.display = 'flex';
+    }
+
+    function closeThemeModal() {
+      document.getElementById('themeModal').style.display = 'none';
+    }
+
+    function applyTheme(themeKey) {
+      const root = document.getElementById('appRoot');
+      if (themeKey === 'nude') root.removeAttribute('data-theme');
+      else root.setAttribute('data-theme', themeKey);
+
+      document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
+      document.getElementById(`opt-${themeKey}`).classList.add('active');
+      showToast(`Tema ${themeKey.toUpperCase()} activado`);
+      closeThemeModal();
+    }
+
+    function verPedidosPorVencer() {
+      showToast('Proyecto "15 años Maria" vence en 2 días');
+    }
+
+    function crearNuevoProyecto() {
+      showToast('Abriendo formulario de Nuevo Proyecto...');
+    }
+
+    function verDetalleProyecto(idx) {
+      showToast(idx === 0 ? 'Abriendo 15 años Maria (Tatiana)' : 'Abriendo Bautizo Santiago');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    // Inicializar POS
+    renderPos();
+  </script>
+</body>
+</html>

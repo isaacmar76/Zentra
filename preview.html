@@ -498,6 +498,7 @@
     <header class="app-header">
       <div class="app-title" id="headerTitle">Zentra - Servicios</div>
       <div class="header-actions">
+        <button class="icon-btn" id="btnBusinessProfile" title="Datos del negocio" onclick="openBusinessProfileModal()">🏢</button>
         <button class="icon-btn" id="btnThemePicker" title="Cambiar tema de color" onclick="openThemeModal()">🎨</button>
         <button class="icon-btn" id="btnModeSwitch" title="Alternar modo" onclick="toggleMode()">🔄</button>
       </div>
@@ -514,18 +515,18 @@
       
       <!-- VISTA SERVICIOS -->
       <section id="viewServicios">
-        <div class="stats-grid">
+        <div class="stats-grid" onclick="verDesgloseGlobal()" style="cursor: pointer;" title="Toca para ver desglose financiero global">
           <div class="stat-card">
-            <div class="stat-title">Ingresos Mes</div>
+            <div class="stat-title">Ingresos Totales</div>
             <div class="stat-value val-income" id="txtIngresos">$275.000</div>
           </div>
           <div class="stat-card">
-            <div class="stat-title">Gastos Insumos</div>
-            <div class="stat-value val-expense" id="txtGastos">$108.000</div>
+            <div class="stat-title">Gastos Totales</div>
+            <div class="stat-value val-expense" id="txtGastos">$195.000</div>
           </div>
           <div class="stat-card">
-            <div class="stat-title">Ganancia Real</div>
-            <div class="stat-value val-profit" id="txtGanancia">$167.000</div>
+            <div class="stat-title">Ganancia Neta Real</div>
+            <div class="stat-value val-profit" id="txtGanancia">$80.000</div>
           </div>
           <div class="stat-card">
             <div class="stat-title">Proyectos Activos</div>
@@ -534,6 +535,12 @@
         </div>
 
         <button class="primary-btn" onclick="crearNuevoProyecto()">+ NUEVO PROYECTO</button>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <button onclick="abrirModalGastoGeneral()" style="background:var(--bg); border:1.5px solid var(--alert); color:var(--alert); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Gasto General</button>
+          <button onclick="abrirModalOtroIngreso()" style="background:var(--bg); border:1.5px solid var(--success); color:var(--success); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Otro Ingreso</button>
+        </div>
+
         <button class="alert-btn" onclick="verPedidosPorVencer()">⚠️ PEDIDOS PRONTO A VENCER (1)</button>
 
         <div class="section-title">
@@ -700,26 +707,26 @@
 
         <div style="background:var(--bg); border:1.5px solid var(--primary); border-radius:18px; padding:14px; margin:14px 0;">
           <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-            <span style="font-size:12px; font-weight:700;">Ganancia Real (Cobrado - Gastos)</span>
-            <span style="background:var(--success); color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:8px;">Rentable</span>
+            <span style="font-size:12px; font-weight:700;">Balance del Proyecto (Cobrado - Compras)</span>
+            <span style="background:var(--success); color:#fff; font-size:10px; font-weight:700; padding:2px 8px; border-radius:8px;">Individual</span>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; text-align:center;">
             <div>
-              <div style="font-size:10px; opacity:0.8;">Cobrado</div>
+              <div style="font-size:10px; opacity:0.8;">Abonos Cobrados</div>
               <div style="font-size:14px; font-weight:700; color:var(--success);" id="mCobrado">$160.000</div>
             </div>
             <div>
-              <div style="font-size:10px; opacity:0.8;">Gastos</div>
+              <div style="font-size:10px; opacity:0.8;">Compras Insumos</div>
               <div style="font-size:14px; font-weight:700; color:var(--alert);" id="mGastos">$80.000</div>
             </div>
             <div>
-              <div style="font-size:10px; opacity:0.8;">Ganancia</div>
+              <div style="font-size:10px; opacity:0.8;">Ganancia Neta</div>
               <div style="font-size:14px; font-weight:700; color:var(--text);" id="mGanancia">$80.000</div>
             </div>
           </div>
           <div style="margin-top:10px; font-size:11px; display:flex; justify-content:space-between;">
             <span>Saldo por cobrar: <b id="mSaldo" style="color:var(--alert);">$240.000</b></span>
-            <span>Total: <b id="mTotal">$400.000</b></span>
+            <span>Cotizado: <b id="mTotal">$400.000</b></span>
           </div>
         </div>
 
@@ -743,15 +750,114 @@
           </label>
         </div>
 
-        <!-- Botones de Acción -->
+        <!-- Botones de Acción (Compras vs Abonos) -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
-          <button onclick="agregarGastoDemo()" style="background:var(--bg); border:1.5px solid var(--alert); color:var(--alert); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Gasto</button>
-          <button onclick="agregarAbonoDemo()" style="background:var(--bg); border:1.5px solid var(--success); color:var(--success); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Abono</button>
+          <button onclick="abrirModalCompraProyecto()" style="background:var(--bg); border:1.5px solid var(--alert); color:var(--alert); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Compra</button>
+          <button onclick="abrirModalAbonoProyecto()" style="background:var(--bg); border:1.5px solid var(--success); color:var(--success); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Abono</button>
         </div>
 
         <button onclick="copiarWhatsAppCotizacion()" style="width:100%; background:#25D366; color:#fff; border:none; padding:12px; border-radius:14px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px;">
           <span>📱</span> COPIAR MENSAJE PARA WHATSAPP
         </button>
+      </div>
+    </div>
+
+    <!-- Modal Formulario Genérico (Para Compra, Abono, Gasto General, Otro Ingreso) -->
+    <div id="formModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:300; align-items:center; justify-content:center; padding:18px;">
+      <div style="background:var(--card-bg); width:100%; max-width:340px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <div style="font-size:16px; font-weight:700; margin-bottom:4px;" id="fModalTitle">Registrar Movimiento</div>
+        <div style="font-size:11.5px; color:#777; margin-bottom:14px;" id="fModalSubtitle">Ingresa los datos correspondientes</div>
+
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:4px;">Concepto / Descripción *</label>
+          <input type="text" id="fInpConcepto" placeholder="Ej: Cartulinas, Arriendo, Abono" style="width:100%; padding:10px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:4px;">Valor en Pesos ($ COP) *</label>
+          <input type="number" id="fInpValor" placeholder="Ej: 45000" style="width:100%; padding:10px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:14px; font-weight:700; box-sizing:border-box;">
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button onclick="cerrarFormModal()" style="flex:1; padding:10px; border-radius:12px; border:1px solid #ccc; background:transparent; font-weight:600; cursor:pointer;">Cancelar</button>
+          <button onclick="guardarFormModal()" id="fModalBtnSave" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--secondary); color:#fff; font-weight:700; cursor:pointer;">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Datos del Negocio (Perfil Comercial) -->
+    <div id="bizModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:300; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:85%; overflow-y:auto; color:var(--text);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="font-size:17px; font-weight:700;">🏢 Datos de Mi Negocio</div>
+          <button onclick="cerrarBusinessProfileModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
+        </div>
+
+        <div style="font-size:11.5px; color:#777; margin-bottom:12px;">Estos datos encabezarán las cotizaciones enviadas por WhatsApp y mostrarán tus cuentas de cobro.</div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Nombre del Negocio / Marca *</label>
+          <input type="text" id="bizNameInp" value="TM Diseños Creativos" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Propietario(a)</label>
+          <input type="text" id="bizOwnerInp" value="Tatiana Marín" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Teléfono WhatsApp</label>
+          <input type="text" id="bizPhoneInp" value="312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Número Nequi para Pagos</label>
+          <input type="text" id="bizNequiInp" value="312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Cuenta Bancaria (Bancolombia)</label>
+          <input type="text" id="bizBankInp" value="Ahorros 123-456789-01" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <button onclick="guardarDatosNegocio()" class="primary-btn">GUARDAR DATOS DEL NEGOCIO</button>
+      </div>
+    </div>
+
+    <!-- Modal Desglose Financiero Global -->
+    <div id="desgloseModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:300; align-items:center; justify-content:center; padding:18px;">
+      <div style="background:var(--card-bg); width:100%; max-width:340px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div style="font-size:16px; font-weight:700;">Desglose Financiero</div>
+          <button onclick="cerrarDesgloseGlobal()" style="background:none; border:none; font-size:18px; cursor:pointer;">✕</button>
+        </div>
+        <div style="font-size:11px; color:#777; margin-bottom:12px;">Separación transparente de cuentas:</div>
+        
+        <div style="font-size:12.5px; line-height:1.9;">
+          <div style="display:flex; justify-content:space-between;">
+            <span>Abonos de Proyectos:</span>
+            <b style="color:var(--success);" id="dIngresosProyectos">$160.000</b>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Otros Ingresos Generales:</span>
+            <b style="color:var(--success);" id="dIngresosGenerales">$115.000</b>
+          </div>
+          <hr style="opacity:0.2; margin:6px 0;">
+          <div style="display:flex; justify-content:space-between;">
+            <span>Compras Insumos (Proyectos):</span>
+            <b style="color:var(--alert);" id="dComprasProyectos">-$80.000</b>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Gastos Generales (Negocio):</span>
+            <b style="color:var(--alert);" id="dGastosGenerales">-$115.000</b>
+          </div>
+          <hr style="opacity:0.4; margin:8px 0;">
+          <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:700;">
+            <span>GANANCIA NETA REAL:</span>
+            <b id="dGananciaNeta">$80.000</b>
+          </div>
+        </div>
+        <button onclick="cerrarDesgloseGlobal()" class="primary-btn" style="margin-top:16px;">ENTENDIDO</button>
       </div>
     </div>
 
@@ -769,19 +875,235 @@
       { id: 6, name: 'Azúcar Incauca 1kg', price: 4000, stock: 20, cat: 'Granos' },
     ];
 
+    // Datos del Negocio (Personalizable)
+    let bizProfile = {
+      name: 'TM Diseños Creativos',
+      owner: 'Tatiana Marín',
+      phone: '312 456 7890',
+      nequi: '312 456 7890',
+      daviplata: '312 456 7890',
+      bancolombia: 'Ahorros 123-456789-01'
+    };
+
+    // Proyecto individual de prueba (Tatiana)
     let demoProject = {
       name: '15 años Maria',
       client: 'Maria Rodriguez',
       phone: '312 456 7890',
       total: 400000,
       cobrado: 160000,
-      gastos: 80000,
+      compras: 80000,
       tasks: 4,
       tasksDone: 2
     };
 
+    // Segundo proyecto
+    let secondProject = {
+      cobrado: 115000,
+      compras: 28000
+    };
+
+    // Gastos generales del negocio (independientes de proyectos: ej. Arriendo, Internet)
+    let generalExpenses = [
+      { desc: 'Arriendo mensual taller', amount: 80000 },
+      { desc: 'Internet y telefonía', amount: 35000 }
+    ];
+
+    // Otros ingresos generales del negocio
+    let generalIncomes = [];
+
+    let currentFormAction = null; // 'compra_proyecto', 'abono_proyecto', 'gasto_general', 'otro_ingreso'
+
     let cart = [];
     let currentMode = 'servicios';
+
+    function recalcularTodo() {
+      // 1. Métricas del proyecto individual
+      const gananciaProj = demoProject.cobrado - demoProject.compras;
+      const saldoProj = demoProject.total - demoProject.cobrado;
+
+      document.getElementById('mCobrado').innerText = `$${demoProject.cobrado.toLocaleString('es-CO')}`;
+      document.getElementById('mGastos').innerText = `$${demoProject.compras.toLocaleString('es-CO')}`;
+      document.getElementById('mGanancia').innerText = `$${gananciaProj.toLocaleString('es-CO')}`;
+      document.getElementById('mSaldo').innerText = `$${saldoProj.toLocaleString('es-CO')}`;
+      document.getElementById('mTotal').innerText = `$${demoProject.total.toLocaleString('es-CO')}`;
+      document.getElementById('mTaskRatio').innerText = `${demoProject.tasksDone}/${demoProject.tasks} listas`;
+
+      // 2. Métricas consolidadas del negocio
+      const totalAbonosProyectos = demoProject.cobrado + secondProject.cobrado;
+      const totalOtrosIngresos = generalIncomes.reduce((s, i) => s + i.amount, 0);
+      const totalIngresosGlobal = totalAbonosProyectos + totalOtrosIngresos;
+
+      const totalComprasProyectos = demoProject.compras + secondProject.compras;
+      const totalGastosGenerales = generalExpenses.reduce((s, g) => s + g.amount, 0);
+      const totalGastosGlobal = totalComprasProyectos + totalGastosGenerales;
+
+      const gananciaNetaGlobal = totalIngresosGlobal - totalGastosGlobal;
+
+      // Actualizar tarjetas del Dashboard
+      document.getElementById('txtIngresos').innerText = `$${totalIngresosGlobal.toLocaleString('es-CO')}`;
+      document.getElementById('txtGastos').innerText = `$${totalGastosGlobal.toLocaleString('es-CO')}`;
+      document.getElementById('txtGanancia').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+
+      // Actualizar modal de desglose
+      document.getElementById('dIngresosProyectos').innerText = `$${totalAbonosProyectos.toLocaleString('es-CO')}`;
+      document.getElementById('dIngresosGenerales').innerText = `$${totalOtrosIngresos.toLocaleString('es-CO')}`;
+      document.getElementById('dComprasProyectos').innerText = `-$${totalComprasProyectos.toLocaleString('es-CO')}`;
+      document.getElementById('dGastosGenerales').innerText = `-$${totalGastosGenerales.toLocaleString('es-CO')}`;
+      document.getElementById('dGananciaNeta').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+    }
+
+    // Modal de entrada genérico para registrar datos reales
+    function abrirModalGenerico(action, title, subtitle, btnText) {
+      currentFormAction = action;
+      document.getElementById('fModalTitle').innerText = title;
+      document.getElementById('fModalSubtitle').innerText = subtitle;
+      document.getElementById('fModalBtnSave').innerText = btnText;
+      document.getElementById('fInpConcepto').value = '';
+      document.getElementById('fInpValor').value = '';
+      document.getElementById('formModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('fInpConcepto').focus(), 100);
+    }
+
+    function cerrarFormModal() {
+      document.getElementById('formModal').style.display = 'none';
+    }
+
+    function guardarFormModal() {
+      const concepto = document.getElementById('fInpConcepto').value.trim();
+      const valor = parseFloat(document.getElementById('fInpValor').value);
+
+      if (!concepto || isNaN(valor) || valor <= 0) {
+        showToast('Por favor escribe un concepto y un valor válido.');
+        return;
+      }
+
+      if (currentFormAction === 'compra_proyecto') {
+        demoProject.compras += valor;
+        showToast(`✓ Compra registrada en ${demoProject.name}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+      } else if (currentFormAction === 'abono_proyecto') {
+        demoProject.cobrado += valor;
+        showToast(`✓ Abono recibido de ${demoProject.client}: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+      } else if (currentFormAction === 'gasto_general') {
+        generalExpenses.unshift({ desc: concepto, amount: valor });
+        showToast(`✓ Gasto general registrado: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+      } else if (currentFormAction === 'otro_ingreso') {
+        generalIncomes.unshift({ desc: concepto, amount: valor });
+        showToast(`✓ Ingreso general registrado: ${concepto} ($${valor.toLocaleString('es-CO')})`);
+      }
+
+      cerrarFormModal();
+      recalcularTodo();
+    }
+
+    function abrirModalCompraProyecto() {
+      abrirModalGenerico(
+        'compra_proyecto',
+        'Registrar Compra de Insumo',
+        `Esta compra afectará únicamente las cuentas de "${demoProject.name}".`,
+        'Guardar Compra'
+      );
+    }
+
+    function abrirModalAbonoProyecto() {
+      abrirModalGenerico(
+        'abono_proyecto',
+        'Registrar Abono del Cliente',
+        `Registrar anticipo o abono de ${demoProject.client}.`,
+        'Registrar Abono'
+      );
+    }
+
+    function abrirModalGastoGeneral() {
+      abrirModalGenerico(
+        'gasto_general',
+        'Registrar Gasto General',
+        'Gasto del negocio independiente de proyectos (Arriendo, Servicios, etc.)',
+        'Guardar Gasto'
+      );
+    }
+
+    function abrirModalOtroIngreso() {
+      abrirModalGenerico(
+        'otro_ingreso',
+        'Registrar Otro Ingreso',
+        'Ingreso del negocio no perteneciente a un encargo en particular.',
+        'Guardar Ingreso'
+      );
+    }
+
+    // Modal de Datos del Negocio
+    function openBusinessProfileModal() {
+      document.getElementById('bizNameInp').value = bizProfile.name;
+      document.getElementById('bizOwnerInp').value = bizProfile.owner;
+      document.getElementById('bizPhoneInp').value = bizProfile.phone;
+      document.getElementById('bizNequiInp').value = bizProfile.nequi;
+      document.getElementById('bizBankInp').value = bizProfile.bancolombia;
+      document.getElementById('bizModal').style.display = 'flex';
+    }
+
+    function cerrarBusinessProfileModal() {
+      document.getElementById('bizModal').style.display = 'none';
+    }
+
+    function guardarDatosNegocio() {
+      const name = document.getElementById('bizNameInp').value.trim();
+      if (!name) {
+        showToast('El negocio debe tener un nombre.');
+        return;
+      }
+      bizProfile.name = name;
+      bizProfile.owner = document.getElementById('bizOwnerInp').value.trim();
+      bizProfile.phone = document.getElementById('bizPhoneInp').value.trim();
+      bizProfile.nequi = document.getElementById('bizNequiInp').value.trim();
+      bizProfile.bancolombia = document.getElementById('bizBankInp').value.trim();
+
+      document.getElementById('headerTitle').innerText = `${bizProfile.name} • Servicios`;
+      cerrarBusinessProfileModal();
+      showToast(`¡Datos actualizados para "${bizProfile.name}"!`);
+    }
+
+    // Desglose
+    function verDesgloseGlobal() {
+      document.getElementById('desgloseModal').style.display = 'flex';
+    }
+
+    function cerrarDesgloseGlobal() {
+      document.getElementById('desgloseModal').style.display = 'none';
+    }
+
+    function toggleTaskPreview(chk) {
+      if (chk.checked) demoProject.tasksDone++;
+      else demoProject.tasksDone--;
+      recalcularTodo();
+      showToast(chk.checked ? '✓ Tarea completada' : 'Tarea pendiente');
+    }
+
+    function copiarWhatsAppCotizacion() {
+      const saldo = demoProject.total - demoProject.cobrado;
+      const msg = `✨ *${bizProfile.name.toUpperCase()}* ✨\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Proyecto:* ${demoProject.name}\n👤 *Cliente:* ${demoProject.client}\n📦 *Servicios:* 50 Invitaciones + 10 Centros de mesa\n\n💰 *RESUMEN DE CUENTA:*\n• *Total Cotizado:* $${demoProject.total.toLocaleString('es-CO')}\n• *Abonado a la fecha:* $${demoProject.cobrado.toLocaleString('es-CO')}\n• *SALDO PENDIENTE:* $${saldo.toLocaleString('es-CO')}\n\n🏦 *CUENTAS DE COBRO:*\n• Nequi: ${bizProfile.nequi}\n• Bancolombia: ${bizProfile.bancolombia}\n📞 Contacto: ${bizProfile.phone}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n¡Muchas gracias por apoyar nuestro talento local! 🌸`;
+
+      navigator.clipboard.writeText(msg).catch(() => {});
+      showToast(`¡Cotización de "${bizProfile.name}" copiada para WhatsApp!`);
+    }
+
+    function verPedidosPorVencer() {
+      verDetalleProyecto(0);
+      showToast('⚠️ "15 años Maria" vence en 2 días');
+    }
+
+    function crearNuevoProyecto() {
+      showToast('✨ Formulario de nuevo encargo listo con catálogo Tatiana.');
+    }
+
+    function verDetalleProyecto(idx) {
+      recalcularTodo();
+      document.getElementById('projectModal').style.display = 'flex';
+    }
+
+    function closeProjectModal() {
+      document.getElementById('projectModal').style.display = 'none';
+    }
 
     function renderPos() {
       const grid = document.getElementById('posGrid');
@@ -834,7 +1156,7 @@
       document.getElementById('tabRetail').classList.toggle('active', mode === 'retail');
       document.getElementById('viewServicios').style.display = mode === 'servicios' ? 'block' : 'none';
       document.getElementById('viewRetail').style.display = mode === 'retail' ? 'block' : 'none';
-      document.getElementById('headerTitle').innerText = mode === 'servicios' ? 'Zentra - Papelería Creativa' : 'Zentra - Tienda Don Pedro';
+      document.getElementById('headerTitle').innerText = mode === 'servicios' ? `${bizProfile.name} • Servicios` : 'Zentra • Tienda Don Pedro';
     }
 
     function toggleMode() {
@@ -860,74 +1182,17 @@
       closeThemeModal();
     }
 
-    function verPedidosPorVencer() {
-      verDetalleProyecto(0);
-      showToast('⚠️ "15 años Maria" vence en 2 días');
-    }
-
-    function crearNuevoProyecto() {
-      showToast('✨ Formulario de nuevo proyecto abierto con catálogo Tatiana.');
-    }
-
-    function verDetalleProyecto(idx) {
-      updateProjectModalUI();
-      document.getElementById('projectModal').style.display = 'flex';
-    }
-
-    function closeProjectModal() {
-      document.getElementById('projectModal').style.display = 'none';
-    }
-
-    function updateProjectModalUI() {
-      const ganancia = demoProject.cobrado - demoProject.gastos;
-      const saldo = demoProject.total - demoProject.cobrado;
-      document.getElementById('mCobrado').innerText = `$${demoProject.cobrado.toLocaleString('es-CO')}`;
-      document.getElementById('mGastos').innerText = `$${demoProject.gastos.toLocaleString('es-CO')}`;
-      document.getElementById('mGanancia').innerText = `$${ganancia.toLocaleString('es-CO')}`;
-      document.getElementById('mSaldo').innerText = `$${saldo.toLocaleString('es-CO')}`;
-      document.getElementById('mTotal').innerText = `$${demoProject.total.toLocaleString('es-CO')}`;
-      document.getElementById('mTaskRatio').innerText = `${demoProject.tasksDone}/${demoProject.tasks} listas`;
-    }
-
-    function toggleTaskPreview(chk) {
-      if (chk.checked) demoProject.tasksDone++;
-      else demoProject.tasksDone--;
-      updateProjectModalUI();
-      showToast(chk.checked ? '✓ Tarea completada' : 'Tarea pendiente');
-    }
-
-    function agregarGastoDemo() {
-      demoProject.gastos += 25000;
-      updateProjectModalUI();
-      showToast('-$25.000 COP en insumos registrado');
-    }
-
-    function agregarAbonoDemo() {
-      if (demoProject.cobrado < demoProject.total) {
-        demoProject.cobrado += 100000;
-        updateProjectModalUI();
-        showToast('+$100.000 COP de abono registrado');
-      } else {
-        showToast('¡El proyecto ya está 100% cobrado!');
-      }
-    }
-
-    function copiarWhatsAppCotizacion() {
-      const saldo = demoProject.total - demoProject.cobrado;
-      const msg = `✨ *PAPELERÍA CREATIVA - DETALLE DE PEDIDO* ✨\n📋 *Proyecto:* ${demoProject.name}\n👤 *Cliente:* ${demoProject.client}\n📦 *Servicios:* 50 Invitaciones + 10 Centros de mesa\n💰 *Total:* $${demoProject.total.toLocaleString('es-CO')}\n✓ *Abonado:* $${demoProject.cobrado.toLocaleString('es-CO')}\n⚠️ *Saldo Pendiente:* $${saldo.toLocaleString('es-CO')}\n🏦 Nequi/Daviplata: 312 456 7890\n¡Gracias por tu apoyo! 🌸`;
-      navigator.clipboard.writeText(msg).catch(() => {});
-      showToast('¡Copiado! Listo para pegar en WhatsApp');
-    }
-
     function showToast(msg) {
       const t = document.getElementById('toastMsg');
       t.innerText = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2200);
+      setTimeout(() => t.classList.remove('show'), 2400);
     }
 
-    // Inicializar POS
+    // Inicialización
     renderPos();
+    recalcularTodo();
   </script>
 </body>
 </html>
+

@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import '../models/project_model.dart';
+import '../../profile/models/business_profile_model.dart';
+import '../../profile/providers/business_profile_provider.dart';
 import '../../../core/theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 /// Utilidad para generar y compartir resúmenes, cotizaciones y recibos
-/// de proyectos directamente hacia WhatsApp para el cliente.
+/// de proyectos directamente hacia WhatsApp para el cliente, utilizando los datos del perfil del negocio.
 class QuoteShareHelper {
-  static String buildWhatsAppMessage(ProjectModel project) {
+  static String buildWhatsAppMessage(ProjectModel project, BusinessProfileModel profile) {
     final currency = NumberFormat.currency(locale: 'es_CO', symbol: '\$', decimalDigits: 0);
     final dateStr = DateFormat('dd/MM/yyyy').format(project.deliveryDate);
 
     final buffer = StringBuffer();
-    buffer.writeln('✨ *PAPELERÍA CREATIVA - DETALLE DE PEDIDO* ✨');
+    buffer.writeln('✨ *${profile.businessName.toUpperCase()}* ✨');
     buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     buffer.writeln('📋 *Proyecto:* ${project.name}');
     buffer.writeln('👤 *Cliente:* ${project.clientName}');
@@ -21,9 +23,9 @@ class QuoteShareHelper {
     buffer.writeln('🔄 *Estado actual:* ${project.status}');
     buffer.writeln('');
 
-    buffer.writeln('📦 *SERVICIOS INCLUIDOS:*');
+    buffer.writeln('📦 *SERVICIOS / DETALLE:*');
     if (project.services.isEmpty) {
-      buffer.writeln('• Servicio personalizado');
+      buffer.writeln('• Servicio artesanal personalizado');
     } else {
       for (final service in project.services) {
         buffer.writeln('• $service');
@@ -51,18 +53,21 @@ class QuoteShareHelper {
       buffer.writeln('');
     }
 
-    buffer.writeln('🏦 *MÉTODOS DE PAGO ACEPTADOS:*');
-    buffer.writeln('• Nequi / Daviplata: 312 456 7890');
-    buffer.writeln('• Bancolombia Ahorros: 123-456789-01');
+    buffer.writeln('🏦 *MEDIOS DE PAGO ACEPTADOS:*');
+    if (profile.nequi.isNotEmpty) buffer.writeln('• Nequi: ${profile.nequi}');
+    if (profile.daviplata.isNotEmpty) buffer.writeln('• Daviplata: ${profile.daviplata}');
+    if (profile.bancolombia.isNotEmpty) buffer.writeln('• Bancolombia: ${profile.bancolombia}');
+    if (profile.phone.isNotEmpty) buffer.writeln('📞 Contacto: ${profile.phone}');
     buffer.writeln('━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    buffer.writeln('¡Muchas gracias por apoyar nuestro emprendimiento! 🌸');
+    buffer.writeln(profile.customNote);
 
     return buffer.toString();
   }
 
   static void showShareModal(BuildContext context, ProjectModel project) {
     final theme = context.read<ThemeProvider>().currentPalette;
-    final messageText = buildWhatsAppMessage(project);
+    final profile = context.read<BusinessProfileProvider>().profile;
+    final messageText = buildWhatsAppMessage(project, profile);
 
     showModalBottomSheet(
       context: context,
@@ -109,13 +114,17 @@ class QuoteShareHelper {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Compartir con ${project.clientName}',
+                              'Enviar a ${project.clientName}',
                               style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 18),
+                            ),
+                            Text(
+                              'Remitente: ${profile.businessName}',
+                              style: const TextStyle(fontSize: 12.5, color: Colors.grey, fontWeight: FontWeight.w500),
                             ),
                             if (project.clientPhone.isNotEmpty)
                               Text(
                                 'WhatsApp: ${project.clientPhone}',
-                                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
                               ),
                           ],
                         ),
@@ -131,7 +140,7 @@ class QuoteShareHelper {
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEFEAE2), // Típico fondo chat WhatsApp
+                      color: const Color(0xFFEFEAE2),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.grey.shade300),
                     ),

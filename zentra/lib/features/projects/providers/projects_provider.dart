@@ -5,11 +5,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/project_model.dart';
 
+import '../models/general_transaction_model.dart';
+
 /// Provider de gestión de proyectos y finanzas para el Modo Servicios de Zentra.
 /// Diseñado con arquitectura híbrida: opera 100% offline con datos locales persistentes (SharedPreferences)
 /// y sincroniza con Firestore en la nube si hay conexión activa.
 class ProjectsProvider with ChangeNotifier {
   static const String _storageKey = 'zentra_projects_storage_v1';
+  static const String _generalTxStorageKey = 'zentra_general_transactions_v1';
 
   FirebaseFirestore? get _firestore {
     try {
@@ -28,23 +31,52 @@ class ProjectsProvider with ChangeNotifier {
   }
 
   List<ProjectModel> _projects = [];
+  List<GeneralTransactionModel> _generalTransactions = [];
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
   List<ProjectModel> get projects => _projects;
+  List<GeneralTransactionModel> get generalTransactions => _generalTransactions;
 
-  // Cálculo en tiempo real de ingresos: suma de todos los pagos registrados
-  double get ingresosMes {
-    return _projects.fold(0.0, (sum, p) => sum + p.totalPaid);
-  }
-
-  // Cálculo en tiempo real de gastos: suma de todos los insumos y costos
-  double get gastosMes {
+  // 1. Desglose de Gastos
+  // Compras de insumos asignadas a proyectos específicos
+  double get comprasProyectos {
     return _projects.fold(0.0, (sum, p) => sum + p.totalExpenses);
   }
 
-  // Ganancia neta global del negocio = Ingresos - Gastos
-  double get gananciaMes => ingresosMes - gastosMes;
+  // Gastos generales del negocio (arriendo, servicios, publicidad, etc.)
+  double get gastosGenerales {
+    return _generalTransactions
+        .where((tx) => tx.isExpense)
+        .fold(0.0, (sum, tx) => sum + tx.amount);
+  }
+
+  // Total acumulado de gastos (Compras proyectos + Gastos generales)
+  double get totalGastosGlobal => comprasProyectos + gastosGenerales;
+
+  // 2. Desglose de Ingresos
+  // Abonos y anticipos cobrados en proyectos
+  double get ingresosProyectos {
+    return _projects.fold(0.0, (sum, p) => sum + p.totalPaid);
+  }
+
+  // Otros ingresos independientes de proyectos
+  double get ingresosGenerales {
+    return _generalTransactions
+        .where((tx) => tx.isIncome)
+        .fold(0.0, (sum, tx) => sum + tx.amount);
+  }
+
+  // Total acumulado de ingresos (Abonos proyectos + Otros ingresos)
+  double get totalIngresosGlobal => ingresosProyectos + ingresosGenerales;
+
+  // 3. Ganancia Neta Real del Negocio = Total Ingresos - Total Gastos
+  double get gananciaNetaGlobal => totalIngresosGlobal - totalGastosGlobal;
+
+  // Aliases compatibles con el Dashboard
+  double get ingresosMes => totalIngresosGlobal;
+  double get gastosMes => totalGastosGlobal;
+  double get gananciaMes => gananciaNetaGlobal;
 
   // Proyectos activos (no finalizados)
   int get proyectosActivos =>
@@ -61,6 +93,7 @@ class ProjectsProvider with ChangeNotifier {
 
   ProjectsProvider() {
     _loadStoredProjects();
+    _loadStoredGeneralTransactions();
     _listenToAuthChanges();
   }
 
@@ -357,4 +390,71 @@ class ProjectsProvider with ChangeNotifier {
       await updateProject(project.copyWith(tasks: updatedTasks));
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // GESTIÓN DE GASTOS GENERALES Y OTROS INGRESOS DEL NEGOCIO
+  // ---------------------------------------------------------------------------
+  Future<void> _loadStoredGeneralTransactions() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final str = prefs.getString(_generalTxStorageKey);
+      if (str != null && str.isNotEmpty) {
+        final List<dynamic> decoded = jsonDecode(str);
+        _generalTransactions = decoded
+            .map((item) => GeneralTransactionModel.fromMap(Map<String, dynamic>.from(item)))
+            .toList();
+        notifyListeners();
+        return;
+      }
+    } catch (e) {
+      debugPrint('Error leyendo transacciones generales: $e');
+    }
+
+    // Datos de ejemplo iniciales (Arriendo taller e Internet)
+    _generalTransactions = [
+      GeneralTransactionModel(
+        id: 'tx_demo_1',
+        type: GeneralTransactionType.gasto,
+        category: 'Arriendo',
+        description: 'Arriendo mensual del taller creativo',
+        amount: 80000.0,
+        date: DateTime.now().subtract(const Duration(days: 4)),
+        paymentMethod: 'Transferencia',
+      ),
+      GeneralTransactionModel(
+        id: 'tx_demo_2',
+        type: GeneralTransactionType.gasto,
+        category: 'Servicios',
+        description: 'Pago de Internet y telefonía',
+        amount: 35000.0,
+        date: DateTime.now().subtract(const Duration(days: 2)),
+        paymentMethod: 'Nequi',
+      ),
+    ];
+    _saveGeneralTransactionsToLocalStorage();
+    notifyListeners();
+  }
+
+  Future<void> _saveGeneralTransactionsToLocalStorage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final list = _generalTransactions.map((tx) => tx.toMap()).toList();
+      await prefs.setString(_generalTxStorageKey, jsonEncode(list));
+    } catch (e) {
+      debugPrint('Error guardando transacciones generales: $e');
+    }
+  }
+
+  Future<void> addGeneralTransaction(GeneralTransactionModel tx) async {
+    _generalTransactions.insert(0, tx);
+    await _saveGeneralTransactionsToLocalStorage();
+    notifyListeners();
+  }
+
+  Future<void> deleteGeneralTransaction(String txId) async {
+    _generalTransactions.removeWhere((tx) => tx.id == txId);
+    await _saveGeneralTransactionsToLocalStorage();
+    notifyListeners();
+  }
 }
+

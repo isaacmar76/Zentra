@@ -25,22 +25,28 @@ class ProjectDetailScreen extends StatelessWidget {
     'Entregado',
   ];
 
-  void _showAddExpenseDialog(BuildContext context, ProjectsProvider provider, String projectId) {
+  void _showAddPurchaseDialog(BuildContext context, ProjectsProvider provider, String projectId) {
     final descController = TextEditingController();
     final amountController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Agregar Gasto / Insumo'),
+        title: const Text('Registrar Compra de Insumo'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              'Esta compra se asignará exclusivamente a este proyecto para su balance individual.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 12),
             TextField(
               controller: descController,
               decoration: const InputDecoration(
-                labelText: 'Descripción del gasto *',
-                hintText: 'Ej: Cartulinas, cintas, papel fotográfico',
+                labelText: 'Concepto o material comprado *',
+                hintText: 'Ej: Cartulinas blush, cintas doradas, papel',
               ),
             ),
             const SizedBox(height: 12),
@@ -48,14 +54,9 @@ class ProjectDetailScreen extends StatelessWidget {
               controller: amountController,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(
-                labelText: 'Valor del gasto (\$ COP) *',
+                labelText: 'Valor de la compra (\$ COP) *',
                 prefixIcon: Icon(Icons.attach_money),
               ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Regla de Oro: El gasto se restará directamente de la ganancia real del encargo.',
-              style: TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
         ),
@@ -79,11 +80,11 @@ class ProjectDetailScreen extends StatelessWidget {
                 provider.addExpense(projectId, newExpense);
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Gasto registrado exitosamente')),
+                  const SnackBar(content: Text('Compra de insumo registrada en el proyecto')),
                 );
               }
             },
-            child: const Text('GUARDAR GASTO'),
+            child: const Text('GUARDAR COMPRA'),
           ),
         ],
       ),
@@ -302,8 +303,8 @@ class ProjectDetailScreen extends StatelessWidget {
                 _buildServicesCard(context, currentProject, theme),
                 const SizedBox(height: 14),
 
-                // 5. Módulo de Gastos del Proyecto (Regla de oro: solo borrar)
-                _buildExpensesCard(context, provider, currentProject, currencyFormatter, theme),
+                // 5. Módulo de Compras de Insumos del Proyecto
+                _buildPurchasesCard(context, provider, currentProject, currencyFormatter, theme),
                 const SizedBox(height: 14),
 
                 // 6. Módulo de Pagos / Abonos
@@ -486,7 +487,7 @@ class ProjectDetailScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildStatItem('Total Cobrado', formatter.format(project.totalPaid), theme.success),
-                _buildStatItem('Total Gastos', formatter.format(project.totalExpenses), theme.alert),
+                _buildStatItem('Compras Insumos', formatter.format(project.totalExpenses), theme.alert),
                 _buildStatItem('Ganancia Neta', formatter.format(project.netProfit), theme.textDark, isBold: true),
               ],
             ),
@@ -676,7 +677,7 @@ class ProjectDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildExpensesCard(
+  Widget _buildPurchasesCard(
     BuildContext context,
     ProjectsProvider provider,
     ProjectModel project,
@@ -692,19 +693,25 @@ class ProjectDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Gastos / Insumos', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Compras de Insumos', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16)),
+                    const Text('Materiales asignados a este proyecto', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                  ],
+                ),
                 TextButton.icon(
-                  onPressed: () => _showAddExpenseDialog(context, provider, project.id),
-                  icon: const Icon(Icons.add_circle_outline, size: 18),
-                  label: const Text('+ Gasto'),
+                  onPressed: () => _showAddPurchaseDialog(context, provider, project.id),
+                  icon: const Icon(Icons.add_shopping_cart, size: 18),
+                  label: const Text('+ Compra'),
                 ),
               ],
             ),
-            const Divider(height: 12),
+            const Divider(height: 14),
             if (project.expenses.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Text('Sin gastos registrados. Toca "+ Gasto" para restar costos de insumos.'),
+                child: Text('Sin compras de insumos para este encargo. Toca "+ Compra" para registrar materiales.'),
               )
             else
               ...project.expenses.map(
@@ -722,7 +729,7 @@ class ProjectDetailScreen extends StatelessWidget {
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete_outline, size: 18, color: Colors.grey),
-                        tooltip: 'Eliminar gasto (Regla de oro: solo borrar)',
+                        tooltip: 'Eliminar compra (Regla de oro: solo borrar)',
                         onPressed: () => provider.deleteExpense(project.id, expense.id),
                       ),
                     ],
@@ -751,7 +758,13 @@ class ProjectDetailScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Pagos y Abonos', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16)),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Abonos Recibidos', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 16)),
+                    const Text('Anticipos y pagos del cliente', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                  ],
+                ),
                 TextButton.icon(
                   onPressed: () => _showAddPaymentDialog(context, provider, project.id),
                   icon: const Icon(Icons.add_circle_outline, size: 18),
@@ -759,11 +772,11 @@ class ProjectDetailScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const Divider(height: 12),
+            const Divider(height: 14),
             if (project.payments.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8.0),
-                child: Text('Sin pagos registrados. Registra anticipos con "+ Abono".'),
+                child: Text('Sin abonos registrados aún. Registra anticipos con "+ Abono".'),
               )
             else
               ...project.payments.map(

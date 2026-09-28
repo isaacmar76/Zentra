@@ -1,4 +1,4 @@
-name: Zentra CI/CD - Compilación y Despliegue ($0 USD)
+name: Zentra CI/CD - Compilación y Distribución ($0 USD)
 
 on:
   push:
@@ -7,11 +7,14 @@ on:
     branches: [ main, master ]
   workflow_dispatch:
 
-jobs:
-  build:
-    name: Compilar Zentra Web y APK Android
-    runs-on: ubuntu-latest
+permissions:
+  contents: write
+  packages: write
 
+jobs:
+  build-apk:
+    name: Compilar APK Android para Celular
+    runs-on: ubuntu-latest
     steps:
       - name: Clonar repositorio
         uses: actions/checkout@v4
@@ -28,25 +31,61 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Instalar dependencias
+      - name: Instalar dependencias Flutter
         working-directory: ./zentra
         run: flutter pub get
 
-      - name: Compilar Versión Web
+      - name: Compilar APK Android Release
         working-directory: ./zentra
-        run: flutter build web --release
+        run: flutter build apk --release --no-tree-shake-icons
 
-      - name: Compilar APK Android
-        working-directory: ./zentra
-        run: flutter build apk --release
-
-      - name: Publicar APK compilado como artefacto de descarga
+      - name: Subir APK Android como Artefacto descargable
         uses: actions/upload-artifact@v4
         with:
           name: zentra-app-release-apk
           path: zentra/build/app/outputs/flutter-apk/app-release.apk
 
-      - name: Publicar versión Web compilada
+      - name: Publicar Release directa con el APK en GitHub
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        continue-on-error: true
+        with:
+          tag_name: v1.2.0-preview
+          name: Zentra V1.2.0 - Versión para Pruebas en Celular
+          body: |
+            ### 📱 Zentra V1.2.0 - App Móvil para Pruebas
+            Descarga directamente el archivo **`app-release.apk`** en tu celular Android para instalar y probar:
+            - **4 Temas de Color Personalizables** (Nude & Blush, Esmeralda, Lavanda, Océano).
+            - **Modo Tatiana (Servicios y Proyectos)** con cálculo de balance real.
+            - **Modo Don Pedro (Comercio / Retail)** con catálogo, punto de venta y cierre de caja.
+            - **Acceso Rápido Demo 1-Click** sin necesidad de credenciales.
+          files: zentra/build/app/outputs/flutter-apk/app-release.apk
+
+  build-web:
+    name: Compilar Versión Web / PWA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Habilitar Flutter Web
+        run: flutter config --enable-web
+
+      - name: Instalar dependencias
+        working-directory: ./zentra
+        run: flutter pub get
+
+      - name: Compilar Web Release
+        working-directory: ./zentra
+        run: flutter build web --release --base-href "/Zentra/" --no-tree-shake-icons
+
+      - name: Subir versión Web como Artefacto
         uses: actions/upload-artifact@v4
         with:
           name: zentra-web-build

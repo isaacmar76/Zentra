@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zentra - Gestión Ágil para Micronegocios</title>
   <meta name="description" content="Gestión financiera, pedidos por proyecto y mostrador POS sin complicaciones.">
-  <meta name="theme-color" content="#E8C4C4">
+  <meta name="theme-color" content="#FF2B78">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -17,7 +17,29 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* Tema 1 por defecto: Nude & Blush */
+      /* Tema Oficial por Defecto: TM Diseños Creativos */
+      --bg: #FFE3F4;
+      --primary: #FF2B78;
+      --secondary: #FF4400;
+      --text: #545454;
+      --success: #2E7D32;
+      --alert: #FF4400;
+      --card-bg: #FFFFFF;
+      --surface-border: rgba(255, 43, 120, 0.25);
+    }
+
+    [data-theme="tm_disenos"] {
+      --bg: #FFE3F4;
+      --primary: #FF2B78;
+      --secondary: #FF4400;
+      --text: #545454;
+      --success: #2E7D32;
+      --alert: #FF4400;
+      --card-bg: #FFFFFF;
+      --surface-border: rgba(255, 43, 120, 0.25);
+    }
+
+    [data-theme="nude"] {
       --bg: #F5EFE6;
       --primary: #E8C4C4;
       --secondary: #D4A5A5;
@@ -668,11 +690,28 @@
     <!-- Modal de Selección de Temas -->
     <div class="theme-modal" id="themeModal" onclick="closeThemeModal(event)">
       <div class="theme-sheet" onclick="event.stopPropagation()">
-        <h3 style="font-size: 15px; margin-bottom: 4px; color: var(--text);">Paletas de Colores (4 Themes)</h3>
+        <h3 style="font-size: 15px; margin-bottom: 4px; color: var(--text);">Paletas de Colores (5 Temas)</h3>
         <p style="font-size: 11px; color: #666; margin-bottom: 14px;">Elige el tema que mejor represente a tu negocio:</p>
 
-        <!-- Tema 1 -->
-        <div class="theme-option active" id="opt-nude" onclick="applyTheme('nude')">
+        <!-- Tema Oficial TM Diseños Creativos -->
+        <div class="theme-option active" id="opt-tm_disenos" onclick="applyTheme('tm_disenos')">
+          <div class="dots-preview">
+            <div class="color-dot" style="background: #FFE3F4; border: 1px solid #FF2B78;"></div>
+            <div class="color-dot" style="background: #FF2B78;"></div>
+            <div class="color-dot" style="background: #FF4400;"></div>
+            <div class="color-dot" style="background: #545454;"></div>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size: 12px; font-weight: 700; color: #FF2B78;">TM Diseños Creativos</span>
+              <span style="font-size: 9px; background: #FF2B78; color: #fff; padding: 1px 6px; border-radius: 6px; font-weight: 700;">OFICIAL</span>
+            </div>
+            <div style="font-size: 10px; color: #777;">Fucsia (#ff2b78), Naranja (#ff4400) y Rosa Pastel (#ffe3f4)</div>
+          </div>
+        </div>
+
+        <!-- Tema 2 -->
+        <div class="theme-option" id="opt-nude" onclick="applyTheme('nude')">
           <div class="dots-preview">
             <div class="color-dot" style="background: #F5EFE6;"></div>
             <div class="color-dot" style="background: #E8C4C4;"></div>
@@ -680,8 +719,8 @@
             <div class="color-dot" style="background: #5C4A3E;"></div>
           </div>
           <div>
-            <div style="font-size: 12px; font-weight: 700;">Nude & Blush (Tatiana)</div>
-            <div style="font-size: 10px; color: #777;">Artesanal, papelerías creativas, eventos</div>
+            <div style="font-size: 12px; font-weight: 700;">Nude & Blush (Artesanal)</div>
+            <div style="font-size: 10px; color: #777;">Neutro, arena claro y blush rosado</div>
           </div>
         </div>
 
@@ -1166,6 +1205,8 @@
         if (incStr) generalIncomes = JSON.parse(incStr);
         const catStr = localStorage.getItem('zentra_catalog');
         if (catStr) catalogItems = JSON.parse(catStr);
+        const savedTheme = localStorage.getItem('zentra_active_theme') || 'tm_disenos';
+        applyTheme(savedTheme, false);
       } catch (e) {
         console.warn('Storage load error', e);
       }
@@ -1923,15 +1964,35 @@
       document.getElementById('themeModal').style.display = 'none';
     }
 
-    function applyTheme(themeKey) {
+    function applyTheme(themeKey, showNotification = true) {
       const root = document.getElementById('appRoot');
-      if (themeKey === 'nude') root.removeAttribute('data-theme');
-      else root.setAttribute('data-theme', themeKey);
+      if (themeKey === 'tm_disenos') {
+        root.setAttribute('data-theme', 'tm_disenos');
+      } else if (themeKey === 'nude') {
+        root.setAttribute('data-theme', 'nude');
+      } else {
+        root.setAttribute('data-theme', themeKey);
+      }
 
       document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
-      document.getElementById(`opt-${themeKey}`).classList.add('active');
-      showToast(`Tema ${themeKey.toUpperCase()} activado`);
-      closeThemeModal();
+      const activeEl = document.getElementById(`opt-${themeKey}`);
+      if (activeEl) activeEl.classList.add('active');
+
+      try {
+        localStorage.setItem('zentra_active_theme', themeKey);
+      } catch (e) {}
+
+      if (showNotification) {
+        const themeNames = {
+          tm_disenos: 'TM DISEÑOS CREATIVOS',
+          nude: 'NUDE & BLUSH',
+          esmeralda: 'ESMERALDA & MENTA',
+          lavanda: 'LAVANDA & CIRUELA',
+          oceano: 'OCÉANO & MEDIANOCHE'
+        };
+        showToast(`Tema ${themeNames[themeKey] || themeKey.toUpperCase()} activado`);
+        closeThemeModal();
+      }
     }
 
     function showToast(msg) {

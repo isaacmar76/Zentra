@@ -117,12 +117,26 @@ class ZentraThemePalette {
 }
 
 /// Registro central de los 4 temas personalizables de Zentra.
+/// Registro central de los temas personalizables de Zentra.
 class AppTheme {
-  // 1. TEMA 1: Nude & Blush (Tema Original de Tatiana / Artesanal)
+  // 1. TEMA OFICIAL: TM Diseños Creativos (Identidad Oficial de Marca)
+  static const ZentraThemePalette tmDisenos = ZentraThemePalette(
+    id: 'tm_disenos',
+    name: 'TM Diseños Creativos',
+    subtitle: 'Paleta Oficial de Marca (#ff2b78, #ff4400 y #ffe3f4)',
+    background: Color(0xFFFFE3F4), // Rosa pastel suave (#ffe3f4)
+    primary: Color(0xFFFF2B78),    // Fucsia vibrante oficial (#ff2b78)
+    secondary: Color(0xFFFF4400),  // Naranja vibrante oficial (#ff4400)
+    textDark: Color(0xFF545454),   // Gris carbón oficial (#545454)
+    success: Color(0xFF2E7D32),    // Verde confirmación
+    alert: Color(0xFFFF4400),      // Naranja alerta / acento (#ff4400)
+  );
+
+  // 2. TEMA: Nude & Blush (Artesanal y Delicado)
   static const ZentraThemePalette nudeBlush = ZentraThemePalette(
     id: 'nude_blush',
     name: 'Nude & Blush',
-    subtitle: 'Artesanal, femenino y delicado (Caso Tatiana)',
+    subtitle: 'Artesanal, neutro y delicado',
     background: Color(0xFFF5EFE6), // Nude arena claro
     primary: Color(0xFFE8C4C4),    // Blush rosado
     secondary: Color(0xFFD4A5A5),  // Rosado fuerte para botones
@@ -131,7 +145,7 @@ class AppTheme {
     alert: Color(0xFFE07A5F),      // Naranja terracota
   );
 
-  // 2. TEMA 2: Esmeralda & Menta (Comercio & Retail Moderno)
+  // 3. TEMA: Esmeralda & Menta (Comercio & Retail Moderno)
   static const ZentraThemePalette esmeraldaMenta = ZentraThemePalette(
     id: 'esmeralda_menta',
     name: 'Esmeralda & Menta',
@@ -144,7 +158,7 @@ class AppTheme {
     alert: Color(0xFFE53E3E),      // Rojo coral
   );
 
-  // 3. TEMA 3: Lavanda & Ciruela (Elegancia & Bienestar)
+  // 4. TEMA: Lavanda & Ciruela (Elegancia & Bienestar)
   static const ZentraThemePalette lavandaCiruela = ZentraThemePalette(
     id: 'lavanda_ciruela',
     name: 'Lavanda & Ciruela',
@@ -157,7 +171,7 @@ class AppTheme {
     alert: Color(0xFFED8936),      // Naranja ámbar
   );
 
-  // 4. TEMA 4: Océano & Medianoche (Sobrio & Ejecutivo)
+  // 5. TEMA: Océano & Medianoche (Sobrio & Ejecutivo)
   static const ZentraThemePalette oceanoNavy = ZentraThemePalette(
     id: 'oceano_navy',
     name: 'Océano & Medianoche',
@@ -170,8 +184,9 @@ class AppTheme {
     alert: Color(0xFFEA580C),      // Naranja fuego
   );
 
-  /// Lista con los 4 temas seleccionables por el usuario
+  /// Lista con los 5 temas seleccionables por el usuario
   static const List<ZentraThemePalette> allThemes = [
+    tmDisenos,
     nudeBlush,
     esmeraldaMenta,
     lavandaCiruela,
@@ -182,10 +197,10 @@ class AppTheme {
   static ZentraThemePalette getThemeById(String id) {
     return allThemes.firstWhere(
       (t) => t.id == id,
-      orElse: () => nudeBlush,
+      orElse: () => tmDisenos,
     );
   }
 
-  /// Retorna el ThemeData por defecto (Nude & Blush)
-  static ThemeData get lightTheme => nudeBlush.toThemeData();
+  /// Retorna el ThemeData por defecto (TM Diseños Creativos)
+  static ThemeData get lightTheme => tmDisenos.toThemeData();
 }

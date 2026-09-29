@@ -191,7 +191,8 @@ class CatalogItemModel {
 | **2026-09-28** | `8d79e42` | Fix | Corrección en `preview.html`: restauración de modales de proyectos, checklist y flujo contable | ✅ Completado |
 | **2026-09-29** | `13a7b9e` | Architecture | Creación de `LOGICA_Y_BITACORA.md` como fuente de verdad y registro continuo | ✅ Completado |
 | **2026-09-29** | `9f31f41` | Core | Configuración fija de tipo de negocio al crear empresa, borrado total de datos demo y persistencia local | ✅ Completado |
-| **2026-09-29** | *Pendiente Push* | Deploy / PWA | Estructura para despliegue instantáneo en Vercel (`index.html`, `vercel.json`, `manifest.json`, iconos PWA) | ✅ Completado |
+| **2026-09-29** | `051ed97` | Deploy / PWA | Estructura para despliegue instantáneo en Vercel (`index.html`, `vercel.json`, `manifest.json`, iconos PWA) | ✅ Completado |
+| **2026-09-29** | *Pendiente Push* | UI / Branding | Integración de la paleta oficial de TM Diseños Creativos (`#ff2b78`, `#ff4400`, `#ffe3f4`, `#545454`, `#ffffff`) como tema oficial | ✅ Completado |
 
 ---
 
@@ -225,6 +226,18 @@ class CatalogItemModel {
   2. Creación de `vercel.json` con enrutamiento limpio y soporte SPA.
   3. Configuración de `manifest.json` y meta-etiquetas PWA (`mobile-web-app-capable`, `theme-color`).
   4. Generación de íconos de aplicación de alta resolución en `img/` para instalación directa en pantalla de inicio de Android/iOS ("Añadir a pantalla de inicio").
+
+#### Hito 6: Paleta Oficial de Marca TM Diseños Creativos
+- **Especificación de Marca recibida:**
+  - Fucsia vibrante: `#ff2b78`
+  - Naranja vibrante: `#ff4400`
+  - Rosa pastel suave (fondo): `#ffe3f4`
+  - Gris carbón (texto y contraste): `#545454`
+  - Blanco puro (tarjetas y superficies): `#ffffff`
+- **Implementación:**
+  1. Se agregó la paleta `tm_disenos` como tema oficial principal tanto en Flutter ([app_theme.dart](file:///c:/Proyectos/MyBusiness/zentra/lib/core/theme/app_theme.dart), [theme_provider.dart](file:///c:/Proyectos/MyBusiness/zentra/lib/core/theme/theme_provider.dart)) como en la versión web PWA ([index.html](file:///c:/Proyectos/MyBusiness/index.html) y [preview.html](file:///c:/Proyectos/MyBusiness/preview.html)).
+  2. Se añadió como primera opción destacada con distintivo `OFICIAL` en el selector de temas.
+  3. Se sincronizó la persistencia del tema en el almacenamiento local.
 
 ---
 

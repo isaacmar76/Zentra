@@ -10,17 +10,21 @@ class BusinessProfileModel {
   final String daviplata;
   final String bancolombia;
   final String customNote;
+  final String businessType; // 'SERVICIOS' o 'RETAIL'
+  final bool isConfigured;
 
   const BusinessProfileModel({
-    this.businessName = 'TM Diseños Creativos',
-    this.ownerName = 'Tatiana Marín',
-    this.phone = '312 456 7890',
+    this.businessName = '',
+    this.ownerName = '',
+    this.phone = '',
     this.city = 'Colombia',
     this.logoIconName = 'auto_awesome',
-    this.nequi = '312 456 7890',
-    this.daviplata = '312 456 7890',
-    this.bancolombia = '123-456789-01',
+    this.nequi = '',
+    this.daviplata = '',
+    this.bancolombia = '',
     this.customNote = '¡Muchas gracias por apoyar nuestro talento local! 🌸',
+    this.businessType = 'SERVICIOS',
+    this.isConfigured = false,
   });
 
   BusinessProfileModel copyWith({
@@ -33,6 +37,8 @@ class BusinessProfileModel {
     String? daviplata,
     String? bancolombia,
     String? customNote,
+    String? businessType,
+    bool? isConfigured,
   }) {
     return BusinessProfileModel(
       businessName: businessName ?? this.businessName,
@@ -44,6 +50,8 @@ class BusinessProfileModel {
       daviplata: daviplata ?? this.daviplata,
       bancolombia: bancolombia ?? this.bancolombia,
       customNote: customNote ?? this.customNote,
+      businessType: businessType ?? this.businessType,
+      isConfigured: isConfigured ?? this.isConfigured,
     );
   }
 
@@ -58,20 +66,24 @@ class BusinessProfileModel {
       'daviplata': daviplata,
       'bancolombia': bancolombia,
       'customNote': customNote,
+      'businessType': businessType,
+      'isConfigured': isConfigured,
     };
   }
 
   factory BusinessProfileModel.fromMap(Map<String, dynamic> map) {
     return BusinessProfileModel(
-      businessName: map['businessName'] ?? 'TM Diseños Creativos',
-      ownerName: map['ownerName'] ?? 'Tatiana Marín',
-      phone: map['phone'] ?? '312 456 7890',
+      businessName: map['businessName'] ?? '',
+      ownerName: map['ownerName'] ?? '',
+      phone: map['phone'] ?? '',
       city: map['city'] ?? 'Colombia',
       logoIconName: map['logoIconName'] ?? 'auto_awesome',
-      nequi: map['nequi'] ?? '312 456 7890',
-      daviplata: map['daviplata'] ?? '312 456 7890',
-      bancolombia: map['bancolombia'] ?? '123-456789-01',
+      nequi: map['nequi'] ?? '',
+      daviplata: map['daviplata'] ?? '',
+      bancolombia: map['bancolombia'] ?? '',
       customNote: map['customNote'] ?? '¡Muchas gracias por apoyar nuestro talento local! 🌸',
+      businessType: map['businessType'] ?? 'SERVICIOS',
+      isConfigured: map['isConfigured'] ?? false,
     );
   }
 }

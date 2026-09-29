@@ -10,6 +10,9 @@ import 'features/retail/providers/retail_provider.dart';
 import 'features/profile/providers/business_profile_provider.dart';
 import 'features/inventory/providers/inventory_provider.dart';
 
+import 'features/retail/screens/retail_main_screen.dart';
+import 'core/layout/main_layout_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -76,7 +79,18 @@ class ZentraApp extends StatelessWidget {
                 ),
               );
             },
-            home: const LoginScreen(),
+            home: Consumer<BusinessProfileProvider>(
+              builder: (context, profileProv, _) {
+                if (profileProv.isConfigured) {
+                  if (profileProv.businessType == 'RETAIL') {
+                    return const RetailMainScreen();
+                  } else {
+                    return const MainLayoutScreen();
+                  }
+                }
+                return const LoginScreen();
+              },
+            ),
           );
         },
       ),

@@ -4,20 +4,11 @@ import '../models/retail_models.dart';
 /// Provider de gestión operativa para el Modo Retail (Don Pedro) en Zentra.
 /// Maneja inventario en tiempo real, punto de venta y arqueo de caja diario.
 class RetailProvider with ChangeNotifier {
-  double _cajaBase = 100000.0; // Base de apertura típica en Colombia
+  double _cajaBase = 0.0;
   final List<CashMovement> _movimientosCaja = [];
   final List<CartItem> _cart = [];
 
-  List<ProductItem> _products = [
-    ProductItem(id: 'prod-1', name: 'Arroz Diana 1kg', price: 4200, cost: 3400, stock: 25, category: 'Granos'),
-    ProductItem(id: 'prod-2', name: 'Aceite Premier 1L', price: 9500, cost: 7800, stock: 14, category: 'Abarrotes'),
-    ProductItem(id: 'prod-3', name: 'Leche Alquería Entera 1L', price: 4800, cost: 3900, stock: 18, category: 'Lácteos'),
-    ProductItem(id: 'prod-4', name: 'Huevos AA x 30', price: 18000, cost: 15200, stock: 3, category: 'Abarrotes'), // Stock bajo
-    ProductItem(id: 'prod-5', name: 'Pan Tajado Bimbo', price: 6500, cost: 5200, stock: 8, category: 'Panadería'),
-    ProductItem(id: 'prod-6', name: 'Azúcar Incauca 1kg', price: 4000, cost: 3200, stock: 20, category: 'Granos'),
-    ProductItem(id: 'prod-7', name: 'Café Sello Rojo 500g', price: 12500, cost: 10400, stock: 4, category: 'Bebidas'), // Stock bajo
-    ProductItem(id: 'prod-8', name: 'Gaseosa Coca Cola 1.5L', price: 5500, cost: 4200, stock: 12, category: 'Bebidas'),
-  ];
+  List<ProductItem> _products = [];
 
   double get cajaBase => _cajaBase;
   List<ProductItem> get products => _products;

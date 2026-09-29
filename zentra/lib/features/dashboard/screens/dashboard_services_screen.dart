@@ -326,16 +326,6 @@ class DashboardServicesScreen extends StatelessWidget {
             tooltip: 'Cambiar tema (${theme.name})',
             onPressed: () => showZentraThemeSelector(context),
           ),
-          IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded),
-            tooltip: 'Cambiar de modo',
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const ModeSelectionScreen()),
-              );
-            },
-          ),
         ],
       ),
       body: Consumer<ProjectsProvider>(

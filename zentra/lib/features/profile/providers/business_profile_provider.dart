@@ -9,6 +9,8 @@ class BusinessProfileProvider with ChangeNotifier {
   BusinessProfileModel _profile = const BusinessProfileModel();
 
   BusinessProfileModel get profile => _profile;
+  bool get isConfigured => _profile.isConfigured;
+  String get businessType => _profile.businessType;
 
   BusinessProfileProvider() {
     _loadProfile();
@@ -37,6 +39,18 @@ class BusinessProfileProvider with ChangeNotifier {
       await prefs.setString(_storageKey, jsonEncode(_profile.toMap()));
     } catch (e) {
       debugPrint('Error guardando perfil del negocio: $e');
+    }
+  }
+
+  Future<void> resetBusiness() async {
+    _profile = const BusinessProfileModel();
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_storageKey);
+    } catch (e) {
+      debugPrint('Error reseteando perfil del negocio: $e');
     }
   }
 }

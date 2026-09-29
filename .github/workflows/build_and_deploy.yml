@@ -50,15 +50,16 @@ jobs:
         if: github.ref == 'refs/heads/main'
         continue-on-error: true
         with:
-          tag_name: v1.2.0-preview
-          name: Zentra V1.2.0 - Versión para Pruebas en Celular
+          tag_name: v1.2.1-clean-release
+          name: Zentra V1.2.1 - App Móvil Limpia para Pruebas
           body: |
-            ### 📱 Zentra V1.2.0 - App Móvil para Pruebas
+            ### 📱 Zentra V1.2.1 - Versión para Pruebas en Celular (Base Limpia)
             Descarga directamente el archivo **`app-release.apk`** en tu celular Android para instalar y probar:
-            - **4 Temas de Color Personalizables** (Nude & Blush, Esmeralda, Lavanda, Océano).
-            - **Modo Tatiana (Servicios y Proyectos)** con cálculo de balance real.
-            - **Modo Don Pedro (Comercio / Retail)** con catálogo, punto de venta y cierre de caja.
-            - **Acceso Rápido Demo 1-Click** sin necesidad de credenciales.
+            - **Base Limpia**: Sin datos de prueba para que registres tu propio negocio desde cero.
+            - **Modelo Fijo**: Eliges Servicios o Retail al iniciar y la aplicación siempre abrirá según tu tipo de negocio.
+            - **Modo Servicios**: Gestión de pedidos por fases (Diseño, Producción, Empaque, Entregado), checklist con compras integradas y cotización instantánea por WhatsApp.
+            - **Modo Retail**: Catálogo, inventario, punto de venta ágil y balance de caja.
+            - **Temas Visuales**: Paletas de color premium (Nude & Blush, Esmeralda, Lavanda, Océano).
           files: zentra/build/app/outputs/flutter-apk/app-release.apk
 
   build-web:

@@ -16,7 +16,7 @@
 1. **Sin burocracia fiscal:** Cero facturación electrónica obligatoria ni reportes DIAN innecesarios. Cálculos limpios, rápidos y directos en Pesos Colombianos (COP).
 2. **Offline-First:** Capacidad de operar y registrar información sin depender de una conexión permanente a internet.
 3. **Simplicidad visual:** Interfaz limpia, ágil, con paletas elegantes (Nude, Blush, Noche, Forest) que generan una experiencia premium adaptada al tipo de comercio.
-4. **Doble Modelo de Operación:** La app se adapta con un solo toque a dos realidades comerciales completamente distintas:
+4. **Modelo de Operación Definido al Crear el Negocio:** Al ingresar por primera vez, el usuario configura su negocio y selecciona su modelo operativo (**Servicios** o **Retail**). A partir de ese momento, la app siempre abre directamente en el modelo seleccionado, eliminando el intercambio accidental o innecesario entre modalidades durante el trabajo diario:
    - **Modo Servicios (Por Encargo / Proyecto):** Para negocios creativos, talleres, papelería personalizada, eventos, salones y catering. *Caso prototipo: TM Diseños Creativos (Tatiana Marín).*
    - **Modo Retail (Mostrador / POS):** Para tiendas de barrio, abarrotes, minimercados y papelerías de mostrador. *Caso prototipo: Tienda Don Pedro.*
 
@@ -189,7 +189,8 @@ class CatalogItemModel {
 | **2026-09-28** | `b373dfb` | Concept | Clarificación conceptual del botón "+ Nuevo Pedido / Proyecto" para encargos de clientes | ✅ Completado |
 | **2026-09-28** | `95b1efa` | Feature | Estados de Proyecto (🎨✂️📦✅), compras en checklist con balance automático y Catálogo/Inventario | ✅ Completado |
 | **2026-09-28** | `8d79e42` | Fix | Corrección en `preview.html`: restauración de modales de proyectos, checklist y flujo contable | ✅ Completado |
-| **2026-09-29** | *Actual* | Docs | Creación de `LOGICA_Y_BITACORA.md` como fuente de verdad y registro continuo | ✅ Vigente |
+| **2026-09-29** | `13a7b9e` | Architecture | Creación de `LOGICA_Y_BITACORA.md` como fuente de verdad y registro continuo | ✅ Completado |
+| **2026-09-29** | *Pendiente Push* | Core / Pre-Release | Configuración fija de tipo de negocio al crear empresa (sin toggle en caliente), borrado total de datos demo y persistencia local | ✅ Completado |
 
 ---
 
@@ -207,6 +208,15 @@ class CatalogItemModel {
 - **Problema previo:** No existía forma de gestionar inventario para productos terminados que Tatiana también vende además de sus servicios bajo pedido.
 - **Solución implementada:** Se integró el módulo de catálogo con control de stock, margen de ganancia por unidad y venta rápida para ambos perfiles.
 
+#### Hito 4: Selección Fija de Tipo de Negocio y Base Limpia (Pre-Release)
+- **Problema previo:** La aplicación permitía cambiar entre Servicios y Retail libremente mediante un botón en el AppBar, y cargaba proyectos y transacciones de prueba prefabricadas ("15 años Maria", "Bautizo Santiago", etc.) que confundían a un usuario nuevo.
+- **Solución implementada:**
+  1. Se eliminó el botón de intercambio en caliente de las barras de navegación.
+  2. En el primer ingreso o tras cerrar el negocio, el usuario pasa por una pantalla de configuración donde registra el nombre de su negocio, titular, teléfono de WhatsApp y **selecciona de manera fija su tipo de negocio** (Servicios o Retail).
+  3. A partir de esa selección, la app abre directamente y siempre en el modelo correspondiente.
+  4. Se vaciaron todas las listas de datos demo tanto en Flutter (`projects_provider`, `inventory_provider`, `retail_provider`) como en el prototipo interactivo (`preview.html`), arrancando en blanco ($0 y 0 proyectos) listo para producción/pruebas reales.
+  5. Se implementó persistencia en `localStorage` en el prototipo web para conservar la información registrada en el teléfono o navegador.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios
@@ -221,7 +231,7 @@ Cada vez que se reciba un nuevo requerimiento o se implemente una mejora:
 
 ## 7. Hoja de Ruta / Próximos Pasos
 
-- [ ] **Persistencia Web (LocalStorage / IndexedDB):** Guardar en el navegador los proyectos, compras e inventario creados por el usuario en `preview.html` para no perderlos al recargar.
+- [x] **Persistencia Web (LocalStorage / IndexedDB):** Guardar en el navegador los proyectos, compras e inventario creados por el usuario en `preview.html` para no perderlos al recargar.
 - [ ] **Generador de Recibos / Comprobantes en PDF:** Descarga de comprobante de entrega y anticipo para enviar al cliente.
 - [ ] **Módulo de Clientes:** Directorio con historial de pedidos de cada cliente y total acumulado comprado.
 - [ ] **Sincronización Supabase:** Conexión de la base de datos remota para persistencia multi-dispositivo cuando haya internet.

@@ -128,83 +128,9 @@ class ProjectsProvider with ChangeNotifier {
     }
   }
 
-  /// Carga los datos por defecto de Tatiana (08-ajustes-tatiana.md)
+  /// Inicializa la lista de proyectos vacía para un nuevo negocio
   void _loadInitialData() {
-    final now = DateTime.now();
-    _projects = [
-      ProjectModel(
-        id: 'tatiana-demo-1',
-        name: '15 años Maria',
-        clientName: 'Maria Rodriguez',
-        clientPhone: '3124567890',
-        notes: 'Colores Blush y Nude con toques dorados. Cuidado con las esquinas.',
-        deliveryDate: now.add(const Duration(days: 2)), // Pronto a vencer
-        status: 'En Producción',
-        services: ['50 Invitaciones (\$150.000)', '10 Centros de mesa (\$250.000)'],
-        totalPrice: 400000.0,
-        tasks: [
-          ProjectTaskModel(id: 't-1', title: 'Comprar cartulina blush y cinta oro', isCompleted: true),
-          ProjectTaskModel(id: 't-2', title: 'Imprimir 50 invitaciones', isCompleted: true),
-          ProjectTaskModel(id: 't-3', title: 'Armar centros de mesa con flor seca', isCompleted: false),
-          ProjectTaskModel(id: 't-4', title: 'Empacar con etiqueta de entrega', isCompleted: false),
-        ],
-        payments: [
-          ProjectPaymentModel(
-            id: 'pay-1',
-            amount: 160000.0,
-            paymentMethod: 'Nequi',
-            date: now.subtract(const Duration(days: 3)),
-            notes: 'Anticipo del 40%',
-          ),
-        ],
-        expenses: [
-          ProjectExpenseModel(
-            id: 'exp-1',
-            description: 'Papel fotográfico y cintas blush',
-            amount: 45000.0,
-            date: now.subtract(const Duration(days: 2)),
-          ),
-          ProjectExpenseModel(
-            id: 'exp-2',
-            description: 'Bases en madera para centros de mesa',
-            amount: 35000.0,
-            date: now.subtract(const Duration(days: 1)),
-          ),
-        ],
-      ),
-      ProjectModel(
-        id: 'tatiana-demo-2',
-        name: 'Bautizo Santiago',
-        clientName: 'Camila Duque',
-        clientPhone: '3009876543',
-        notes: 'Temática angelical en tonos pastel.',
-        deliveryDate: now.add(const Duration(days: 8)),
-        status: 'En Diseño',
-        services: ['Banderines (\$80.000)', 'Invitaciones (\$150.000)'],
-        totalPrice: 230000.0,
-        tasks: [
-          ProjectTaskModel(id: 't-5', title: 'Diseñar boceto de banderines en Canva', isCompleted: true),
-          ProjectTaskModel(id: 't-6', title: 'Comprar cintas celestes', isCompleted: false),
-        ],
-        payments: [
-          ProjectPaymentModel(
-            id: 'pay-2',
-            amount: 115000.0,
-            paymentMethod: 'Efectivo',
-            date: now.subtract(const Duration(days: 1)),
-            notes: 'Anticipo 50%',
-          ),
-        ],
-        expenses: [
-          ProjectExpenseModel(
-            id: 'exp-3',
-            description: 'Cartulina perlada y cinta dorada',
-            amount: 28000.0,
-            date: now,
-          ),
-        ],
-      ),
-    ];
+    _projects = [];
     _saveToLocalStorage();
     notifyListeners();
   }
@@ -417,27 +343,8 @@ class ProjectsProvider with ChangeNotifier {
       debugPrint('Error leyendo transacciones generales: $e');
     }
 
-    // Datos de ejemplo iniciales (Arriendo taller e Internet)
-    _generalTransactions = [
-      GeneralTransactionModel(
-        id: 'tx_demo_1',
-        type: GeneralTransactionType.gasto,
-        category: 'Arriendo',
-        description: 'Arriendo mensual del taller creativo',
-        amount: 80000.0,
-        date: DateTime.now().subtract(const Duration(days: 4)),
-        paymentMethod: 'Transferencia',
-      ),
-      GeneralTransactionModel(
-        id: 'tx_demo_2',
-        type: GeneralTransactionType.gasto,
-        category: 'Servicios',
-        description: 'Pago de Internet y telefonía',
-        amount: 35000.0,
-        date: DateTime.now().subtract(const Duration(days: 2)),
-        paymentMethod: 'Nequi',
-      ),
-    ];
+    // Inicialización limpia para nuevo negocio
+    _generalTransactions = [];
     _saveGeneralTransactionsToLocalStorage();
     notifyListeners();
   }
@@ -460,6 +367,15 @@ class ProjectsProvider with ChangeNotifier {
 
   Future<void> deleteGeneralTransaction(String txId) async {
     _generalTransactions.removeWhere((tx) => tx.id == txId);
+    await _saveGeneralTransactionsToLocalStorage();
+    notifyListeners();
+  }
+
+  /// Limpia todos los proyectos y transacciones locales (para reiniciar o crear nuevo negocio)
+  Future<void> clearAllProjects() async {
+    _projects = [];
+    _generalTransactions = [];
+    await _saveToLocalStorage();
     await _saveGeneralTransactionsToLocalStorage();
     notifyListeners();
   }

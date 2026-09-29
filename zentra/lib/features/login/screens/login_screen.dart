@@ -7,6 +7,8 @@ import 'package:zentra/features/retail/screens/retail_main_screen.dart';
 import 'package:zentra/core/theme/theme_provider.dart';
 import 'package:zentra/core/theme/theme_selector_modal.dart';
 
+import '../../profile/providers/business_profile_provider.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -15,74 +17,75 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController(text: 'tatiana@zentra.co');
-  final _passwordController = TextEditingController(text: '123456');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   final _authService = FirebaseAuthService();
   bool _isLoading = false;
 
+  void _navigateAfterAuth() {
+    final profileProvider = context.read<BusinessProfileProvider>();
+    if (profileProvider.isConfigured) {
+      if (profileProvider.businessType == 'RETAIL') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const RetailMainScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const MainLayoutScreen()),
+        );
+      }
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const ModeSelectionScreen()),
+      );
+    }
+  }
+
   Future<void> _login() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) return;
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      _navigateAfterAuth();
+      return;
+    }
     setState(() => _isLoading = true);
     try {
       await _authService.signInWithEmail(
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const ModeSelectionScreen()),
-        );
-      }
+      if (mounted) _navigateAfterAuth();
     } catch (_) {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const ModeSelectionScreen()),
-        );
-      }
+      if (mounted) _navigateAfterAuth();
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _register() async {
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) return;
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      _navigateAfterAuth();
+      return;
+    }
     setState(() => _isLoading = true);
     try {
       await _authService.registerWithEmail(
         _emailController.text.trim(),
         _passwordController.text,
       );
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const ModeSelectionScreen()),
-        );
-      }
+      if (mounted) _navigateAfterAuth();
     } catch (_) {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const ModeSelectionScreen()),
-        );
-      }
+      if (mounted) _navigateAfterAuth();
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  void _loginAsDemoTatiana() {
+  void _irAConfiguracionNegocio() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const MainLayoutScreen()),
-    );
-  }
-
-  void _loginAsDemoRetail() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const RetailMainScreen()),
+      MaterialPageRoute(builder: (_) => const ModeSelectionScreen()),
     );
   }
 
@@ -186,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: Text(
-                          'O PRUEBA CON 1 CLIC',
+                          'O CONFIGURA DIRECTAMENTE',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
@@ -200,25 +203,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 16),
                   OutlinedButton.icon(
-                    onPressed: _loginAsDemoTatiana,
-                    icon: Icon(Icons.design_services_outlined, color: theme.secondary),
-                    label: const Text('Entrar como Tatiana (Servicios)'),
+                    onPressed: _irAConfiguracionNegocio,
+                    icon: Icon(Icons.storefront_outlined, color: theme.secondary),
+                    label: const Text('Crear / Configurar Mi Negocio'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: theme.textDark,
-                      side: BorderSide(color: theme.secondary),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  OutlinedButton.icon(
-                    onPressed: _loginAsDemoRetail,
-                    icon: Icon(Icons.storefront, color: theme.success),
-                    label: const Text('Entrar como Don Pedro (Retail)'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: theme.textDark,
-                      side: BorderSide(color: theme.success),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      side: BorderSide(color: theme.secondary, width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
                   ),

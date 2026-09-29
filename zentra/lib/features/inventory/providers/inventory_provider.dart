@@ -53,83 +53,13 @@ class InventoryProvider with ChangeNotifier {
   }
 
   List<CatalogItemModel> _getDefaultInitialItems() {
-    return [
-      // 1. Catálogo Tatiana (Modo Servicios - Productos terminados)
-      CatalogItemModel(
-        id: 'cat_serv_1',
-        name: 'Agendas 2026 Personalizadas',
-        salePrice: 45000,
-        costPrice: 18000,
-        stock: 12,
-        category: 'Papelería',
-        businessType: 'servicios',
-      ),
-      CatalogItemModel(
-        id: 'cat_serv_2',
-        name: 'Cake Topper Acrílico & Foil',
-        salePrice: 22000,
-        costPrice: 7000,
-        stock: 8,
-        category: 'Fiestas',
-        businessType: 'servicios',
-      ),
-      CatalogItemModel(
-        id: 'cat_serv_3',
-        name: 'Cajas Sorpresa Ensambladas',
-        salePrice: 35000,
-        costPrice: 12000,
-        stock: 5,
-        category: 'Empaques',
-        businessType: 'servicios',
-      ),
-      CatalogItemModel(
-        id: 'cat_serv_4',
-        name: 'Cuadro Decorativo en Foil',
-        salePrice: 55000,
-        costPrice: 20000,
-        stock: 4,
-        category: 'Decoración',
-        businessType: 'servicios',
-      ),
+    return [];
+  }
 
-      // 2. Catálogo Don Pedro (Modo Retail)
-      CatalogItemModel(
-        id: 'cat_ret_1',
-        name: 'Arroz Diana 1kg',
-        salePrice: 4200,
-        costPrice: 3400,
-        stock: 25,
-        category: 'Granos',
-        businessType: 'retail',
-      ),
-      CatalogItemModel(
-        id: 'cat_ret_2',
-        name: 'Aceite Premier 1L',
-        salePrice: 9500,
-        costPrice: 7800,
-        stock: 14,
-        category: 'Abarrotes',
-        businessType: 'retail',
-      ),
-      CatalogItemModel(
-        id: 'cat_ret_3',
-        name: 'Leche Alquería Entera 1L',
-        salePrice: 4800,
-        costPrice: 3900,
-        stock: 18,
-        category: 'Lácteos',
-        businessType: 'retail',
-      ),
-      CatalogItemModel(
-        id: 'cat_ret_4',
-        name: 'Huevos AA x 30',
-        salePrice: 18000,
-        costPrice: 15200,
-        stock: 3,
-        category: 'Abarrotes',
-        businessType: 'retail',
-      ),
-    ];
+  Future<void> clearAllInventory() async {
+    _items = [];
+    await _saveItems();
+    notifyListeners();
   }
 
   Future<void> addItem(CatalogItemModel item) async {

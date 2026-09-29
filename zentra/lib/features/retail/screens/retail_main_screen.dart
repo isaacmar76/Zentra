@@ -3,7 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../providers/retail_provider.dart';
 import '../models/retail_models.dart';
-import '../../mode_selection/screens/mode_selection_screen.dart';
+import '../../profile/providers/business_profile_provider.dart';
+import '../../profile/screens/business_profile_screen.dart';
 import '../../../core/theme/theme_provider.dart';
 import '../../../core/theme/theme_selector_modal.dart';
 import '../../inventory/screens/catalog_inventory_screen.dart';
@@ -151,26 +152,43 @@ class _RetailMainScreenState extends State<RetailMainScreen> {
   Widget build(BuildContext context) {
     final provider = context.watch<RetailProvider>();
     final theme = context.watch<ThemeProvider>().currentPalette;
+    final businessProfile = context.watch<BusinessProfileProvider>().profile;
+
+    final headerTitle = businessProfile.businessName.isNotEmpty
+        ? '${businessProfile.businessName} • Retail'
+        : 'Zentra • Retail';
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_currentTab == 0 ? 'Zentra - Punto de Venta' : _currentTab == 1 ? 'Zentra - Caja del Día' : 'Zentra - Inventario'),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              headerTitle,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            Text(
+              _currentTab == 0 ? 'Punto de Venta' : _currentTab == 1 ? 'Caja del Día' : 'Inventario',
+              style: TextStyle(fontSize: 11, color: theme.secondary, fontWeight: FontWeight.w600),
+            ),
+          ],
+        ),
         automaticallyImplyLeading: false,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.storefront_outlined),
+            tooltip: 'Datos del Negocio',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BusinessProfileScreen()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.palette_outlined),
             tooltip: 'Cambiar tema (${theme.name})',
             onPressed: () => showZentraThemeSelector(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.swap_horiz_rounded),
-            tooltip: 'Cambiar de modo',
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const ModeSelectionScreen()),
-              );
-            },
           ),
         ],
       ),

@@ -1,0 +1,25 @@
+{
+  "name": "Zentra - Gestión Ágil",
+  "short_name": "Zentra",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5EFE6",
+  "theme_color": "#E8C4C4",
+  "description": "Gestión financiera, pedidos por proyecto y mostrador POS sin complicaciones.",
+  "icons": [
+    {
+      "src": "img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

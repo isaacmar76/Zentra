@@ -190,7 +190,8 @@ class CatalogItemModel {
 | **2026-09-28** | `95b1efa` | Feature | Estados de Proyecto (🎨✂️📦✅), compras en checklist con balance automático y Catálogo/Inventario | ✅ Completado |
 | **2026-09-28** | `8d79e42` | Fix | Corrección en `preview.html`: restauración de modales de proyectos, checklist y flujo contable | ✅ Completado |
 | **2026-09-29** | `13a7b9e` | Architecture | Creación de `LOGICA_Y_BITACORA.md` como fuente de verdad y registro continuo | ✅ Completado |
-| **2026-09-29** | *Pendiente Push* | Core / Pre-Release | Configuración fija de tipo de negocio al crear empresa (sin toggle en caliente), borrado total de datos demo y persistencia local | ✅ Completado |
+| **2026-09-29** | `9f31f41` | Core | Configuración fija de tipo de negocio al crear empresa, borrado total de datos demo y persistencia local | ✅ Completado |
+| **2026-09-29** | *Pendiente Push* | Deploy / PWA | Estructura para despliegue instantáneo en Vercel (`index.html`, `vercel.json`, `manifest.json`, iconos PWA) | ✅ Completado |
 
 ---
 
@@ -216,6 +217,14 @@ class CatalogItemModel {
   3. A partir de esa selección, la app abre directamente y siempre en el modelo correspondiente.
   4. Se vaciaron todas las listas de datos demo tanto en Flutter (`projects_provider`, `inventory_provider`, `retail_provider`) como en el prototipo interactivo (`preview.html`), arrancando en blanco ($0 y 0 proyectos) listo para producción/pruebas reales.
   5. Se implementó persistencia en `localStorage` en el prototipo web para conservar la información registrada en el teléfono o navegador.
+
+#### Hito 5: Despliegue en Vercel y Experiencia PWA para Celular
+- **Motivación:** Facilitar el acceso inmediato a la app desde cualquier celular mediante un enlace público de Vercel sin obligar a descargar APKs de desarrollo ni habilitar permisos de fuentes desconocidas.
+- **Implementación:**
+  1. Creación de `index.html` en la raíz como entrada principal para Vercel.
+  2. Creación de `vercel.json` con enrutamiento limpio y soporte SPA.
+  3. Configuración de `manifest.json` y meta-etiquetas PWA (`mobile-web-app-capable`, `theme-color`).
+  4. Generación de íconos de aplicación de alta resolución en `img/` para instalación directa en pantalla de inicio de Android/iOS ("Añadir a pantalla de inicio").
 
 ---
 

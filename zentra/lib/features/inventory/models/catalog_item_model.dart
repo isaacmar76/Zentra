@@ -9,6 +9,7 @@ class CatalogItemModel {
   int stock;
   final String category;
   final String businessType; // 'servicios', 'retail', 'ambos'
+  final String? imageUrl; // Foto tomada con cámara o subida desde galería
 
   CatalogItemModel({
     required this.id,
@@ -18,6 +19,7 @@ class CatalogItemModel {
     required this.stock,
     required this.category,
     this.businessType = 'ambos',
+    this.imageUrl,
   });
 
   bool get isLowStock => stock <= 5;
@@ -33,6 +35,7 @@ class CatalogItemModel {
       'stock': stock,
       'category': category,
       'businessType': businessType,
+      'imageUrl': imageUrl,
     };
   }
 
@@ -45,6 +48,7 @@ class CatalogItemModel {
       stock: (map['stock'] as num?)?.toInt() ?? 0,
       category: map['category'] ?? 'General',
       businessType: map['businessType'] ?? 'ambos',
+      imageUrl: map['imageUrl'],
     );
   }
 
@@ -56,6 +60,7 @@ class CatalogItemModel {
     int? stock,
     String? category,
     String? businessType,
+    String? imageUrl,
   }) {
     return CatalogItemModel(
       id: id ?? this.id,
@@ -65,6 +70,7 @@ class CatalogItemModel {
       stock: stock ?? this.stock,
       category: category ?? this.category,
       businessType: businessType ?? this.businessType,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 }

@@ -193,7 +193,7 @@ class CatalogItemModel {
 | **2026-09-29** | `9f31f41` | Core | Configuración fija de tipo de negocio al crear empresa, borrado total de datos demo y persistencia local | ✅ Completado |
 | **2026-09-29** | `051ed97` | Deploy / PWA | Estructura para despliegue instantáneo en Vercel (`index.html`, `vercel.json`, `manifest.json`, iconos PWA) | ✅ Completado |
 | **2026-09-29** | `47de877` | UI / UX / Auth | Portal de Acceso (Iniciar Sesión vs Crear Negocio), Paleta Minimalista Blanca y Vistas Despejadas | ✅ Completado |
-| **2026-09-29** | *Pendiente Push* | UI / Fix | Barra de estado y títulos superior cambiada a blanco puro (`#FFFFFF`) para celular PWA | ✅ Completado |
+| **2026-09-30** | `current` | Feature / Auth / Multi-item | CRUD de Usuarios (Dueño vs Colaborador), Catálogo con Fotos (Cámara/Galería), Proyectos Multi-Producto y Cotizaciones WhatsApp | ✅ Completado |
 
 ---
 
@@ -249,6 +249,30 @@ class CatalogItemModel {
      - Se incorporó un **control segmentado de 3 pestañas** (`Encargos`, `Cuentas & Gastos`, `Catálogo`), eliminando los 5 botones apilados que saturaban la pantalla principal.
      - Barra de navegación inferior limpia (`Inicio`, `Mi Negocio`, `Apariencia`).
   4. **Barra Superior / Status Bar Blanca:** Se cambió el meta tag `theme-color`, header y `manifest.json` a blanco puro (`#FFFFFF`), eliminando la barra fucsia superior en navegadores móviles de celular y app instalada.
+
+#### Hito 8: Zentra como Marca Pública Neutral + Preservación de TM Diseños
+- **Motivación:** Desvincular la identidad general de Zentra de un solo negocio, proyectándola como una solución integral para emprendedores y micronegocios colombianos.
+- **Implementación:**
+  - Definición de paletas visuales neutras (Minimal White / Púrpura Zentra, Nude & Blush, Esmeralda, Océano) y conservación de "TM Diseños Creativos" como preset personalizado para Tatiana.
+
+#### Hito 9: CRUD de Usuarios y Roles (Dueño vs Colaborador), Catálogo con Fotos y Proyectos Multi-Ítem
+- **Motivación:**
+  1. Permitir que Tatiana o el dueño del negocio delegue el registro de ventas o pedidos a empleados o vendedores sin exponer las ganancias netas de la empresa.
+  2. Subir o tomar fotos con la cámara para los productos del catálogo.
+  3. Gestionar pedidos complejos (ej. un "Cumpleaños") donde se venden varios productos del catálogo (toppers, portaplatos, dulces, invitaciones) bajo un mismo proyecto con totales y cotización desglosada para WhatsApp.
+- **Implementación Técnica:**
+  1. **Sistema de Roles (2 Perfiles):**
+     - **Dueño / Administrador (`OWNER`):** Visibilidad financiera completa (márgenes, costos, compras directas), administración de cuentas bancarias y panel CRUD de usuarios con asignación de PIN de 4 dígitos.
+     - **Colaborador / Vendedor (`COLLABORATOR`):** Puede registrar ventas POS, pedidos y marcar checklists. El campo `Ganancia Neta` y desgloses contables se enmascaran automáticamente (`••••••`).
+  2. **Catálogo Multimedia con Fotos:**
+     - Selección de archivo o disparo directo de cámara móvil (`accept="image/*"`).
+     - Compresión cliente en `<canvas>` a máx 320x320 px (JPEG 0.75) para evitar desbordar el almacenamiento local.
+     - Miniaturas en catálogo, POS y selector de proyectos.
+  3. **Proyectos Multi-Ítem / Multi-Producto:**
+     - Selector directo del catálogo con filtro en tiempo real y contador de cantidades (+/-).
+     - Soporte para agregar ítems a medida específicos.
+     - Cálculo en tiempo real de subtotales y total del proyecto.
+     - Botón para compartir cotización por WhatsApp con desglose estructurado producto a producto y cuentas de cobro (Nequi, Bancolombia).
 
 ---
 

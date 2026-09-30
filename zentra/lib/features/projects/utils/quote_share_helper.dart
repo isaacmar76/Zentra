@@ -23,12 +23,19 @@ class QuoteShareHelper {
     buffer.writeln('🔄 *Estado actual:* ${project.status}');
     buffer.writeln('');
 
-    buffer.writeln('📦 *SERVICIOS / DETALLE:*');
-    if (project.services.isEmpty) {
-      buffer.writeln('• Servicio artesanal personalizado');
+    if (project.items.isNotEmpty) {
+      buffer.writeln('📦 *PRODUCTOS Y ENTREGABLES:*');
+      for (final item in project.items) {
+        buffer.writeln('• ${item.quantity}x ${item.name} - ${currency.format(item.subtotal)}');
+      }
     } else {
-      for (final service in project.services) {
-        buffer.writeln('• $service');
+      buffer.writeln('📦 *SERVICIOS / DETALLE:*');
+      if (project.services.isEmpty) {
+        buffer.writeln('• Servicio artesanal personalizado');
+      } else {
+        for (final service in project.services) {
+          buffer.writeln('• $service');
+        }
       }
     }
     buffer.writeln('');

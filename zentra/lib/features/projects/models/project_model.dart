@@ -124,6 +124,52 @@ class ProjectTaskModel {
   }
 }
 
+class ProjectItemModel {
+  final String id;
+  final String? catalogId;
+  final String name;
+  final int quantity;
+  final double unitPrice;
+  final double subtotal;
+  final String? imageUrl;
+
+  ProjectItemModel({
+    required this.id,
+    this.catalogId,
+    required this.name,
+    this.quantity = 1,
+    required this.unitPrice,
+    double? subtotal,
+    this.imageUrl,
+  }) : subtotal = subtotal ?? (quantity * unitPrice);
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'catalogId': catalogId,
+      'name': name,
+      'quantity': quantity,
+      'unitPrice': unitPrice,
+      'subtotal': subtotal,
+      'imageUrl': imageUrl,
+    };
+  }
+
+  factory ProjectItemModel.fromMap(Map<String, dynamic> map) {
+    final qty = (map['quantity'] as num?)?.toInt() ?? 1;
+    final price = (map['unitPrice'] as num?)?.toDouble() ?? 0.0;
+    return ProjectItemModel(
+      id: map['id'] ?? '',
+      catalogId: map['catalogId'],
+      name: map['name'] ?? '',
+      quantity: qty,
+      unitPrice: price,
+      subtotal: (map['subtotal'] as num?)?.toDouble() ?? (qty * price),
+      imageUrl: map['imageUrl'],
+    );
+  }
+}
+
 class ProjectModel {
   final String id;
   final String name;
@@ -133,6 +179,7 @@ class ProjectModel {
   final DateTime deliveryDate;
   final String status;
   final List<String> services;
+  final List<ProjectItemModel> items;
   final double totalPrice;
   final List<ProjectExpenseModel> expenses;
   final List<ProjectPaymentModel> payments;
@@ -147,6 +194,7 @@ class ProjectModel {
     required this.deliveryDate,
     required this.status,
     required this.services,
+    this.items = const [],
     this.totalPrice = 0.0,
     this.expenses = const [],
     this.payments = const [],
@@ -187,6 +235,7 @@ class ProjectModel {
     DateTime? deliveryDate,
     String? status,
     List<String>? services,
+    List<ProjectItemModel>? items,
     double? totalPrice,
     List<ProjectExpenseModel>? expenses,
     List<ProjectPaymentModel>? payments,
@@ -201,6 +250,7 @@ class ProjectModel {
       deliveryDate: deliveryDate ?? this.deliveryDate,
       status: status ?? this.status,
       services: services ?? this.services,
+      items: items ?? this.items,
       totalPrice: totalPrice ?? this.totalPrice,
       expenses: expenses ?? this.expenses,
       payments: payments ?? this.payments,
@@ -218,6 +268,7 @@ class ProjectModel {
       'deliveryDate': deliveryDate.toIso8601String(),
       'status': status,
       'services': services,
+      'items': items.map((i) => i.toMap()).toList(),
       'totalPrice': totalPrice,
       'expenses': expenses.map((e) => e.toMap()).toList(),
       'payments': payments.map((p) => p.toMap()).toList(),
@@ -229,6 +280,7 @@ class ProjectModel {
     var rawExpenses = map['expenses'] as List<dynamic>? ?? [];
     var rawPayments = map['payments'] as List<dynamic>? ?? [];
     var rawTasks = map['tasks'] as List<dynamic>? ?? [];
+    var rawItems = map['items'] as List<dynamic>? ?? [];
 
     return ProjectModel(
       id: documentId.isNotEmpty ? documentId : (map['id'] ?? ''),
@@ -241,6 +293,9 @@ class ProjectModel {
           : DateTime.now(),
       status: map['status'] ?? 'En Diseño',
       services: List<String>.from(map['services'] ?? []),
+      items: rawItems
+          .map((i) => ProjectItemModel.fromMap(Map<String, dynamic>.from(i)))
+          .toList(),
       totalPrice: (map['totalPrice'] as num?)?.toDouble() ?? 0.0,
       expenses: rawExpenses
           .map((e) => ProjectExpenseModel.fromMap(Map<String, dynamic>.from(e)))

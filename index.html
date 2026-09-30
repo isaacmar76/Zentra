@@ -446,6 +446,62 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 10px;
+    }
+
+    .prod-thumb {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      object-fit: cover;
+      background: #F8F9FA;
+      border: 1px solid #ECEEF2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .order-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FFFFFF;
+      border: 1px solid #ECEEF2;
+      border-radius: 12px;
+      padding: 8px 10px;
+      gap: 8px;
+    }
+
+    .stepper-btn {
+      width: 24px;
+      height: 24px;
+      border-radius: 7px;
+      border: 1px solid #E2E8F0;
+      background: #F8F9FA;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .stepper-btn:hover {
+      background: #EDF2F7;
+    }
+
+    .user-card-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FFFFFF;
+      border: 1px solid #ECEEF2;
+      border-radius: 14px;
+      padding: 10px 12px;
     }
 
     /* Lista de Proyectos / Catálogo */
@@ -683,7 +739,10 @@
     <header class="app-header">
       <div class="app-title" id="headerTitle">Zentra</div>
       <div class="header-actions">
-        <button class="icon-btn" id="btnBusinessProfile" title="Datos del negocio" onclick="openBusinessProfileModal()">🏢</button>
+        <span id="userBadgeHeader" onclick="openBusinessProfileModal()" title="Toca para ver o cambiar usuario" style="font-size:11px; font-weight:700; background:var(--primary-soft); color:var(--text); padding:4px 9px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; border:1px solid #ECEEF2;">
+          <span id="lblUserRoleIcon">👑</span> <span id="lblUserName">Dueño</span>
+        </span>
+        <button class="icon-btn" id="btnBusinessProfile" title="Datos del negocio y usuarios" onclick="openBusinessProfileModal()">🏢</button>
         <button class="icon-btn" id="btnThemePicker" title="Cambiar tema de color" onclick="openThemeModal()">🎨</button>
       </div>
     </header>
@@ -953,6 +1012,22 @@
           </div>
         </div>
 
+        <!-- Productos y Entregables Incluidos en el Pedido -->
+        <div style="background:#FFFFFF; border:1px solid #ECEEF2; border-radius:18px; padding:14px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div>
+              <div style="font-size:13px; font-weight:700; color:var(--text);">📦 Productos & Entregables</div>
+              <div style="font-size:10.5px; color:var(--text-muted);" id="mProjItemsCount">0 productos incluidos</div>
+            </div>
+            <button onclick="abrirPickerCatalogo('active_project')" style="background:var(--secondary-soft); border:1px solid var(--secondary); color:var(--secondary); padding:5px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+              🛍️ + Del Catálogo
+            </button>
+          </div>
+          <div id="mProjItemsList" style="display:flex; flex-direction:column; gap:6px;">
+            <!-- Renderizado dinámico de productos del proyecto -->
+          </div>
+        </div>
+
         <!-- Tareas / Checklist con Compras -->
         <div style="font-size:13px; font-weight:700; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
           <div>
@@ -1044,7 +1119,29 @@
         </div>
 
         <button onclick="guardarDatosNegocio()" class="primary-btn">GUARDAR CAMBIOS</button>
-        <button onclick="reiniciarNegocio()" style="width:100%; margin-top:10px; background:transparent; border:1.5px dashed var(--alert); color:var(--alert); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">
+
+        <!-- Sección CRUD de Usuarios y Accesos -->
+        <div style="margin-top:16px; border-top:1px solid #ECEEF2; padding-top:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div>
+              <div style="font-size:13px; font-weight:700; color:var(--text);">👥 Usuarios y Accesos (CRUD)</div>
+              <div style="font-size:10.5px; color:var(--text-muted);">Dueño (control total) y Colaboradores (operativo)</div>
+            </div>
+            <button onclick="abrirModalUsuario()" style="background:var(--secondary); color:#fff; border:none; padding:5px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+              + Nuevo Usuario
+            </button>
+          </div>
+
+          <div id="bizUsersList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px;">
+            <!-- Renderizado dinámico de usuarios -->
+          </div>
+
+          <button onclick="cerrarSesionUsuario()" style="width:100%; background:var(--bg); border:1px solid #D1D5DB; color:var(--text); padding:9px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;">
+            <span>🚪</span> Cerrar Sesión / Cambiar de Usuario
+          </button>
+        </div>
+
+        <button onclick="reiniciarNegocio()" style="width:100%; margin-top:6px; background:transparent; border:1.5px dashed var(--alert); color:var(--alert); padding:9px; border-radius:14px; font-weight:700; font-size:11.5px; cursor:pointer;">
           ⚠️ CERRAR Y CREAR OTRO NEGOCIO
         </button>
       </div>
@@ -1210,9 +1307,36 @@
           <input type="text" id="orderPhoneInp" placeholder="Ej: 310 987 6543" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
+        <!-- Sección: Productos y Entregables del Pedido (Catálogo + A Medida) -->
+        <div style="background:#F8F9FA; border:1px solid #ECEEF2; border-radius:16px; padding:12px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--text);">📦 Productos & Entregables</div>
+              <div style="font-size:10px; color:var(--text-muted);">Topper, portaplatos, dulces, invitaciones, etc.</div>
+            </div>
+            <button type="button" onclick="abrirPickerCatalogo('new_order')" style="background:var(--secondary); color:#fff; border:none; padding:5px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+              🛍️ + Del Catálogo
+            </button>
+          </div>
+
+          <!-- Lista de ítems agregados al nuevo pedido -->
+          <div id="newOrderItemsList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;">
+            <div style="font-size:11px; color:#888; text-align:center; padding:8px 0;">No has agregado productos. Toca "+ Del Catálogo" o "+ Ítem a Medida".</div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:4px;">
+            <button type="button" onclick="abrirModalItemMedida('new_order')" style="background:transparent; border:1px dashed var(--secondary); color:var(--secondary); padding:4px 8px; border-radius:8px; font-size:10.5px; font-weight:700; cursor:pointer;">
+              ✏️ + Ítem a Medida
+            </button>
+            <div style="font-size:11.5px; color:var(--text-muted);">
+              Suma productos: <b id="lblNewOrderItemsSum" style="color:var(--text); font-weight:800;">$0</b>
+            </div>
+          </div>
+        </div>
+
         <div style="margin-bottom:10px;">
-          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Servicios / Productos Incluidos</label>
-          <input type="text" id="orderServicesInp" placeholder="Ej: 40 Invitaciones + 1 Libro de firmas" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Resumen de Servicios / Entregables</label>
+          <input type="text" id="orderServicesInp" placeholder="Ej: 1x Topper + 20x Portaplatos + 50x Dulces" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
@@ -1291,15 +1415,35 @@
       </div>
     </div>
 
-    <!-- Modal: Nuevo Producto al Catálogo -->
+    <!-- Modal: Nuevo Producto al Catálogo (Con Foto/Cámara) -->
     <div id="newProductModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:350; align-items:center; justify-content:center; padding:18px;">
-      <div style="background:var(--card-bg); width:100%; max-width:340px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+      <div style="background:var(--card-bg); width:100%; max-width:340px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3); max-height:88%; overflow-y:auto;">
         <div style="font-size:16px; font-weight:700; margin-bottom:4px;">Nuevo Producto al Catálogo</div>
-        <div style="font-size:11.5px; color:#777; margin-bottom:12px;">Ingresa los datos para control de stock y venta</div>
+        <div style="font-size:11.5px; color:#777; margin-bottom:12px;">Ingresa los datos para control de stock, fotos y venta</div>
+
+        <!-- Campo: Foto del Producto (Subir o Tomar con Cámara) -->
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px;">Foto o Imagen del Producto</label>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div id="prodImgPreview" onclick="document.getElementById('prodPhotoInp').click()" style="width:62px; height:62px; border-radius:14px; background:#F8F9FA; border:1.5px dashed var(--secondary); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:24px; cursor:pointer; flex-shrink:0;">
+              📷
+            </div>
+            <div style="flex:1;">
+              <input type="file" id="prodPhotoInp" accept="image/*" capture="environment" style="display:none;" onchange="handleProductPhotoSelect(event)">
+              <button type="button" onclick="document.getElementById('prodPhotoInp').click()" style="background:var(--bg); border:1px solid var(--secondary); color:var(--secondary); padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+                📸 Tomar Foto / Galería
+              </button>
+              <button type="button" id="btnRemoveProdPhoto" onclick="removeProductPhoto()" style="display:none; background:transparent; border:none; color:var(--alert); font-size:11px; font-weight:600; cursor:pointer; margin-left:4px;">
+                ✕ Quitar
+              </button>
+              <div style="font-size:10px; color:var(--text-muted); margin-top:3px;">Cámara o archivo para mostrar en catálogo</div>
+            </div>
+          </div>
+        </div>
 
         <div style="margin-bottom:10px;">
           <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Nombre del Producto *</label>
-          <input type="text" id="prodNameInp" placeholder="Ej: Agendas 2026, Cake Topper" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          <input type="text" id="prodNameInp" placeholder="Ej: Cake Topper Shaker, Agendas" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
@@ -1327,6 +1471,108 @@
         <div style="display:flex; gap:8px;">
           <button onclick="cerrarModalNuevoProducto()" style="flex:1; padding:10px; border-radius:12px; border:1px solid #ccc; background:transparent; font-weight:600; cursor:pointer;">Cancelar</button>
           <button onclick="guardarNuevoProducto()" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--secondary); color:#fff; font-weight:700; cursor:pointer;">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Escoger del Catálogo para el Pedido / Proyecto -->
+    <div id="pickerCatalogModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:400; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:20px 18px; max-height:85%; overflow-y:auto; color:var(--text);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div>
+            <div style="font-size:16px; font-weight:700;">🛍️ Escoger del Catálogo</div>
+            <div style="font-size:11px; color:var(--text-muted);">Selecciona los productos y cantidades para este proyecto</div>
+          </div>
+          <button onclick="cerrarPickerCatalogo()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <input type="text" id="pickerSearchInp" oninput="filtrarPickerCatalogo()" placeholder="🔍 Buscar producto (ej: Topper, Portaplatos)..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:12.5px; box-sizing:border-box;">
+        </div>
+
+        <div id="pickerCatalogList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:360px; overflow-y:auto;">
+          <!-- Renderizado dinámico de productos para seleccionar -->
+        </div>
+
+        <button onclick="cerrarPickerCatalogo()" class="primary-btn" style="padding:11px;">
+          LISTO / VOLVER AL PEDIDO
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal: Agregar Ítem a Medida al Proyecto -->
+    <div id="customItemModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:410; align-items:center; justify-content:center; padding:18px;">
+      <div style="background:var(--card-bg); width:100%; max-width:330px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <div style="font-size:16px; font-weight:700; margin-bottom:4px;">✏️ Ítem a Medida</div>
+        <div style="font-size:11px; color:#777; margin-bottom:12px;">Agrega un producto o servicio personalizado para este pedido</div>
+
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Descripción / Nombre *</label>
+          <input type="text" id="customItemNameInp" placeholder="Ej: Invitaciones Caladas a Mano" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Cantidad *</label>
+            <input type="number" id="customItemQtyInp" value="1" min="1" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Precio Unitario ($) *</label>
+            <input type="number" id="customItemPriceInp" placeholder="3000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button onclick="cerrarModalItemMedida()" style="flex:1; padding:10px; border-radius:12px; border:1px solid #ccc; background:transparent; font-weight:600; cursor:pointer;">Cancelar</button>
+          <button onclick="guardarItemMedida()" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--secondary); color:#fff; font-weight:700; cursor:pointer;">Agregar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: CRUD de Usuario (Crear / Editar Usuario y Rol) -->
+    <div id="userModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:420; align-items:center; justify-content:center; padding:18px;">
+      <div style="background:var(--card-bg); width:100%; max-width:340px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3);">
+        <div style="font-size:16px; font-weight:700; margin-bottom:4px;" id="uModalTitle">Usuario de la App</div>
+        <div style="font-size:11.5px; color:#777; margin-bottom:12px;">Gestiona el acceso y los permisos de este colaborador</div>
+
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Nombre Completo *</label>
+          <input type="text" id="uModalNameInp" placeholder="Ej: Tatiana Marín" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Usuario, Correo o Celular *</label>
+          <input type="text" id="uModalUserInp" placeholder="tatiana@tmdisenos.com o 312..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">PIN de Acceso (4 dígitos) *</label>
+          <input type="password" id="uModalPinInp" placeholder="1234" maxlength="6" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; letter-spacing:2px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11px; font-weight:700; margin-bottom:6px;">Rol y Nivel de Acceso *</label>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <label style="display:flex; align-items:center; gap:8px; background:var(--bg); padding:8px 10px; border-radius:12px; cursor:pointer; font-size:12px;">
+              <input type="radio" name="uModalRole" id="uRoleOwner" value="OWNER" checked style="accent-color:var(--secondary);">
+              <div>
+                <div style="font-weight:700;">👑 Dueño / Administrador</div>
+                <div style="font-size:10px; color:#777;">Control total: métricas financieras, ganancias, costos y usuarios.</div>
+              </div>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; background:var(--bg); padding:8px 10px; border-radius:12px; cursor:pointer; font-size:12px;">
+              <input type="radio" name="uModalRole" id="uRoleCollaborator" value="COLLABORATOR" style="accent-color:var(--secondary);">
+              <div>
+                <div style="font-weight:700;">💼 Colaborador / Vendedor</div>
+                <div style="font-size:10px; color:#777;">Operativo: pedidos, ventas y checklist. No ve ganancias netas.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button onclick="cerrarModalUsuario()" style="flex:1; padding:10px; border-radius:12px; border:1px solid #ccc; background:transparent; font-weight:600; cursor:pointer;">Cancelar</button>
+          <button onclick="guardarUsuario()" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--secondary); color:#fff; font-weight:700; cursor:pointer;">Guardar Usuario</button>
         </div>
       </div>
     </div>
@@ -1359,6 +1605,27 @@
     let catalogFilter = 'servicios';
     let currentFormAction = null;
 
+    // Estado del CRUD de Usuarios y Roles
+    let users = [];
+    let currentUser = null;
+    let editingUserId = null;
+
+    // Estado para Foto del Producto
+    let tempProductPhoto = null;
+
+    // Estado para Ítems/Productos dentro del Pedido
+    let tempOrderItems = [];
+    let catalogPickerTarget = 'new_order'; // 'new_order' o 'active_project'
+
+    // Catálogo por defecto para Servicios Creativos
+    const DEFAULT_CATALOG_SERVICIOS = [
+      { id: 'c_topper', name: 'Cake Topper Shaker 3D', price: 35000, cost: 12000, stock: 15, cat: 'Papelería Creativa', mode: 'servicios', image: null },
+      { id: 'c_platos', name: 'Portaplatos Temáticos (Paquete x10)', price: 30000, cost: 10000, stock: 20, cat: 'Mesa & Fiesta', mode: 'servicios', image: null },
+      { id: 'c_dulces', name: 'Dulces Personalizados (Paquete x25)', price: 50000, cost: 18000, stock: 30, cat: 'Repostería', mode: 'servicios', image: null },
+      { id: 'c_invitaciones', name: 'Invitaciones Físicas Caladas (x10)', price: 35000, cost: 9000, stock: 25, cat: 'Invitaciones', mode: 'servicios', image: null },
+      { id: 'c_libro', name: 'Libro de Firmas / Agenda Personalizada', price: 45000, cost: 16000, stock: 10, cat: 'Papelería Creativa', mode: 'servicios', image: null }
+    ];
+
     function persistirEstadoLocal() {
       try {
         localStorage.setItem('zentra_biz_profile', JSON.stringify(bizProfile));
@@ -1366,6 +1633,8 @@
         localStorage.setItem('zentra_expenses', JSON.stringify(generalExpenses));
         localStorage.setItem('zentra_incomes', JSON.stringify(generalIncomes));
         localStorage.setItem('zentra_catalog', JSON.stringify(catalogItems));
+        localStorage.setItem('zentra_users', JSON.stringify(users));
+        if (currentUser) localStorage.setItem('zentra_current_user', JSON.stringify(currentUser));
       } catch (e) {
         console.warn('Storage save error', e);
       }
@@ -1376,19 +1645,592 @@
         const pStr = localStorage.getItem('zentra_biz_profile');
         if (pStr) bizProfile = JSON.parse(pStr);
         const projStr = localStorage.getItem('zentra_projects');
-        if (projStr) projectsData = JSON.parse(projStr);
+        if (projStr) {
+          projectsData = JSON.parse(projStr);
+          projectsData.forEach(p => { if (!p.items) p.items = []; });
+        }
         const expStr = localStorage.getItem('zentra_expenses');
         if (expStr) generalExpenses = JSON.parse(expStr);
         const incStr = localStorage.getItem('zentra_incomes');
         if (incStr) generalIncomes = JSON.parse(incStr);
         const catStr = localStorage.getItem('zentra_catalog');
-        if (catStr) catalogItems = JSON.parse(catStr);
+        if (catStr) {
+          catalogItems = JSON.parse(catStr);
+        } else {
+          catalogItems = [...DEFAULT_CATALOG_SERVICIOS];
+        }
+        if (catalogItems.length === 0) {
+          catalogItems = [...DEFAULT_CATALOG_SERVICIOS];
+        }
+
         const savedTheme = localStorage.getItem('zentra_active_theme') || 'tm_disenos';
         applyTheme(savedTheme, false);
+
+        inicializarUsuarios();
       } catch (e) {
         console.warn('Storage load error', e);
       }
     }
+
+    // ==========================================
+    // SISTEMA Y CRUD DE USUARIOS (ROLES)
+    // ==========================================
+    function inicializarUsuarios() {
+      const uStr = localStorage.getItem('zentra_users');
+      if (uStr) {
+        try { users = JSON.parse(uStr); } catch (_) { users = []; }
+      }
+
+      if (!users || users.length === 0) {
+        users = [
+          {
+            id: 'usr_owner',
+            name: bizProfile.owner || 'Tatiana Marín',
+            username: (bizProfile.owner ? bizProfile.owner.toLowerCase().replace(/\s+/g, '') : 'admin'),
+            email: 'tatiana@tmdisenos.com',
+            phone: bizProfile.phone || '3124567890',
+            pin: '1234',
+            role: 'OWNER',
+            active: true
+          },
+          {
+            id: 'usr_collab',
+            name: 'Vendedor(a) / Asistente',
+            username: 'vendedor',
+            email: 'ventas@tmdisenos.com',
+            phone: '3100000000',
+            pin: '0000',
+            role: 'COLLABORATOR',
+            active: true
+          }
+        ];
+        persistirEstadoLocal();
+      }
+
+      const curUserStr = localStorage.getItem('zentra_current_user');
+      if (curUserStr) {
+        try { currentUser = JSON.parse(curUserStr); } catch (_) { currentUser = null; }
+      }
+      if (!currentUser && users.length > 0) {
+        currentUser = users[0];
+      }
+
+      aplicarUsuarioActivo();
+      renderUsersList();
+    }
+
+    function aplicarUsuarioActivo() {
+      if (!currentUser) return;
+      const isOwner = currentUser.role === 'OWNER';
+      const lblIcon = document.getElementById('lblUserRoleIcon');
+      const lblName = document.getElementById('lblUserName');
+
+      if (lblIcon) lblIcon.innerText = isOwner ? '👑' : '💼';
+      if (lblName) lblName.innerText = currentUser.name.split(' ')[0] + (isOwner ? '' : ' (Colab)');
+
+      // Adaptar visibilidad financiera según el rol
+      const txtGanancia = document.getElementById('txtGanancia');
+      if (txtGanancia) {
+        if (!isOwner) {
+          txtGanancia.innerText = '••••••';
+          txtGanancia.title = 'Métricas ocultas para perfil Colaborador';
+        }
+      }
+
+      const segTabMov = document.getElementById('segTabMovimientos');
+      if (segTabMov) {
+        segTabMov.style.display = isOwner ? 'inline-flex' : 'none';
+      }
+    }
+
+    function renderUsersList() {
+      const container = document.getElementById('bizUsersList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      users.forEach(u => {
+        const isOwner = u.role === 'OWNER';
+        const isCurrent = currentUser && currentUser.id === u.id;
+        const card = document.createElement('div');
+        card.className = 'user-card-item';
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:36px; height:36px; border-radius:10px; background:${isOwner ? 'var(--secondary-soft)' : '#F1F3F5'}; display:flex; align-items:center; justify-content:center; font-size:18px;">
+              ${isOwner ? '👑' : '💼'}
+            </div>
+            <div>
+              <div style="font-size:12.5px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:4px;">
+                ${u.name} ${isCurrent ? '<span style="font-size:9px; background:var(--primary); color:#fff; padding:1px 5px; border-radius:6px;">Tú</span>' : ''}
+              </div>
+              <div style="font-size:10px; color:var(--text-muted);">
+                ${u.username} • PIN: **** • <b>${isOwner ? 'Dueño/Admin' : 'Colaborador'}</b>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:4px;">
+            <button onclick="abrirModalUsuario('${u.id}')" style="background:#F8F9FA; border:1px solid #ECEEF2; padding:4px 8px; border-radius:8px; font-size:11px; cursor:pointer;" title="Editar usuario">✏️</button>
+            ${!isOwner ? `<button onclick="eliminarUsuario('${u.id}')" style="background:#FFF5F5; border:1px solid #FED7D7; color:var(--alert); padding:4px 8px; border-radius:8px; font-size:11px; cursor:pointer;" title="Eliminar colaborador">🗑️</button>` : ''}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function abrirModalUsuario(userId = null) {
+      editingUserId = userId;
+      if (userId) {
+        const u = users.find(x => x.id === userId);
+        if (!u) return;
+        document.getElementById('uModalTitle').innerText = 'Editar Usuario';
+        document.getElementById('uModalNameInp').value = u.name;
+        document.getElementById('uModalUserInp').value = u.username;
+        document.getElementById('uModalPinInp').value = u.pin;
+        document.getElementById('uRoleOwner').checked = u.role === 'OWNER';
+        document.getElementById('uRoleCollaborator').checked = u.role === 'COLLABORATOR';
+      } else {
+        document.getElementById('uModalTitle').innerText = 'Nuevo Usuario / Colaborador';
+        document.getElementById('uModalNameInp').value = '';
+        document.getElementById('uModalUserInp').value = '';
+        document.getElementById('uModalPinInp').value = '';
+        document.getElementById('uRoleOwner').checked = false;
+        document.getElementById('uRoleCollaborator').checked = true;
+      }
+      document.getElementById('userModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('uModalNameInp').focus(), 100);
+    }
+
+    function cerrarModalUsuario() {
+      document.getElementById('userModal').style.display = 'none';
+      editingUserId = null;
+    }
+
+    function guardarUsuario() {
+      const name = document.getElementById('uModalNameInp').value.trim();
+      const username = document.getElementById('uModalUserInp').value.trim();
+      const pin = document.getElementById('uModalPinInp').value.trim();
+      const role = document.getElementById('uRoleOwner').checked ? 'OWNER' : 'COLLABORATOR';
+
+      if (!name || !username || !pin) {
+        showToast('Completa el nombre, usuario y PIN');
+        return;
+      }
+
+      if (editingUserId) {
+        const u = users.find(x => x.id === editingUserId);
+        if (u) {
+          u.name = name;
+          u.username = username;
+          u.pin = pin;
+          u.role = role;
+          if (currentUser && currentUser.id === u.id) {
+            currentUser = u;
+          }
+          showToast(`✓ Usuario "${name}" actualizado`);
+        }
+      } else {
+        const newUser = {
+          id: 'usr_' + Date.now(),
+          name: name,
+          username: username,
+          email: username.includes('@') ? username : '',
+          phone: username.includes('@') ? '' : username,
+          pin: pin,
+          role: role,
+          active: true
+        };
+        users.push(newUser);
+        showToast(`✓ Nuevo usuario "${name}" (${role === 'OWNER' ? 'Dueño' : 'Colaborador'}) creado`);
+      }
+
+      persistirEstadoLocal();
+      renderUsersList();
+      aplicarUsuarioActivo();
+      cerrarModalUsuario();
+    }
+
+    function eliminarUsuario(userId) {
+      const u = users.find(x => x.id === userId);
+      if (!u) return;
+      if (u.role === 'OWNER') {
+        showToast('No se puede eliminar un usuario con rol de Dueño');
+        return;
+      }
+      if (confirm(`¿Estás seguro de eliminar el acceso de ${u.name}?`)) {
+        users = users.filter(x => x.id !== userId);
+        if (currentUser && currentUser.id === userId) {
+          currentUser = users[0];
+        }
+        persistirEstadoLocal();
+        renderUsersList();
+        aplicarUsuarioActivo();
+        showToast(`Usuario "${u.name}" eliminado`);
+      }
+    }
+
+    function cerrarSesionUsuario() {
+      cerrarBusinessProfileModal();
+      abrirAuthPortal('login');
+      showToast('Sesión de usuario cerrada');
+    }
+
+    // ==========================================
+    // FOTOS DE PRODUCTOS (CÁMARA / SUBIR)
+    // ==========================================
+    function handleProductPhotoSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const maxDim = 320;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          tempProductPhoto = canvas.toDataURL('image/jpeg', 0.75);
+
+          const preview = document.getElementById('prodImgPreview');
+          preview.innerHTML = `<img src="${tempProductPhoto}" style="width:100%; height:100%; object-fit:cover;">`;
+          document.getElementById('btnRemoveProdPhoto').style.display = 'inline-block';
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeProductPhoto() {
+      tempProductPhoto = null;
+      document.getElementById('prodPhotoInp').value = '';
+      const preview = document.getElementById('prodImgPreview');
+      preview.innerHTML = '📷';
+      document.getElementById('btnRemoveProdPhoto').style.display = 'none';
+    }
+
+    // ==========================================
+    // SELECTOR DE PRODUCTOS DEL CATÁLOGO PARA PROYECTOS
+    // ==========================================
+    function abrirPickerCatalogo(target = 'new_order') {
+      catalogPickerTarget = target;
+      document.getElementById('pickerSearchInp').value = '';
+      filtrarPickerCatalogo();
+      document.getElementById('pickerCatalogModal').style.display = 'flex';
+    }
+
+    function cerrarPickerCatalogo() {
+      document.getElementById('pickerCatalogModal').style.display = 'none';
+    }
+
+    function filtrarPickerCatalogo() {
+      const container = document.getElementById('pickerCatalogList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const query = (document.getElementById('pickerSearchInp').value || '').trim().toLowerCase();
+      const items = catalogItems.filter(it => 
+        it.mode === 'servicios' && (!query || it.name.toLowerCase().includes(query) || (it.cat && it.cat.toLowerCase().includes(query)))
+      );
+
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:24px 10px; color:#888;">
+            <div style="font-size:24px; margin-bottom:4px;">🔍</div>
+            <div style="font-size:12px; font-weight:600;">No hay productos que coincidan</div>
+            <div style="font-size:11px; margin-top:2px;">Crea nuevos productos en la pestaña "Catálogo".</div>
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(it => {
+        const card = document.createElement('div');
+        card.style.cssText = 'display:flex; align-items:center; justify-content:space-between; background:#F8F9FA; border:1px solid #ECEEF2; border-radius:14px; padding:10px 12px; gap:8px;';
+        
+        const thumbHtml = it.image
+          ? `<img src="${it.image}" class="prod-thumb">`
+          : `<div class="prod-thumb">🎁</div>`;
+
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+            ${thumbHtml}
+            <div style="min-width:0; flex:1;">
+              <div style="font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${it.name}</div>
+              <div style="font-size:10.5px; color:var(--text-muted);">${it.cat || 'General'} • Stock: ${it.stock}</div>
+              <div style="font-size:12px; font-weight:800; color:var(--secondary); margin-top:1px;">$${it.price.toLocaleString('es-CO')} COP</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <input type="number" id="qty_pick_${it.id}" value="1" min="1" max="999" style="width:46px; padding:6px; border-radius:8px; border:1px solid #D1D5DB; text-align:center; font-weight:700; font-size:12px; background:#fff;">
+            <button onclick="agregarItemDesdePicker('${it.id}')" style="background:var(--secondary); color:#fff; border:none; padding:7px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">
+              + Agregar
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function agregarItemDesdePicker(catalogId) {
+      const it = catalogItems.find(x => x.id === catalogId);
+      if (!it) return;
+
+      const qtyInp = document.getElementById(`qty_pick_${catalogId}`);
+      const qty = parseInt(qtyInp ? qtyInp.value : 1) || 1;
+
+      const newItem = {
+        id: 'pi_' + Date.now() + Math.random().toString(36).substr(2, 4),
+        catalogId: it.id,
+        name: it.name,
+        quantity: qty,
+        unitPrice: it.price,
+        subtotal: qty * it.price,
+        image: it.image || null
+      };
+
+      if (catalogPickerTarget === 'new_order') {
+        const existing = tempOrderItems.find(x => x.catalogId === it.id);
+        if (existing) {
+          existing.quantity += qty;
+          existing.subtotal = existing.quantity * existing.unitPrice;
+        } else {
+          tempOrderItems.push(newItem);
+        }
+        renderNewOrderItems();
+        showToast(`✓ Agregado: ${qty}x ${it.name} al pedido`);
+      } else if (catalogPickerTarget === 'active_project') {
+        const p = projectsData[selectedProjectIdx];
+        if (p) {
+          if (!p.items) p.items = [];
+          const existing = p.items.find(x => x.catalogId === it.id);
+          if (existing) {
+            existing.quantity += qty;
+            existing.subtotal = existing.quantity * existing.unitPrice;
+          } else {
+            p.items.push(newItem);
+          }
+          p.total += (qty * it.price);
+          persistirEstadoLocal();
+          recalcularTodo();
+          renderProjectItems();
+          showToast(`✓ Agregado al proyecto: ${qty}x ${it.name}`);
+        }
+      }
+    }
+
+    // Modal Ítem a Medida
+    function abrirModalItemMedida(target = 'new_order') {
+      catalogPickerTarget = target;
+      document.getElementById('customItemNameInp').value = '';
+      document.getElementById('customItemQtyInp').value = '1';
+      document.getElementById('customItemPriceInp').value = '';
+      document.getElementById('customItemModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('customItemNameInp').focus(), 100);
+    }
+
+    function cerrarModalItemMedida() {
+      document.getElementById('customItemModal').style.display = 'none';
+    }
+
+    function guardarItemMedida() {
+      const name = document.getElementById('customItemNameInp').value.trim();
+      const qty = parseInt(document.getElementById('customItemQtyInp').value) || 1;
+      const price = parseFloat(document.getElementById('customItemPriceInp').value) || 0;
+
+      if (!name || price <= 0) {
+        showToast('Ingresa nombre y precio válido');
+        return;
+      }
+
+      const newItem = {
+        id: 'pi_custom_' + Date.now(),
+        catalogId: null,
+        name: name,
+        quantity: qty,
+        unitPrice: price,
+        subtotal: qty * price,
+        image: null
+      };
+
+      if (catalogPickerTarget === 'new_order') {
+        tempOrderItems.push(newItem);
+        renderNewOrderItems();
+        showToast(`✓ Ítem a medida añadido: ${name}`);
+      } else if (catalogPickerTarget === 'active_project') {
+        const p = projectsData[selectedProjectIdx];
+        if (p) {
+          if (!p.items) p.items = [];
+          p.items.push(newItem);
+          p.total += (qty * price);
+          persistirEstadoLocal();
+          recalcularTodo();
+          renderProjectItems();
+          showToast(`✓ Ítem a medida añadido al proyecto: ${name}`);
+        }
+      }
+      cerrarModalItemMedida();
+    }
+
+    // Render de ítems en el Modal de Nuevo Pedido
+    function renderNewOrderItems() {
+      const container = document.getElementById('newOrderItemsList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (tempOrderItems.length === 0) {
+        container.innerHTML = '<div style="font-size:11px; color:#888; text-align:center; padding:8px 0;">No has agregado productos. Toca "+ Del Catálogo" o "+ Ítem a Medida".</div>';
+        document.getElementById('lblNewOrderItemsSum').innerText = '$0';
+        return;
+      }
+
+      let sum = 0;
+      tempOrderItems.forEach((it, idx) => {
+        sum += (it.quantity * it.unitPrice);
+        const row = document.createElement('div');
+        row.className = 'order-item-row';
+        const thumb = it.image
+          ? `<img src="${it.image}" style="width:30px; height:30px; border-radius:8px; object-fit:cover;">`
+          : `<span style="font-size:18px;">🎁</span>`;
+
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+            ${thumb}
+            <div style="min-width:0; flex:1;">
+              <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${it.name}</div>
+              <div style="font-size:10.5px; color:var(--text-muted);">$${it.unitPrice.toLocaleString('es-CO')} c/u</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:5px;">
+            <button type="button" class="stepper-btn" onclick="cambiarCantidadItemNuevoPedido(${idx}, -1)">-</button>
+            <span style="font-size:12px; font-weight:800; min-width:18px; text-align:center;">${it.quantity}</span>
+            <button type="button" class="stepper-btn" onclick="cambiarCantidadItemNuevoPedido(${idx}, 1)">+</button>
+            <div style="font-size:12px; font-weight:800; color:var(--text); min-width:60px; text-align:right;">
+              $${(it.quantity * it.unitPrice).toLocaleString('es-CO')}
+            </div>
+            <button type="button" onclick="eliminarItemNuevoPedido(${idx})" style="background:transparent; border:none; color:var(--alert); font-size:13px; cursor:pointer; padding:2px 4px;">✕</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById('lblNewOrderItemsSum').innerText = `$${sum.toLocaleString('es-CO')}`;
+
+      // Auto-llenar el total cotizado y resumen si el usuario no los ha modificado
+      const orderTotalInp = document.getElementById('orderTotalInp');
+      if (orderTotalInp && sum > 0) {
+        orderTotalInp.value = sum;
+      }
+      const orderServicesInp = document.getElementById('orderServicesInp');
+      if (orderServicesInp && tempOrderItems.length > 0) {
+        orderServicesInp.value = tempOrderItems.map(x => `${x.quantity}x ${x.name}`).join(' + ');
+      }
+    }
+
+    function cambiarCantidadItemNuevoPedido(idx, delta) {
+      if (!tempOrderItems[idx]) return;
+      tempOrderItems[idx].quantity += delta;
+      if (tempOrderItems[idx].quantity <= 0) {
+        tempOrderItems.splice(idx, 1);
+      } else {
+        tempOrderItems[idx].subtotal = tempOrderItems[idx].quantity * tempOrderItems[idx].unitPrice;
+      }
+      renderNewOrderItems();
+    }
+
+    function eliminarItemNuevoPedido(idx) {
+      tempOrderItems.splice(idx, 1);
+      renderNewOrderItems();
+    }
+
+    // Render de ítems en el Detalle del Proyecto Activo
+    function renderProjectItems() {
+      const container = document.getElementById('mProjItemsList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const p = projectsData[selectedProjectIdx];
+      if (!p || !p.items || p.items.length === 0) {
+        container.innerHTML = '<div style="font-size:11px; color:#888; text-align:center; padding:10px 0;">No hay productos específicos cargados en este pedido. Toca "+ Del Catálogo".</div>';
+        const lblCount = document.getElementById('mProjItemsCount');
+        if (lblCount) lblCount.innerText = '0 productos';
+        return;
+      }
+
+      const lblCount = document.getElementById('mProjItemsCount');
+      if (lblCount) lblCount.innerText = `${p.items.length} producto(s) incluidos`;
+
+      p.items.forEach((it, idx) => {
+        const row = document.createElement('div');
+        row.className = 'order-item-row';
+        const thumb = it.image
+          ? `<img src="${it.image}" style="width:32px; height:32px; border-radius:8px; object-fit:cover;">`
+          : `<span style="font-size:18px;">🎁</span>`;
+
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+            ${thumb}
+            <div style="min-width:0; flex:1;">
+              <div style="font-size:12px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${it.name}</div>
+              <div style="font-size:10.5px; color:var(--text-muted);">$${it.unitPrice.toLocaleString('es-CO')} c/u</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:5px;">
+            <button type="button" class="stepper-btn" onclick="cambiarCantidadItemProyecto(${idx}, -1)">-</button>
+            <span style="font-size:12px; font-weight:800; min-width:18px; text-align:center;">${it.quantity}</span>
+            <button type="button" class="stepper-btn" onclick="cambiarCantidadItemProyecto(${idx}, 1)">+</button>
+            <div style="font-size:12px; font-weight:800; color:var(--text); min-width:60px; text-align:right;">
+              $${(it.quantity * it.unitPrice).toLocaleString('es-CO')}
+            </div>
+            <button type="button" onclick="eliminarItemProyecto(${idx})" style="background:transparent; border:none; color:var(--alert); font-size:13px; cursor:pointer; padding:2px 4px;">✕</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function cambiarCantidadItemProyecto(idx, delta) {
+      const p = projectsData[selectedProjectIdx];
+      if (!p || !p.items || !p.items[idx]) return;
+      const it = p.items[idx];
+      const diff = delta * it.unitPrice;
+
+      it.quantity += delta;
+      if (it.quantity <= 0) {
+        p.total -= it.subtotal;
+        p.items.splice(idx, 1);
+      } else {
+        it.subtotal = it.quantity * it.unitPrice;
+        p.total += diff;
+      }
+      persistirEstadoLocal();
+      recalcularTodo();
+      renderProjectItems();
+    }
+
+    function eliminarItemProyecto(idx) {
+      const p = projectsData[selectedProjectIdx];
+      if (!p || !p.items || !p.items[idx]) return;
+      const it = p.items[idx];
+      p.total -= it.subtotal;
+      p.items.splice(idx, 1);
+      persistirEstadoLocal();
+      recalcularTodo();
+      renderProjectItems();
+      showToast(`Ítem "${it.name}" retirado del pedido`);
+    }
+
 
     function selectSetupMode(mode) {
       selectedSetupMode = mode;
@@ -1428,12 +2270,46 @@
     }
 
     function iniciarSesionUsuario() {
-      const user = document.getElementById('loginUserInp').value.trim();
-      const pass = document.getElementById('loginPassInp').value.trim();
+      const userInput = (document.getElementById('loginUserInp').value || '').trim();
+      const passInput = (document.getElementById('loginPassInp').value || '').trim();
 
-      if (!user) {
-        showToast('Ingresa tu correo o celular registrado');
+      if (!userInput) {
+        showToast('Ingresa tu correo, usuario o celular registrado');
         return;
+      }
+
+      // Buscar coincidencia en la base de datos de usuarios
+      const uMatch = users.find(u => 
+        (u.username && u.username.toLowerCase() === userInput.toLowerCase()) ||
+        (u.email && u.email.toLowerCase() === userInput.toLowerCase()) ||
+        (u.phone && u.phone === userInput) ||
+        (u.name && u.name.toLowerCase() === userInput.toLowerCase())
+      );
+
+      if (uMatch) {
+        if (uMatch.pin && passInput && uMatch.pin !== passInput) {
+          showToast('⚠️ PIN / Contraseña incorrecta');
+          return;
+        }
+        currentUser = uMatch;
+      } else {
+        // Si no coincide con ninguno pero es el primer acceso, crear Dueño
+        if (users.length === 0) {
+          currentUser = {
+            id: 'usr_' + Date.now(),
+            name: userInput.includes('@') ? userInput.split('@')[0] : userInput,
+            username: userInput,
+            email: userInput.includes('@') ? userInput : '',
+            phone: userInput.includes('@') ? '' : userInput,
+            pin: passInput || '1234',
+            role: 'OWNER',
+            active: true
+          };
+          users.push(currentUser);
+        } else {
+          showToast('⚠️ Usuario no encontrado. Crea tu negocio o verifica tus datos.');
+          return;
+        }
       }
 
       // Si ya hay perfil guardado en el dispositivo, usarlo
@@ -1449,13 +2325,11 @@
       }
 
       if (!bizProfile.name) {
-        // Inicializar perfil con los datos ingresados
-        const cleanName = user.includes('@') ? user.split('@')[0] : 'Mi Negocio';
         bizProfile = {
-          name: cleanName.charAt(0).toUpperCase() + cleanName.slice(1),
-          owner: cleanName.charAt(0).toUpperCase() + cleanName.slice(1),
-          phone: user.includes('@') ? '' : user,
-          nequi: '',
+          name: 'TM Diseños Creativos',
+          owner: currentUser.name,
+          phone: currentUser.phone || '3124567890',
+          nequi: currentUser.phone || '3124567890',
           daviplata: '',
           bancolombia: '',
           type: 'servicios',
@@ -1467,10 +2341,11 @@
 
       persistirEstadoLocal();
       document.getElementById('authScreenModal').style.display = 'none';
+      aplicarUsuarioActivo();
       aplicarModalidadNegocio();
       recalcularTodo();
       renderPos();
-      showToast(`¡Bienvenida(o), ${bizProfile.owner || bizProfile.name}!`);
+      showToast(`¡Bienvenida(o), ${currentUser.name}! (${currentUser.role === 'OWNER' ? 'Dueño' : 'Colaborador'})`);
     }
 
     function guardarNegocioOnboarding() {
@@ -1494,16 +2369,42 @@
         configured: true
       };
 
-      // Iniciar con datos 100% limpios
+      // Crear usuario Dueño inicial
+      currentUser = {
+        id: 'usr_' + Date.now(),
+        name: owner,
+        username: phone || owner.toLowerCase().replace(/\s+/g, ''),
+        email: phone.includes('@') ? phone : '',
+        phone: phone,
+        pin: '1234',
+        role: 'OWNER',
+        active: true
+      };
+      users = [
+        currentUser,
+        {
+          id: 'usr_collab',
+          name: 'Colaborador Vendedor',
+          username: 'vendedor',
+          email: '',
+          phone: '',
+          pin: '0000',
+          role: 'COLLABORATOR',
+          active: true
+        }
+      ];
+
+      // Iniciar con catálogo predefinido
       projectsData = [];
       generalExpenses = [];
       generalIncomes = [];
-      catalogItems = [];
+      catalogItems = [...DEFAULT_CATALOG_SERVICIOS];
       cart = [];
 
       persistirEstadoLocal();
 
       document.getElementById('authScreenModal').style.display = 'none';
+      aplicarUsuarioActivo();
       aplicarModalidadNegocio();
       recalcularTodo();
       renderPos();
@@ -1739,7 +2640,13 @@
       // Actualizar tarjetas del Dashboard
       if (document.getElementById('txtIngresos')) document.getElementById('txtIngresos').innerText = `$${totalIngresosGlobal.toLocaleString('es-CO')}`;
       if (document.getElementById('txtGastos')) document.getElementById('txtGastos').innerText = `$${totalGastosGlobal.toLocaleString('es-CO')}`;
-      if (document.getElementById('txtGanancia')) document.getElementById('txtGanancia').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+      if (document.getElementById('txtGanancia')) {
+        if (currentUser && currentUser.role === 'COLLABORATOR') {
+          document.getElementById('txtGanancia').innerText = '••••••';
+        } else {
+          document.getElementById('txtGanancia').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
+        }
+      }
 
       // Actualizar modal de desglose
       if (document.getElementById('dIngresosProyectos')) document.getElementById('dIngresosProyectos').innerText = `$${totalAbonosProyectos.toLocaleString('es-CO')}`;
@@ -1877,6 +2784,7 @@
 
     // Modal de Nuevo Pedido / Proyecto de Cliente
     function abrirModalNuevoPedido() {
+      tempOrderItems = [];
       document.getElementById('orderNameInp').value = '';
       document.getElementById('orderClientInp').value = '';
       document.getElementById('orderPhoneInp').value = '';
@@ -1884,19 +2792,21 @@
       document.getElementById('orderTotalInp').value = '';
       document.getElementById('orderAdvanceInp').value = '';
       document.getElementById('orderDaysInp').value = '5';
+      renderNewOrderItems();
       document.getElementById('newOrderModal').style.display = 'flex';
       setTimeout(() => document.getElementById('orderNameInp').focus(), 100);
     }
 
     function cerrarNuevoPedidoModal() {
       document.getElementById('newOrderModal').style.display = 'none';
+      tempOrderItems = [];
     }
 
     function guardarNuevoPedido() {
       const name = document.getElementById('orderNameInp').value.trim();
       const client = document.getElementById('orderClientInp').value.trim();
       const phone = document.getElementById('orderPhoneInp').value.trim() || '312 000 0000';
-      const services = document.getElementById('orderServicesInp').value.trim() || 'Servicio personalizado';
+      let services = document.getElementById('orderServicesInp').value.trim();
       const total = parseFloat(document.getElementById('orderTotalInp').value) || 0;
       const advance = parseFloat(document.getElementById('orderAdvanceInp').value) || 0;
       const days = parseInt(document.getElementById('orderDaysInp').value) || 5;
@@ -1906,12 +2816,31 @@
         return;
       }
 
+      if (!services && tempOrderItems.length > 0) {
+        services = tempOrderItems.map(it => `${it.quantity}x ${it.name}`).join(' + ');
+      }
+      if (!services) services = 'Servicios personalizados';
+
+      let finalItems = [...tempOrderItems];
+      if (finalItems.length === 0) {
+        finalItems.push({
+          id: 'pi_' + Date.now(),
+          catalogId: null,
+          name: services,
+          quantity: 1,
+          unitPrice: total,
+          subtotal: total,
+          image: null
+        });
+      }
+
       const newProj = {
-        id: projectsData.length,
+        id: projectsData.length + 1,
         name: name,
         client: client,
         phone: phone,
         services: services,
+        items: finalItems,
         total: total,
         cobrado: advance,
         directCompras: 0,
@@ -1927,6 +2856,7 @@
 
       projectsData.unshift(newProj);
       selectedProjectIdx = 0;
+      persistirEstadoLocal();
       cerrarNuevoPedidoModal();
       recalcularTodo();
       verDetalleProyecto(0);
@@ -1935,6 +2865,10 @@
 
     // Desglose
     function verDesgloseGlobal() {
+      if (currentUser && currentUser.role === 'COLLABORATOR') {
+        showToast('🔒 El desglose financiero es exclusivo del perfil Dueño');
+        return;
+      }
       document.getElementById('desgloseModal').style.display = 'flex';
     }
 
@@ -1945,7 +2879,16 @@
     function copiarWhatsAppCotizacion() {
       const p = projectsData[selectedProjectIdx];
       const saldo = p.total - p.cobrado;
-      const msg = `✨ *${bizProfile.name.toUpperCase()}* ✨\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Proyecto:* ${p.name}\n👤 *Cliente:* ${p.client}\n📦 *Servicios:* ${p.services}\n\n💰 *RESUMEN DE CUENTA:*\n• *Total Cotizado:* $${p.total.toLocaleString('es-CO')}\n• *Abonado a la fecha:* $${p.cobrado.toLocaleString('es-CO')}\n• *SALDO PENDIENTE:* $${saldo.toLocaleString('es-CO')}\n\n🏦 *CUENTAS DE COBRO:*\n• Nequi: ${bizProfile.nequi}\n• Bancolombia: ${bizProfile.bancolombia}\n📞 Contacto: ${bizProfile.phone}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n¡Muchas gracias por apoyar nuestro talento local! 🌸`;
+
+      let itemsBreakdown = '';
+      if (p.items && p.items.length > 0) {
+        itemsBreakdown = '\n📦 *PRODUCTOS Y ENTREGABLES:*\n' + 
+          p.items.map(it => `• ${it.quantity}x ${it.name} - $${(it.subtotal || it.quantity * it.unitPrice).toLocaleString('es-CO')}`).join('\n') + '\n';
+      } else {
+        itemsBreakdown = `\n📦 *Servicios:* ${p.services}\n`;
+      }
+
+      const msg = `✨ *${(bizProfile.name || 'ZENTRA').toUpperCase()}* ✨\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n📋 *Proyecto:* ${p.name}\n👤 *Cliente:* ${p.client}${itemsBreakdown}\n💰 *RESUMEN DE CUENTA:*\n• *Total Cotizado:* $${p.total.toLocaleString('es-CO')}\n• *Abonado a la fecha:* $${p.cobrado.toLocaleString('es-CO')}\n• *SALDO PENDIENTE:* $${saldo.toLocaleString('es-CO')}\n\n🏦 *CUENTAS DE COBRO:*\n• Nequi: ${bizProfile.nequi || bizProfile.phone}\n• Bancolombia: ${bizProfile.bancolombia || 'Consultar'}\n📞 Contacto: ${bizProfile.phone}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n¡Muchas gracias por apoyar nuestro talento local! 🌸`;
 
       navigator.clipboard.writeText(msg).catch(() => {});
       showToast(`¡Cotización de "${bizProfile.name}" copiada para WhatsApp!`);
@@ -2136,17 +3079,23 @@
         card.className = 'catalog-item-card';
         const isLow = item.stock <= 5;
         const gananciaUnidad = item.price - item.cost;
+        const thumbHtml = item.image
+          ? `<img src="${item.image}" class="prod-thumb" style="width:48px; height:48px; border-radius:12px; object-fit:cover; border:1px solid #E5E7EB; flex-shrink:0;">`
+          : `<div class="prod-thumb" style="width:48px; height:48px; border-radius:12px; background:var(--bg); border:1px solid var(--surface-border); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🎁</div>`;
 
         card.innerHTML = `
-          <div>
-            <div style="font-weight:700; font-size:13px; color:var(--text);">${item.name}</div>
-            <div style="font-size:11px; color:#777;">Cat: ${item.cat} • Costo: $${item.cost.toLocaleString('es-CO')}</div>
-            <div style="font-size:13px; font-weight:700; color:var(--secondary); margin-top:2px;">
-              $${item.price.toLocaleString('es-CO')} 
-              <span style="font-size:10px; font-weight:500; color:#38A169;">(Ganancia: +$${gananciaUnidad.toLocaleString('es-CO')})</span>
+          <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+            ${thumbHtml}
+            <div style="min-width:0; flex:1;">
+              <div style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</div>
+              <div style="font-size:11px; color:#777;">Cat: ${item.cat} • Costo: $${item.cost.toLocaleString('es-CO')}</div>
+              <div style="font-size:13px; font-weight:700; color:var(--secondary); margin-top:2px;">
+                $${item.price.toLocaleString('es-CO')} 
+                <span style="font-size:10px; font-weight:500; color:#38A169;">(Ganancia: +$${gananciaUnidad.toLocaleString('es-CO')})</span>
+              </div>
             </div>
           </div>
-          <div style="text-align:right;">
+          <div style="text-align:right; margin-left:8px;">
             <div style="font-size:11px; font-weight:700; margin-bottom:6px; color:${isLow ? 'var(--alert)' : '#38A169'};">
               ${isLow ? '⚠️ ' : ''}${item.stock} disp
             </div>
@@ -2185,11 +3134,13 @@
       document.getElementById('prodCostInp').value = '';
       document.getElementById('prodStockInp').value = '10';
       document.getElementById('prodCatInp').value = catalogFilter === 'servicios' ? 'Papelería' : 'Abarrotes';
+      removeProductPhoto();
       document.getElementById('newProductModal').style.display = 'flex';
       setTimeout(() => document.getElementById('prodNameInp').focus(), 100);
     }
 
     function cerrarModalNuevoProducto() {
+      removeProductPhoto();
       document.getElementById('newProductModal').style.display = 'none';
     }
 
@@ -2212,11 +3163,15 @@
         cost: cost,
         stock: stock,
         cat: cat,
+        image: tempProductPhoto || null,
         mode: catalogFilter
       });
 
+      removeProductPhoto();
+      persistirEstadoLocal();
       cerrarModalNuevoProducto();
       renderCatalogItems();
+      renderPos();
       showToast(`✓ Producto "${name}" agregado al catálogo con ${stock} unidades`);
     }
 
@@ -2242,7 +3197,11 @@
         const isLow = p.stock <= 5;
         const el = document.createElement('div');
         el.className = 'pos-product';
+        const thumbHtml = p.image 
+          ? `<img src="${p.image}" style="width:100%; height:75px; object-fit:cover; border-radius:10px; margin-bottom:6px;">`
+          : '';
         el.innerHTML = `
+          ${thumbHtml}
           <div>
             <span style="font-size: 9px; opacity: 0.6;">${p.cat || 'General'}</span>
             <div class="pos-name">${p.name}</div>

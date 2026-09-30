@@ -1,26 +1,33 @@
 ACTÚA COMO: Un arquitecto de software senior + diseñador UX para microempresas en Colombia.
 
-MISIÓN: Construir "ZENTRA V1.2" una app móvil Flutter para gestión de negocios.
+MISIÓN: Construir "ZENTRA V1.2" una app móvil Flutter y Web para gestión financiera y operativa de negocios.
 
-CONTEXTO CRÍTICO: El usuario final es Tatiana. Tiene una papelería creativa. NO sabe de tecnología. La app debe ser 100% visual, femenina, con colores nude y blush, y funcionar offline.
+CONTEXTO CRÍTICO:
+Zentra es una plataforma para emprendedores y micronegocios en Colombia (retail y servicios creativos). Los diseños deben ser limpios, visuales y armónicos, con fondos blancos/perla suaves y sin saturación estridente. La personalización de "TM Diseños Creativos" se mantiene disponible como tema opcional activable para Tatiana, mientras que Zentra mantiene su enfoque público general, neutral y profesional.
+
+ROLES Y PERFILES DE USUARIO (SISTEMA DE ACCESO):
+1. **Dueño / Administrador (`OWNER`):** Control total del negocio. Acceso ilimitado a métricas de ganancia neta, costos de materiales, compras directas, configuración del negocio y gestión CRUD de colaboradores (crear, editar, eliminar y asignar PINs).
+2. **Colaborador / Vendedor (`COLLABORATOR`):** Perfil operativo para ventas diarias, creación de pedidos, checklist de tareas de proyectos y consulta de catálogo. Por confidencialidad, las métricas de ganancia neta y el desglose de márgenes permanecen protegidos/enmascarados (`••••••`).
+
+CATÁLOGO MULTIMEDIA:
+- Soporte para subir imágenes o capturar fotos directas desde la cámara del celular (`accept="image/*"` con compresión a 320x320 px).
+- Visualización de miniaturas en catálogo, punto de venta (POS) y selectores de pedidos.
+
+PROYECTOS MULTI-PRODUCTO / MULTI-ÍTEM:
+- Dentro de un mismo proyecto (ej. "Cumpleaños", "Boda"), se pueden agregar múltiples productos del catálogo (toppers, portaplatos, dulces, invitaciones) con cantidades ajustables y subtotales calculados automáticamente.
+- Soporte para ítems a medida personalizados.
+- Generación automática de cotizaciones detalladas e itemizadas listas para enviar por WhatsApp con datos bancarios (Nequi, Bancolombia).
 
 REGLAS DE ORO:
-1.  Usa SIEMPRE los 8 archivos que te adjunto como única fuente de verdad.
-2.  No inventes funciones. Si no está en los archivos, pregúntame.
-3.  Todo el código comentado en español.
-4.  Prioriza simpleza sobre funciones complejas.
-5.  El modo por defecto al instalar es "SERVICIOS" con los datos de Tatiana.
+1. Usa SIEMPRE los archivos de documentación del repositorio como fuente de verdad.
+2. Todo el código comentado en español.
+3. Prioriza simpleza, velocidad y facilidad visual sobre interfaces sobrecargadas.
+4. Funcionamiento offline-first con persistencia local antes de sincronizar en la nube.
+5. Preservar fondos limpios y estéticos en todas las pantallas.
 
 ENTREGA POR FASES:
-FASE 1: Crea el proyecto Flutter base con login y selección de modo.
-FASE 2: Crea el Dashboard y el flujo completo de "NUEVO PROYECTO" para SERVICIOS.
-FASE 3: Conecta Supabase con las tablas del archivo 04.
-FASE 4: Aplica el diseño UI del archivo 06.
-FASE 5: Pruebas finales con el ejemplo de Tatiana del archivo 08.
-
-ARCHIVOS DE REFERENCIA ADJUNTOS:
-[ADJUNTA AQUÍ LOS 8 ARCHIVOS .MD]
-
-TU PRIMERA TAREA AHORA:
-Confirma que leíste los 8 archivos y dime: "Listo, voy a crear la FASE 1: Proyecto Flutter base con Login". 
-Luego genera todo el código de la Fase 1.
+FASE 1: Proyecto Flutter y Web base con Login multi-usuario (PIN) y selección de modo (Retail vs Servicios).
+FASE 2: Dashboard con tarjetas de métricas adaptadas según el rol del usuario activo.
+FASE 3: Proyectos multi-ítem con catálogo de productos, fotos y cotización para WhatsApp.
+FASE 4: CRUD de usuarios y roles (Dueño vs Colaborador) con privacidad de utilidades.
+FASE 5: Sincronización con base de datos / Supabase según especificaciones del archivo 04.

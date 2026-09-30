@@ -5,8 +5,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#FFE3F4",
-  "theme_color": "#FF2B78",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
   "description": "Gestión financiera, pedidos por proyecto y mostrador POS sin complicaciones.",
   "icons": [
     {

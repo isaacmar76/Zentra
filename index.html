@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zentra - Gestión Ágil para Micronegocios</title>
   <meta name="description" content="Gestión financiera, pedidos por proyecto y mostrador POS sin complicaciones.">
-  <meta name="theme-color" content="#FF2B78">
+  <meta name="theme-color" content="#FFFFFF">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -165,8 +165,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: var(--bg);
-      border-bottom: 1px solid rgba(0,0,0,0.05);
+      background: #FFFFFF;
+      border-bottom: 1px solid #ECEEF2;
     }
 
     .app-title {
@@ -2309,6 +2309,9 @@
       document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
       const activeEl = document.getElementById(`opt-${themeKey}`);
       if (activeEl) activeEl.classList.add('active');
+
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      if (metaTheme) metaTheme.setAttribute('content', '#FFFFFF');
 
       try {
         localStorage.setItem('zentra_active_theme', themeKey);

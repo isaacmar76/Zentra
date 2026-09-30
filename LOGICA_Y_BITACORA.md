@@ -192,8 +192,8 @@ class CatalogItemModel {
 | **2026-09-29** | `13a7b9e` | Architecture | Creación de `LOGICA_Y_BITACORA.md` como fuente de verdad y registro continuo | ✅ Completado |
 | **2026-09-29** | `9f31f41` | Core | Configuración fija de tipo de negocio al crear empresa, borrado total de datos demo y persistencia local | ✅ Completado |
 | **2026-09-29** | `051ed97` | Deploy / PWA | Estructura para despliegue instantáneo en Vercel (`index.html`, `vercel.json`, `manifest.json`, iconos PWA) | ✅ Completado |
-| **2026-09-29** | `7a0420f` | UI / Branding | Integración inicial de la paleta oficial de TM Diseños Creativos | ✅ Completado |
-| **2026-09-29** | *Pendiente Push* | UI / UX / Auth | Portal de Acceso (Iniciar Sesión vs Crear Negocio), Paleta Minimalista Blanca (anti-saturación) y Vistas Despejadas | ✅ Completado |
+| **2026-09-29** | `47de877` | UI / UX / Auth | Portal de Acceso (Iniciar Sesión vs Crear Negocio), Paleta Minimalista Blanca y Vistas Despejadas | ✅ Completado |
+| **2026-09-29** | *Pendiente Push* | UI / Fix | Barra de estado y títulos superior cambiada a blanco puro (`#FFFFFF`) para celular PWA | ✅ Completado |
 
 ---
 
@@ -248,6 +248,7 @@ class CatalogItemModel {
      - Se reemplazó la cuadrícula pesada de 4 cajitas por una **Tarjeta Hero de Balance** limpia, con el monto principal grande y claro, más dos indicadores discretos de Entradas y Salidas.
      - Se incorporó un **control segmentado de 3 pestañas** (`Encargos`, `Cuentas & Gastos`, `Catálogo`), eliminando los 5 botones apilados que saturaban la pantalla principal.
      - Barra de navegación inferior limpia (`Inicio`, `Mi Negocio`, `Apariencia`).
+  4. **Barra Superior / Status Bar Blanca:** Se cambió el meta tag `theme-color`, header y `manifest.json` a blanco puro (`#FFFFFF`), eliminando la barra fucsia superior en navegadores móviles de celular y app instalada.
 
 ---
 

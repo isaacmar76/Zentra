@@ -121,23 +121,41 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Icon(
-                    Icons.storefront_outlined,
-                    size: 72,
-                    color: theme.secondary,
+                  Center(
+                    child: Container(
+                      width: 96,
+                      height: 96,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.06),
+                            blurRadius: 18,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Image.asset(
+                        'assets/images/zentra_logo.png',
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.shield_outlined,
+                          size: 54,
+                          color: theme.primary,
+                        ),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Bienvenido a',
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
+                  const SizedBox(height: 18),
                   Text(
                     'ZENTRA',
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                          color: theme.alert,
-                          letterSpacing: 2,
+                          color: theme.textDark,
+                          letterSpacing: 1.5,
+                          fontWeight: FontWeight.w800,
                         ),
                   ),
                   const SizedBox(height: 6),

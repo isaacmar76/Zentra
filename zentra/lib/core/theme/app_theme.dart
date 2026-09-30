@@ -119,17 +119,17 @@ class ZentraThemePalette {
 /// Registro central de los 4 temas personalizables de Zentra.
 /// Registro central de los temas personalizables de Zentra.
 class AppTheme {
-  // 1. TEMA OFICIAL: TM Diseños Creativos (Identidad Oficial de Marca)
+  // 1. TEMA OFICIAL: TM Diseños Creativos (Edición Minimalista Blanca)
   static const ZentraThemePalette tmDisenos = ZentraThemePalette(
     id: 'tm_disenos',
     name: 'TM Diseños Creativos',
-    subtitle: 'Paleta Oficial de Marca (#ff2b78, #ff4400 y #ffe3f4)',
-    background: Color(0xFFFFE3F4), // Rosa pastel suave (#ffe3f4)
-    primary: Color(0xFFFF2B78),    // Fucsia vibrante oficial (#ff2b78)
-    secondary: Color(0xFFFF4400),  // Naranja vibrante oficial (#ff4400)
-    textDark: Color(0xFF545454),   // Gris carbón oficial (#545454)
-    success: Color(0xFF2E7D32),    // Verde confirmación
-    alert: Color(0xFFFF4400),      // Naranja alerta / acento (#ff4400)
+    subtitle: 'Blanco minimalista, fucsia (#ff2b78) y naranja (#ff4400)',
+    background: Color(0xFFF8F9FA), // Blanco perla limpio y luminoso
+    primary: Color(0xFFFF2B78),    // Fucsia oficial como acento sutil
+    secondary: Color(0xFFFF4400),  // Naranja oficial para llamadas a la acción
+    textDark: Color(0xFF1E2329),   // Grafito oscuro nítido
+    success: Color(0xFF10B981),    // Verde esmeralda
+    alert: Color(0xFFEF4444),      // Rojo suave de alerta
   );
 
   // 2. TEMA: Nude & Blush (Artesanal y Delicado)

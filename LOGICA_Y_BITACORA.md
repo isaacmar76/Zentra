@@ -192,7 +192,8 @@ class CatalogItemModel {
 | **2026-09-29** | `13a7b9e` | Architecture | Creación de `LOGICA_Y_BITACORA.md` como fuente de verdad y registro continuo | ✅ Completado |
 | **2026-09-29** | `9f31f41` | Core | Configuración fija de tipo de negocio al crear empresa, borrado total de datos demo y persistencia local | ✅ Completado |
 | **2026-09-29** | `051ed97` | Deploy / PWA | Estructura para despliegue instantáneo en Vercel (`index.html`, `vercel.json`, `manifest.json`, iconos PWA) | ✅ Completado |
-| **2026-09-29** | *Pendiente Push* | UI / Branding | Integración de la paleta oficial de TM Diseños Creativos (`#ff2b78`, `#ff4400`, `#ffe3f4`, `#545454`, `#ffffff`) como tema oficial | ✅ Completado |
+| **2026-09-29** | `7a0420f` | UI / Branding | Integración inicial de la paleta oficial de TM Diseños Creativos | ✅ Completado |
+| **2026-09-29** | *Pendiente Push* | UI / UX / Auth | Portal de Acceso (Iniciar Sesión vs Crear Negocio), Paleta Minimalista Blanca (anti-saturación) y Vistas Despejadas | ✅ Completado |
 
 ---
 
@@ -227,17 +228,26 @@ class CatalogItemModel {
   3. Configuración de `manifest.json` y meta-etiquetas PWA (`mobile-web-app-capable`, `theme-color`).
   4. Generación de íconos de aplicación de alta resolución en `img/` para instalación directa en pantalla de inicio de Android/iOS ("Añadir a pantalla de inicio").
 
-#### Hito 6: Paleta Oficial de Marca TM Diseños Creativos
+#### Hito 6: Paleta Oficial de Marca TM Diseños Creativos (Commit `7a0420f`)
 - **Especificación de Marca recibida:**
   - Fucsia vibrante: `#ff2b78`
   - Naranja vibrante: `#ff4400`
   - Rosa pastel suave (fondo): `#ffe3f4`
   - Gris carbón (texto y contraste): `#545454`
   - Blanco puro (tarjetas y superficies): `#ffffff`
-- **Implementación:**
-  1. Se agregó la paleta `tm_disenos` como tema oficial principal tanto en Flutter ([app_theme.dart](file:///c:/Proyectos/MyBusiness/zentra/lib/core/theme/app_theme.dart), [theme_provider.dart](file:///c:/Proyectos/MyBusiness/zentra/lib/core/theme/theme_provider.dart)) como en la versión web PWA ([index.html](file:///c:/Proyectos/MyBusiness/index.html) y [preview.html](file:///c:/Proyectos/MyBusiness/preview.html)).
-  2. Se añadió como primera opción destacada con distintivo `OFICIAL` en el selector de temas.
-  3. Se sincronizó la persistencia del tema en el almacenamiento local.
+
+#### Hito 7: Portal de Acceso Dual, Paleta Minimalista Blanca y Vistas Despejadas
+- **Feedback del Cliente (Tatiana):**
+  1. No saturar de fucsia la pantalla; a Tatiana le gustan los **fondos blancos**.
+  2. Despejar las vistas para que no se vean abarrotadas de botones y cajas.
+  3. Al entrar, permitir tanto **iniciar sesión** para quien ya tiene un negocio creado, como **crear negocio** para nuevos comercios.
+- **Solución implementada:**
+  1. **Portal de Acceso Dual:** Pestañas claras para `🔑 Iniciar Sesión` (con correo/teléfono y PIN/contraseña) y `✨ Crear Negocio` (con registro limpio y selección fija de modelo operativo).
+  2. **Paleta Minimal White:** El fondo general pasó a ser blanco perla pulcro (`#F8F9FA` / `#FFFFFF`) con tarjetas blancas puras (`#FFFFFF`), bordes finos `#EAECEF` y textos en grafito `#1E2329`. El fucsia `#ff2b78` y naranja `#ff4400` se redistribuyeron como acentos editoriales y botones de acción limpios sin saturar.
+  3. **Despeje de Vistas (Decluttering):**
+     - Se reemplazó la cuadrícula pesada de 4 cajitas por una **Tarjeta Hero de Balance** limpia, con el monto principal grande y claro, más dos indicadores discretos de Entradas y Salidas.
+     - Se incorporó un **control segmentado de 3 pestañas** (`Encargos`, `Cuentas & Gastos`, `Catálogo`), eliminando los 5 botones apilados que saturaban la pantalla principal.
+     - Barra de navegación inferior limpia (`Inicio`, `Mi Negocio`, `Apariencia`).
 
 ---
 

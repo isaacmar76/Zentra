@@ -19,3 +19,6 @@ build/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Copias de seguridad locales
+backup_app_actual/

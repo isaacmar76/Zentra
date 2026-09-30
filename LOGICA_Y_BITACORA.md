@@ -191,9 +191,8 @@ class CatalogItemModel {
 | **2026-09-28** | `8d79e42` | Fix | Corrección en `preview.html`: restauración de modales de proyectos, checklist y flujo contable | ✅ Completado |
 | **2026-09-29** | `13a7b9e` | Architecture | Creación de `LOGICA_Y_BITACORA.md` como fuente de verdad y registro continuo | ✅ Completado |
 | **2026-09-29** | `9f31f41` | Core | Configuración fija de tipo de negocio al crear empresa, borrado total de datos demo y persistencia local | ✅ Completado |
-| **2026-09-29** | `051ed97` | Deploy / PWA | Estructura para despliegue instantáneo en Vercel (`index.html`, `vercel.json`, `manifest.json`, iconos PWA) | ✅ Completado |
-| **2026-09-29** | `47de877` | UI / UX / Auth | Portal de Acceso (Iniciar Sesión vs Crear Negocio), Paleta Minimalista Blanca y Vistas Despejadas | ✅ Completado |
-| **2026-09-30** | `current` | Feature / Auth / Multi-item | CRUD de Usuarios (Dueño vs Colaborador), Catálogo con Fotos (Cámara/Galería), Proyectos Multi-Producto y Cotizaciones WhatsApp | ✅ Completado |
+| **2026-09-30** | `61041bb` | Feature / Auth / Multi-item | CRUD de Usuarios (Dueño vs Colaborador), Catálogo con Fotos (Cámara/Galería), Proyectos Multi-Producto y Cotizaciones WhatsApp | ✅ Completado |
+| **2026-09-30** | `current` | UI / UX / Design System | Adopción de Sistema Visual Fintech Clarity (nuevo_diseño.md): Plus Jakarta Sans + Inter, Cockpit Hero con micro-gráfica SVG, Bento cards | ✅ Completado |
 
 ---
 
@@ -273,6 +272,25 @@ class CatalogItemModel {
      - Soporte para agregar ítems a medida específicos.
      - Cálculo en tiempo real de subtotales y total del proyecto.
      - Botón para compartir cotización por WhatsApp con desglose estructurado producto a producto y cuentas de cobro (Nequi, Bancolombia).
+
+#### Hito 10: Sistema de Diseño Fintech Clarity (Opción A - Adaptación de `nuevo_diseño.md`)
+- **Motivación:** Elevar la experiencia visual de la aplicación operativa al nivel ejecutivo de las fintechs modernas globales, manteniendo la funcionalidad intacta y los fondos blancos pulcros.
+- **Implementación Técnica:**
+  1. **Tipografía Ejecutiva:** Migración de fuentes a **Plus Jakarta Sans** (para números grandes, métricas, titulares y precios) y **Inter** (para textos de lectura y etiquetas de interfaz).
+  2. **Tema Oficial Zentra Clarity (Predeterminado):**
+     - Fondo: Blanco perlado de alta gama (`#F8F9FF`) y tarjetas blancas puras (`#FFFFFF`).
+     - Acentos principales: Verde Bosque / Esmeralda (`#006C46`) y Verde Menta Neón (`#00D68F`).
+     - Textos de alto contraste: Midnight Graphite (`#0B1C30`) y Pizarra (`#596273`).
+     - Conservación de "TM Diseños Creativos" de Tatiana (fucsia/naranja/blanco) y los demás temas en el selector de apariencia.
+  3. **Cabina Financiera Hero (Fintech Cockpit):**
+     - Rediseño de la tarjeta de balance con etiqueta superior en vivo (`En vivo • Flujo`), saldo en gran formato *Plus Jakarta Sans*, y **micro-gráfico vectorial SVG interactivo** con curva de degradado translúcido.
+     - Cuadrícula bento inferior para desglose de *Ingresos / Abonos* y *Gastos / Compras*.
+  4. **Tarjetas Bento de Proyectos:**
+     - Tarjetas con bordes ultra-limpios `#E5EEFF`, micro-barra de progreso de cobro (`p.cobrado / p.total`), badges de productos incluidos y margen protegido para colaboradores.
+  5. **Barra de Navegación y Header:**
+     - Header ejecutivo con monograma `Z` en degradado menta/esmeralda e indicador de estado en vivo.
+     - Iconografía Google Material Symbols Outlined en la barra inferior (`dashboard`, `storefront`, `palette`).
+  6. **Alineación Flutter:** Inclusión de la paleta `zentraClarity` en `app_theme.dart` y establecimiento como tema por defecto en `ThemeProvider`.
 
 ---
 

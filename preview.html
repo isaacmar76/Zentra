@@ -14,39 +14,54 @@
   <link rel="apple-touch-icon" href="img/icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..700,0..1,0&display=swap" rel="stylesheet">
   <style>
-    :root {
-      /* Tema Oficial Tatiana / TM Diseños: Edición Minimalista Blanca */
-      --bg: #F8F9FA;
-      --card-bg: #FFFFFF;
-      --surface-border: #EAECEF;
-      --text: #1E2329;
-      --text-muted: #64748B;
-      --primary: #FF2B78;       /* Fucsia solo como acento sutil */
-      --primary-soft: #FFF0F6;  /* Rosa muy sutil para chips/badges */
-      --secondary: #FF4400;     /* Naranja de marca para botones principales */
-      --secondary-soft: #FFF2ED;
-      --success: #10B981;
-      --alert: #EF4444;
-      --shadow-sm: 0 2px 8px rgba(0,0,0,0.03);
-      --shadow-md: 0 4px 16px rgba(0,0,0,0.05);
+    :root, [data-theme="zentra_clarity"] {
+      /* Tema Fintech Clarity (Zentra Core - nuevo_diseño.md) */
+      --bg: #F8F9FF;             /* Blanco perlado suave y limpio */
+      --card-bg: #FFFFFF;        /* Superficie blanca pura */
+      --surface-border: #E5EEFF; /* Borde sutil */
+      --surface-subtle: #F0F4FC;
+      --surface-container-low: #EFF4FF;
+      --text: #0B1C30;           /* Midnight Graphite */
+      --text-muted: #596273;     /* Pizarra neutro */
+      --primary: #006C46;        /* Verde Bosque / Esmeralda Fintech */
+      --primary-container: #00D68F; /* Verde Menta Neón de alto impacto */
+      --primary-soft: rgba(0, 214, 143, 0.14);
+      --secondary: #006C46;      /* Botones y acciones */
+      --secondary-hover: #005637;
+      --secondary-soft: #E6F8F1;
+      --accent: #00D68F;
+      --success: #006C46;
+      --alert: #BA1A1A;
+      --warning: #B45309;
+      --shadow-sm: 0 2px 8px rgba(11, 28, 48, 0.04);
+      --shadow-md: 0 6px 20px rgba(11, 28, 48, 0.06);
+      --shadow-lg: 0 12px 36px rgba(11, 28, 48, 0.08);
     }
 
     [data-theme="tm_disenos"] {
       --bg: #F8F9FA;
       --card-bg: #FFFFFF;
       --surface-border: #EAECEF;
+      --surface-subtle: #F8F9FA;
+      --surface-container-low: #FFF0F6;
       --text: #1E2329;
       --text-muted: #64748B;
       --primary: #FF2B78;
+      --primary-container: #FF4400;
       --primary-soft: #FFF0F6;
       --secondary: #FF4400;
+      --secondary-hover: #E03D00;
       --secondary-soft: #FFF2ED;
+      --accent: #FF2B78;
       --success: #10B981;
       --alert: #EF4444;
+      --warning: #F59E0B;
       --shadow-sm: 0 2px 8px rgba(0,0,0,0.03);
       --shadow-md: 0 4px 16px rgba(0,0,0,0.05);
+      --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
     }
 
     [data-theme="nude"] {
@@ -58,6 +73,8 @@
       --alert: #E07A5F;
       --card-bg: #FFFFFF;
       --surface-border: #E8C4C4;
+      --surface-subtle: #FAF5EF;
+      --surface-container-low: #F5EFE6;
     }
 
     [data-theme="esmeralda"] {
@@ -69,6 +86,8 @@
       --alert: #E53E3E;
       --card-bg: #FFFFFF;
       --surface-border: #A7D7C5;
+      --surface-subtle: #F4FAF7;
+      --surface-container-low: #E8F5F0;
     }
 
     [data-theme="lavanda"] {
@@ -80,6 +99,8 @@
       --alert: #ED8936;
       --card-bg: #FFFFFF;
       --surface-border: #D6C7E2;
+      --surface-subtle: #FAF7FB;
+      --surface-container-low: #F1EBF5;
     }
 
     [data-theme="oceano"] {
@@ -91,14 +112,21 @@
       --alert: #EA580C;
       --card-bg: #FFFFFF;
       --surface-border: #BAE6FD;
+      --surface-subtle: #F8FAFC;
+      --surface-container-low: #E2E8F0;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    h1, h2, h3, h4, .app-title, .metric-display, .stat-value, .item-title, .pos-price, .font-headline {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: -0.02em;
     }
 
     body {
@@ -267,82 +295,98 @@
     .val-profit { color: var(--text); }
     .val-projects { color: var(--secondary); }
 
-    /* Tarjeta Hero de Balance Minimalista */
+    /* Tarjeta Hero de Balance Fintech Clarity (Cockpit de nuevo_diseño.md) */
     .hero-balance-card {
-      background: #FFFFFF;
-      border: 1px solid #ECEEF2;
-      border-radius: 20px;
-      padding: 18px;
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 24px;
+      padding: 18px 20px;
       margin-bottom: 14px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      box-shadow: 0 8px 24px rgba(11, 28, 48, 0.05), 0 1px 3px rgba(11, 28, 48, 0.03);
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
       transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
     .hero-balance-card:active {
       transform: scale(0.99);
     }
+    .hero-balance-card::before {
+      content: '';
+      position: absolute;
+      top: -30px;
+      right: -30px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(0, 214, 143, 0.16) 0%, transparent 70%);
+      pointer-events: none;
+    }
 
     /* Pestañas de Navegación Segmentada */
     .tab-segments {
       display: flex;
-      background: #ECEEF2;
+      background: var(--surface-container-low);
       padding: 4px;
-      border-radius: 14px;
+      border-radius: 16px;
       margin-bottom: 14px;
       gap: 4px;
+      border: 1px solid var(--surface-border);
     }
 
     .seg-btn {
       flex: 1;
       border: none;
       background: transparent;
-      padding: 8px 6px;
-      border-radius: 10px;
+      padding: 9px 8px;
+      border-radius: 12px;
       font-size: 12px;
       font-weight: 600;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       color: var(--text-muted);
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 6px;
       transition: all 0.2s ease;
     }
 
     .seg-btn.active {
-      background: #FFFFFF;
+      background: var(--card-bg);
       color: var(--text);
       font-weight: 700;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(11, 28, 48, 0.08);
     }
 
     .seg-badge {
       background: var(--primary-soft);
       color: var(--primary);
       font-size: 10px;
-      font-weight: 700;
-      padding: 1px 6px;
-      border-radius: 8px;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
     }
 
     /* Botón de Acción Principal */
     .primary-btn {
       width: 100%;
-      background: var(--secondary);
+      background: linear-gradient(135deg, var(--primary) 0%, #004D32 100%);
       color: #FFFFFF;
       border: none;
-      padding: 14px;
+      padding: 14px 18px;
       border-radius: 16px;
       font-size: 13.5px;
       font-weight: 700;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: -0.01em;
       cursor: pointer;
       margin-bottom: 12px;
-      box-shadow: 0 4px 14px rgba(255, 68, 0, 0.2);
+      box-shadow: 0 4px 16px rgba(0, 108, 70, 0.25);
       display: flex;
       justify-content: center;
       align-items: center;
       gap: 8px;
-      transition: transform 0.15s ease, opacity 0.15s ease;
+      transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
     }
     .primary-btn:active {
       transform: scale(0.98);
@@ -735,15 +779,30 @@
   <div class="phone-container" id="appRoot">
     <div class="notch"></div>
 
-    <!-- Header -->
+    <!-- Header Ejecutivo Fintech Zentra -->
     <header class="app-header">
-      <div class="app-title" id="headerTitle">Zentra</div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg, #006C46 0%, #00D68F 100%); display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(0,214,143,0.3); color:#fff; font-weight:800; font-size:17px; font-family:'Plus Jakarta Sans'; flex-shrink:0;">
+          Z
+        </div>
+        <div>
+          <div class="app-title" id="headerTitle" style="font-size:16px; font-weight:800; color:var(--text); line-height:1.1; letter-spacing:-0.02em;">ZENTRA</div>
+          <div style="display:flex; align-items:center; gap:5px; font-size:9.5px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.04em;">
+            <span style="width:6px; height:6px; border-radius:50%; background:var(--primary-container); display:inline-block; box-shadow:0 0 6px var(--primary-container);"></span>
+            <span>Fintech OS • Activo</span>
+          </div>
+        </div>
+      </div>
       <div class="header-actions">
-        <span id="userBadgeHeader" onclick="openBusinessProfileModal()" title="Toca para ver o cambiar usuario" style="font-size:11px; font-weight:700; background:var(--primary-soft); color:var(--text); padding:4px 9px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; border:1px solid #ECEEF2;">
+        <span id="userBadgeHeader" onclick="openBusinessProfileModal()" title="Toca para ver o cambiar usuario" style="font-size:11px; font-weight:700; background:var(--surface-container-low); color:var(--text); padding:4px 10px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; border:1px solid var(--surface-border);">
           <span id="lblUserRoleIcon">👑</span> <span id="lblUserName">Dueño</span>
         </span>
-        <button class="icon-btn" id="btnBusinessProfile" title="Datos del negocio y usuarios" onclick="openBusinessProfileModal()">🏢</button>
-        <button class="icon-btn" id="btnThemePicker" title="Cambiar tema de color" onclick="openThemeModal()">🎨</button>
+        <button class="icon-btn" id="btnBusinessProfile" title="Datos del negocio y usuarios" onclick="openBusinessProfileModal()">
+          <span class="material-symbols-outlined" style="font-size:18px;">storefront</span>
+        </button>
+        <button class="icon-btn" id="btnThemePicker" title="Cambiar tema de color" onclick="openThemeModal()">
+          <span class="material-symbols-outlined" style="font-size:18px;">palette</span>
+        </button>
       </div>
     </header>
 
@@ -751,28 +810,54 @@
     <main class="app-content">
       
       <!-- VISTA SERVICIOS -->
-      <!-- VISTA SERVICIOS (Minimal White & Decluttered) -->
       <section id="viewServicios">
-        <!-- Tarjeta Hero de Balance Minimalista -->
+        <!-- Tarjeta Hero de Balance Fintech Clarity (Cockpit de nuevo_diseño.md) -->
         <div class="hero-balance-card" onclick="verDesgloseGlobal()" title="Toca para ver desglose financiero">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div>
-              <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted);">Balance Disponible</div>
-              <div style="font-size:26px; font-weight:800; color:var(--text); margin-top:2px;" id="txtGanancia">$0</div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:16px; color:var(--primary);">account_balance_wallet</span>
+              <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted);">Saldo Disponible Real</span>
             </div>
-            <div style="display:flex; align-items:center; gap:4px; font-size:11px; background:#F1F3F5; padding:4px 9px; border-radius:10px; color:var(--text-muted); font-weight:600;">
-              <span>Cuentas</span> <span>›</span>
+            <div style="display:inline-flex; align-items:center; gap:4px; font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 8px; border-radius:20px; font-weight:700;">
+              <span style="width:6px; height:6px; border-radius:50%; background:var(--primary-container); display:inline-block;"></span>
+              <span>En vivo</span>
+              <span class="material-symbols-outlined" style="font-size:12px; margin-left:1px;">chevron_right</span>
             </div>
           </div>
-          <div style="display:flex; gap:12px; margin-top:14px; padding-top:12px; border-top:1px solid #F1F3F5;">
-            <div style="flex:1;">
-              <div style="font-size:10.5px; color:var(--text-muted);">Abonos / Ingresos</div>
-              <div style="font-size:13.5px; font-weight:700; color:var(--success); margin-top:1px;" id="txtIngresos">$0</div>
+
+          <div style="margin: 6px 0 2px;">
+            <div class="metric-display" id="txtGanancia" style="font-size:29px; font-weight:800; color:var(--text); letter-spacing:-0.03em;">$0</div>
+          </div>
+
+          <!-- Micro Gráfico SVG de Flujo Operativo (inspirado en nuevo_diseño.md) -->
+          <div style="width:100%; height:32px; margin: 4px 0 10px; position:relative;">
+            <svg preserveAspectRatio="none" viewBox="0 0 320 50" style="width:100%; height:100%; overflow:visible;">
+              <defs>
+                <linearGradient id="heroGradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#00D68F" stop-opacity="0.28"></stop>
+                  <stop offset="100%" stop-color="#00D68F" stop-opacity="0.0"></stop>
+                </linearGradient>
+              </defs>
+              <path d="M0,42 C50,38 90,26 140,30 C190,34 230,16 270,12 C290,10 310,6 320,4 L320,50 L0,50 Z" fill="url(#heroGradient)"></path>
+              <path d="M0,42 C50,38 90,26 140,30 C190,34 230,16 270,12 C290,10 310,6 320,4" fill="none" stroke="#00D68F" stroke-linecap="round" stroke-width="2.5"></path>
+              <circle cx="270" cy="12" fill="#00D68F" r="3.5" stroke="#FFFFFF" stroke-width="1.5"></circle>
+            </svg>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding-top:10px; border-top:1px solid var(--surface-border);">
+            <div style="background:var(--surface-subtle); padding:8px 10px; border-radius:12px;">
+              <div style="font-size:10px; color:var(--text-muted); display:flex; align-items:center; gap:4px;">
+                <span class="material-symbols-outlined" style="font-size:13px; color:var(--primary);">arrow_downward</span>
+                <span>Ingresos / Abonos</span>
+              </div>
+              <div style="font-size:13px; font-weight:800; color:var(--primary); margin-top:2px;" id="txtIngresos">$0</div>
             </div>
-            <div style="width:1px; background:#F1F3F5;"></div>
-            <div style="flex:1;">
-              <div style="font-size:10.5px; color:var(--text-muted);">Compras / Gastos</div>
-              <div style="font-size:13.5px; font-weight:700; color:var(--alert); margin-top:1px;" id="txtGastos">$0</div>
+            <div style="background:var(--surface-subtle); padding:8px 10px; border-radius:12px;">
+              <div style="font-size:10px; color:var(--text-muted); display:flex; align-items:center; gap:4px;">
+                <span class="material-symbols-outlined" style="font-size:13px; color:var(--alert);">arrow_upward</span>
+                <span>Gastos / Compras</span>
+              </div>
+              <div style="font-size:13px; font-weight:800; color:var(--alert); margin-top:2px;" id="txtGastos">$0</div>
             </div>
           </div>
         </div>
@@ -869,15 +954,15 @@
     <!-- Barra de navegación inferior limpia -->
     <nav class="bottom-bar">
       <button class="nav-btn active" id="btnNavHome" onclick="irInicio()">
-        <span>🏠</span>
+        <span class="material-symbols-outlined" style="font-size:20px;">dashboard</span>
         <span>Inicio</span>
       </button>
       <button class="nav-btn" onclick="openBusinessProfileModal()">
-        <span>🏢</span>
+        <span class="material-symbols-outlined" style="font-size:20px;">storefront</span>
         <span>Mi Negocio</span>
       </button>
       <button class="nav-btn" onclick="openThemeModal()">
-        <span>🎨</span>
+        <span class="material-symbols-outlined" style="font-size:20px;">palette</span>
         <span>Apariencia</span>
       </button>
     </nav>
@@ -885,11 +970,28 @@
     <!-- Modal de Selección de Temas -->
     <div class="theme-modal" id="themeModal" onclick="closeThemeModal(event)">
       <div class="theme-sheet" onclick="event.stopPropagation()">
-        <h3 style="font-size: 15px; margin-bottom: 4px; color: var(--text);">Paletas de Colores (5 Temas)</h3>
+        <h3 style="font-size: 15px; margin-bottom: 4px; color: var(--text);">Paletas de Colores (6 Temas)</h3>
         <p style="font-size: 11px; color: #666; margin-bottom: 14px;">Elige el tema que mejor represente a tu negocio:</p>
 
-        <!-- Tema Oficial TM Diseños Creativos (Minimal White) -->
-        <div class="theme-option active" id="opt-tm_disenos" onclick="applyTheme('tm_disenos')">
+        <!-- Tema 1: Zentra Fintech Clarity (Predeterminado) -->
+        <div class="theme-option active" id="opt-zentra_clarity" onclick="applyTheme('zentra_clarity')">
+          <div class="dots-preview">
+            <div class="color-dot" style="background: #F8F9FF; border: 1px solid #CBD5E1;"></div>
+            <div class="color-dot" style="background: #006C46;"></div>
+            <div class="color-dot" style="background: #00D68F;"></div>
+            <div class="color-dot" style="background: #0B1C30;"></div>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size: 12.5px; font-weight: 700; color: #0B1C30;">Zentra Clarity (Fintech Core)</span>
+              <span style="font-size: 9px; background: #006C46; color: #fff; padding: 1px 6px; border-radius: 6px; font-weight: 700;">DEFAULT</span>
+            </div>
+            <div style="font-size: 10px; color: #596273;">Verde bosque, menta neón y blanco perlado ejecutivo</div>
+          </div>
+        </div>
+
+        <!-- Tema 2: TM Diseños Creativos (Minimal White) -->
+        <div class="theme-option" id="opt-tm_disenos" onclick="applyTheme('tm_disenos')">
           <div class="dots-preview">
             <div class="color-dot" style="background: #FFFFFF; border: 1.5px solid #FF2B78;"></div>
             <div class="color-dot" style="background: #FF2B78;"></div>
@@ -899,7 +1001,7 @@
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:6px;">
               <span style="font-size: 12.5px; font-weight: 700; color: #1E2329;">TM Diseños (Minimal White)</span>
-              <span style="font-size: 9px; background: #FF2B78; color: #fff; padding: 1px 6px; border-radius: 6px; font-weight: 700;">OFICIAL</span>
+              <span style="font-size: 9px; background: #FF2B78; color: #fff; padding: 1px 6px; border-radius: 6px; font-weight: 700;">CREATIVO</span>
             </div>
             <div style="font-size: 10px; color: #777;">Fondo blanco pulcro, toques fucsia (#ff2b78) y naranja (#ff4400)</div>
           </div>
@@ -1663,7 +1765,7 @@
           catalogItems = [...DEFAULT_CATALOG_SERVICIOS];
         }
 
-        const savedTheme = localStorage.getItem('zentra_active_theme') || 'tm_disenos';
+        const savedTheme = localStorage.getItem('zentra_active_theme') || 'zentra_clarity';
         applyTheme(savedTheme, false);
 
         inicializarUsuarios();
@@ -2572,21 +2674,47 @@
         if (p.status === 'Empaque') statusIcon = '📦';
         if (p.status === 'Entregado') statusIcon = '✅';
 
+        const isOwner = !currentUser || currentUser.role === 'OWNER';
+        const gananciaLabel = isOwner ? `$${ganancia.toLocaleString('es-CO')}` : '••••••';
+        const progressPct = p.total > 0 ? Math.min(100, Math.round((p.cobrado / p.total) * 100)) : 100;
+
+        let itemsBadges = '';
+        if (p.items && p.items.length > 0) {
+          itemsBadges = `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">` +
+            p.items.slice(0, 3).map(it => `<span style="font-size:9.5px; background:var(--surface-subtle); color:var(--text-muted); padding:2px 6px; border-radius:6px; font-weight:600;">${it.quantity}x ${it.name}</span>`).join('') +
+            (p.items.length > 3 ? `<span style="font-size:9.5px; color:var(--text-muted); padding:2px 4px;">+${p.items.length - 3} más</span>` : '') +
+            `</div>`;
+        }
+
         const card = document.createElement('div');
         card.className = 'card-item';
+        card.style.cssText = 'background:#FFFFFF; border:1px solid var(--surface-border); border-radius:18px; padding:14px 16px; margin-bottom:10px; box-shadow:var(--shadow-sm); cursor:pointer;';
         card.onclick = () => verDetalleProyecto(idx);
         card.innerHTML = `
-          <div class="item-header">
-            <span class="item-title">${p.name}</span>
+          <div class="item-header" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+            <div>
+              <div class="item-title" style="font-size:13.5px; font-weight:700; color:var(--text);">${p.name}</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:1px;">👤 ${p.client}</div>
+            </div>
             <span class="${badgeClass}">${badgeText}</span>
           </div>
-          <div class="item-detail">
-            <span>Cliente: ${p.client}</span>
-            <span style="font-weight: 700; color:var(--text);">Ganancia: $${ganancia.toLocaleString('es-CO')}</span>
+
+          ${itemsBadges}
+
+          <!-- Barra de Progreso de Pago -->
+          <div style="margin: 8px 0 6px;">
+            <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); margin-bottom:3px;">
+              <span>Abonado: <b>$${p.cobrado.toLocaleString('es-CO')}</b> de $${p.total.toLocaleString('es-CO')}</span>
+              <span style="font-weight:700; color:var(--primary);">${progressPct}%</span>
+            </div>
+            <div style="width:100%; height:4px; background:var(--surface-subtle); border-radius:10px; overflow:hidden;">
+              <div style="width:${progressPct}%; height:100%; background:linear-gradient(90deg, #00D68F, #006C46); border-radius:10px;"></div>
+            </div>
           </div>
-          <div class="item-detail" style="margin-top: 6px; padding-top:6px; border-top:1px solid #F8F9FA;">
-            <span style="color:var(--text-muted); font-size:11px;">${p.services || 'Servicios personalizados'}</span>
-            <span class="badge" style="font-size: 10px; font-weight:700; background:var(--primary-soft); color:var(--primary);">${statusIcon} ${p.status}</span>
+
+          <div class="item-detail" style="margin-top:6px; padding-top:6px; border-top:1px solid #F1F4F9; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:11px; font-weight:700; color:var(--text);">Margen: ${gananciaLabel}</span>
+            <span class="badge" style="font-size:10px; font-weight:700; background:var(--primary-soft); color:var(--primary);">${statusIcon} ${p.status}</span>
           </div>
         `;
         container.appendChild(card);
@@ -3257,27 +3385,26 @@
 
     function applyTheme(themeKey, showNotification = true) {
       const root = document.getElementById('appRoot');
-      if (themeKey === 'tm_disenos') {
-        root.setAttribute('data-theme', 'tm_disenos');
-      } else if (themeKey === 'nude') {
-        root.setAttribute('data-theme', 'nude');
+      if (themeKey === 'zentra_clarity' || !themeKey) {
+        root.setAttribute('data-theme', 'zentra_clarity');
       } else {
         root.setAttribute('data-theme', themeKey);
       }
 
       document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
-      const activeEl = document.getElementById(`opt-${themeKey}`);
+      const activeEl = document.getElementById(`opt-${themeKey || 'zentra_clarity'}`);
       if (activeEl) activeEl.classList.add('active');
 
       const metaTheme = document.querySelector('meta[name="theme-color"]');
       if (metaTheme) metaTheme.setAttribute('content', '#FFFFFF');
 
       try {
-        localStorage.setItem('zentra_active_theme', themeKey);
+        localStorage.setItem('zentra_active_theme', themeKey || 'zentra_clarity');
       } catch (e) {}
 
       if (showNotification) {
         const themeNames = {
+          zentra_clarity: 'ZENTRA CLARITY (FINTECH CORE)',
           tm_disenos: 'TM DISEÑOS CREATIVOS',
           nude: 'NUDE & BLUSH',
           esmeralda: 'ESMERALDA & MENTA',

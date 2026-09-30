@@ -5,7 +5,7 @@ import 'app_theme.dart';
 /// Provider reactivo para gestionar la selección y persistencia de temas visuales en Zentra.
 class ThemeProvider with ChangeNotifier {
   static const String _prefKey = 'zentra_active_theme';
-  String _currentThemeId = 'tm_disenos';
+  String _currentThemeId = 'zentra_clarity';
 
   String get currentThemeId => _currentThemeId;
 

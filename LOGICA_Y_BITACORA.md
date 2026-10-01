@@ -193,8 +193,8 @@ class CatalogItemModel {
 | **2026-09-29** | `9f31f41` | Core | Configuración fija de tipo de negocio al crear empresa, borrado total de datos demo y persistencia local | ✅ Completado |
 | **2026-09-30** | `61041bb` | Feature / Auth / Multi-item | CRUD de Usuarios (Dueño vs Colaborador), Catálogo con Fotos (Cámara/Galería), Proyectos Multi-Producto y Cotizaciones WhatsApp | ✅ Completado |
 | **2026-09-30** | `0c59e31` | UI / UX / Design System | Adopción de Sistema Visual Fintech Clarity (nuevo_diseño.md): Plus Jakarta Sans + Inter, Cockpit Hero con micro-gráfica SVG, Bento cards | ✅ Completado |
-| **2026-10-01** | `d053028` | Feature / Clients & POS | CRUD de Clientes, flujo "Tomar Pedido" con cotizador en vivo, Factura/Recibo ejecutivo para WhatsApp e impresión | ✅ Completado |
-| **2026-10-01** | `current` | Security / Multi-Tenant | Aislamiento estricto de productos y datos por negocio (multi-tenancy, registro central, llaves namespaced y control de acceso por PIN) | ✅ Completado |
+| **2026-10-01** | `e1d1f05` | Security / Multi-Tenant | Aislamiento estricto de productos y datos por negocio (multi-tenancy, registro central, llaves namespaced y control de acceso por PIN) | ✅ Completado |
+| **2026-10-01** | `current` | UI / Theming / UX | Colección Fintech Zentra (Clarity, Midnight, Cobalt), preservación de temas personalizados en Perfil/Configuración y retiro del botón del header | ✅ Completado |
 
 ---
 
@@ -310,6 +310,22 @@ class CatalogItemModel {
      - Desde un negocio activo NO es posible saltar a otro negocio sin antes **Cerrar Sesión**.
      - Al cerrar sesión se limpia la memoria volátil del dispositivo y se exige autenticación con PIN del negocio de destino.
   4. **Migración Transparente:** La información histórica de *TM Diseños Creativos* se encapsuló automáticamente bajo el espacio aislado `biz_tm_disenos`, preservando su inventario creativo y clientes sin contaminar ningún negocio nuevo.
+
+#### Hito 12: Colección Zentra Fintech (Clarity, Midnight, Cobalt), Reubicación en Perfil y Limpieza de Header
+- **Requerimiento del Usuario:**
+  1. Adoptar el tema de `nuevo_diseño.md` como el tema principal y oficial de Zentra (`Zentra Clarity`), sin mezclarlo ni contaminarlo con las paletas de temas anteriores (como TM Diseños).
+  2. Derivar dos temas fintech adicionales inspirados en `nuevo_diseño.md`:
+     - **Zentra Midnight (Dark Mode Fintech):** Fondo azul medianoche profundo `#0B1C30`, tarjetas `#13233A`, bordes `#1E3555`, menta neón `#00D68F` y tipografía blanca perlada `#F8F9FF`.
+     - **Zentra Cobalt (Azul Ejecutivo Fintech):** Azul cobalto financiero internacional `#0052FF`, cyan neón `#00D8FF`, fondo `#F8F9FF`, texto grafito `#0B192C`.
+  3. Preservar los temas anteriores (`TM Diseños`, `Nude & Blush`, `Esmeralda`, `Lavanda`) como una colección secundaria de personalización.
+  4. Retirar el botón de paleta del header y la barra inferior. La configuración de apariencia ahora vive de forma elegante dentro de **Datos de Mi Negocio / Perfil**, accesible cuando el usuario lo decida.
+  5. Mantener en todos los temas el logo oficial de Zentra (`img/zentra-logo.png`).
+- **Implementación Técnica:**
+  - **CSS Themes:** Declaración limpia de `[data-theme="zentra_midnight"]` y `[data-theme="zentra_cobalt"]` en `index.html` y `preview.html`.
+  - **Header & Bottom Bar:** Eliminación de `#btnThemePicker` del header; la navegación inferior ahora presenta un flujo despejado (`Inicio`, `Catálogo`, `Mi Negocio`).
+  - **Configuración de Negocio (`#bizModal`):** Incorporación de la tarjeta "Tema y Apariencia Visual" con el nombre del tema activo y botón para abrir el selector.
+  - **Modal de Selección (`#themeModal`):** Clasificación en dos grupos: *💎 Colección Zentra Fintech (Oficial)* y *🎨 Colección de Personalización*.
+  - **Sincronización:** Actualización reactiva de `applyTheme` con soporte para meta `theme-color` adaptativo (`#0B1C30` en modo oscuro / `#FFFFFF` en claro) y persistencia en `localStorage`.
 
 ---
 

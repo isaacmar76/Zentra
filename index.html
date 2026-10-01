@@ -1375,13 +1375,13 @@
             <!-- Renderizado dinámico de usuarios -->
           </div>
 
-          <button onclick="cerrarSesionUsuario()" style="width:100%; background:var(--bg); border:1px solid #D1D5DB; color:var(--text); padding:9px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;">
-            <span>🚪</span> Cerrar Sesión / Cambiar de Usuario
+          <button onclick="cerrarSesionNegocio(false)" style="width:100%; background:var(--bg); border:1px solid #D1D5DB; color:var(--text); padding:9px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;">
+            <span>🚪</span> Cerrar Sesión del Negocio
           </button>
         </div>
 
-        <button onclick="reiniciarNegocio()" style="width:100%; margin-top:6px; background:transparent; border:1.5px dashed var(--alert); color:var(--alert); padding:9px; border-radius:14px; font-weight:700; font-size:11.5px; cursor:pointer;">
-          ⚠️ CERRAR Y CREAR OTRO NEGOCIO
+        <button onclick="cerrarSesionNegocio(true)" style="width:100%; margin-top:6px; background:transparent; border:1.5px dashed var(--secondary); color:var(--secondary); padding:9px; border-radius:14px; font-weight:700; font-size:11.5px; cursor:pointer;">
+          ✨ CERRAR Y CREAR OTRO NEGOCIO
         </button>
       </div>
     </div>
@@ -1398,7 +1398,7 @@
         </div>
 
         <!-- Selector de Pestañas: Iniciar Sesión vs Crear Negocio -->
-        <div class="auth-tabs">
+        <div class="auth-tabs" id="authTabsContainer">
           <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">
             <span>🔑 Iniciar Sesión</span>
           </button>
@@ -1410,11 +1410,11 @@
         <!-- Vista: INICIAR SESIÓN -->
         <div id="authSecLogin">
           <div style="margin-bottom:12px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:var(--text);">Correo o Celular Registrado</label>
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:var(--text);">Correo, Usuario o Celular Registrado</label>
             <input type="text" id="loginUserInp" placeholder="Ej: tatiana@tmdisenos.com o 3124567890" style="width:100%; padding:10px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
           </div>
           <div style="margin-bottom:16px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:var(--text);">Contraseña o PIN</label>
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:var(--text);">Contraseña o PIN Secreto</label>
             <input type="password" id="loginPassInp" placeholder="••••••••" style="width:100%; padding:10px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
           </div>
           <button onclick="iniciarSesionUsuario()" class="primary-btn" style="padding:12px; font-weight:800; font-size:13.5px; margin-bottom:10px;">
@@ -1424,6 +1424,18 @@
             ¿Aún no tienes un negocio registrado? <br>
             <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color:var(--primary); font-weight:700; text-decoration:none;">Crear nuevo negocio aquí</a>
           </div>
+        </div>
+
+        <!-- Vista: SELECCIONAR NEGOCIO AUTORIZADO (Para usuarios con más de un negocio) -->
+        <div id="authSecPickBiz" style="display:none;">
+          <div style="font-size:13.5px; font-weight:800; color:var(--text); margin-bottom:4px;">Selecciona tu Negocio</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">Estás autorizado(a) en los siguientes negocios. Toca el negocio para ingresar a sus datos exclusivos:</div>
+          <div id="authPickBizList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:220px; overflow-y:auto;">
+            <!-- Renderizado dinámico de negocios autorizados -->
+          </div>
+          <button onclick="switchAuthTab('login')" style="width:100%; padding:9px; border:1px solid #ECEEF2; background:transparent; border-radius:12px; font-size:12px; font-weight:700; color:var(--text-muted); cursor:pointer;">
+            ← Volver a Ingresar Datos
+          </button>
         </div>
 
         <!-- Vista: CREAR NEGOCIO -->
@@ -1443,8 +1455,14 @@
             <input type="text" id="setupPhoneInp" placeholder="Ej: 312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
           </div>
 
+          <div style="margin-bottom:10px;">
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:var(--text);">4. PIN Secreto de Acceso (4 dígitos) *</label>
+            <input type="password" maxlength="6" id="setupPinInp" placeholder="Ej: 1234" value="1234" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
+            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">Contraseña para ingresar exclusivamente a este negocio.</div>
+          </div>
+
           <div style="margin-bottom:14px;">
-            <label style="font-size:11.5px; font-weight:700; display:block; margin-bottom:6px; color:var(--text);">4. Selecciona tu Modelo de Negocio *</label>
+            <label style="font-size:11.5px; font-weight:700; display:block; margin-bottom:6px; color:var(--text);">5. Selecciona tu Modelo de Negocio *</label>
             <div style="display:flex; flex-direction:column; gap:8px;" id="setupModeCards">
               <div id="cardSetupServicios" onclick="selectSetupMode('servicios')" style="border:2px solid var(--secondary); background:var(--secondary-soft); border-radius:14px; padding:10px; cursor:pointer;">
                 <div style="display:flex; align-items:flex-start; gap:8px;">
@@ -2035,8 +2053,11 @@
   </div>
 
   <script>
-    // Datos del Negocio (Personalizable con Onboarding)
+    // ==========================================
+    // ESTADO GLOBAL EN MEMORIA (NEGOCIO ACTIVO)
+    // ==========================================
     let bizProfile = {
+      id: '',
       name: '',
       owner: '',
       phone: '',
@@ -2068,8 +2089,8 @@
     let editingClientId = null;
     let selectedOrderClientId = null;
 
-    // Clientes iniciales para muestra
-    const DEFAULT_CLIENTS = [
+    // Clientes de muestra EXCLUSIVOS para TM Diseños Creativos (Migración legada)
+    const DEFAULT_CLIENTS_TM = [
       { id: 'cli_1', name: 'Ana María Gómez', phone: '312 456 7890', document: '1020304050', email: 'ana.gomez@gmail.com', address: 'Calle 10 # 25-14', notes: 'Boda en noviembre. Tonos rosa pastel y dorado.', createdAt: '2026-09-15' },
       { id: 'cli_2', name: 'Carlos Mendoza', phone: '315 889 1234', document: '900123456-1', email: 'carlos@eventos.co', address: 'Av. Las Palmas # 12', notes: 'Eventos corporativos y souvenirs en acrílico.', createdAt: '2026-09-18' },
       { id: 'cli_3', name: 'Laura Restrepo', phone: '320 654 9871', document: '1035987654', email: 'laura.res@hotmail.com', address: 'Cra 43A # 1-50', notes: 'Cumpleaños infantil temática Safari.', createdAt: '2026-09-22' }
@@ -2082,8 +2103,8 @@
     let tempOrderItems = [];
     let catalogPickerTarget = 'new_order'; // 'new_order' o 'active_project'
 
-    // Catálogo por defecto para Servicios Creativos
-    const DEFAULT_CATALOG_SERVICIOS = [
+    // Catálogo EXCLUSIVO para TM Diseños Creativos (Migración legada de Tatiana)
+    const DEFAULT_CATALOG_TM_SERVICIOS = [
       { id: 'c_topper', name: 'Cake Topper Shaker 3D', price: 35000, cost: 12000, stock: 15, cat: 'Papelería Creativa', mode: 'servicios', image: null },
       { id: 'c_platos', name: 'Portaplatos Temáticos (Paquete x10)', price: 30000, cost: 10000, stock: 20, cat: 'Mesa & Fiesta', mode: 'servicios', image: null },
       { id: 'c_dulces', name: 'Dulces Personalizados (Paquete x25)', price: 50000, cost: 18000, stock: 30, cat: 'Repostería', mode: 'servicios', image: null },
@@ -2091,59 +2112,348 @@
       { id: 'c_libro', name: 'Libro de Firmas / Agenda Personalizada', price: 45000, cost: 16000, stock: 10, cat: 'Papelería Creativa', mode: 'servicios', image: null }
     ];
 
-    function persistirEstadoLocal() {
+    // ==========================================
+    // MULTI-TENANCY: GESTIÓN Y AISLAMIENTO DE NEGOCIOS
+    // ==========================================
+    function obtenerRegistroNegocios() {
       try {
-        localStorage.setItem('zentra_biz_profile', JSON.stringify(bizProfile));
-        localStorage.setItem('zentra_projects', JSON.stringify(projectsData));
-        localStorage.setItem('zentra_expenses', JSON.stringify(generalExpenses));
-        localStorage.setItem('zentra_incomes', JSON.stringify(generalIncomes));
-        localStorage.setItem('zentra_catalog', JSON.stringify(catalogItems));
-        localStorage.setItem('zentra_users', JSON.stringify(users));
-        localStorage.setItem('zentra_clients', JSON.stringify(clients));
-        if (currentUser) localStorage.setItem('zentra_current_user', JSON.stringify(currentUser));
+        const str = localStorage.getItem('zentra_businesses_registry');
+        return str ? JSON.parse(str) : [];
+      } catch (e) {
+        console.warn('Error leyendo registro de negocios', e);
+        return [];
+      }
+    }
+
+    function guardarRegistroNegocios(reg) {
+      try {
+        localStorage.setItem('zentra_businesses_registry', JSON.stringify(reg || []));
+      } catch (e) {
+        console.warn('Error guardando registro de negocios', e);
+      }
+    }
+
+    function migrarDatosLegadosSiAplica() {
+      try {
+        const registry = obtenerRegistroNegocios();
+        const legacyProfileStr = localStorage.getItem('zentra_biz_profile');
+        
+        // Si no hay registro pero sí existían datos previos no aislados, migramos TM Diseños
+        if (registry.length === 0 && legacyProfileStr) {
+          let legacyProfile = null;
+          try { legacyProfile = JSON.parse(legacyProfileStr); } catch (_) {}
+
+          const legacyBizId = 'biz_tm_disenos';
+          const bizName = (legacyProfile && legacyProfile.name) ? legacyProfile.name : 'TM Diseños Creativos';
+          const bizOwner = (legacyProfile && legacyProfile.owner) ? legacyProfile.owner : 'Tatiana Marín';
+          const bizPhone = (legacyProfile && legacyProfile.phone) ? legacyProfile.phone : '3124567890';
+          const bizType = (legacyProfile && legacyProfile.type) ? legacyProfile.type : 'servicios';
+
+          const newProfile = {
+            id: legacyBizId,
+            name: bizName,
+            owner: bizOwner,
+            phone: bizPhone,
+            nequi: (legacyProfile && legacyProfile.nequi) || bizPhone,
+            daviplata: (legacyProfile && legacyProfile.daviplata) || '',
+            bancolombia: (legacyProfile && legacyProfile.bancolombia) || '',
+            type: bizType,
+            configured: true,
+            createdAt: new Date().toISOString()
+          };
+
+          const legacyCat = localStorage.getItem('zentra_catalog');
+          localStorage.setItem(`zentra_catalog_${legacyBizId}`, legacyCat || JSON.stringify(DEFAULT_CATALOG_TM_SERVICIOS));
+
+          const legacyProj = localStorage.getItem('zentra_projects');
+          if (legacyProj) localStorage.setItem(`zentra_projects_${legacyBizId}`, legacyProj);
+
+          const legacyCli = localStorage.getItem('zentra_clients');
+          localStorage.setItem(`zentra_clients_${legacyBizId}`, legacyCli || JSON.stringify(DEFAULT_CLIENTS_TM));
+
+          const legacyExp = localStorage.getItem('zentra_expenses');
+          if (legacyExp) localStorage.setItem(`zentra_expenses_${legacyBizId}`, legacyExp);
+
+          const legacyInc = localStorage.getItem('zentra_incomes');
+          if (legacyInc) localStorage.setItem(`zentra_incomes_${legacyBizId}`, legacyInc);
+
+          const legacyUsers = localStorage.getItem('zentra_users');
+          if (legacyUsers) {
+            localStorage.setItem(`zentra_users_${legacyBizId}`, legacyUsers);
+          } else {
+            const initialUsers = [
+              {
+                id: 'usr_owner',
+                bizId: legacyBizId,
+                name: bizOwner,
+                username: bizOwner.toLowerCase().replace(/\s+/g, '') || 'tatiana',
+                email: 'tatiana@tmdisenos.com',
+                phone: bizPhone,
+                pin: '1234',
+                role: 'OWNER',
+                active: true
+              },
+              {
+                id: 'usr_collab',
+                bizId: legacyBizId,
+                name: 'Vendedor(a) / Asistente',
+                username: 'vendedor',
+                email: 'ventas@tmdisenos.com',
+                phone: '3100000000',
+                pin: '0000',
+                role: 'COLLABORATOR',
+                active: true
+              }
+            ];
+            localStorage.setItem(`zentra_users_${legacyBizId}`, JSON.stringify(initialUsers));
+          }
+
+          localStorage.setItem(`zentra_biz_profile_${legacyBizId}`, JSON.stringify(newProfile));
+
+          guardarRegistroNegocios([{
+            id: legacyBizId,
+            name: bizName,
+            owner: bizOwner,
+            phone: bizPhone,
+            type: bizType,
+            createdAt: newProfile.createdAt
+          }]);
+
+          localStorage.setItem('zentra_active_biz_id', legacyBizId);
+
+          // Limpiar llaves globales no aisladas
+          localStorage.removeItem('zentra_biz_profile');
+          localStorage.removeItem('zentra_catalog');
+          localStorage.removeItem('zentra_projects');
+          localStorage.removeItem('zentra_clients');
+          localStorage.removeItem('zentra_expenses');
+          localStorage.removeItem('zentra_incomes');
+          localStorage.removeItem('zentra_users');
+          localStorage.removeItem('zentra_current_user');
+        }
+      } catch (err) {
+        console.warn('Error en migración de datos legados:', err);
+      }
+    }
+
+    function persistirEstadoLocal() {
+      if (!bizProfile || !bizProfile.id) return;
+      const bizId = bizProfile.id;
+      try {
+        localStorage.setItem(`zentra_biz_profile_${bizId}`, JSON.stringify(bizProfile));
+        localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(projectsData));
+        localStorage.setItem(`zentra_expenses_${bizId}`, JSON.stringify(generalExpenses));
+        localStorage.setItem(`zentra_incomes_${bizId}`, JSON.stringify(generalIncomes));
+        localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(catalogItems));
+        localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(users));
+        localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(clients));
+        if (currentUser) localStorage.setItem(`zentra_current_user_${bizId}`, JSON.stringify(currentUser));
+        localStorage.setItem('zentra_active_biz_id', bizId);
+
+        // Actualizar registro general de negocios
+        const reg = obtenerRegistroNegocios();
+        const idx = reg.findIndex(b => b.id === bizId);
+        if (idx !== -1) {
+          reg[idx].name = bizProfile.name;
+          reg[idx].owner = bizProfile.owner;
+          reg[idx].phone = bizProfile.phone;
+          reg[idx].type = bizProfile.type;
+          guardarRegistroNegocios(reg);
+        }
       } catch (e) {
         console.warn('Storage save error', e);
       }
     }
 
-    function cargarEstadoLocal() {
+    function cargarEstadoNegocio(bizId, targetUserId = null) {
+      if (!bizId) return false;
+      const reg = obtenerRegistroNegocios();
+      const bizEntry = reg.find(b => b.id === bizId);
+      if (!bizEntry) return false;
+
       try {
-        const pStr = localStorage.getItem('zentra_biz_profile');
-        if (pStr) bizProfile = JSON.parse(pStr);
-        const projStr = localStorage.getItem('zentra_projects');
-        if (projStr) {
-          projectsData = JSON.parse(projStr);
-          projectsData.forEach(p => { if (!p.items) p.items = []; });
-        }
-        const expStr = localStorage.getItem('zentra_expenses');
-        if (expStr) generalExpenses = JSON.parse(expStr);
-        const incStr = localStorage.getItem('zentra_incomes');
-        if (incStr) generalIncomes = JSON.parse(incStr);
-        const catStr = localStorage.getItem('zentra_catalog');
-        if (catStr) {
-          catalogItems = JSON.parse(catStr);
+        const pStr = localStorage.getItem(`zentra_biz_profile_${bizId}`);
+        if (pStr) {
+          bizProfile = JSON.parse(pStr);
         } else {
-          catalogItems = [...DEFAULT_CATALOG_SERVICIOS];
-        }
-        if (catalogItems.length === 0) {
-          catalogItems = [...DEFAULT_CATALOG_SERVICIOS];
+          bizProfile = {
+            id: bizId,
+            name: bizEntry.name,
+            owner: bizEntry.owner,
+            phone: bizEntry.phone,
+            nequi: bizEntry.phone,
+            daviplata: '',
+            bancolombia: '',
+            type: bizEntry.type || 'servicios',
+            configured: true
+          };
         }
 
-        const cliStr = localStorage.getItem('zentra_clients');
-        if (cliStr) {
+        // AISLAMIENTO TOTAL: Proyectos exclusivos de este negocio
+        const projStr = localStorage.getItem(`zentra_projects_${bizId}`);
+        projectsData = projStr ? JSON.parse(projStr) : [];
+        projectsData.forEach(p => { if (!p.items) p.items = []; });
+
+        // AISLAMIENTO TOTAL: Finanzas exclusivas de este negocio
+        const expStr = localStorage.getItem(`zentra_expenses_${bizId}`);
+        generalExpenses = expStr ? JSON.parse(expStr) : [];
+        const incStr = localStorage.getItem(`zentra_incomes_${bizId}`);
+        generalIncomes = incStr ? JSON.parse(incStr) : [];
+
+        // AISLAMIENTO TOTAL: Catálogo exclusivo de este negocio (NUNCA mezclar con otros negocios)
+        const catStr = localStorage.getItem(`zentra_catalog_${bizId}`);
+        if (catStr !== null) {
+          try { catalogItems = JSON.parse(catStr); } catch (_) { catalogItems = []; }
+        } else {
+          catalogItems = [];
+        }
+
+        // AISLAMIENTO TOTAL: Clientes exclusivos de este negocio
+        const cliStr = localStorage.getItem(`zentra_clients_${bizId}`);
+        if (cliStr !== null) {
           try { clients = JSON.parse(cliStr); } catch (_) { clients = []; }
         } else {
-          clients = [...DEFAULT_CLIENTS];
-        }
-        if (!clients || clients.length === 0) {
-          clients = [...DEFAULT_CLIENTS];
+          clients = [];
         }
 
+        // AISLAMIENTO TOTAL: Usuarios de este negocio
+        const uStr = localStorage.getItem(`zentra_users_${bizId}`);
+        if (uStr) {
+          try { users = JSON.parse(uStr); } catch (_) { users = []; }
+        } else {
+          users = [];
+        }
+
+        if (users.length === 0) {
+          users = [{
+            id: 'usr_owner_' + Date.now(),
+            bizId: bizId,
+            name: bizProfile.owner || 'Dueño(a)',
+            username: (bizProfile.owner ? bizProfile.owner.toLowerCase().replace(/\s+/g, '') : 'admin'),
+            email: '',
+            phone: bizProfile.phone || '',
+            pin: '1234',
+            role: 'OWNER',
+            active: true
+          }];
+          localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(users));
+        }
+
+        // Determinar usuario activo
+        if (targetUserId) {
+          currentUser = users.find(u => u.id === targetUserId) || users[0];
+        } else {
+          const curUserStr = localStorage.getItem(`zentra_current_user_${bizId}`);
+          if (curUserStr) {
+            try { currentUser = JSON.parse(curUserStr); } catch (_) { currentUser = null; }
+          }
+          if (!currentUser || !users.some(u => u.id === currentUser.id)) {
+            currentUser = users[0];
+          }
+        }
+
+        localStorage.setItem('zentra_active_biz_id', bizId);
+        cart = [];
+
+        aplicarUsuarioActivo();
+        aplicarModalidadNegocio();
+        renderUsersList();
+        inicializarClientes();
+        recalcularTodo();
+        renderCatalogItems();
+        renderPos();
+
+        return true;
+      } catch (e) {
+        console.error('Error cargando estado de negocio', e);
+        return false;
+      }
+    }
+
+    function limpiarEstadoEnMemoria() {
+      bizProfile = {
+        id: '',
+        name: '',
+        owner: '',
+        phone: '',
+        nequi: '',
+        daviplata: '',
+        bancolombia: '',
+        type: 'servicios',
+        configured: false
+      };
+      projectsData = [];
+      generalExpenses = [];
+      generalIncomes = [];
+      catalogItems = [];
+      clients = [];
+      users = [];
+      currentUser = null;
+      cart = [];
+      tempOrderItems = [];
+      tempProductPhoto = null;
+
+      // Limpiar UI visual
+      const hTitle = document.getElementById('headerTitle');
+      if (hTitle) hTitle.innerText = 'Zentra';
+      const txtGanancia = document.getElementById('txtGanancia');
+      if (txtGanancia) txtGanancia.innerText = '$0';
+      const txtIng = document.getElementById('txtIngresos');
+      if (txtIng) txtIng.innerText = '$0';
+      const txtGas = document.getElementById('txtGastos');
+      if (txtGas) txtGas.innerText = '$0';
+      const pList = document.getElementById('projectsList');
+      if (pList) pList.innerHTML = '';
+      const cList = document.getElementById('catalogItemsList');
+      if (cList) cList.innerHTML = '';
+      const cliList = document.getElementById('clientesListContainer');
+      if (cliList) cliList.innerHTML = '';
+      const posG = document.getElementById('posGrid');
+      if (posG) posG.innerHTML = '';
+    }
+
+    function cerrarSesionNegocio(paraCrearNuevo = false) {
+      const bizName = bizProfile && bizProfile.name ? bizProfile.name : 'este negocio';
+      const msgConfirm = paraCrearNuevo 
+        ? `¿Deseas salir de "${bizName}" para crear un nuevo negocio independiente?`
+        : `¿Deseas cerrar la sesión en "${bizName}"? Deberás ingresar tus credenciales y PIN para volver a entrar.`;
+      
+      if (confirm(msgConfirm)) {
+        localStorage.removeItem('zentra_active_biz_id');
+        limpiarEstadoEnMemoria();
+        cerrarBusinessProfileModal();
+        abrirAuthPortal(paraCrearNuevo ? 'register' : 'login');
+        showToast(paraCrearNuevo ? 'Listo para registrar nuevo negocio' : 'Sesión cerrada con seguridad');
+      }
+    }
+
+    function cerrarSesionUsuario() {
+      cerrarSesionNegocio(false);
+    }
+
+    function reiniciarNegocio() {
+      cerrarSesionNegocio(true);
+    }
+
+    function cargarEstadoLocal() {
+      try {
+        // 1. Migración de versión anterior si aplica
+        migrarDatosLegadosSiAplica();
+
+        // 2. Tema visual
         const savedTheme = localStorage.getItem('zentra_active_theme') || 'zentra_clarity';
         applyTheme(savedTheme, false);
 
-        inicializarUsuarios();
-        inicializarClientes();
+        // 3. Verificar si hay un negocio autenticado activo
+        const activeBizId = localStorage.getItem('zentra_active_biz_id');
+        const registry = obtenerRegistroNegocios();
+
+        if (activeBizId && registry.some(b => b.id === activeBizId)) {
+          cargarEstadoNegocio(activeBizId);
+        } else {
+          limpiarEstadoEnMemoria();
+          abrirAuthPortal(registry.length === 0 ? 'register' : 'login');
+        }
       } catch (e) {
         console.warn('Storage load error', e);
       }
@@ -2153,7 +2463,9 @@
     // SISTEMA Y CRUD DE USUARIOS (ROLES)
     // ==========================================
     function inicializarUsuarios() {
-      const uStr = localStorage.getItem('zentra_users');
+      if (!bizProfile || !bizProfile.id) return;
+      const bizId = bizProfile.id;
+      const uStr = localStorage.getItem(`zentra_users_${bizId}`);
       if (uStr) {
         try { users = JSON.parse(uStr); } catch (_) { users = []; }
       }
@@ -2161,30 +2473,21 @@
       if (!users || users.length === 0) {
         users = [
           {
-            id: 'usr_owner',
-            name: bizProfile.owner || 'Tatiana Marín',
+            id: 'usr_owner_' + Date.now(),
+            bizId: bizId,
+            name: bizProfile.owner || 'Dueño(a)',
             username: (bizProfile.owner ? bizProfile.owner.toLowerCase().replace(/\s+/g, '') : 'admin'),
-            email: 'tatiana@tmdisenos.com',
-            phone: bizProfile.phone || '3124567890',
+            email: '',
+            phone: bizProfile.phone || '',
             pin: '1234',
             role: 'OWNER',
-            active: true
-          },
-          {
-            id: 'usr_collab',
-            name: 'Vendedor(a) / Asistente',
-            username: 'vendedor',
-            email: 'ventas@tmdisenos.com',
-            phone: '3100000000',
-            pin: '0000',
-            role: 'COLLABORATOR',
             active: true
           }
         ];
         persistirEstadoLocal();
       }
 
-      const curUserStr = localStorage.getItem('zentra_current_user');
+      const curUserStr = localStorage.getItem(`zentra_current_user_${bizId}`);
       if (curUserStr) {
         try { currentUser = JSON.parse(curUserStr); } catch (_) { currentUser = null; }
       }
@@ -2724,6 +3027,10 @@
       document.getElementById('tabBtnRegister').classList.toggle('active', tab === 'register');
       document.getElementById('authSecLogin').style.display = tab === 'login' ? 'block' : 'none';
       document.getElementById('authSecRegister').style.display = tab === 'register' ? 'block' : 'none';
+      const pickSec = document.getElementById('authSecPickBiz');
+      if (pickSec) pickSec.style.display = 'none';
+      const tabsCont = document.getElementById('authTabsContainer');
+      if (tabsCont) tabsCont.style.display = 'flex';
     }
 
     function abrirAuthPortal(defaultTab = 'login') {
@@ -2755,87 +3062,117 @@
         return;
       }
 
-      // Buscar coincidencia en la base de datos de usuarios
-      const uMatch = users.find(u => 
-        (u.username && u.username.toLowerCase() === userInput.toLowerCase()) ||
-        (u.email && u.email.toLowerCase() === userInput.toLowerCase()) ||
-        (u.phone && u.phone === userInput) ||
-        (u.name && u.name.toLowerCase() === userInput.toLowerCase())
-      );
-
-      if (uMatch) {
-        if (uMatch.pin && passInput && uMatch.pin !== passInput) {
-          showToast('⚠️ PIN / Contraseña incorrecta');
-          return;
-        }
-        currentUser = uMatch;
-      } else {
-        // Si no coincide con ninguno pero es el primer acceso, crear Dueño
-        if (users.length === 0) {
-          currentUser = {
-            id: 'usr_' + Date.now(),
-            name: userInput.includes('@') ? userInput.split('@')[0] : userInput,
-            username: userInput,
-            email: userInput.includes('@') ? userInput : '',
-            phone: userInput.includes('@') ? '' : userInput,
-            pin: passInput || '1234',
-            role: 'OWNER',
-            active: true
-          };
-          users.push(currentUser);
-        } else {
-          showToast('⚠️ Usuario no encontrado. Crea tu negocio o verifica tus datos.');
-          return;
-        }
+      const registry = obtenerRegistroNegocios();
+      if (registry.length === 0) {
+        showToast('No hay negocios registrados en este dispositivo. Crea tu negocio aquí.');
+        switchAuthTab('register');
+        return;
       }
 
-      // Si ya hay perfil guardado en el dispositivo, usarlo
-      const pStr = localStorage.getItem('zentra_biz_profile');
-      if (pStr) {
+      // Buscar usuario en los registros aislados de cada negocio
+      let matches = [];
+
+      registry.forEach(biz => {
+        let bUsers = [];
         try {
-          const saved = JSON.parse(pStr);
-          if (saved && saved.name) {
-            bizProfile = saved;
-            bizProfile.configured = true;
-          }
+          const uStr = localStorage.getItem(`zentra_users_${biz.id}`);
+          if (uStr) bUsers = JSON.parse(uStr);
         } catch (_) {}
+
+        const matchedUser = bUsers.find(u => 
+          (u.username && u.username.toLowerCase() === userInput.toLowerCase()) ||
+          (u.email && u.email.toLowerCase() === userInput.toLowerCase()) ||
+          (u.phone && u.phone === userInput) ||
+          (u.name && u.name.toLowerCase() === userInput.toLowerCase())
+        );
+
+        if (matchedUser) {
+          const pinValido = !matchedUser.pin || !passInput || matchedUser.pin === passInput;
+          matches.push({
+            biz: biz,
+            user: matchedUser,
+            pinOk: pinValido
+          });
+        }
+      });
+
+      if (matches.length === 0) {
+        showToast('⚠️ No se encontró ningún negocio asociado a estos datos. Verifica o crea uno nuevo.');
+        return;
       }
 
-      if (!bizProfile.name) {
-        bizProfile = {
-          name: 'TM Diseños Creativos',
-          owner: currentUser.name,
-          phone: currentUser.phone || '3124567890',
-          nequi: currentUser.phone || '3124567890',
-          daviplata: '',
-          bancolombia: '',
-          type: 'servicios',
-          configured: true
+      const validMatches = matches.filter(m => m.pinOk);
+
+      if (validMatches.length === 0) {
+        showToast('⚠️ Contraseña o PIN secreto incorrecto para este negocio');
+        return;
+      }
+
+      if (validMatches.length === 1) {
+        const target = validMatches[0];
+        cargarEstadoNegocio(target.biz.id, target.user.id);
+        document.getElementById('authScreenModal').style.display = 'none';
+        showToast(`¡Bienvenida(o) a "${target.biz.name}", ${target.user.name}!`);
+        return;
+      }
+
+      // Si el usuario pertenece a más de un negocio (ej: dueño de 2 marcas)
+      mostrarSelectorNegociosAutorizados(validMatches);
+    }
+
+    function mostrarSelectorNegociosAutorizados(matches) {
+      const container = document.getElementById('authPickBizList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      matches.forEach(m => {
+        const item = document.createElement('div');
+        item.style.cssText = 'padding:12px; border-radius:14px; border:1.5px solid var(--surface-border); background:#F8F9FA; cursor:pointer; display:flex; align-items:center; justify-content:space-between; transition:all 0.2s ease;';
+        item.innerHTML = `
+          <div>
+            <div style="font-weight:800; font-size:13.5px; color:var(--text);">${m.biz.name}</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+              ${m.biz.type === 'servicios' ? '🎨 Servicios / Por Encargo' : '🛒 Retail / Mostrador'} • Rol: <b>${m.user.role === 'OWNER' ? 'Dueño' : 'Colaborador'}</b>
+            </div>
+          </div>
+          <span style="font-size:18px; color:var(--primary); font-weight:800;">→</span>
+        `;
+        item.onclick = () => {
+          cargarEstadoNegocio(m.biz.id, m.user.id);
+          document.getElementById('authScreenModal').style.display = 'none';
+          showToast(`¡Bienvenida(o) a "${m.biz.name}", ${m.user.name}!`);
         };
-      } else {
-        bizProfile.configured = true;
-      }
+        container.appendChild(item);
+      });
 
-      persistirEstadoLocal();
-      document.getElementById('authScreenModal').style.display = 'none';
-      aplicarUsuarioActivo();
-      aplicarModalidadNegocio();
-      recalcularTodo();
-      renderPos();
-      showToast(`¡Bienvenida(o), ${currentUser.name}! (${currentUser.role === 'OWNER' ? 'Dueño' : 'Colaborador'})`);
+      document.getElementById('authSecLogin').style.display = 'none';
+      document.getElementById('authSecRegister').style.display = 'none';
+      const tabsCont = document.getElementById('authTabsContainer');
+      if (tabsCont) tabsCont.style.display = 'none';
+      document.getElementById('authSecPickBiz').style.display = 'block';
     }
 
     function guardarNegocioOnboarding() {
       const name = document.getElementById('setupNameInp').value.trim();
       const owner = document.getElementById('setupOwnerInp').value.trim();
       const phone = document.getElementById('setupPhoneInp').value.trim();
+      const pin = (document.getElementById('setupPinInp')?.value || '1234').trim();
 
       if (!name || !owner) {
         showToast('Ingresa el nombre del negocio y tu nombre.');
         return;
       }
 
+      if (!pin) {
+        showToast('Ingresa un PIN de 4 dígitos para proteger tu negocio.');
+        return;
+      }
+
+      // ID Único e irrepetible para el negocio
+      const newBizId = 'biz_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+
       bizProfile = {
+        id: newBizId,
         name: name,
         owner: owner,
         phone: phone,
@@ -2843,24 +3180,28 @@
         daviplata: phone,
         bancolombia: '',
         type: selectedSetupMode,
-        configured: true
+        configured: true,
+        createdAt: new Date().toISOString()
       };
 
-      // Crear usuario Dueño inicial
+      // Crear usuario Dueño inicial para este negocio
       currentUser = {
-        id: 'usr_' + Date.now(),
+        id: 'usr_owner_' + Date.now(),
+        bizId: newBizId,
         name: owner,
         username: phone || owner.toLowerCase().replace(/\s+/g, ''),
         email: phone.includes('@') ? phone : '',
         phone: phone,
-        pin: '1234',
+        pin: pin,
         role: 'OWNER',
         active: true
       };
+
       users = [
         currentUser,
         {
-          id: 'usr_collab',
+          id: 'usr_collab_' + Date.now(),
+          bizId: newBizId,
           name: 'Colaborador Vendedor',
           username: 'vendedor',
           email: '',
@@ -2871,21 +3212,38 @@
         }
       ];
 
-      // Iniciar con catálogo predefinido
+      // AISLAMIENTO TOTAL: Catálogo, proyectos y datos completamente nuevos y limpios
+      // Ningún dato o producto se comparte con otros negocios
       projectsData = [];
       generalExpenses = [];
       generalIncomes = [];
-      catalogItems = [...DEFAULT_CATALOG_SERVICIOS];
+      catalogItems = []; // Catálogo exclusivo en blanco para este nuevo negocio
+      clients = [];      // Lista de clientes exclusiva en blanco para este nuevo negocio
       cart = [];
 
+      // Registrar en el directorio de negocios del dispositivo
+      const registry = obtenerRegistroNegocios();
+      registry.push({
+        id: newBizId,
+        name: name,
+        owner: owner,
+        phone: phone,
+        type: selectedSetupMode,
+        createdAt: bizProfile.createdAt
+      });
+      guardarRegistroNegocios(registry);
+
+      // Persistir bajo el namespace único de este negocio
       persistirEstadoLocal();
 
       document.getElementById('authScreenModal').style.display = 'none';
       aplicarUsuarioActivo();
       aplicarModalidadNegocio();
       recalcularTodo();
+      renderCatalogItems();
       renderPos();
-      showToast(`🎉 ¡Negocio "${name}" creado con éxito!`);
+      inicializarClientes();
+      showToast(`🎉 ¡Negocio "${name}" creado exitosamente! Catálogo y datos 100% aislados.`);
     }
 
     // ==========================================
@@ -3172,13 +3530,7 @@
     }
 
     function reiniciarNegocio() {
-      if (confirm('¿Deseas cerrar la sesión de este negocio? Podrás iniciar sesión nuevamente o crear otro.')) {
-        bizProfile.configured = false;
-        persistirEstadoLocal();
-        cerrarBusinessProfileModal();
-        abrirAuthPortal('login');
-        showToast('Sesión cerrada');
-      }
+      cerrarSesionNegocio(true);
     }
 
     function aplicarModalidadNegocio() {
@@ -4114,7 +4466,14 @@ ${itemsBreakdown}
       const items = catalogItems.filter(i => i.mode === catalogFilter);
 
       if (items.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:20px; color:#777;">No hay productos en esta categoría.</div>';
+        container.innerHTML = `
+          <div style="text-align:center; padding:32px 18px; background:var(--card-bg); border-radius:20px; border:1.5px dashed var(--surface-border); margin:12px 0;">
+            <div style="font-size:36px; margin-bottom:10px;">🏷️</div>
+            <div style="font-weight:700; font-size:15px; margin-bottom:6px; color:var(--text);">Catálogo Exclusivo Vacío</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:18px; line-height:1.4;">Este negocio no tiene productos registrados en esta modalidad. Los productos que crees serán 100% exclusivos de este negocio.</div>
+            <button class="primary-btn" onclick="abrirModalNuevoProducto()" style="max-width:240px; margin:0 auto;">+ AGREGAR PRODUCTO</button>
+          </div>
+        `;
         return;
       }
 
@@ -4339,15 +4698,8 @@ ${itemsBreakdown}
       setTimeout(() => t.classList.remove('show'), 2400);
     }
 
-    // Inicialización y arranque
+    // Inicialización y arranque con verificación multi-inquilino
     cargarEstadoLocal();
-    if (!bizProfile.configured || !bizProfile.name) {
-      abrirSetupBusinessModal();
-    } else {
-      aplicarModalidadNegocio();
-    }
-    recalcularTodo();
-    renderPos();
   </script>
 </body>
 </html>

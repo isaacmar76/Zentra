@@ -192,7 +192,9 @@ class CatalogItemModel {
 | **2026-09-29** | `13a7b9e` | Architecture | Creación de `LOGICA_Y_BITACORA.md` como fuente de verdad y registro continuo | ✅ Completado |
 | **2026-09-29** | `9f31f41` | Core | Configuración fija de tipo de negocio al crear empresa, borrado total de datos demo y persistencia local | ✅ Completado |
 | **2026-09-30** | `61041bb` | Feature / Auth / Multi-item | CRUD de Usuarios (Dueño vs Colaborador), Catálogo con Fotos (Cámara/Galería), Proyectos Multi-Producto y Cotizaciones WhatsApp | ✅ Completado |
-| **2026-09-30** | `current` | UI / UX / Design System | Adopción de Sistema Visual Fintech Clarity (nuevo_diseño.md): Plus Jakarta Sans + Inter, Cockpit Hero con micro-gráfica SVG, Bento cards | ✅ Completado |
+| **2026-09-30** | `0c59e31` | UI / UX / Design System | Adopción de Sistema Visual Fintech Clarity (nuevo_diseño.md): Plus Jakarta Sans + Inter, Cockpit Hero con micro-gráfica SVG, Bento cards | ✅ Completado |
+| **2026-10-01** | `d053028` | Feature / Clients & POS | CRUD de Clientes, flujo "Tomar Pedido" con cotizador en vivo, Factura/Recibo ejecutivo para WhatsApp e impresión | ✅ Completado |
+| **2026-10-01** | `current` | Security / Multi-Tenant | Aislamiento estricto de productos y datos por negocio (multi-tenancy, registro central, llaves namespaced y control de acceso por PIN) | ✅ Completado |
 
 ---
 
@@ -291,6 +293,23 @@ class CatalogItemModel {
      - Header ejecutivo con monograma `Z` en degradado menta/esmeralda e indicador de estado en vivo.
      - Iconografía Google Material Symbols Outlined en la barra inferior (`dashboard`, `storefront`, `palette`).
   6. **Alineación Flutter:** Inclusión de la paleta `zentraClarity` en `app_theme.dart` y establecimiento como tema por defecto en `ThemeProvider`.
+
+#### Hito 11: Aislamiento Total de Datos y Catálogos por Negocio (Arquitectura Multi-Inquilino)
+- **Problema previo:** El almacenamiento local utilizaba claves globales (`zentra_catalog`, `zentra_biz_profile`, `zentra_projects`, etc.). Cuando se creaba un nuevo negocio o se cambiaba de cuenta, se compartía el mismo catálogo o se sobreescribían los productos entre empresas creadas en el mismo dispositivo o navegador.
+- **Solución implementada:**
+  1. **Directorio Central de Negocios (`zentra_businesses_registry`):** Registro seguro de todas las marcas y negocios independientes creados en el dispositivo (`id`, `name`, `owner`, `phone`, `type`, `createdAt`).
+  2. **Aislamiento Estricto por Namespace (`bizId`):** Cada negocio posee sus propias claves totalmente aisladas:
+     - `zentra_biz_profile_${bizId}`: Perfil comercial y cuentas de pago.
+     - `zentra_catalog_${bizId}`: Catálogo de productos 100% exclusivo (un negocio NUNCA ve ni comparte los productos de otro).
+     - `zentra_projects_${bizId}`: Encargos y pedidos exclusivos.
+     - `zentra_clients_${bizId}`: Directorio de clientes exclusivo.
+     - `zentra_expenses_${bizId}` & `zentra_incomes_${bizId}`: Finanzas y caja exclusivas.
+     - `zentra_users_${bizId}`: Usuarios autorizados y PIN de acceso específicos para ese negocio.
+  3. **Barrera de Autenticación y Control de Acceso:**
+     - Para entrar a un negocio se debe suministrar el usuario/teléfono/correo y el PIN secreto asignado a dicho negocio.
+     - Desde un negocio activo NO es posible saltar a otro negocio sin antes **Cerrar Sesión**.
+     - Al cerrar sesión se limpia la memoria volátil del dispositivo y se exige autenticación con PIN del negocio de destino.
+  4. **Migración Transparente:** La información histórica de *TM Diseños Creativos* se encapsuló automáticamente bajo el espacio aislado `biz_tm_disenos`, preservando su inventario creativo y clientes sin contaminar ningún negocio nuevo.
 
 ---
 

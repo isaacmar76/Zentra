@@ -548,6 +548,101 @@
       padding: 10px 12px;
     }
 
+    /* Estilos del Módulo de Clientes (CRUD) */
+    .client-card-item {
+      background: #FFFFFF;
+      border: 1px solid var(--surface-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(11, 28, 48, 0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .client-card-item:hover {
+      box-shadow: 0 4px 14px rgba(11, 28, 48, 0.08);
+    }
+    .client-avatar-badge {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 108, 70, 0.2);
+    }
+
+    /* Estilos de Factura / Recibo */
+    .receipt-paper {
+      background: #FFFFFF;
+      border-radius: 20px;
+      border: 1px solid #ECEEF2;
+      padding: 18px 16px;
+      color: #1A202C;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    .receipt-dotted-line {
+      border: none;
+      border-top: 1.5px dashed #CBD5E1;
+      margin: 12px 0;
+    }
+    .receipt-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      margin: 8px 0;
+    }
+    .receipt-table th {
+      text-align: left;
+      padding: 6px 4px;
+      border-bottom: 1px solid #E2E8F0;
+      color: #64748B;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: 0.04em;
+    }
+    .receipt-table td {
+      padding: 7px 4px;
+      border-bottom: 1px solid #F1F5F9;
+      color: #1E293B;
+    }
+
+    /* Reglas de Impresión (@media print) */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #invoiceReceiptModal, #invoiceReceiptModal * {
+        visibility: visible !important;
+      }
+      #invoiceReceiptModal {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: #FFFFFF !important;
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .receipt-paper {
+        box-shadow: none !important;
+        border: 1px solid #DDD !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+      }
+    }
+
     /* Lista de Proyectos / Catálogo */
     .section-title {
       font-size: 14px;
@@ -866,6 +961,10 @@
             <span>Encargos</span>
             <span class="seg-badge" id="lblProyectosCount">0</span>
           </button>
+          <button class="seg-btn" id="segTabClientes" onclick="switchServiciosTab('clientes')">
+            <span>Clientes</span>
+            <span class="seg-badge" id="lblClientesCount">0</span>
+          </button>
           <button class="seg-btn" id="segTabMovimientos" onclick="switchServiciosTab('movimientos')">
             <span>Cuentas & Gastos</span>
           </button>
@@ -887,6 +986,21 @@
 
           <div id="projectsList">
             <!-- Renderizado dinámico de pedidos -->
+          </div>
+        </div>
+
+        <!-- Subsección: Directorio y CRUD de Clientes -->
+        <div id="subSecClientes" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
+            <div style="position:relative; flex:1;">
+              <input type="text" id="inpBuscarCliente" oninput="filtrarClientesUI()" placeholder="🔍 Buscar cliente, teléfono o documento..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:#FFFFFF; font-size:12px; color:var(--text); box-sizing:border-box;">
+            </div>
+            <button onclick="abrirModalCliente()" style="background:var(--primary); color:#fff; border:none; padding:9px 12px; border-radius:12px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(0,108,70,0.2);">
+              <span>+</span> Nuevo Cliente
+            </button>
+          </div>
+          <div id="clientesListContainer">
+            <!-- Renderizado dinámico de clientes -->
           </div>
         </div>
 
@@ -1076,10 +1190,24 @@
           <button onclick="closeProjectModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
         </div>
 
+        <!-- Banner de Aprobación de Cotización -->
+        <div id="mCotizacionBanner" style="display:none; background:#FFFBEB; border:1.5px solid #F59E0B; border-radius:16px; padding:12px 14px; margin:10px 0 6px; justify-content:space-between; align-items:center; gap:8px;">
+          <div>
+            <div style="font-size:12px; font-weight:800; color:#92400E; display:flex; align-items:center; gap:5px;">
+              <span>📋</span> COTIZACIÓN PENDIENTE
+            </div>
+            <div style="font-size:10.5px; color:#B45309; margin-top:2px;">El cliente aún no ha confirmado el pedido.</div>
+          </div>
+          <button onclick="aprobarCotizacionActual()" style="background:#10B981; color:#fff; border:none; padding:8px 12px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(16,185,129,0.3); white-space:nowrap;">
+            ✅ Aprobar Pedido
+          </button>
+        </div>
+
         <!-- Selector de Estados del Proyecto -->
         <div style="margin: 10px 0 12px;">
           <div style="font-size: 11px; font-weight: 700; margin-bottom: 6px;">Fase / Estado del Proyecto:</div>
-          <div style="display: flex; gap: 6px;" id="mStatusChips">
+          <div style="display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none;" id="mStatusChips">
+            <button class="status-chip" id="chip-cotizacion" onclick="setProjectStatus('Cotización')">📋 Cotización</button>
             <button class="status-chip" id="chip-diseno" onclick="setProjectStatus('Diseño')">🎨 Diseño</button>
             <button class="status-chip" id="chip-produccion" onclick="setProjectStatus('Producción')">✂️ Producción</button>
             <button class="status-chip" id="chip-empaque" onclick="setProjectStatus('Empaque')">📦 Empaque</button>
@@ -1141,13 +1269,18 @@
         </div>
 
         <!-- Botones de Acción (Compras vs Abonos) -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
           <button onclick="abrirModalCompraProyecto()" style="background:var(--bg); border:1.5px solid var(--alert); color:var(--alert); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Compra</button>
           <button onclick="abrirModalAbonoProyecto()" style="background:var(--bg); border:1.5px solid var(--success); color:var(--success); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Abono</button>
         </div>
 
-        <button onclick="copiarWhatsAppCotizacion()" style="width:100%; background:#25D366; color:#fff; border:none; padding:12px; border-radius:14px; font-weight:700; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px;">
-          <span>📱</span> COPIAR MENSAJE PARA WHATSAPP
+        <!-- Botón Generar Factura / Recibo -->
+        <button onclick="abrirFacturaRecibo()" style="width:100%; background:linear-gradient(135deg, #006C46 0%, #004D32 100%); color:#fff; border:none; padding:12px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
+          <span style="font-size:15px;">🧾</span> GENERAR FACTURA / RECIBO DE PAGO
+        </button>
+
+        <button onclick="copiarWhatsAppCotizacion()" style="width:100%; background:#25D366; color:#fff; border:none; padding:11px; border-radius:14px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px;">
+          <span>📱</span> ENVIAR RESUMEN POR WHATSAPP
         </button>
       </div>
     </div>
@@ -1208,9 +1341,15 @@
           <input type="text" id="bizPhoneInp" placeholder="Ej: 312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
-        <div style="margin-bottom:10px;">
-          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Número Nequi para Pagos</label>
-          <input type="text" id="bizNequiInp" placeholder="312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <div>
+            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Número Nequi</label>
+            <input type="text" id="bizNequiInp" placeholder="312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Número Daviplata</label>
+            <input type="text" id="bizDaviplataInp" placeholder="312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
         </div>
 
         <div style="margin-bottom:14px;">
@@ -1379,81 +1518,133 @@
       </div>
     </div>
 
-    <!-- Modal Nuevo Pedido / Proyecto (Cliente) -->
+    <!-- Modal Nuevo Pedido / Proyecto (Tomar Pedido con Cliente y Carrito) -->
     <div id="newOrderModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:300; align-items:flex-end; justify-content:center;">
       <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <div>
-            <div style="font-size:17px; font-weight:700;">+ Nuevo Pedido / Proyecto</div>
-            <div style="font-size:11.5px; color:#777;">Registra un nuevo encargo o trabajo de un cliente</div>
+            <div style="font-size:17px; font-weight:800; color:var(--text); letter-spacing:-0.01em;">🛍️ Tomar Pedido / Cotización</div>
+            <div style="font-size:11px; color:var(--text-muted);">Selecciona el cliente, añade ítems del catálogo y cotiza</div>
           </div>
           <button onclick="cerrarNuevoPedidoModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
         </div>
 
-        <div style="margin-bottom:10px;">
-          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Nombre del Pedido / Proyecto *</label>
-          <input type="text" id="orderNameInp" placeholder="Ej: Baby Shower Lucas, Grados San José" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        <!-- PASO 1: CLIENTE -->
+        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:16px; padding:12px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:11px; font-weight:700; color:var(--text); margin:0;">1. Cliente *</label>
+            <button type="button" onclick="toggleCrearClienteRapido()" id="btnToggleQuickClient" style="background:transparent; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer;">
+              + Crear Nuevo Cliente
+            </button>
+          </div>
+
+          <!-- Selector dropdown de clientes existentes -->
+          <div id="boxSelectExistingClient">
+            <select id="orderClientSelect" onchange="alCambiarClienteSelect(this.value)" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:#FFFFFF; color:var(--text); font-size:12.5px; box-sizing:border-box;">
+              <!-- Inyectado por JS -->
+            </select>
+          </div>
+
+          <!-- Formulario rápido para crear cliente al vuelo -->
+          <div id="boxQuickCreateClient" style="display:none; margin-top:8px; padding-top:8px; border-top:1px dashed #CBD5E1;">
+            <div style="font-size:10.5px; font-weight:700; color:var(--primary); margin-bottom:6px;">✨ Datos del nuevo cliente:</div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
+              <input type="text" id="quickCliNameInp" placeholder="Nombre completo *" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; font-size:12px; background:#fff;">
+              <input type="text" id="quickCliPhoneInp" placeholder="WhatsApp / Celular *" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; font-size:12px; background:#fff;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr auto; gap:6px;">
+              <input type="text" id="quickCliDocInp" placeholder="Cédula / NIT (opcional)" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; font-size:12px; background:#fff;">
+              <button type="button" onclick="guardarClienteRapidoEnPedido()" style="background:var(--primary); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+                Guardar Cliente
+              </button>
+            </div>
+          </div>
+
+          <!-- Badge con resumen del cliente seleccionado -->
+          <div id="selectedClientBadge" style="display:none; margin-top:8px; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:8px 10px; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div id="lblSelectedCliAvatar" class="client-avatar-badge" style="width:28px; height:28px; font-size:11px;">AG</div>
+              <div>
+                <div id="lblSelectedCliName" style="font-size:12px; font-weight:700; color:var(--text);">Ana María Gómez</div>
+                <div id="lblSelectedCliDetail" style="font-size:10px; color:var(--text-muted);">📱 312 456 7890 • CC: 1020304050</div>
+              </div>
+            </div>
+            <button type="button" onclick="limpiarClienteSeleccionado()" style="background:none; border:none; color:var(--text-muted); font-size:14px; cursor:pointer;">✕</button>
+          </div>
+
+          <input type="hidden" id="orderClientInp">
+          <input type="hidden" id="orderPhoneInp">
+          <input type="hidden" id="orderClientIdInp">
         </div>
 
+        <!-- PASO 2: DATOS DEL PROYECTO -->
         <div style="margin-bottom:10px;">
-          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Nombre del Cliente *</label>
-          <input type="text" id="orderClientInp" placeholder="Ej: Marcela Gómez" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">2. Nombre del Proyecto / Pedido *</label>
+          <input type="text" id="orderNameInp" placeholder="Ej: Boda de Ana, 15 Años Sofía, Baby Shower Lucas" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
-        <div style="margin-bottom:10px;">
-          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Teléfono WhatsApp</label>
-          <input type="text" id="orderPhoneInp" placeholder="Ej: 310 987 6543" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
-        </div>
-
-        <!-- Sección: Productos y Entregables del Pedido (Catálogo + A Medida) -->
+        <!-- PASO 3: CARRITO DE COMPRAS / ARTÍCULOS DEL CATÁLOGO -->
         <div style="background:#F8F9FA; border:1px solid #ECEEF2; border-radius:16px; padding:12px; margin-bottom:12px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <div>
-              <div style="font-size:12px; font-weight:700; color:var(--text);">📦 Productos & Entregables</div>
-              <div style="font-size:10px; color:var(--text-muted);">Topper, portaplatos, dulces, invitaciones, etc.</div>
+              <div style="font-size:12px; font-weight:700; color:var(--text);">3. 🛒 Carrito de la Cotización</div>
+              <div style="font-size:10px; color:var(--text-muted);">Agrega artículos del inventario o personalizados</div>
             </div>
-            <button type="button" onclick="abrirPickerCatalogo('new_order')" style="background:var(--secondary); color:#fff; border:none; padding:5px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
-              🛍️ + Del Catálogo
-            </button>
+            <div style="display:flex; gap:6px;">
+              <button type="button" onclick="abrirPickerCatalogo('new_order')" style="background:var(--secondary); color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+                🛍️ + Catálogo
+              </button>
+              <button type="button" onclick="abrirModalItemMedida('new_order')" style="background:#FFFFFF; border:1px solid var(--secondary); color:var(--secondary); padding:5px 9px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+                ✏️ + A Medida
+              </button>
+            </div>
           </div>
 
-          <!-- Lista de ítems agregados al nuevo pedido -->
+          <!-- Lista interactiva de ítems agregados al carrito -->
           <div id="newOrderItemsList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;">
-            <div style="font-size:11px; color:#888; text-align:center; padding:8px 0;">No has agregado productos. Toca "+ Del Catálogo" o "+ Ítem a Medida".</div>
+            <!-- Renderizado dinámico del carrito -->
           </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:4px;">
-            <button type="button" onclick="abrirModalItemMedida('new_order')" style="background:transparent; border:1px dashed var(--secondary); color:var(--secondary); padding:4px 8px; border-radius:8px; font-size:10.5px; font-weight:700; cursor:pointer;">
-              ✏️ + Ítem a Medida
-            </button>
-            <div style="font-size:11.5px; color:var(--text-muted);">
-              Suma productos: <b id="lblNewOrderItemsSum" style="color:var(--text); font-weight:800;">$0</b>
-            </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px; border-top:1px solid #E2E8F0;">
+            <span style="font-size:11.5px; color:var(--text-muted);">Total Artículos Carrito:</span>
+            <b id="lblNewOrderItemsSum" style="color:var(--primary); font-size:14px; font-weight:800;">$0</b>
           </div>
         </div>
 
         <div style="margin-bottom:10px;">
-          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Resumen de Servicios / Entregables</label>
-          <input type="text" id="orderServicesInp" placeholder="Ej: 1x Topper + 20x Portaplatos + 50x Dulces" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Resumen descriptivo de Servicios</label>
+          <input type="text" id="orderServicesInp" placeholder="Se genera automáticamente según el carrito" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:12.5px; box-sizing:border-box;">
         </div>
 
+        <!-- PASO 4: VALORES Y CONDICIONES -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
           <div>
             <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Total Cotizado ($ COP) *</label>
-            <input type="number" id="orderTotalInp" placeholder="350000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
+            <input type="number" id="orderTotalInp" placeholder="0" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
           </div>
           <div>
-            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Abono Inicial Recibido ($ COP)</label>
-            <input type="number" id="orderAdvanceInp" placeholder="150000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
+            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Abono Inicial ($ COP)</label>
+            <input type="number" id="orderAdvanceInp" value="0" placeholder="0" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
           </div>
         </div>
 
-        <div style="margin-bottom:14px;">
-          <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Días para Entrega</label>
-          <input type="number" id="orderDaysInp" value="5" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+          <div>
+            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Días para Entrega</label>
+            <input type="number" id="orderDaysInp" value="5" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">Estado Inicial</label>
+            <select id="orderInitialStatusInp" style="width:100%; padding:9px 10px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:12px; font-weight:600; box-sizing:border-box;">
+              <option value="Cotización" selected>📋 Cotización (Por aprobar)</option>
+              <option value="Diseño">🎨 Aprobado (En Producción)</option>
+            </select>
+          </div>
         </div>
 
-        <button onclick="guardarNuevoPedido()" class="primary-btn">GUARDAR PEDIDO / PROYECTO</button>
+        <button onclick="guardarNuevoPedido()" class="primary-btn">
+          CREAR PEDIDO / COTIZACIÓN
+        </button>
       </div>
     </div>
 
@@ -1675,6 +1866,170 @@
       </div>
     </div>
 
+    <!-- Modal: CRUD de Clientes (Crear / Editar Cliente) -->
+    <div id="clientModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:360; align-items:center; justify-content:center; padding:18px;">
+      <div style="background:var(--card-bg); width:100%; max-width:350px; border-radius:24px; padding:22px 18px; color:var(--text); box-shadow:0 12px 36px rgba(0,0,0,0.25); max-height:90%; overflow-y:auto;">
+        <div style="font-size:16px; font-weight:800; margin-bottom:2px;" id="cliModalTitle">+ Nuevo Cliente</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-bottom:14px;">Registra los datos para pedidos, cotizaciones y facturas</div>
+
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Nombre Completo *</label>
+          <input type="text" id="cliNameInp" placeholder="Ej: Ana María Gómez" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:8px; margin-bottom:10px;">
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">WhatsApp / Teléfono *</label>
+            <input type="text" id="cliPhoneInp" placeholder="Ej: 312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Cédula / NIT</label>
+            <input type="text" id="cliDocInp" placeholder="1020304050" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Correo Electrónico</label>
+          <input type="email" id="cliEmailInp" placeholder="cliente@correo.com" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Dirección / Ciudad de Entrega</label>
+          <input type="text" id="cliAddrInp" placeholder="Ej: Calle 10 # 25-14, Medellín" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Notas o Preferencias Especiales</label>
+          <input type="text" id="cliNotesInp" placeholder="Ej: Paleta tonos pastel, entrega en la mañana" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+        </div>
+
+        <div style="display:flex; gap:8px;">
+          <button onclick="cerrarModalCliente()" style="flex:1; padding:10px; border-radius:12px; border:1px solid #CBD5E1; background:transparent; font-weight:600; cursor:pointer;">Cancelar</button>
+          <button onclick="guardarCliente()" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--primary); color:#fff; font-weight:700; cursor:pointer;">Guardar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Factura / Recibo de Pago para Enviar al Cliente -->
+    <div id="invoiceReceiptModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); z-index:500; align-items:center; justify-content:center; padding:14px; overflow-y:auto;">
+      <div class="receipt-paper" style="width:100%; max-width:380px; max-height:92%; overflow-y:auto;">
+        
+        <!-- Botón cerrar flotante (oculto en impresión) -->
+        <div class="no-print" style="display:flex; justify-content:flex-end; margin-bottom:4px;">
+          <button onclick="cerrarFacturaRecibo()" style="background:#F1F5F9; border:none; border-radius:50%; width:28px; height:28px; font-size:14px; cursor:pointer; color:#64748B;">✕</button>
+        </div>
+
+        <!-- Encabezado con Nombre del Negocio -->
+        <div style="text-align:center;">
+          <img src="img/zentra-logo.png" alt="Logo" style="width:46px; height:46px; border-radius:12px; object-fit:contain; margin-bottom:4px; border:1px solid #ECEEF2; padding:2px; background:#fff;">
+          <div style="font-size:16px; font-weight:800; color:#0B1C30; text-transform:uppercase; letter-spacing:-0.02em;" id="recBizName">ZENTRA FINANCIAL</div>
+          <div style="font-size:10.5px; color:#64748B; margin-top:2px;" id="recBizContact">Propietario • Tel: 312 000 0000</div>
+          <div style="font-size:9.5px; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-top:1px;">Factura de Venta / Comprobante de Entrega</div>
+        </div>
+
+        <div class="receipt-dotted-line"></div>
+
+        <!-- Consecutivo y Fechas -->
+        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:8px;">
+          <div>
+            <span style="color:#64748B;">Comprobante:</span>
+            <b style="color:#0B1C30;" id="recOrderNum">#PED-001</b>
+          </div>
+          <div>
+            <span style="color:#64748B;">Fecha:</span>
+            <b style="color:#0B1C30;" id="recOrderDate">01/10/2026</b>
+          </div>
+        </div>
+
+        <!-- Información del Cliente y Proyecto -->
+        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px; margin-bottom:10px; font-size:11px;">
+          <div style="margin-bottom:3px;">
+            <span style="color:#64748B;">Cliente:</span>
+            <b style="color:#0B1C30;" id="recClientName">Ana María Gómez</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:3px;" id="recClientExtraRow">
+            <div><span style="color:#64748B;">Tel:</span> <span id="recClientPhone">312 456 7890</span></div>
+            <div><span style="color:#64748B;">CC/NIT:</span> <span id="recClientDoc">1020304050</span></div>
+          </div>
+          <div style="margin-top:4px; padding-top:4px; border-top:1px dashed #E2E8F0;">
+            <span style="color:#64748B;">Proyecto:</span>
+            <b style="color:var(--primary);" id="recProjName">Boda de Ana</b>
+            <span class="badge" id="recProjStatusBadge" style="margin-left:6px; font-size:9.5px; padding:1px 6px;">🎨 En Proceso</span>
+          </div>
+        </div>
+
+        <!-- Tabla Detallada de Artículos / Servicios -->
+        <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:4px;">Detalle de Artículos / Servicios:</div>
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th style="width:38px;">Cant.</th>
+              <th>Descripción</th>
+              <th style="text-align:right;">Unitario</th>
+              <th style="text-align:right;">Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="recTableBody">
+            <!-- Filas dinámicas -->
+          </tbody>
+        </table>
+
+        <!-- Totales y Saldos -->
+        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px; margin:10px 0;">
+          <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
+            <span style="color:#64748B;">Total Cotizado:</span>
+            <b style="color:#0B1C30;" id="recTotalVal">$0</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
+            <span style="color:#64748B;">Abonos Recibidos:</span>
+            <b style="color:#006C46;" id="recCobradoVal">$0</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; padding-top:6px; border-top:1px solid #CBD5E1; font-weight:800;">
+            <span id="lblRecSaldoTitle">Saldo Pendiente:</span>
+            <span id="recSaldoVal" style="color:#DC2626;">$0</span>
+          </div>
+        </div>
+
+        <!-- Sello de Estado de Pago -->
+        <div id="recPaymentStatusStamp" style="text-align:center; padding:6px; border-radius:10px; font-size:11px; font-weight:800; margin-bottom:10px;">
+          <!-- Dinámico: PAGADO o SALDO PENDIENTE -->
+        </div>
+
+        <!-- Medios de Pago que Recibimos -->
+        <div style="background:#FFFFFF; border:1px dashed #CBD5E1; border-radius:12px; padding:10px 12px; font-size:10.5px; margin-bottom:12px;">
+          <div style="font-weight:700; color:#334155; margin-bottom:5px; display:flex; align-items:center; gap:4px;">
+            <span>🏦</span> Medios de Pago que Recibimos:
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+            <div>🟣 <b>Nequi:</b> <span id="recNequiNum">312 000 0000</span></div>
+            <div>🟡 <b>Daviplata:</b> <span id="recDaviplataNum">312 000 0000</span></div>
+            <div style="grid-column:1 / -1;">🔵 <b>Bancolombia:</b> <span id="recBankNum">Ahorros</span></div>
+            <div style="grid-column:1 / -1;">💵 <b>Efectivo:</b> Contra entrega / en tienda</div>
+          </div>
+        </div>
+
+        <div style="text-align:center; font-size:10px; color:#64748B; font-style:italic; margin-bottom:14px;">
+          ¡Gracias por confiar en nuestro trabajo y apoyar nuestro talento!
+        </div>
+
+        <!-- Botones de Acción (Ocultos en Impresión) -->
+        <div class="no-print" style="display:flex; flex-direction:column; gap:8px;">
+          <button onclick="enviarReciboWhatsApp()" style="width:100%; background:#25D366; color:#fff; border:none; padding:11px; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 10px rgba(37,211,102,0.25);">
+            <span>📲</span> Enviar Recibo por WhatsApp
+          </button>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button onclick="imprimirFacturaRecibo()" style="padding:9px; border-radius:12px; border:1px solid #CBD5E1; background:#FFFFFF; color:#334155; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+              <span>🖨️</span> Imprimir / PDF
+            </button>
+            <button onclick="copiarTextoRecibo()" style="padding:9px; border-radius:12px; border:1px solid #CBD5E1; background:#FFFFFF; color:#334155; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+              <span>📋</span> Copiar Texto
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toastMsg">Venta registrada</div>
   </div>
@@ -1708,6 +2063,18 @@
     let currentUser = null;
     let editingUserId = null;
 
+    // Estado del CRUD de Clientes
+    let clients = [];
+    let editingClientId = null;
+    let selectedOrderClientId = null;
+
+    // Clientes iniciales para muestra
+    const DEFAULT_CLIENTS = [
+      { id: 'cli_1', name: 'Ana María Gómez', phone: '312 456 7890', document: '1020304050', email: 'ana.gomez@gmail.com', address: 'Calle 10 # 25-14', notes: 'Boda en noviembre. Tonos rosa pastel y dorado.', createdAt: '2026-09-15' },
+      { id: 'cli_2', name: 'Carlos Mendoza', phone: '315 889 1234', document: '900123456-1', email: 'carlos@eventos.co', address: 'Av. Las Palmas # 12', notes: 'Eventos corporativos y souvenirs en acrílico.', createdAt: '2026-09-18' },
+      { id: 'cli_3', name: 'Laura Restrepo', phone: '320 654 9871', document: '1035987654', email: 'laura.res@hotmail.com', address: 'Cra 43A # 1-50', notes: 'Cumpleaños infantil temática Safari.', createdAt: '2026-09-22' }
+    ];
+
     // Estado para Foto del Producto
     let tempProductPhoto = null;
 
@@ -1732,6 +2099,7 @@
         localStorage.setItem('zentra_incomes', JSON.stringify(generalIncomes));
         localStorage.setItem('zentra_catalog', JSON.stringify(catalogItems));
         localStorage.setItem('zentra_users', JSON.stringify(users));
+        localStorage.setItem('zentra_clients', JSON.stringify(clients));
         if (currentUser) localStorage.setItem('zentra_current_user', JSON.stringify(currentUser));
       } catch (e) {
         console.warn('Storage save error', e);
@@ -1761,10 +2129,21 @@
           catalogItems = [...DEFAULT_CATALOG_SERVICIOS];
         }
 
+        const cliStr = localStorage.getItem('zentra_clients');
+        if (cliStr) {
+          try { clients = JSON.parse(cliStr); } catch (_) { clients = []; }
+        } else {
+          clients = [...DEFAULT_CLIENTS];
+        }
+        if (!clients || clients.length === 0) {
+          clients = [...DEFAULT_CLIENTS];
+        }
+
         const savedTheme = localStorage.getItem('zentra_active_theme') || 'zentra_clarity';
         applyTheme(savedTheme, false);
 
         inicializarUsuarios();
+        inicializarClientes();
       } catch (e) {
         console.warn('Storage load error', e);
       }
@@ -2509,15 +2888,202 @@
       showToast(`🎉 ¡Negocio "${name}" creado con éxito!`);
     }
 
+    // ==========================================
+    // SISTEMA Y CRUD DE CLIENTES
+    // ==========================================
+    function inicializarClientes() {
+      if (document.getElementById('lblClientesCount')) {
+        document.getElementById('lblClientesCount').innerText = clients.length;
+      }
+      renderClientesList();
+    }
+
+    function renderClientesList() {
+      const container = document.getElementById('clientesListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const query = (document.getElementById('inpBuscarCliente')?.value || '').trim().toLowerCase();
+      const filtered = clients.filter(c => 
+        !query || 
+        c.name.toLowerCase().includes(query) || 
+        (c.phone && c.phone.includes(query)) || 
+        (c.document && c.document.includes(query)) ||
+        (c.email && c.email.toLowerCase().includes(query))
+      );
+
+      if (document.getElementById('lblClientesCount')) {
+        document.getElementById('lblClientesCount').innerText = clients.length;
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:32px 18px; background:#FFFFFF; border-radius:20px; border:1px dashed #ECEEF2; margin:12px 0;">
+            <div style="font-size:36px; margin-bottom:10px;">👥</div>
+            <div style="font-weight:700; font-size:15px; margin-bottom:6px; color:var(--text);">No hay clientes registrados</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:18px; line-height:1.4;">Registra a tus clientes habituales para tomar pedidos y generar cotizaciones y facturas en 1 toque.</div>
+            <button class="primary-btn" onclick="abrirModalCliente()" style="max-width:240px; margin:0 auto;">+ NUEVO CLIENTE</button>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(c => {
+        const clientProjects = projectsData.filter(p => p.clientId === c.id || p.phone === c.phone || p.client === c.name);
+        const totalSpent = clientProjects.reduce((s, p) => s + p.total, 0);
+        const initials = c.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'CL';
+
+        const card = document.createElement('div');
+        card.className = 'client-card-item';
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div class="client-avatar-badge">${initials}</div>
+              <div>
+                <div style="font-size:13.5px; font-weight:800; color:var(--text);">${c.name}</div>
+                <div style="font-size:11px; color:var(--text-muted); display:flex; align-items:center; gap:6px; margin-top:1px;">
+                  <span>📱 ${c.phone || 'Sin WhatsApp'}</span>
+                  ${c.document ? `<span>• CC/NIT: ${c.document}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div style="display:flex; gap:4px;">
+              <button onclick="abrirModalCliente('${c.id}')" title="Editar cliente" style="background:#F1F5F9; border:none; padding:5px 8px; border-radius:8px; font-size:11px; cursor:pointer;">✏️</button>
+              <button onclick="eliminarCliente('${c.id}')" title="Eliminar cliente" style="background:#FFF1F2; border:none; padding:5px 8px; border-radius:8px; font-size:11px; color:#E11D48; cursor:pointer;">🗑️</button>
+            </div>
+          </div>
+
+          ${c.address || c.notes ? `
+            <div style="font-size:10.5px; color:#64748B; background:#F8FAFC; padding:6px 10px; border-radius:8px; margin-bottom:8px;">
+              ${c.address ? `📍 ${c.address}` : ''}
+              ${c.address && c.notes ? ' • ' : ''}
+              ${c.notes ? `💡 ${c.notes}` : ''}
+            </div>
+          ` : ''}
+
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:6px; border-top:1px solid #F1F5F9;">
+            <div style="font-size:10.5px; color:var(--text-muted);">
+              <b>${clientProjects.length}</b> pedidos • Total: <b style="color:var(--primary);">$${totalSpent.toLocaleString('es-CO')}</b>
+            </div>
+            <button onclick="tomarPedidoParaCliente('${c.id}')" style="background:var(--primary-soft); color:var(--primary); border:1px solid var(--primary); padding:5px 11px; border-radius:10px; font-size:11px; font-weight:800; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <span>🛍️</span> Tomar Pedido
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function filtrarClientesUI() {
+      renderClientesList();
+    }
+
+    function abrirModalCliente(clientId = null) {
+      editingClientId = clientId;
+      if (clientId) {
+        const c = clients.find(x => x.id === clientId);
+        if (!c) return;
+        document.getElementById('cliModalTitle').innerText = 'Editar Cliente';
+        document.getElementById('cliNameInp').value = c.name || '';
+        document.getElementById('cliPhoneInp').value = c.phone || '';
+        document.getElementById('cliDocInp').value = c.document || '';
+        document.getElementById('cliEmailInp').value = c.email || '';
+        document.getElementById('cliAddrInp').value = c.address || '';
+        document.getElementById('cliNotesInp').value = c.notes || '';
+      } else {
+        document.getElementById('cliModalTitle').innerText = '+ Nuevo Cliente';
+        document.getElementById('cliNameInp').value = '';
+        document.getElementById('cliPhoneInp').value = '';
+        document.getElementById('cliDocInp').value = '';
+        document.getElementById('cliEmailInp').value = '';
+        document.getElementById('cliAddrInp').value = '';
+        document.getElementById('cliNotesInp').value = '';
+      }
+      document.getElementById('clientModal').style.display = 'flex';
+      setTimeout(() => document.getElementById('cliNameInp').focus(), 80);
+    }
+
+    function cerrarModalCliente() {
+      document.getElementById('clientModal').style.display = 'none';
+      editingClientId = null;
+    }
+
+    function guardarCliente() {
+      const name = document.getElementById('cliNameInp').value.trim();
+      const phone = document.getElementById('cliPhoneInp').value.trim();
+      const doc = document.getElementById('cliDocInp').value.trim();
+      const email = document.getElementById('cliEmailInp').value.trim();
+      const addr = document.getElementById('cliAddrInp').value.trim();
+      const notes = document.getElementById('cliNotesInp').value.trim();
+
+      if (!name || !phone) {
+        showToast('Nombre y teléfono son obligatorios.');
+        return;
+      }
+
+      if (editingClientId) {
+        const c = clients.find(x => x.id === editingClientId);
+        if (c) {
+          c.name = name;
+          c.phone = phone;
+          c.document = doc;
+          c.email = email;
+          c.address = addr;
+          c.notes = notes;
+          showToast(`✓ Cliente "${name}" actualizado.`);
+        }
+      } else {
+        const newCli = {
+          id: 'cli_' + Date.now(),
+          name,
+          phone,
+          document: doc,
+          email,
+          address: addr,
+          notes,
+          createdAt: new Date().toISOString()
+        };
+        clients.unshift(newCli);
+        showToast(`✓ Cliente "${name}" registrado exitosamente.`);
+      }
+
+      persistirEstadoLocal();
+      cerrarModalCliente();
+      renderClientesList();
+      if (document.getElementById('lblClientesCount')) {
+        document.getElementById('lblClientesCount').innerText = clients.length;
+      }
+    }
+
+    function eliminarCliente(clientId) {
+      const c = clients.find(x => x.id === clientId);
+      if (!c) return;
+      if (confirm(`¿Eliminar al cliente "${c.name}"? Los pedidos existentes se conservarán.`)) {
+        clients = clients.filter(x => x.id !== clientId);
+        persistirEstadoLocal();
+        renderClientesList();
+        showToast(`Cliente "${c.name}" eliminado.`);
+      }
+    }
+
+    function tomarPedidoParaCliente(clientId) {
+      switchServiciosTab('pedidos');
+      abrirModalNuevoPedido(clientId);
+    }
+
     function switchServiciosTab(tab) {
       document.getElementById('segTabPedidos').classList.toggle('active', tab === 'pedidos');
+      if (document.getElementById('segTabClientes')) document.getElementById('segTabClientes').classList.toggle('active', tab === 'clientes');
       document.getElementById('segTabMovimientos').classList.toggle('active', tab === 'movimientos');
       document.getElementById('segTabCatalogo').classList.toggle('active', tab === 'catalogo');
 
       document.getElementById('subSecPedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
+      if (document.getElementById('subSecClientes')) document.getElementById('subSecClientes').style.display = tab === 'clientes' ? 'block' : 'none';
       document.getElementById('subSecMovimientos').style.display = tab === 'movimientos' ? 'block' : 'none';
       document.getElementById('subSecCatalogo').style.display = tab === 'catalogo' ? 'block' : 'none';
 
+      if (tab === 'pedidos') renderProjectsList();
+      if (tab === 'clientes') renderClientesList();
       if (tab === 'movimientos') renderGeneralMovimientos();
       if (tab === 'catalogo') renderCatalogIntegrated();
     }
@@ -2660,18 +3226,38 @@
       projectsData.forEach((p, idx) => {
         const compras = calcularComprasProyecto(p);
         const ganancia = p.cobrado - compras;
-        const isUrgent = p.daysLeft <= 3 && p.status !== 'Entregado';
+        const isCotiz = p.status === 'Cotización';
+        const isUrgent = !isCotiz && p.daysLeft <= 3 && p.status !== 'Entregado';
         if (isUrgent) urgentCount++;
-        const badgeClass = isUrgent ? 'badge badge-urgent' : 'badge';
-        const badgeText = `Vence en ${p.daysLeft} días`;
+        
+        let badgeClass = 'badge';
+        let badgeText = `Vence en ${p.daysLeft} días`;
+        if (isCotiz) {
+          badgeClass = 'badge';
+          badgeText = '📋 Por Aprobar';
+        } else if (isUrgent) {
+          badgeClass = 'badge badge-urgent';
+        }
 
         let statusIcon = '🎨';
-        if (p.status === 'Producción') statusIcon = '✂️';
-        if (p.status === 'Empaque') statusIcon = '📦';
-        if (p.status === 'Entregado') statusIcon = '✅';
+        let statusBg = 'var(--primary-soft)';
+        let statusColor = 'var(--primary)';
+        if (isCotiz) {
+          statusIcon = '📋';
+          statusBg = '#FEF3C7';
+          statusColor = '#B45309';
+        } else if (p.status === 'Producción') {
+          statusIcon = '✂️';
+        } else if (p.status === 'Empaque') {
+          statusIcon = '📦';
+        } else if (p.status === 'Entregado') {
+          statusIcon = '✅';
+          statusBg = '#DCFCE7';
+          statusColor = '#15803D';
+        }
 
         const isOwner = !currentUser || currentUser.role === 'OWNER';
-        const gananciaLabel = isOwner ? `$${ganancia.toLocaleString('es-CO')}` : '••••••';
+        const gananciaLabel = isOwner ? (isCotiz ? `$${p.total.toLocaleString('es-CO')} (Cotizado)` : `$${ganancia.toLocaleString('es-CO')}`) : '••••••';
         const progressPct = p.total > 0 ? Math.min(100, Math.round((p.cobrado / p.total) * 100)) : 100;
 
         let itemsBadges = '';
@@ -2692,7 +3278,7 @@
               <div class="item-title" style="font-size:13.5px; font-weight:700; color:var(--text);">${p.name}</div>
               <div style="font-size:11px; color:var(--text-muted); margin-top:1px;">👤 ${p.client}</div>
             </div>
-            <span class="${badgeClass}">${badgeText}</span>
+            <span class="${badgeClass}" ${isCotiz ? 'style="background:#FFFBEB; color:#B45309; border:1px solid #FCD34D;"' : ''}>${badgeText}</span>
           </div>
 
           ${itemsBadges}
@@ -2709,8 +3295,8 @@
           </div>
 
           <div class="item-detail" style="margin-top:6px; padding-top:6px; border-top:1px solid #F1F4F9; display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:11px; font-weight:700; color:var(--text);">Margen: ${gananciaLabel}</span>
-            <span class="badge" style="font-size:10px; font-weight:700; background:var(--primary-soft); color:var(--primary);">${statusIcon} ${p.status}</span>
+            <span style="font-size:11px; font-weight:700; color:var(--text);">${isCotiz ? 'Valor: ' + gananciaLabel : 'Margen: ' + gananciaLabel}</span>
+            <span class="badge" style="font-size:10px; font-weight:700; background:${statusBg}; color:${statusColor};">${statusIcon} ${p.status}</span>
           </div>
         `;
         container.appendChild(card);
@@ -2748,6 +3334,11 @@
 
         actualizarChipsEstado(p.status || 'Diseño');
         renderTasksList();
+        renderProjectItems();
+      }
+
+      if (document.getElementById('lblClientesCount')) {
+        document.getElementById('lblClientesCount').innerText = clients.length;
       }
 
       // Consolidado del Negocio
@@ -2877,11 +3468,12 @@
 
     // Modal de Datos del Negocio
     function openBusinessProfileModal() {
-      document.getElementById('bizNameInp').value = bizProfile.name;
-      document.getElementById('bizOwnerInp').value = bizProfile.owner;
-      document.getElementById('bizPhoneInp').value = bizProfile.phone;
-      document.getElementById('bizNequiInp').value = bizProfile.nequi;
-      document.getElementById('bizBankInp').value = bizProfile.bancolombia;
+      document.getElementById('bizNameInp').value = bizProfile.name || '';
+      document.getElementById('bizOwnerInp').value = bizProfile.owner || '';
+      document.getElementById('bizPhoneInp').value = bizProfile.phone || '';
+      document.getElementById('bizNequiInp').value = bizProfile.nequi || '';
+      if (document.getElementById('bizDaviplataInp')) document.getElementById('bizDaviplataInp').value = bizProfile.daviplata || '';
+      document.getElementById('bizBankInp').value = bizProfile.bancolombia || '';
       document.getElementById('bizModal').style.display = 'flex';
     }
 
@@ -2899,26 +3491,158 @@
       bizProfile.owner = document.getElementById('bizOwnerInp').value.trim();
       bizProfile.phone = document.getElementById('bizPhoneInp').value.trim();
       bizProfile.nequi = document.getElementById('bizNequiInp').value.trim();
+      if (document.getElementById('bizDaviplataInp')) bizProfile.daviplata = document.getElementById('bizDaviplataInp').value.trim();
       bizProfile.bancolombia = document.getElementById('bizBankInp').value.trim();
 
       document.getElementById('headerTitle').innerText = `${bizProfile.name} • Servicios`;
+      persistirEstadoLocal();
       cerrarBusinessProfileModal();
       showToast(`¡Datos actualizados para "${bizProfile.name}"!`);
     }
 
-    // Modal de Nuevo Pedido / Proyecto de Cliente
-    function abrirModalNuevoPedido() {
-      tempOrderItems = [];
-      document.getElementById('orderNameInp').value = '';
+    // ==========================================
+    // FLUJO DE "TOMAR PEDIDO" & CARRITO DE COTIZACIÓN
+    // ==========================================
+    function actualizarDropdownClientes(selectedId = null) {
+      const sel = document.getElementById('orderClientSelect');
+      if (!sel) return;
+      sel.innerHTML = '<option value="">-- Selecciona un cliente registrado --</option>';
+      clients.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.innerText = `${c.name} (${c.phone || 'Sin WhatsApp'})`;
+        if (selectedId && c.id === selectedId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      const optNew = document.createElement('option');
+      optNew.value = '__NEW__';
+      optNew.innerText = '➕ Crear nuevo cliente al vuelo...';
+      sel.appendChild(optNew);
+    }
+
+    function alCambiarClienteSelect(val) {
+      if (val === '__NEW__') {
+        mostrarCrearClienteAlVuelo(true);
+        return;
+      }
+      mostrarCrearClienteAlVuelo(false);
+      const found = clients.find(c => c.id === val);
+      if (found) {
+        seleccionarClienteParaPedido(found);
+      } else {
+        limpiarClienteSeleccionado();
+      }
+    }
+
+    function seleccionarClienteParaPedido(c) {
+      selectedOrderClientId = c.id;
+      document.getElementById('orderClientInp').value = c.name;
+      document.getElementById('orderPhoneInp').value = c.phone || '';
+      document.getElementById('orderClientIdInp').value = c.id;
+
+      const initials = c.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase() || 'CL';
+      document.getElementById('lblSelectedCliAvatar').innerText = initials;
+      document.getElementById('lblSelectedCliName').innerText = c.name;
+      document.getElementById('lblSelectedCliDetail').innerText = `📱 ${c.phone || 'Sin WhatsApp'}${c.document ? ' • CC/NIT: ' + c.document : ''}`;
+      document.getElementById('selectedClientBadge').style.display = 'flex';
+      document.getElementById('boxSelectExistingClient').style.display = 'none';
+    }
+
+    function limpiarClienteSeleccionado() {
+      selectedOrderClientId = null;
       document.getElementById('orderClientInp').value = '';
       document.getElementById('orderPhoneInp').value = '';
+      document.getElementById('orderClientIdInp').value = '';
+      document.getElementById('selectedClientBadge').style.display = 'none';
+      document.getElementById('boxSelectExistingClient').style.display = 'block';
+      document.getElementById('orderClientSelect').value = '';
+    }
+
+    function toggleCrearClienteRapido() {
+      const box = document.getElementById('boxQuickCreateClient');
+      if (!box) return;
+      const isHidden = box.style.display === 'none' || !box.style.display;
+      mostrarCrearClienteAlVuelo(isHidden);
+    }
+
+    function mostrarCrearClienteAlVuelo(show) {
+      const box = document.getElementById('boxQuickCreateClient');
+      const btn = document.getElementById('btnToggleQuickClient');
+      if (box) box.style.display = show ? 'block' : 'none';
+      if (btn) btn.innerText = show ? '✕ Cancelar Creación' : '+ Crear Nuevo Cliente';
+      if (show) {
+        setTimeout(() => document.getElementById('quickCliNameInp')?.focus(), 80);
+      }
+    }
+
+    function guardarClienteRapidoEnPedido() {
+      const name = (document.getElementById('quickCliNameInp')?.value || '').trim();
+      const phone = (document.getElementById('quickCliPhoneInp')?.value || '').trim();
+      const doc = (document.getElementById('quickCliDocInp')?.value || '').trim();
+
+      if (!name || !phone) {
+        showToast('Ingresa al menos nombre y teléfono del cliente.');
+        return;
+      }
+
+      const newCli = {
+        id: 'cli_' + Date.now(),
+        name: name,
+        phone: phone,
+        document: doc || '',
+        email: '',
+        address: '',
+        notes: '',
+        createdAt: new Date().toISOString()
+      };
+
+      clients.unshift(newCli);
+      persistirEstadoLocal();
+      actualizarDropdownClientes(newCli.id);
+      seleccionarClienteParaPedido(newCli);
+      mostrarCrearClienteAlVuelo(false);
+      
+      document.getElementById('quickCliNameInp').value = '';
+      document.getElementById('quickCliPhoneInp').value = '';
+      document.getElementById('quickCliDocInp').value = '';
+
+      if (document.getElementById('lblClientesCount')) {
+        document.getElementById('lblClientesCount').innerText = clients.length;
+      }
+      showToast(`✓ Cliente "${name}" guardado y seleccionado`);
+    }
+
+    function abrirModalNuevoPedido(preselectedClientId = null) {
+      tempOrderItems = [];
+      document.getElementById('orderNameInp').value = '';
       document.getElementById('orderServicesInp').value = '';
       document.getElementById('orderTotalInp').value = '';
-      document.getElementById('orderAdvanceInp').value = '';
+      document.getElementById('orderAdvanceInp').value = '0';
       document.getElementById('orderDaysInp').value = '5';
+      if (document.getElementById('orderInitialStatusInp')) {
+        document.getElementById('orderInitialStatusInp').value = 'Cotización';
+      }
+
+      actualizarDropdownClientes();
+      limpiarClienteSeleccionado();
+      mostrarCrearClienteAlVuelo(false);
+
+      if (preselectedClientId) {
+        const c = clients.find(x => x.id === preselectedClientId);
+        if (c) {
+          document.getElementById('orderClientSelect').value = c.id;
+          seleccionarClienteParaPedido(c);
+          document.getElementById('orderNameInp').value = `Pedido para ${c.name.split(' ')[0]}`;
+        }
+      }
+
       renderNewOrderItems();
       document.getElementById('newOrderModal').style.display = 'flex';
-      setTimeout(() => document.getElementById('orderNameInp').focus(), 100);
+      setTimeout(() => {
+        if (!preselectedClientId) {
+          document.getElementById('orderNameInp').focus();
+        }
+      }, 100);
     }
 
     function cerrarNuevoPedidoModal() {
@@ -2930,13 +3654,19 @@
       const name = document.getElementById('orderNameInp').value.trim();
       const client = document.getElementById('orderClientInp').value.trim();
       const phone = document.getElementById('orderPhoneInp').value.trim() || '312 000 0000';
+      const clientId = document.getElementById('orderClientIdInp').value.trim() || selectedOrderClientId;
       let services = document.getElementById('orderServicesInp').value.trim();
       const total = parseFloat(document.getElementById('orderTotalInp').value) || 0;
       const advance = parseFloat(document.getElementById('orderAdvanceInp').value) || 0;
       const days = parseInt(document.getElementById('orderDaysInp').value) || 5;
+      const initialStatus = document.getElementById('orderInitialStatusInp')?.value || 'Cotización';
 
-      if (!name || !client || total <= 0) {
-        showToast('Ingresa nombre del pedido, cliente y valor total.');
+      if (!client) {
+        showToast('Selecciona o crea un cliente para el pedido.');
+        return;
+      }
+      if (!name || total <= 0) {
+        showToast('Ingresa nombre del pedido y agrega artículos para el total.');
         return;
       }
 
@@ -2960,6 +3690,7 @@
 
       const newProj = {
         id: projectsData.length + 1,
+        clientId: clientId || null,
         name: name,
         client: client,
         phone: phone,
@@ -2969,7 +3700,7 @@
         cobrado: advance,
         directCompras: 0,
         daysLeft: days,
-        status: 'Diseño',
+        status: initialStatus,
         tasks: [
           { id: Date.now() + 1, title: 'Definir requerimientos y boceto inicial', isDone: false, isPurchase: false, cost: 0 },
           { id: Date.now() + 2, title: 'Comprar materiales o insumos específicos', isDone: false, isPurchase: true, cost: 0 },
@@ -2984,7 +3715,189 @@
       cerrarNuevoPedidoModal();
       recalcularTodo();
       verDetalleProyecto(0);
-      showToast(`✓ ¡Pedido "${name}" de ${client} creado!`);
+
+      if (initialStatus === 'Cotización') {
+        showToast(`✓ ¡Cotización "${name}" para ${client} lista!`);
+      } else {
+        showToast(`✓ ¡Pedido "${name}" de ${client} creado!`);
+      }
+    }
+
+    function aprobarCotizacionActual() {
+      const p = projectsData[selectedProjectIdx];
+      if (!p) return;
+      p.status = 'Diseño';
+      persistirEstadoLocal();
+      recalcularTodo();
+      showToast('✓ ¡Cotización aprobada por el cliente! Proyecto iniciado.');
+    }
+
+    // ==========================================
+    // FACTURA / RECIBO DE PAGO EJECUTIVO
+    // ==========================================
+    function abrirFacturaRecibo() {
+      const p = projectsData[selectedProjectIdx];
+      if (!p) return;
+
+      const saldo = Math.max(0, p.total - p.cobrado);
+      const clientObj = clients.find(c => c.id === p.clientId || c.phone === p.phone || c.name === p.client);
+
+      document.getElementById('recBizName').innerText = (bizProfile.name || 'ZENTRA').toUpperCase();
+      document.getElementById('recBizContact').innerText = `${bizProfile.owner || 'Administración'} • Tel: ${bizProfile.phone || '312 000 0000'}`;
+      
+      document.getElementById('recOrderNum').innerText = `#PED-${String(p.id).padStart(4, '0')}`;
+      document.getElementById('recOrderDate').innerText = new Date().toLocaleDateString('es-CO');
+      
+      document.getElementById('recClientName').innerText = p.client || 'Cliente General';
+      document.getElementById('recClientPhone').innerText = p.phone || 'No registrado';
+      document.getElementById('recClientDoc').innerText = (clientObj && clientObj.document) ? clientObj.document : 'N/A';
+      
+      document.getElementById('recProjName').innerText = p.name;
+      
+      const badgeEl = document.getElementById('recProjStatusBadge');
+      if (badgeEl) {
+        let icon = '🎨';
+        if (p.status === 'Cotización') icon = '📋';
+        if (p.status === 'Producción') icon = '✂️';
+        if (p.status === 'Empaque') icon = '📦';
+        if (p.status === 'Entregado') icon = '✅';
+        badgeEl.innerText = `${icon} ${p.status}`;
+      }
+
+      const tbody = document.getElementById('recTableBody');
+      tbody.innerHTML = '';
+      if (p.items && p.items.length > 0) {
+        p.items.forEach(it => {
+          const tr = document.createElement('tr');
+          const unit = it.unitPrice || 0;
+          const sub = it.subtotal || (it.quantity * unit);
+          tr.innerHTML = `
+            <td style="font-weight:700; color:#0B1C30;">${it.quantity}x</td>
+            <td>
+              <div style="font-weight:600; color:#1E293B;">${it.name}</div>
+            </td>
+            <td style="text-align:right; color:#64748B;">$${unit.toLocaleString('es-CO')}</td>
+            <td style="text-align:right; font-weight:700; color:#0B1C30;">$${sub.toLocaleString('es-CO')}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } else {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight:700;">1x</td>
+          <td><div style="font-weight:600;">${p.services || p.name}</div></td>
+          <td style="text-align:right; color:#64748B;">$${p.total.toLocaleString('es-CO')}</td>
+          <td style="text-align:right; font-weight:700;">$${p.total.toLocaleString('es-CO')}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById('recTotalVal').innerText = `$${p.total.toLocaleString('es-CO')}`;
+      document.getElementById('recCobradoVal').innerText = `$${p.cobrado.toLocaleString('es-CO')}`;
+      document.getElementById('recSaldoVal').innerText = `$${saldo.toLocaleString('es-CO')}`;
+      
+      const stampEl = document.getElementById('recPaymentStatusStamp');
+      if (saldo <= 0) {
+        stampEl.style.background = '#ECFDF5';
+        stampEl.style.border = '1.5px solid #10B981';
+        stampEl.style.color = '#047857';
+        stampEl.innerHTML = '✓ PEDIDO PAGADO EN SU TOTALIDAD';
+      } else {
+        stampEl.style.background = '#FFFBEB';
+        stampEl.style.border = '1px solid #FCD34D';
+        stampEl.style.color = '#B45309';
+        stampEl.innerHTML = `⏳ SALDO PENDIENTE POR COBRAR: $${saldo.toLocaleString('es-CO')}`;
+      }
+
+      document.getElementById('recNequiNum').innerText = bizProfile.nequi || bizProfile.phone || 'Consultar';
+      document.getElementById('recDaviplataNum').innerText = bizProfile.daviplata || bizProfile.phone || 'Consultar';
+      document.getElementById('recBankNum').innerText = bizProfile.bancolombia || 'Cuenta registrada';
+
+      document.getElementById('invoiceReceiptModal').style.display = 'flex';
+    }
+
+    function cerrarFacturaRecibo() {
+      document.getElementById('invoiceReceiptModal').style.display = 'none';
+    }
+
+    function enviarReciboWhatsApp() {
+      const p = projectsData[selectedProjectIdx];
+      if (!p) return;
+      const saldo = Math.max(0, p.total - p.cobrado);
+      const clientObj = clients.find(c => c.id === p.clientId || c.phone === p.phone || c.name === p.client);
+      const clientDoc = clientObj && clientObj.document ? `\n📄 *Cédula/NIT:* ${clientObj.document}` : '';
+
+      let itemsBreakdown = '';
+      if (p.items && p.items.length > 0) {
+        itemsBreakdown = '\n📦 *DETALLE DE ARTÍCULOS:*\n' + 
+          p.items.map(it => `• ${it.quantity}x ${it.name} ($${it.unitPrice.toLocaleString('es-CO')} c/u) = $${(it.subtotal || it.quantity * it.unitPrice).toLocaleString('es-CO')}`).join('\n') + '\n';
+      } else {
+        itemsBreakdown = `\n📦 *Concepto:* ${p.services || p.name}\n`;
+      }
+
+      const estadoBadge = saldo <= 0 ? '✅ TOTALMENTE CANCELADO' : `⏳ SALDO PENDIENTE: $${saldo.toLocaleString('es-CO')}`;
+
+      const msg = 
+`🧾 *COMPROBANTE DE PEDIDO / FACTURA*
+✨ *${(bizProfile.name || 'ZENTRA').toUpperCase()}* ✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏷️ *N° de Pedido:* #PED-${String(p.id).padStart(4, '0')}
+📋 *Proyecto:* ${p.name}
+👤 *Cliente:* ${p.client}${clientDoc}
+📅 *Fecha:* ${new Date().toLocaleDateString('es-CO')}
+${itemsBreakdown}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 *RESUMEN DE CUENTA:*
+• *Valor Total:* $${p.total.toLocaleString('es-CO')}
+• *Abonado a la fecha:* $${p.cobrado.toLocaleString('es-CO')}
+• *ESTADO:* ${estadoBadge}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏦 *MEDIOS DE PAGO HABILITADOS:*
+• 📱 *Nequi:* ${bizProfile.nequi || bizProfile.phone || 'Consultar'}
+• 🟡 *Daviplata:* ${bizProfile.daviplata || bizProfile.phone || 'Consultar'}
+• 🔵 *Bancolombia:* ${bizProfile.bancolombia || 'Consultar cuenta'}
+• 💵 *Efectivo contra entrega*
+📞 *Contacto:* ${bizProfile.phone || ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+¡Muchas gracias por su confianza y preferencia! 🌸`;
+
+      const cleanPhone = (p.phone || '').replace(/\D/g, '');
+      const url = cleanPhone ? `https://wa.me/57${cleanPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+      showToast('✓ Abriendo WhatsApp con el recibo...');
+    }
+
+    function copiarTextoRecibo() {
+      const p = projectsData[selectedProjectIdx];
+      if (!p) return;
+      const saldo = Math.max(0, p.total - p.cobrado);
+      const clientObj = clients.find(c => c.id === p.clientId || c.phone === p.phone || c.name === p.client);
+      const clientDoc = clientObj && clientObj.document ? `\n📄 Cédula/NIT: ${clientObj.document}` : '';
+
+      let itemsBreakdown = '';
+      if (p.items && p.items.length > 0) {
+        itemsBreakdown = '\nDETALLE DE ARTÍCULOS:\n' + 
+          p.items.map(it => `• ${it.quantity}x ${it.name} - $${(it.subtotal || it.quantity * it.unitPrice).toLocaleString('es-CO')}`).join('\n') + '\n';
+      } else {
+        itemsBreakdown = `\nConcepto: ${p.services || p.name}\n`;
+      }
+
+      const text = `COMPROBANTE DE PEDIDO / FACTURA - ${(bizProfile.name || 'ZENTRA').toUpperCase()}\n` +
+        `N°: #PED-${String(p.id).padStart(4, '0')} | Fecha: ${new Date().toLocaleDateString('es-CO')}\n` +
+        `Cliente: ${p.client}${clientDoc}\n` +
+        `Proyecto: ${p.name}\n` +
+        `${itemsBreakdown}\n` +
+        `Total: $${p.total.toLocaleString('es-CO')}\n` +
+        `Abonado: $${p.cobrado.toLocaleString('es-CO')}\n` +
+        `Saldo: $${saldo.toLocaleString('es-CO')}\n\n` +
+        `Medios de pago:\n- Nequi: ${bizProfile.nequi || bizProfile.phone}\n- Daviplata: ${bizProfile.daviplata || bizProfile.phone}\n- Bancolombia: ${bizProfile.bancolombia}`;
+
+      navigator.clipboard.writeText(text).catch(() => {});
+      showToast('✓ Texto del recibo copiado al portapapeles');
+    }
+
+    function imprimirFacturaRecibo() {
+      window.print();
     }
 
     // Desglose
@@ -3106,11 +4019,13 @@
     }
 
     function actualizarChipsEstado(currentStatus) {
-      ['diseno', 'produccion', 'empaque', 'entregado'].forEach(id => {
+      ['cotizacion', 'diseno', 'produccion', 'empaque', 'entregado'].forEach(id => {
         const el = document.getElementById(`chip-${id}`);
         if (el) el.classList.remove('active');
       });
-      if (currentStatus === 'Diseño' && document.getElementById('chip-diseno')) {
+      if (currentStatus === 'Cotización' && document.getElementById('chip-cotizacion')) {
+        document.getElementById('chip-cotizacion').classList.add('active');
+      } else if (currentStatus === 'Diseño' && document.getElementById('chip-diseno')) {
         document.getElementById('chip-diseno').classList.add('active');
       } else if (currentStatus === 'Producción' && document.getElementById('chip-produccion')) {
         document.getElementById('chip-produccion').classList.add('active');
@@ -3118,6 +4033,11 @@
         document.getElementById('chip-empaque').classList.add('active');
       } else if (currentStatus === 'Entregado' && document.getElementById('chip-entregado')) {
         document.getElementById('chip-entregado').classList.add('active');
+      }
+
+      const bCotiz = document.getElementById('mCotizacionBanner');
+      if (bCotiz) {
+        bCotiz.style.display = currentStatus === 'Cotización' ? 'flex' : 'none';
       }
     }
 

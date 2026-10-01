@@ -9,6 +9,7 @@ import 'features/projects/providers/projects_provider.dart';
 import 'features/retail/providers/retail_provider.dart';
 import 'features/profile/providers/business_profile_provider.dart';
 import 'features/inventory/providers/inventory_provider.dart';
+import 'features/clients/providers/clients_provider.dart';
 
 import 'features/retail/screens/retail_main_screen.dart';
 import 'core/layout/main_layout_screen.dart';
@@ -39,6 +40,7 @@ class ZentraApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ProjectsProvider()),
         ChangeNotifierProvider(create: (_) => RetailProvider()),
         ChangeNotifierProvider(create: (_) => InventoryProvider()),
+        ChangeNotifierProvider(create: (_) => ClientsProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {

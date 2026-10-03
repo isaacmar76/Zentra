@@ -29,6 +29,7 @@ class ZentraThemePalette {
   ThemeData toThemeData() {
     return ThemeData(
       useMaterial3: true,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: background,
       colorScheme: ColorScheme.light(
         primary: primary,
@@ -39,7 +40,10 @@ class ZentraThemePalette {
         onSecondary: Colors.white,
         onSurface: textDark,
       ),
-      textTheme: GoogleFonts.poppinsTextTheme().copyWith(
+      textTheme: GoogleFonts.poppinsTextTheme().apply(
+        bodyColor: textDark,
+        displayColor: textDark,
+      ).copyWith(
         displayLarge: GoogleFonts.poppins(
           fontSize: 24,
           fontWeight: FontWeight.bold,
@@ -48,6 +52,11 @@ class ZentraThemePalette {
         titleLarge: GoogleFonts.poppins(
           fontSize: 18,
           fontWeight: FontWeight.bold,
+          color: textDark,
+        ),
+        titleMedium: GoogleFonts.poppins(
+          fontSize: 15,
+          fontWeight: FontWeight.normal,
           color: textDark,
         ),
         bodyLarge: GoogleFonts.poppins(
@@ -99,6 +108,7 @@ class ZentraThemePalette {
           borderSide: BorderSide(color: secondary, width: 2),
         ),
         labelStyle: TextStyle(color: textDark),
+        hintStyle: TextStyle(color: textDark.withOpacity(0.55)),
         prefixIconColor: textDark,
       ),
       appBarTheme: AppBarTheme(

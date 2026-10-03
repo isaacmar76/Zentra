@@ -115,6 +115,7 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
               const SizedBox(height: 24),
               TextField(
                 controller: _nameController,
+                style: TextStyle(color: theme.textDark),
                 decoration: const InputDecoration(
                   labelText: 'Nombre de tu Negocio / Marca *',
                   hintText: 'Ej: Mi Taller Creativo, Tienda El Carmen',
@@ -124,6 +125,7 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _ownerController,
+                style: TextStyle(color: theme.textDark),
                 decoration: const InputDecoration(
                   labelText: 'Tu Nombre (Propietario/a) *',
                   hintText: 'Ej: María Gómez',
@@ -133,6 +135,7 @@ class _ModeSelectionScreenState extends State<ModeSelectionScreen> {
               const SizedBox(height: 16),
               TextField(
                 controller: _phoneController,
+                style: TextStyle(color: theme.textDark),
                 keyboardType: TextInputType.phone,
                 decoration: const InputDecoration(
                   labelText: 'Teléfono WhatsApp (Opcional)',

@@ -167,6 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 32),
                   TextField(
                     controller: _emailController,
+                    style: TextStyle(color: theme.textDark),
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       labelText: 'Correo Electrónico',
@@ -176,6 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
+                    style: TextStyle(color: theme.textDark),
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: 'Contraseña',

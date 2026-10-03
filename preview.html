@@ -159,6 +159,18 @@
       transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
     }
 
+    /* Garantía global de contraste y legibilidad para todos los inputs y campos de formulario */
+    input, select, textarea {
+      color: var(--text) !important;
+      -webkit-text-fill-color: var(--text) !important;
+      font-family: inherit;
+    }
+    input::placeholder, textarea::placeholder {
+      color: var(--text-muted) !important;
+      -webkit-text-fill-color: var(--text-muted) !important;
+      opacity: 0.7;
+    }
+
     h1, h2, h3, h4, .app-title, .metric-display, .stat-value, .item-title, .pos-price, .font-headline {
       font-family: 'Plus Jakarta Sans', sans-serif;
       letter-spacing: -0.02em;
@@ -454,10 +466,11 @@
     /* Estilos Auth Screen (Login vs Registro) */
     .auth-tabs {
       display: flex;
-      background: #ECEEF2;
+      background: #F1F5F9;
       padding: 4px;
       border-radius: 14px;
       margin-bottom: 16px;
+      border: 1px solid #E2E8F0;
     }
     .auth-tab-btn {
       flex: 1;
@@ -467,15 +480,87 @@
       border-radius: 10px;
       font-size: 12.5px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: #64748B;
       cursor: pointer;
       transition: all 0.2s ease;
     }
     .auth-tab-btn.active {
       background: #FFFFFF;
-      color: var(--text);
+      color: #0B1C30;
       font-weight: 700;
       box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    /* ==============================================================
+       MODAL DE ACCESO Y REGISTRO (authScreenModal)
+       Garantía absoluta de contraste: Fondo blanco (#FFFFFF) y texto oscuro (#0F172A)
+       para que NUNCA se vuelva blanco sobre blanco independientemente del tema.
+       ============================================================== */
+    #authScreenModal {
+      color: #0F172A !important;
+      color-scheme: light !important;
+    }
+    #authScreenModal .auth-card {
+      background: #FFFFFF !important;
+      color: #0F172A !important;
+      border: 1px solid #E2E8F0 !important;
+      color-scheme: light !important;
+    }
+    #authScreenModal .auth-title {
+      color: #0B1C30 !important;
+    }
+    #authScreenModal .auth-sub {
+      color: #64748B !important;
+    }
+    #authScreenModal label {
+      color: #0B1C30 !important;
+      font-weight: 700 !important;
+      opacity: 1 !important;
+    }
+    #authScreenModal input,
+    #authScreenModal input[type="text"],
+    #authScreenModal input[type="password"],
+    #authScreenModal input[type="number"],
+    #authScreenModal input[type="tel"],
+    #authScreenModal input[type="email"] {
+      background-color: #FFFFFF !important;
+      color: #0F172A !important;
+      -webkit-text-fill-color: #0F172A !important;
+      border: 1.5px solid #CBD5E1 !important;
+      font-size: 13.5px !important;
+      font-weight: 600 !important;
+      border-radius: 12px !important;
+      box-shadow: none !important;
+      color-scheme: light !important;
+    }
+    #authScreenModal input:focus {
+      background-color: #FFFFFF !important;
+      border-color: #006C46 !important;
+      color: #0F172A !important;
+      -webkit-text-fill-color: #0F172A !important;
+      outline: none !important;
+      box-shadow: 0 0 0 3px rgba(0, 108, 70, 0.16) !important;
+    }
+    #authScreenModal input::placeholder {
+      color: #94A3B8 !important;
+      -webkit-text-fill-color: #94A3B8 !important;
+      opacity: 1 !important;
+      font-weight: 400 !important;
+    }
+    #authScreenModal .auth-tabs {
+      background: #F1F5F9 !important;
+      border: 1px solid #E2E8F0 !important;
+    }
+    #authScreenModal .auth-tab-btn {
+      color: #64748B !important;
+      -webkit-text-fill-color: #64748B !important;
+    }
+    #authScreenModal .auth-tab-btn.active {
+      background: #FFFFFF !important;
+      color: #0B1C30 !important;
+      -webkit-text-fill-color: #0B1C30 !important;
+      font-weight: 800 !important;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
     }
 
     .alert-btn {
@@ -1472,21 +1557,21 @@
 
     <!-- Modal de Acceso / Auth Screen: Iniciar Sesión vs Crear Negocio -->
     <div id="authScreenModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); backdrop-filter:blur(3px); z-index:500; align-items:center; justify-content:center; padding:16px;">
-      <div style="background:#FFFFFF; width:100%; max-width:360px; border-radius:26px; padding:22px 18px; color:var(--text); box-shadow:0 15px 40px rgba(0,0,0,0.25); max-height:92%; overflow-y:auto; border:1px solid #ECEEF2;">
+      <div class="auth-card" style="background:#FFFFFF; width:100%; max-width:360px; border-radius:26px; padding:22px 18px; color:#0F172A; box-shadow:0 15px 40px rgba(0,0,0,0.25); max-height:92%; overflow-y:auto; border:1px solid #E2E8F0;">
         
         <!-- Header del Portal de Acceso -->
         <div style="text-align:center; margin-bottom:14px;">
-          <img src="img/zentra-logo.png" alt="Zentra Logo" style="width:76px; height:76px; object-fit:contain; margin-bottom:8px; border-radius:18px; background:#FFFFFF; padding:4px; box-shadow:0 4px 14px rgba(11,28,48,0.08); border:1px solid var(--surface-border); display:inline-block;">
-          <div style="font-size:19px; font-weight:800; color:var(--text); font-family:'Plus Jakarta Sans'; letter-spacing:-0.02em;">Portal Zentra</div>
-          <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Finanzas sin caos • Control ágil de tu negocio</div>
+          <img src="img/zentra-logo.png" alt="Zentra Logo" style="width:76px; height:76px; object-fit:contain; margin-bottom:8px; border-radius:18px; background:#FFFFFF; padding:4px; box-shadow:0 4px 14px rgba(11,28,48,0.08); border:1px solid #E2E8F0; display:inline-block;">
+          <div class="auth-title" style="font-size:19px; font-weight:800; color:#0B1C30; font-family:'Plus Jakarta Sans'; letter-spacing:-0.02em;">Portal Zentra</div>
+          <div class="auth-sub" style="font-size:11.5px; color:#64748B; margin-top:2px;">Finanzas sin caos • Control ágil de tu negocio</div>
         </div>
 
         <!-- Selector de Pestañas: Iniciar Sesión vs Crear Negocio -->
-        <div class="auth-tabs" id="authTabsContainer">
-          <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">
+        <div class="auth-tabs" id="authTabsContainer" style="background:#F1F5F9; border:1px solid #E2E8F0;">
+          <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')" style="color:#0B1C30;">
             <span>🔑 Iniciar Sesión</span>
           </button>
-          <button class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">
+          <button class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')" style="color:#64748B;">
             <span>✨ Crear Negocio</span>
           </button>
         </div>
@@ -1494,30 +1579,30 @@
         <!-- Vista: INICIAR SESIÓN -->
         <div id="authSecLogin">
           <div style="margin-bottom:12px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:var(--text);">Correo, Usuario o Celular Registrado</label>
-            <input type="text" id="loginUserInp" placeholder="Ej: tatiana@tmdisenos.com o 3124567890" style="width:100%; padding:10px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:#0B1C30;">Correo, Usuario o Celular Registrado</label>
+            <input type="text" id="loginUserInp" placeholder="Ej: tatiana@tmdisenos.com o 3124567890" style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
           </div>
           <div style="margin-bottom:16px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:var(--text);">Contraseña o PIN Secreto</label>
-            <input type="password" id="loginPassInp" placeholder="••••••••" style="width:100%; padding:10px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:#0B1C30;">Contraseña o PIN Secreto</label>
+            <input type="password" id="loginPassInp" placeholder="••••••••" style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
           </div>
           <button onclick="iniciarSesionUsuario()" class="primary-btn" style="padding:12px; font-weight:800; font-size:13.5px; margin-bottom:10px;">
             ENTRAR A MI NEGOCIO
           </button>
-          <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:6px;">
+          <div style="text-align:center; font-size:11px; color:#64748B; margin-top:6px;">
             ¿Aún no tienes un negocio registrado? <br>
-            <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color:var(--primary); font-weight:700; text-decoration:none;">Crear nuevo negocio aquí</a>
+            <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color:#006C46; font-weight:700; text-decoration:none;">Crear nuevo negocio aquí</a>
           </div>
         </div>
 
         <!-- Vista: SELECCIONAR NEGOCIO AUTORIZADO (Para usuarios con más de un negocio) -->
         <div id="authSecPickBiz" style="display:none;">
-          <div style="font-size:13.5px; font-weight:800; color:var(--text); margin-bottom:4px;">Selecciona tu Negocio</div>
-          <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">Estás autorizado(a) en los siguientes negocios. Toca el negocio para ingresar a sus datos exclusivos:</div>
+          <div style="font-size:13.5px; font-weight:800; color:#0B1C30; margin-bottom:4px;">Selecciona tu Negocio</div>
+          <div style="font-size:11px; color:#64748B; margin-bottom:12px; line-height:1.4;">Estás autorizado(a) en los siguientes negocios. Toca el negocio para ingresar a sus datos exclusivos:</div>
           <div id="authPickBizList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:220px; overflow-y:auto;">
             <!-- Renderizado dinámico de negocios autorizados -->
           </div>
-          <button onclick="switchAuthTab('login')" style="width:100%; padding:9px; border:1px solid #ECEEF2; background:transparent; border-radius:12px; font-size:12px; font-weight:700; color:var(--text-muted); cursor:pointer;">
+          <button onclick="switchAuthTab('login')" style="width:100%; padding:9px; border:1px solid #CBD5E1; background:transparent; border-radius:12px; font-size:12px; font-weight:700; color:#64748B; cursor:pointer;">
             ← Volver a Ingresar Datos
           </button>
         </div>
@@ -1525,48 +1610,48 @@
         <!-- Vista: CREAR NEGOCIO -->
         <div id="authSecRegister" style="display:none;">
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:var(--text);">1. Nombre del Negocio / Marca *</label>
-            <input type="text" id="setupNameInp" placeholder="Ej: TM Diseños Creativos" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:#0B1C30;">1. Nombre del Negocio / Marca *</label>
+            <input type="text" id="setupNameInp" placeholder="Ej: TM Diseños Creativos" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
           </div>
 
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:var(--text);">2. Propietario(a) *</label>
-            <input type="text" id="setupOwnerInp" placeholder="Ej: Tatiana Marín" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:#0B1C30;">2. Propietario(a) *</label>
+            <input type="text" id="setupOwnerInp" placeholder="Ej: Tatiana Marín" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
           </div>
 
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:var(--text);">3. Teléfono WhatsApp (Opcional)</label>
-            <input type="text" id="setupPhoneInp" placeholder="Ej: 312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:#0B1C30;">3. Teléfono WhatsApp (Opcional)</label>
+            <input type="text" id="setupPhoneInp" placeholder="Ej: 312 456 7890" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
           </div>
 
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:var(--text);">4. PIN Secreto de Acceso (4 dígitos) *</label>
-            <input type="password" maxlength="6" id="setupPinInp" placeholder="Ej: 1234" value="1234" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:13px; box-sizing:border-box;">
-            <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">Contraseña para ingresar exclusivamente a este negocio.</div>
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:#0B1C30;">4. PIN Secreto de Acceso (4 dígitos) *</label>
+            <input type="password" maxlength="6" id="setupPinInp" placeholder="Ej: 1234" value="1234" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
+            <div style="font-size:10px; color:#64748B; margin-top:2px;">Contraseña para ingresar exclusivamente a este negocio.</div>
           </div>
 
           <div style="margin-bottom:14px;">
-            <label style="font-size:11.5px; font-weight:700; display:block; margin-bottom:6px; color:var(--text);">5. Selecciona tu Modelo de Negocio *</label>
+            <label style="font-size:11.5px; font-weight:700; display:block; margin-bottom:6px; color:#0B1C30;">5. Selecciona tu Modelo de Negocio *</label>
             <div style="display:flex; flex-direction:column; gap:8px;" id="setupModeCards">
-              <div id="cardSetupServicios" onclick="selectSetupMode('servicios')" style="border:2px solid var(--secondary); background:var(--secondary-soft); border-radius:14px; padding:10px; cursor:pointer;">
+              <div id="cardSetupServicios" onclick="selectSetupMode('servicios')" style="border:2px solid #006C46; background:#F0FDF4; border-radius:14px; padding:10px; cursor:pointer;">
                 <div style="display:flex; align-items:flex-start; gap:8px;">
                   <span style="font-size:20px;">🎨</span>
                   <div style="flex:1;">
-                    <div style="font-weight:700; font-size:12px; color:var(--text);">SERVICIOS / POR ENCARGO</div>
-                    <div style="font-size:10px; color:var(--text-muted); margin-top:2px; line-height:1.3;">Proyectos por cliente, compras de insumos, checklist y cotizaciones WhatsApp.</div>
+                    <div class="mode-title" id="txtSetupServiciosTitle" style="font-weight:700; font-size:12px; color:#006C46;">SERVICIOS / POR ENCARGO</div>
+                    <div style="font-size:10px; color:#475569; margin-top:2px; line-height:1.3;">Proyectos por cliente, compras de insumos, checklist y cotizaciones WhatsApp.</div>
                   </div>
-                  <input type="radio" name="setupModeRadio" id="radioServicios" checked style="accent-color:var(--secondary); margin-top:4px;">
+                  <input type="radio" name="setupModeRadio" id="radioServicios" checked style="accent-color:#006C46; margin-top:4px;">
                 </div>
               </div>
 
-              <div id="cardSetupRetail" onclick="selectSetupMode('retail')" style="border:1.5px solid #ECEEF2; background:#FFFFFF; border-radius:14px; padding:10px; cursor:pointer;">
+              <div id="cardSetupRetail" onclick="selectSetupMode('retail')" style="border:1.5px solid #CBD5E1; background:#FFFFFF; border-radius:14px; padding:10px; cursor:pointer;">
                 <div style="display:flex; align-items:flex-start; gap:8px;">
                   <span style="font-size:20px;">🛒</span>
                   <div style="flex:1;">
-                    <div style="font-weight:700; font-size:12px; color:var(--text);">RETAIL / MOSTRADOR</div>
-                    <div style="font-size:10px; color:var(--text-muted); margin-top:2px; line-height:1.3;">Tienda, minimercado, papelería de mostrador. Punto de venta POS, control de stock y caja.</div>
+                    <div class="mode-title" id="txtSetupRetailTitle" style="font-weight:700; font-size:12px; color:#0F172A;">RETAIL / MOSTRADOR</div>
+                    <div style="font-size:10px; color:#475569; margin-top:2px; line-height:1.3;">Tienda, minimercado, papelería de mostrador. Punto de venta POS, control de stock y caja.</div>
                   </div>
-                  <input type="radio" name="setupModeRadio" id="radioRetail" style="accent-color:var(--secondary); margin-top:4px;">
+                  <input type="radio" name="setupModeRadio" id="radioRetail" style="accent-color:#006C46; margin-top:4px;">
                 </div>
               </div>
             </div>
@@ -1575,9 +1660,9 @@
           <button onclick="guardarNegocioOnboarding()" class="primary-btn" style="padding:12px; font-weight:800; font-size:13.5px; margin-bottom:10px;">
             CREAR NEGOCIO Y COMENZAR
           </button>
-          <div style="text-align:center; font-size:11px; color:var(--text-muted); margin-top:6px;">
+          <div style="text-align:center; font-size:11px; color:#64748B; margin-top:6px;">
             ¿Ya tienes un negocio registrado? <br>
-            <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color:var(--secondary); font-weight:700; text-decoration:none;">Iniciar sesión aquí</a>
+            <a href="javascript:void(0)" onclick="switchAuthTab('login')" style="color:#006C46; font-weight:700; text-decoration:none;">Iniciar sesión aquí</a>
           </div>
         </div>
       </div>
@@ -1651,11 +1736,11 @@
           <div id="boxQuickCreateClient" style="display:none; margin-top:8px; padding-top:8px; border-top:1px dashed #CBD5E1;">
             <div style="font-size:10.5px; font-weight:700; color:var(--primary); margin-bottom:6px;">✨ Datos del nuevo cliente:</div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
-              <input type="text" id="quickCliNameInp" placeholder="Nombre completo *" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; font-size:12px; background:#fff;">
-              <input type="text" id="quickCliPhoneInp" placeholder="WhatsApp / Celular *" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; font-size:12px; background:#fff;">
+              <input type="text" id="quickCliNameInp" placeholder="Nombre completo *" style="padding:8px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--bg); color:var(--text);">
+              <input type="text" id="quickCliPhoneInp" placeholder="WhatsApp / Celular *" style="padding:8px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--bg); color:var(--text);">
             </div>
             <div style="display:grid; grid-template-columns:1fr auto; gap:6px;">
-              <input type="text" id="quickCliDocInp" placeholder="Cédula / NIT (opcional)" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; font-size:12px; background:#fff;">
+              <input type="text" id="quickCliDocInp" placeholder="Cédula / NIT (opcional)" style="padding:8px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--bg); color:var(--text);">
               <button type="button" onclick="guardarClienteRapidoEnPedido()" style="background:var(--primary); color:#fff; border:none; padding:8px 12px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
                 Guardar Cliente
               </button>
@@ -1878,7 +1963,7 @@
         </div>
 
         <div style="margin-bottom:10px;">
-          <input type="text" id="pickerSearchInp" oninput="filtrarPickerCatalogo()" placeholder="🔍 Buscar producto (ej: Topper, Portaplatos)..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid #ECEEF2; background:#F8F9FA; color:var(--text); font-size:12.5px; box-sizing:border-box;">
+          <input type="text" id="pickerSearchInp" oninput="filtrarPickerCatalogo()" placeholder="🔍 Buscar producto (ej: Topper, Portaplatos)..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:12.5px; box-sizing:border-box;">
         </div>
 
         <div id="pickerCatalogList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:360px; overflow-y:auto;">
@@ -3100,15 +3185,44 @@
       selectedSetupMode = mode;
       document.getElementById('radioServicios').checked = mode === 'servicios';
       document.getElementById('radioRetail').checked = mode === 'retail';
-      document.getElementById('cardSetupServicios').style.border = mode === 'servicios' ? '2px solid var(--secondary)' : '1.5px solid var(--surface-border)';
-      document.getElementById('cardSetupServicios').style.background = mode === 'servicios' ? 'rgba(224,122,95,0.08)' : 'var(--bg)';
-      document.getElementById('cardSetupRetail').style.border = mode === 'retail' ? '2px solid var(--secondary)' : '1.5px solid var(--surface-border)';
-      document.getElementById('cardSetupRetail').style.background = mode === 'retail' ? 'rgba(224,122,95,0.08)' : 'var(--bg)';
+      
+      const sCard = document.getElementById('cardSetupServicios');
+      const rCard = document.getElementById('cardSetupRetail');
+      const sTitle = document.getElementById('txtSetupServiciosTitle');
+      const rTitle = document.getElementById('txtSetupRetailTitle');
+      
+      if (sCard) {
+        sCard.style.border = mode === 'servicios' ? '2px solid #006C46' : '1.5px solid #CBD5E1';
+        sCard.style.background = mode === 'servicios' ? '#F0FDF4' : '#FFFFFF';
+      }
+      if (sTitle) {
+        sTitle.style.color = mode === 'servicios' ? '#006C46' : '#0B1C30';
+      }
+      if (rCard) {
+        rCard.style.border = mode === 'retail' ? '2px solid #006C46' : '1.5px solid #CBD5E1';
+        rCard.style.background = mode === 'retail' ? '#F0FDF4' : '#FFFFFF';
+      }
+      if (rTitle) {
+        rTitle.style.color = mode === 'retail' ? '#006C46' : '#0B1C30';
+      }
     }
 
     function switchAuthTab(tab) {
-      document.getElementById('tabBtnLogin').classList.toggle('active', tab === 'login');
-      document.getElementById('tabBtnRegister').classList.toggle('active', tab === 'register');
+      const btnLogin = document.getElementById('tabBtnLogin');
+      const btnRegister = document.getElementById('tabBtnRegister');
+      if (btnLogin) {
+        btnLogin.classList.toggle('active', tab === 'login');
+        btnLogin.style.color = tab === 'login' ? '#0B1C30' : '#64748B';
+        btnLogin.style.background = tab === 'login' ? '#FFFFFF' : 'transparent';
+        btnLogin.style.boxShadow = tab === 'login' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none';
+      }
+      if (btnRegister) {
+        btnRegister.classList.toggle('active', tab === 'register');
+        btnRegister.style.color = tab === 'register' ? '#0B1C30' : '#64748B';
+        btnRegister.style.background = tab === 'register' ? '#FFFFFF' : 'transparent';
+        btnRegister.style.boxShadow = tab === 'register' ? '0 2px 6px rgba(0,0,0,0.08)' : 'none';
+      }
+
       document.getElementById('authSecLogin').style.display = tab === 'login' ? 'block' : 'none';
       document.getElementById('authSecRegister').style.display = tab === 'register' ? 'block' : 'none';
       const pickSec = document.getElementById('authSecPickBiz');

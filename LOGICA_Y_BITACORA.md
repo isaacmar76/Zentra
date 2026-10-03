@@ -194,7 +194,8 @@ class CatalogItemModel {
 | **2026-09-30** | `61041bb` | Feature / Auth / Multi-item | CRUD de Usuarios (Dueño vs Colaborador), Catálogo con Fotos (Cámara/Galería), Proyectos Multi-Producto y Cotizaciones WhatsApp | ✅ Completado |
 | **2026-09-30** | `0c59e31` | UI / UX / Design System | Adopción de Sistema Visual Fintech Clarity (nuevo_diseño.md): Plus Jakarta Sans + Inter, Cockpit Hero con micro-gráfica SVG, Bento cards | ✅ Completado |
 | **2026-10-01** | `e1d1f05` | Security / Multi-Tenant | Aislamiento estricto de productos y datos por negocio (multi-tenancy, registro central, llaves namespaced y control de acceso por PIN) | ✅ Completado |
-| **2026-10-01** | `current` | UI / Theming / UX | Colección Fintech Zentra (Clarity, Midnight, Cobalt), preservación de temas personalizados en Perfil/Configuración y retiro del botón del header | ✅ Completado |
+| **2026-10-01** | `bfa4840` | UI / Theming / UX | Colección Fintech Zentra (Clarity, Midnight, Cobalt), preservación de temas personalizados en Perfil/Configuración y retiro del botón del header | ✅ Completado |
+| **2026-10-03** | `current` | Fix / Mobile UX | Blindaje de contraste total en inputs de Registro/Login (solución de texto invisible/blanco en celular y modo oscuro) | ✅ Completado |
 
 ---
 
@@ -326,6 +327,14 @@ class CatalogItemModel {
   - **Configuración de Negocio (`#bizModal`):** Incorporación de la tarjeta "Tema y Apariencia Visual" con el nombre del tema activo y botón para abrir el selector.
   - **Modal de Selección (`#themeModal`):** Clasificación en dos grupos: *💎 Colección Zentra Fintech (Oficial)* y *🎨 Colección de Personalización*.
   - **Sincronización:** Actualización reactiva de `applyTheme` con soporte para meta `theme-color` adaptativo (`#0B1C30` en modo oscuro / `#FFFFFF` en claro) y persistencia en `localStorage`.
+
+#### Hito 13: Blindaje de Contraste y Corrección de Campos de Texto en Registro/Login
+- **Problema previo:** En dispositivos móviles o al tener activo un modo oscuro (como Zentra Midnight o el modo oscuro nativo de Android/iOS), las casillas de texto del formulario de Registro y Creación de Negocio (`setupNameInp`, `setupOwnerInp`, etc.) y Login se mostraban con texto blanco sobre fondo blanco, volviendo invisible lo que el usuario escribía.
+- **Solución implementada:**
+  1. Se forzó `color-scheme: light !important;` en `#authScreenModal` y todos sus inputs para prevenir que los navegadores móviles fuercen estilos oscuros automáticos en el formulario blanco.
+  2. Se fijó el color del texto digitado a `#0F172A !important` (grafito oscuro profundo) y `-webkit-text-fill-color: #0F172A !important`, con fondo `#FFFFFF` y bordes `#CBD5E1`.
+  3. Se aseguraron las etiquetas del formulario, títulos de las tarjetas operativas (`#txtSetupServiciosTitle`, `#txtSetupRetailTitle`) y botones de pestañas con colores de alto contraste.
+  4. En Flutter (`app_theme.dart`, `login_screen.dart`, `mode_selection_screen.dart`), se vinculó explícitamente el color de los `TextField` a `theme.textDark` para mantener sincronía visual y legibilidad garantizada en todas las plataformas.
 
 ---
 

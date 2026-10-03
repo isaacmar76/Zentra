@@ -9,6 +9,7 @@ class CatalogItemModel {
   int stock;
   final String category;
   final String businessType; // 'servicios', 'retail', 'ambos'
+  final String itemType; // 'producto', 'servicio'
   final String? imageUrl; // Foto tomada con cámara o subida desde galería
 
   CatalogItemModel({
@@ -19,10 +20,12 @@ class CatalogItemModel {
     required this.stock,
     required this.category,
     this.businessType = 'ambos',
+    this.itemType = 'producto',
     this.imageUrl,
   });
 
-  bool get isLowStock => stock <= 5;
+  bool get isService => itemType == 'servicio';
+  bool get isLowStock => !isService && stock <= 5;
   double get profitMargin => salePrice > 0 ? ((salePrice - costPrice) / salePrice) * 100 : 0.0;
   double get unitProfit => salePrice - costPrice;
 
@@ -35,6 +38,7 @@ class CatalogItemModel {
       'stock': stock,
       'category': category,
       'businessType': businessType,
+      'itemType': itemType,
       'imageUrl': imageUrl,
     };
   }
@@ -48,6 +52,7 @@ class CatalogItemModel {
       stock: (map['stock'] as num?)?.toInt() ?? 0,
       category: map['category'] ?? 'General',
       businessType: map['businessType'] ?? 'ambos',
+      itemType: map['itemType'] ?? 'producto',
       imageUrl: map['imageUrl'],
     );
   }
@@ -60,6 +65,7 @@ class CatalogItemModel {
     int? stock,
     String? category,
     String? businessType,
+    String? itemType,
     String? imageUrl,
   }) {
     return CatalogItemModel(
@@ -70,6 +76,7 @@ class CatalogItemModel {
       stock: stock ?? this.stock,
       category: category ?? this.category,
       businessType: businessType ?? this.businessType,
+      itemType: itemType ?? this.itemType,
       imageUrl: imageUrl ?? this.imageUrl,
     );
   }

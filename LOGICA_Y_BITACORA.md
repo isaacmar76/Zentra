@@ -195,7 +195,8 @@ class CatalogItemModel {
 | **2026-09-30** | `0c59e31` | UI / UX / Design System | Adopción de Sistema Visual Fintech Clarity (nuevo_diseño.md): Plus Jakarta Sans + Inter, Cockpit Hero con micro-gráfica SVG, Bento cards | ✅ Completado |
 | **2026-10-01** | `e1d1f05` | Security / Multi-Tenant | Aislamiento estricto de productos y datos por negocio (multi-tenancy, registro central, llaves namespaced y control de acceso por PIN) | ✅ Completado |
 | **2026-10-03** | `dd5f890` | Fix / Mobile UX | Blindaje de contraste total en inputs de Registro/Login (solución de texto invisible/blanco en celular y modo oscuro) | ✅ Completado |
-| **2026-10-03** | `current` | Clean / Isolation | Eliminación total de datos demo y referencias cruzadas en Retail y Catálogo (cero mención a otros negocios y saldos en $0) | ✅ Completado |
+| **2026-10-03** | `e74c832` | Clean / Isolation | Eliminación total de datos demo y referencias cruzadas en Retail y Catálogo (cero mención a otros negocios y saldos en $0) | ✅ Completado |
+| **2026-10-03** | `current` | Feature / POS / Facturación | Administración avanzada del propietario: Catálogo con costo y venta (márgenes), Carrito mostrador/retail, Pedidos multi-ítem a medida, y ciclo Cotización vs Factura | ✅ Completado |
 
 ---
 
@@ -345,6 +346,29 @@ class CatalogItemModel {
   2. Se reprogramó `renderPos()` y `recalcularTodo()` para calcular las ventas del POS, la caja real y el stock bajo en tiempo real a partir de las transacciones efectivas del negocio activo.
   3. Se retiraron las pestañas con nombres de otros comercios del modal de catálogo. Ahora el catálogo es 100% exclusivo y adaptado automáticamente a la modalidad del negocio activo (`bizProfile.type`), sin filtros ajenos ni mención a terceras marcas.
   4. Se neutralizaron todos los placeholders del sistema (`usuario@minegocio.com`, `Mi Negocio`, etc.) y los segmentos de Flutter en `catalog_inventory_screen.dart` (`Servicios (Por Encargo)` y `Retail (Mostrador POS)`).
+
+#### Hito 15: Administración Avanzada del Propietario (Catálogo con Costo/Venta, Carrito Mostrador/Retail, Pedidos a Medida y Flujo Cotización vs Factura)
+- **Requerimiento del Usuario:**
+  1. **Catálogo con Costos y Precios de Venta:** Permitir crear tanto productos físicos como servicios por encargo especificando valor de costo y valor de venta, visualizando el margen de ganancia real por unidad.
+  2. **Toma de Pedidos como Carrito de Compras en Servicios / Proyectos:** Permitir agregar ítems de proyectos a elaborar a la medida (por ejemplo: "Tarjetas de invitación" personalizadas con cantidad, costo y precio unitario) y combinarlos libremente con otros productos o servicios del catálogo en un único pedido con valor total acumulado.
+  3. **Toma de Pedidos como Carrito de Compras en Retail / Mostrador:** Permitir seleccionar productos del mostrador con cantidades deseadas `[-] [qty] [+]`, visualizando en tiempo real la barra flotante con total acumulado y conteo de artículos.
+  4. **Generación de Comprobantes con Doble Estado para Ambos Modelos:**
+     - **Estado "Presupuesto o Cotización" (`#COT-...`):** Documento formal previo al pago con validez de 15 días, desglose de ítems, cuentas bancarias registradas y opción de compartir directamente por WhatsApp o imprimir. No descuenta inventario ni registra entrada en caja.
+     - **Estado "Facturado / Pagado" (`#FAC-...`):** Al confirmar el pago del cliente, se genera la Factura Oficial o Recibo de Pago con sello verde de cancelado, registrando automáticamente el ingreso en caja y descontando el stock físico correspondiente.
+- **Implementación Técnica:**
+  - **Catálogo Unificado:** En `newProductModal`, selector interactivo entre `📦 Producto Físico` (con control estricto de existencias) y `✂️ Servicio / Proyecto` (disponibilidad por encargo sin bloqueo de stock). Cálculo dinámico en vivo de Ganancia Neta (`precio - costo`) y Margen Comercial (`((precio - costo) / precio) * 100`). Filtros rápidos por chips en el catálogo (`Todos`, `📦 Productos`, `✂️ Servicios`).
+  - **Motor POS de Carrito Retail (`retailCart`):**
+    - Barra flotante inferior `#retailCartBar` con contador animado y total COP en tiempo real.
+    - Modal de Carrito `#retailCartModal` con edición rápida de unidades, botón de remover, captura opcional de cliente y teléfono WhatsApp.
+    - Botones de acción dual: `⚡ COBRAR Y FACTURAR` (descuenta existencias, registra ingreso y abre factura `#FAC-...`) y `📋 GENERAR COTIZACIÓN` (guarda cotización sin cobro ni alteración de existencias y abre presupuesto `#COT-...`).
+  - **Módulo de Ítems a Medida para Proyectos (`customItemModal`):**
+    - Captura de descripción del trabajo artesanal/gráfico, cantidad, costo unitario de materiales e insumos y precio de venta acordado.
+    - Integración transparente en la lista de ítems del encargo y sumatoria automática del total del proyecto.
+  - **Plantilla Unificada de Comprobantes (`invoiceReceiptModal`):**
+    - Renderizador inteligente `abrirFacturaReciboConDatos(data)` y `abrirFacturaRecibo(mode)` que alterna diseño, títulos, numeración correlativa (`#COT-` vs `#FAC-`), avisos de validez comercial y texto preformateado para envío vía WhatsApp (`https://wa.me/...`).
+    - Flujo de transición directa desde la pantalla del proyecto: botón `💳 CLIENTE PAGÓ -> REGISTRAR PAGO Y FACTURAR` que actualiza el estado de `Cotización` a `Facturado / En Producción`.
+  - **Sincronización en Flutter (`catalog_item_model.dart`):**
+    - Adición de `itemType` ('producto' | 'servicio'), getter `isService`, y persistencia en `toMap()` y `fromMap()`.
 
 ---
 

@@ -1165,16 +1165,35 @@
         </div>
 
         <div class="section-title">
-          <span>Punto de Venta (Toca para cobrar)</span>
+          <span>Punto de Venta / Mostrador (Toca para agregar)</span>
           <span style="font-size: 11px; color: var(--alert); display: none;" id="lblStockAviso"></span>
+        </div>
+
+        <!-- Buscador rápido en POS -->
+        <div style="margin-bottom: 10px;">
+          <input type="text" id="posSearchInp" oninput="filtrarPosGrid()" placeholder="🔍 Buscar producto en mostrador..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:12.5px; box-sizing:border-box;">
         </div>
 
         <div class="pos-grid" id="posGrid">
           <!-- Productos inyectados por JS -->
         </div>
 
-        <div style="margin-top: 14px;">
-          <button class="primary-btn" style="background: var(--success);" onclick="cobrarCarrito()">🛒 COBRAR CARRITO (<span id="cartCount">0</span>)</button>
+        <!-- Barra flotante de Carrito en Mostrador -->
+        <div id="retailCartBar" style="position:sticky; bottom:64px; left:0; width:100%; z-index:90; margin-top:14px;">
+          <div style="background:var(--card-bg); border:1.5px solid var(--primary); border-radius:18px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="abrirCarritoRetail()">
+              <div style="background:var(--primary-soft); color:var(--primary); width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; flex-shrink:0;">
+                🛒
+              </div>
+              <div>
+                <div style="font-size:11px; color:var(--text-muted); font-weight:600;"><span id="cartCount">0</span> artículos en carrito</div>
+                <div style="font-size:15px; font-weight:800; color:var(--text);" id="cartTotalSum">$0 COP</div>
+              </div>
+            </div>
+            <button class="primary-btn" onclick="abrirCarritoRetail()" style="width:auto; padding:10px 16px; font-size:12.5px; font-weight:700; margin:0; box-shadow:0 4px 12px rgba(0,108,70,0.25);">
+              VER CARRITO ➔
+            </button>
+          </div>
         </div>
       </section>
 
@@ -1425,14 +1444,10 @@
           <button onclick="abrirModalAbonoProyecto()" style="background:var(--bg); border:1.5px solid var(--success); color:var(--success); padding:10px; border-radius:14px; font-weight:700; font-size:12px; cursor:pointer;">+ Registrar Abono</button>
         </div>
 
-        <!-- Botón Generar Factura / Recibo -->
-        <button onclick="abrirFacturaRecibo()" style="width:100%; background:linear-gradient(135deg, #006C46 0%, #004D32 100%); color:#fff; border:none; padding:12px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
-          <span style="font-size:15px;">🧾</span> GENERAR FACTURA / RECIBO DE PAGO
-        </button>
-
-        <button onclick="copiarWhatsAppCotizacion()" style="width:100%; background:#25D366; color:#fff; border:none; padding:11px; border-radius:14px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:8px;">
-          <span>📱</span> ENVIAR RESUMEN POR WHATSAPP
-        </button>
+        <!-- Botones Dinámicos de Facturación y Cotización según estado del Proyecto -->
+        <div id="mProjReceiptActionButtons" style="display:flex; flex-direction:column; gap:8px;">
+          <!-- Inyectado dinámicamente por JS según sea Cotización o Proyecto Aprobado/Pagado -->
+        </div>
       </div>
     </div>
 
@@ -1872,18 +1887,27 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <div>
             <div style="font-size:17px; font-weight:700;">📦 Catálogo & Inventario</div>
-            <div style="font-size:11px; color:var(--text-muted);" id="lblCatalogModalSub">Control de stock y venta de productos terminados</div>
+            <div style="font-size:11px; color:var(--text-muted);" id="lblCatalogModalSub">Control de productos físicos, servicios y elaboración</div>
           </div>
           <button onclick="cerrarModalCatalogoInventario()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
         </div>
 
-        <!-- Indicador de catálogo exclusivo del negocio activo (Sin referencias a otros comercios) -->
-        <div id="catNoticeContainer" style="margin-bottom:12px; font-size:11px; color:var(--text-muted); display:flex; align-items:center; justify-content:space-between; background:var(--surface-subtle); padding:8px 12px; border-radius:12px; border:1px solid var(--surface-border);">
+        <!-- Indicador de catálogo exclusivo del negocio activo -->
+        <div id="catNoticeContainer" style="margin-bottom:10px; font-size:11px; color:var(--text-muted); display:flex; align-items:center; justify-content:space-between; background:var(--surface-subtle); padding:8px 12px; border-radius:12px; border:1px solid var(--surface-border);">
           <span id="lblCatModeNotice" style="font-weight:600; color:var(--text);">📦 Catálogo exclusivo de tu negocio</span>
-          <span id="lblCatTotalCount" style="font-weight:700; color:var(--primary); background:var(--primary-soft); padding:2px 8px; border-radius:10px;">0 productos</span>
+          <span id="lblCatTotalCount" style="font-weight:700; color:var(--primary); background:var(--primary-soft); padding:2px 8px; border-radius:10px;">0 ítems</span>
         </div>
 
-        <button onclick="abrirModalNuevoProducto()" style="width:100%; background:transparent; border:1.5px dashed var(--secondary); color:var(--secondary); padding:9px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; margin-bottom:14px;">+ AGREGAR NUEVO PRODUCTO AL CATÁLOGO</button>
+        <!-- Filtros por tipo de ítem: Todos / Productos Físicos / Servicios -->
+        <div style="display:flex; gap:6px; margin-bottom:12px; overflow-x:auto;">
+          <button type="button" class="status-chip active" id="chipCatTodos" onclick="filtrarCatalogoPorTipo('todos')">Todos</button>
+          <button type="button" class="status-chip" id="chipCatProductos" onclick="filtrarCatalogoPorTipo('producto')">📦 Productos Físicos</button>
+          <button type="button" class="status-chip" id="chipCatServicios" onclick="filtrarCatalogoPorTipo('servicio')">✂️ Servicios / Proyectos</button>
+        </div>
+
+        <button onclick="abrirModalNuevoProducto()" style="width:100%; background:transparent; border:1.5px dashed var(--secondary); color:var(--secondary); padding:10px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <span>+</span> AGREGAR PRODUCTO O SERVICIO AL CATÁLOGO
+        </button>
 
         <div id="catalogItemsList">
           <!-- Renderizado dinámico de productos -->
@@ -1891,15 +1915,26 @@
       </div>
     </div>
 
-    <!-- Modal: Nuevo Producto al Catálogo (Con Foto/Cámara) -->
+    <!-- Modal: Nuevo Producto o Servicio al Catálogo (Con Foto/Cámara) -->
     <div id="newProductModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:350; align-items:center; justify-content:center; padding:18px;">
       <div style="background:var(--card-bg); width:100%; max-width:340px; border-radius:22px; padding:20px; color:var(--text); box-shadow:0 10px 30px rgba(0,0,0,0.3); max-height:88%; overflow-y:auto;">
-        <div style="font-size:16px; font-weight:700; margin-bottom:4px;">Nuevo Producto al Catálogo</div>
-        <div style="font-size:11.5px; color:#777; margin-bottom:12px;">Ingresa los datos para control de stock, fotos y venta</div>
+        <div style="font-size:16px; font-weight:700; margin-bottom:2px;" id="lblNewProdModalTitle">Nuevo Ítem al Catálogo</div>
+        <div style="font-size:11.5px; color:#777; margin-bottom:12px;" id="lblNewProdModalSub">Define costos, precios de venta y control de existencias</div>
+
+        <!-- Selector de Tipo: Producto Físico vs Servicio / Elaboración -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--surface-subtle); padding:4px; border-radius:12px; margin-bottom:12px; border:1px solid var(--surface-border);">
+          <button type="button" id="btnTypeProducto" onclick="seleccionarTipoItemCatalogo('producto')" style="padding:8px 6px; border-radius:9px; border:none; background:var(--card-bg); color:var(--primary); font-weight:700; font-size:11px; cursor:pointer; box-shadow:var(--shadow-sm); display:flex; align-items:center; justify-content:center; gap:4px;">
+            📦 Producto Físico
+          </button>
+          <button type="button" id="btnTypeServicio" onclick="seleccionarTipoItemCatalogo('servicio')" style="padding:8px 6px; border-radius:9px; border:none; background:transparent; color:var(--text-muted); font-weight:600; font-size:11px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+            ✂️ Servicio / Proyecto
+          </button>
+        </div>
+        <input type="hidden" id="prodTypeInp" value="producto">
 
         <!-- Campo: Foto del Producto (Subir o Tomar con Cámara) -->
         <div style="margin-bottom:12px;">
-          <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px;">Foto o Imagen del Producto</label>
+          <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px;">Foto o Imagen de Referencia</label>
           <div style="display:flex; align-items:center; gap:10px;">
             <div id="prodImgPreview" onclick="document.getElementById('prodPhotoInp').click()" style="width:62px; height:62px; border-radius:14px; background:#F8F9FA; border:1.5px dashed var(--secondary); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:24px; cursor:pointer; flex-shrink:0;">
               📷
@@ -1918,22 +1953,29 @@
         </div>
 
         <div style="margin-bottom:10px;">
-          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Nombre del Producto *</label>
-          <input type="text" id="prodNameInp" placeholder="Ej: Cake Topper Shaker, Agendas" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;" id="lblProdNameTitle">Nombre del Producto / Servicio *</label>
+          <input type="text" id="prodNameInp" placeholder="Ej: Cake Topper Shaker, Agendas, Tarjetas x50" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
           <div>
-            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Precio Venta ($ COP) *</label>
-            <input type="number" id="prodPriceInp" placeholder="45000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;" id="lblProdPriceTitle">Precio Venta ($ COP) *</label>
+            <input type="number" id="prodPriceInp" oninput="calcularMargenNuevoProducto()" placeholder="45000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
           </div>
           <div>
-            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Costo Elaboración ($)</label>
-            <input type="number" id="prodCostInp" placeholder="18000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;" id="lblProdCostTitle">Costo Unitario ($ COP)</label>
+            <input type="number" id="prodCostInp" oninput="calcularMargenNuevoProducto()" placeholder="18000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+        <!-- Indicador dinámico en tiempo real de Ganancia y Margen de Utilidad -->
+        <div id="boxProfitMarginLive" style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:12px; padding:8px 12px; font-size:11.5px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:#166534; font-weight:600;">💰 Ganancia Unitaria:</span>
+          <b id="lblProfitLive" style="color:#15803D; font-weight:800;">+$0 COP (0% margen)</b>
+        </div>
+
+        <!-- Contenedor condicional: Stock para Productos Físicos vs Mensaje para Servicios -->
+        <div id="boxProdStock" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
           <div>
             <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Stock Inicial *</label>
             <input type="number" id="prodStockInp" value="10" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
@@ -1944,9 +1986,19 @@
           </div>
         </div>
 
+        <div id="boxProdServiceNotice" style="display:none; margin-bottom:14px;">
+          <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:12px; padding:9px 12px; font-size:11px; color:#1E40AF; margin-bottom:8px; line-height:1.4;">
+            ✂️ <b>Servicio / Elaboración a Medida:</b> Se produce bajo encargo o cotización para el cliente. No descuenta stock físico rígido.
+          </div>
+          <div>
+            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Categoría de Servicio</label>
+            <input type="text" id="prodServiceCatInp" placeholder="Diseño, Impresión, Decoración" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          </div>
+        </div>
+
         <div style="display:flex; gap:8px;">
           <button onclick="cerrarModalNuevoProducto()" style="flex:1; padding:10px; border-radius:12px; border:1px solid #ccc; background:transparent; font-weight:600; cursor:pointer;">Cancelar</button>
-          <button onclick="guardarNuevoProducto()" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--secondary); color:#fff; font-weight:700; cursor:pointer;">Guardar</button>
+          <button onclick="guardarNuevoProducto()" style="flex:1; padding:10px; border-radius:12px; border:none; background:var(--secondary); color:#fff; font-weight:700; cursor:pointer;">Guardar Ítem</button>
         </div>
       </div>
     </div>
@@ -1987,7 +2039,7 @@
           <input type="text" id="customItemNameInp" placeholder="Ej: Invitaciones Caladas a Mano" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
           <div>
             <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Cantidad *</label>
             <input type="number" id="customItemQtyInp" value="1" min="1" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
@@ -1996,6 +2048,12 @@
             <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Precio Unitario ($) *</label>
             <input type="number" id="customItemPriceInp" placeholder="3000" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; font-weight:700; box-sizing:border-box;">
           </div>
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Costo Estimado Insumos / Elaboración ($)</label>
+          <input type="number" id="customItemCostInp" placeholder="1200" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">Opcional: Permite calcular tu margen real en este encargo.</div>
         </div>
 
         <div style="display:flex; gap:8px;">
@@ -2097,7 +2155,64 @@
       </div>
     </div>
 
-    <!-- Modal: Factura / Recibo de Pago para Enviar al Cliente -->
+    <!-- Modal: Carrito de Compras / Mostrador (Retail POS) -->
+    <div id="retailCartModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:360; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div>
+            <div style="font-size:17px; font-weight:800; color:var(--text);">🛒 Carrito de Mostrador / Pedido</div>
+            <div style="font-size:11px; color:var(--text-muted);">Revisa las cantidades, genera presupuesto o cobra al cliente</div>
+          </div>
+          <button onclick="cerrarCarritoRetail()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
+        </div>
+
+        <!-- Sección Cliente para la Venta (Opcional) -->
+        <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <label style="font-size:11px; font-weight:700; color:var(--text); margin:0;">👤 Datos del Cliente (Para Cotización / WhatsApp)</label>
+            <span style="font-size:10px; color:var(--text-muted);">Opcional</span>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+            <input type="text" id="retailCliNameInp" placeholder="Nombre cliente (ej: Don Carlos)" style="padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--card-bg); color:var(--text);">
+            <input type="text" id="retailCliPhoneInp" placeholder="WhatsApp (ej: 312...)" style="padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--card-bg); color:var(--text);">
+          </div>
+        </div>
+
+        <!-- Lista de Productos en el Carrito -->
+        <div style="font-size:12px; font-weight:700; color:var(--text); margin-bottom:6px;">Artículos en el Pedido:</div>
+        <div id="retailCartItemsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px; max-height:220px; overflow-y:auto;">
+          <!-- Inyectado dinámicamente -->
+        </div>
+
+        <!-- Resumen Financiero del Carrito -->
+        <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:14px; padding:12px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+            <span style="color:var(--text-muted);">Artículos en total:</span>
+            <b id="retailCartTotalUnits" style="color:var(--text);">0 unid.</b>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:800; padding-top:6px; border-top:1px solid var(--surface-border);">
+            <span>Total a Pagar / Cotizar:</span>
+            <span id="retailCartTotalAmount" style="color:var(--primary); font-size:18px;">$0 COP</span>
+          </div>
+        </div>
+
+        <!-- Botones de Acción: Cotización vs Facturación -->
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <button onclick="procesarCobroRetail()" style="width:100%; background:linear-gradient(135deg, #006C46 0%, #004D32 100%); color:#fff; border:none; padding:13px; border-radius:14px; font-weight:800; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(0,108,70,0.3);">
+            <span>💵</span> COBRAR Y FACTURAR (DESCONTAR STOCK)
+          </button>
+          <button onclick="generarComprobanteRetail(true)" style="width:100%; background:var(--card-bg); color:var(--text); border:1.5px solid var(--surface-border); padding:11px; border-radius:14px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>📋</span> GENERAR PRESUPUESTO / COTIZACIÓN (SIN COBRO)
+          </button>
+          <button onclick="vaciarCarritoRetail()" style="background:transparent; border:none; color:var(--alert); font-size:11.5px; font-weight:600; cursor:pointer; padding:4px; text-align:center;">
+            🗑️ Vaciar todo el carrito
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Modal: Factura / Recibo de Pago / Presupuesto para Enviar al Cliente -->
     <div id="invoiceReceiptModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); z-index:500; align-items:center; justify-content:center; padding:14px; overflow-y:auto;">
       <div class="receipt-paper" style="width:100%; max-width:380px; max-height:92%; overflow-y:auto;">
         
@@ -2111,16 +2226,17 @@
           <img src="img/zentra-logo.png" alt="Logo" style="width:46px; height:46px; border-radius:12px; object-fit:contain; margin-bottom:4px; border:1px solid #ECEEF2; padding:2px; background:#fff;">
           <div style="font-size:16px; font-weight:800; color:#0B1C30; text-transform:uppercase; letter-spacing:-0.02em;" id="recBizName">ZENTRA FINANCIAL</div>
           <div style="font-size:10.5px; color:#64748B; margin-top:2px;" id="recBizContact">Propietario • Tel: 312 000 0000</div>
-          <div style="font-size:9.5px; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-top:1px;">Factura de Venta / Comprobante de Entrega</div>
+          <div style="font-size:11px; font-weight:800; color:#0B1C30; text-transform:uppercase; letter-spacing:0.04em; margin-top:4px;" id="recDocTypeTitle">FACTURA DE VENTA / RECIBO OFICIAL</div>
+          <div style="font-size:9.5px; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em; margin-top:1px;" id="recDocTypeSubtitle">Comprobante de Pago y Entrega de Mercancía</div>
         </div>
 
         <div class="receipt-dotted-line"></div>
 
         <!-- Consecutivo y Fechas -->
-        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:8px;">
+        <div style="display:flex; justify-content:space-between; font-size:11px; margin-bottom:6px;">
           <div>
-            <span style="color:#64748B;">Comprobante:</span>
-            <b style="color:#0B1C30;" id="recOrderNum">#PED-001</b>
+            <span style="color:#64748B;" id="recOrderNumLabel">Comprobante:</span>
+            <b style="color:#0B1C30;" id="recOrderNum">#FAC-001</b>
           </div>
           <div>
             <span style="color:#64748B;">Fecha:</span>
@@ -2128,7 +2244,12 @@
           </div>
         </div>
 
-        <!-- Información del Cliente y Proyecto -->
+        <!-- Aviso de Validez de Presupuesto (Visible solo en Cotización) -->
+        <div id="recValidityNotice" style="display:none; font-size:10px; color:#92400E; background:#FEF3C7; border:1px solid #FCD34D; border-radius:8px; padding:6px 8px; margin-bottom:8px; text-align:center; font-weight:600;">
+          ⏳ Presupuesto formal válido por 15 días calendario a partir de su expedición.
+        </div>
+
+        <!-- Información del Cliente y Pedido -->
         <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px; margin-bottom:10px; font-size:11px;">
           <div style="margin-bottom:3px;">
             <span style="color:#64748B;">Cliente:</span>
@@ -2139,7 +2260,7 @@
             <div><span style="color:#64748B;">CC/NIT:</span> <span id="recClientDoc">1020304050</span></div>
           </div>
           <div style="margin-top:4px; padding-top:4px; border-top:1px dashed #E2E8F0;">
-            <span style="color:#64748B;">Proyecto:</span>
+            <span style="color:#64748B;">Concepto / Pedido:</span>
             <b style="color:var(--primary);" id="recProjName">Boda de Ana</b>
             <span class="badge" id="recProjStatusBadge" style="margin-left:6px; font-size:9.5px; padding:1px 6px;">🎨 En Proceso</span>
           </div>
@@ -2164,34 +2285,34 @@
         <!-- Totales y Saldos -->
         <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px; margin:10px 0;">
           <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
-            <span style="color:#64748B;">Total Cotizado:</span>
+            <span style="color:#64748B;" id="lblRecTotalTitle">Total Cotizado:</span>
             <b style="color:#0B1C30;" id="recTotalVal">$0</b>
           </div>
-          <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;">
-            <span style="color:#64748B;">Abonos Recibidos:</span>
+          <div style="display:flex; justify-content:space-between; font-size:11.5px; margin-bottom:4px;" id="recCobradoRow">
+            <span style="color:#64748B;" id="lblRecCobradoTitle">Abonos / Pagado:</span>
             <b style="color:#006C46;" id="recCobradoVal">$0</b>
           </div>
-          <div style="display:flex; justify-content:space-between; font-size:13px; padding-top:6px; border-top:1px solid #CBD5E1; font-weight:800;">
+          <div style="display:flex; justify-content:space-between; font-size:13px; padding-top:6px; border-top:1px solid #CBD5E1; font-weight:800;" id="recSaldoRow">
             <span id="lblRecSaldoTitle">Saldo Pendiente:</span>
             <span id="recSaldoVal" style="color:#DC2626;">$0</span>
           </div>
         </div>
 
-        <!-- Sello de Estado de Pago -->
-        <div id="recPaymentStatusStamp" style="text-align:center; padding:6px; border-radius:10px; font-size:11px; font-weight:800; margin-bottom:10px;">
-          <!-- Dinámico: PAGADO o SALDO PENDIENTE -->
+        <!-- Sello de Estado de Pago / Cotización -->
+        <div id="recPaymentStatusStamp" style="text-align:center; padding:7px; border-radius:10px; font-size:11px; font-weight:800; margin-bottom:10px;">
+          <!-- Dinámico: PAGADO o PRESUPUESTO PENDIENTE -->
         </div>
 
         <!-- Medios de Pago que Recibimos -->
         <div style="background:#FFFFFF; border:1px dashed #CBD5E1; border-radius:12px; padding:10px 12px; font-size:10.5px; margin-bottom:12px;">
           <div style="font-weight:700; color:#334155; margin-bottom:5px; display:flex; align-items:center; gap:4px;">
-            <span>🏦</span> Medios de Pago que Recibimos:
+            <span>🏦</span> Cuentas Autorizadas para Pago / Anticipo:
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
             <div>🟣 <b>Nequi:</b> <span id="recNequiNum">312 000 0000</span></div>
             <div>🟡 <b>Daviplata:</b> <span id="recDaviplataNum">312 000 0000</span></div>
             <div style="grid-column:1 / -1;">🔵 <b>Bancolombia:</b> <span id="recBankNum">Ahorros</span></div>
-            <div style="grid-column:1 / -1;">💵 <b>Efectivo:</b> Contra entrega / en tienda</div>
+            <div style="grid-column:1 / -1;">💵 <b>Efectivo:</b> En caja / mostrador</div>
           </div>
         </div>
 
@@ -2202,7 +2323,7 @@
         <!-- Botones de Acción (Ocultos en Impresión) -->
         <div class="no-print" style="display:flex; flex-direction:column; gap:8px;">
           <button onclick="enviarReciboWhatsApp()" style="width:100%; background:#25D366; color:#fff; border:none; padding:11px; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 10px rgba(37,211,102,0.25);">
-            <span>📲</span> Enviar Recibo por WhatsApp
+            <span>📲</span> <span id="btnRecWhatsAppText">Enviar Recibo por WhatsApp</span>
           </button>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
             <button onclick="imprimirFacturaRecibo()" style="padding:9px; border-radius:12px; border:1px solid #CBD5E1; background:#FFFFFF; color:#334155; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
@@ -2242,8 +2363,9 @@
     let generalExpenses = [];
     let generalIncomes = [];
     let catalogItems = [];
-    let products = [];
-    let cart = [];
+    let retailCart = [];
+    let cart = []; // Mantenido para retrocompatibilidad
+    let catalogTypeFilter = 'todos';
     let selectedProjectIdx = 0;
     let catalogFilter = 'servicios';
     let currentFormAction = null;
@@ -2522,6 +2644,7 @@
         }
 
         localStorage.setItem('zentra_active_biz_id', bizId);
+        retailCart = [];
         cart = [];
 
         aplicarUsuarioActivo();
@@ -2558,6 +2681,7 @@
       clients = [];
       users = [];
       currentUser = null;
+      retailCart = [];
       cart = [];
       tempOrderItems = [];
       tempProductPhoto = null;
@@ -2890,15 +3014,15 @@
 
       const query = (document.getElementById('pickerSearchInp').value || '').trim().toLowerCase();
       const items = catalogItems.filter(it => 
-        it.mode === 'servicios' && (!query || it.name.toLowerCase().includes(query) || (it.cat && it.cat.toLowerCase().includes(query)))
+        (!it.mode || it.mode === 'servicios') && (!query || it.name.toLowerCase().includes(query) || (it.cat && it.cat.toLowerCase().includes(query)))
       );
 
       if (items.length === 0) {
         container.innerHTML = `
           <div style="text-align:center; padding:24px 10px; color:#888;">
             <div style="font-size:24px; margin-bottom:4px;">🔍</div>
-            <div style="font-size:12px; font-weight:600;">No hay productos que coincidan</div>
-            <div style="font-size:11px; margin-top:2px;">Crea nuevos productos en la pestaña "Catálogo".</div>
+            <div style="font-size:12px; font-weight:600;">No hay productos o servicios que coincidan</div>
+            <div style="font-size:11px; margin-top:2px;">Crea nuevos ítems en la pestaña "Catálogo".</div>
           </div>
         `;
         return;
@@ -2908,16 +3032,20 @@
         const card = document.createElement('div');
         card.style.cssText = 'display:flex; align-items:center; justify-content:space-between; background:#F8F9FA; border:1px solid #ECEEF2; border-radius:14px; padding:10px 12px; gap:8px;';
         
+        const isServ = it.itemType === 'servicio';
         const thumbHtml = it.image
           ? `<img src="${it.image}" class="prod-thumb">`
-          : `<div class="prod-thumb">🎁</div>`;
+          : `<div class="prod-thumb">${isServ ? '✂️' : '🎁'}</div>`;
 
         card.innerHTML = `
           <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
             ${thumbHtml}
             <div style="min-width:0; flex:1;">
-              <div style="font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${it.name}</div>
-              <div style="font-size:10.5px; color:var(--text-muted);">${it.cat || 'General'} • Stock: ${it.stock}</div>
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:9px; font-weight:700; padding:1px 5px; border-radius:5px; background:${isServ ? '#EEF2FF; color:#4F46E5;' : '#ECFDF5; color:#065F46;'}">${isServ ? '✂️ SERVICIO' : '📦 PRODUCTO'}</span>
+              </div>
+              <div style="font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${it.name}</div>
+              <div style="font-size:10.5px; color:var(--text-muted);">${it.cat || 'General'} • ${isServ ? 'Bajo encargo' : 'Stock: ' + it.stock}</div>
               <div style="font-size:12px; font-weight:800; color:var(--secondary); margin-top:1px;">$${it.price.toLocaleString('es-CO')} COP</div>
             </div>
           </div>
@@ -2997,6 +3125,7 @@
       const name = document.getElementById('customItemNameInp').value.trim();
       const qty = parseInt(document.getElementById('customItemQtyInp').value) || 1;
       const price = parseFloat(document.getElementById('customItemPriceInp').value) || 0;
+      const cost = parseFloat(document.getElementById('customItemCostInp')?.value) || 0;
 
       if (!name || price <= 0) {
         showToast('Ingresa nombre y precio válido');
@@ -3009,6 +3138,7 @@
         name: name,
         quantity: qty,
         unitPrice: price,
+        costPrice: cost,
         subtotal: qty * price,
         image: null
       };
@@ -3890,6 +4020,7 @@
         actualizarChipsEstado(p.status || 'Diseño');
         renderTasksList();
         renderProjectItems();
+        renderProjectReceiptButtons(p);
       }
 
       if (document.getElementById('lblClientesCount')) {
@@ -4292,8 +4423,12 @@
 
       if (initialStatus === 'Cotización') {
         showToast(`✓ ¡Cotización "${name}" para ${client} lista!`);
+        setTimeout(() => abrirFacturaRecibo('cotizacion'), 250);
       } else {
         showToast(`✓ ¡Pedido "${name}" de ${client} creado!`);
+        if (advance > 0) {
+          setTimeout(() => abrirFacturaRecibo('factura'), 250);
+        }
       }
     }
 
@@ -4306,81 +4441,184 @@
       showToast('✓ ¡Cotización aprobada por el cliente! Proyecto iniciado.');
     }
 
+    function confirmarPagoYFacturarProyecto() {
+      const p = projectsData[selectedProjectIdx];
+      if (!p) return;
+      const saldo = Math.max(0, p.total - p.cobrado);
+      const abono = saldo > 0 ? saldo : p.total;
+
+      p.status = 'Producción';
+      p.cobrado = p.total; // Totalmente pagado
+      generalIncomes.unshift({
+        desc: `Factura / Pago Pedido: ${p.name} (${p.client})`,
+        amount: abono
+      });
+      persistirEstadoLocal();
+      recalcularTodo();
+      abrirFacturaRecibo('factura');
+      showToast(`✓ ¡Pago de $${abono.toLocaleString('es-CO')} registrado y Factura Oficial generada!`);
+    }
+
+    function renderProjectReceiptButtons(p) {
+      const container = document.getElementById('mProjReceiptActionButtons');
+      if (!container || !p) return;
+
+      if (p.status === 'Cotización') {
+        container.innerHTML = `
+          <button onclick="confirmarPagoYFacturarProyecto()" style="width:100%; background:linear-gradient(135deg, #006C46 0%, #004D32 100%); color:#fff; border:none; padding:12px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
+            <span style="font-size:16px;">💳</span> CLIENTE PAGÓ -> REGISTRAR PAGO Y FACTURAR
+          </button>
+          <button onclick="abrirFacturaRecibo('cotizacion')" style="width:100%; background:#FFFBEB; border:1.5px solid #F59E0B; color:#92400E; padding:11px; border-radius:14px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>📋</span> VER / ENVIAR PRESUPUESTO (COTIZACIÓN)
+          </button>
+        `;
+      } else {
+        container.innerHTML = `
+          <button onclick="abrirFacturaRecibo('factura')" style="width:100%; background:linear-gradient(135deg, #006C46 0%, #004D32 100%); color:#fff; border:none; padding:12px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
+            <span style="font-size:16px;">🧾</span> VER FACTURA / RECIBO DE PAGO
+          </button>
+          <button onclick="enviarReciboWhatsApp()" style="width:100%; background:#25D366; color:#fff; border:none; padding:11px; border-radius:14px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <span>📱</span> ENVIAR RECIBO POR WHATSAPP
+          </button>
+        `;
+      }
+    }
+
     // ==========================================
-    // FACTURA / RECIBO DE PAGO EJECUTIVO
+    // MOTOR UNIFICADO DE FACTURA Y COTIZACIÓN
     // ==========================================
-    function abrirFacturaRecibo() {
+    let currentReceiptData = null;
+
+    function abrirFacturaRecibo(mode) {
       const p = projectsData[selectedProjectIdx];
       if (!p) return;
 
-      const saldo = Math.max(0, p.total - p.cobrado);
       const clientObj = clients.find(c => c.id === p.clientId || c.phone === p.phone || c.name === p.client);
+      const isQuote = (mode === 'cotizacion') || (!mode && p.status === 'Cotización');
+      const saldo = Math.max(0, p.total - p.cobrado);
+
+      currentReceiptData = {
+        mode: isQuote ? 'cotizacion' : 'factura',
+        consecutivo: isQuote ? `#COT-${String(p.id).padStart(4, '0')}` : `#FAC-${String(p.id).padStart(4, '0')}`,
+        date: new Date().toLocaleDateString('es-CO'),
+        clientName: p.client || 'Cliente General',
+        clientPhone: p.phone || '',
+        clientDoc: (clientObj && clientObj.document) ? clientObj.document : 'N/A',
+        orderName: p.name,
+        orderStatus: p.status,
+        items: (p.items && p.items.length > 0) ? p.items : [{
+          quantity: 1,
+          name: p.services || p.name,
+          unitPrice: p.total,
+          subtotal: p.total
+        }],
+        total: p.total,
+        cobrado: isQuote ? 0 : p.cobrado,
+        saldo: isQuote ? p.total : saldo
+      };
+
+      abrirFacturaReciboConDatos(currentReceiptData);
+    }
+
+    function abrirFacturaReciboConDatos(data) {
+      currentReceiptData = data;
+      const isQuote = data.mode === 'cotizacion';
 
       document.getElementById('recBizName').innerText = (bizProfile.name || 'ZENTRA').toUpperCase();
       document.getElementById('recBizContact').innerText = `${bizProfile.owner || 'Administración'} • Tel: ${bizProfile.phone || '312 000 0000'}`;
       
-      document.getElementById('recOrderNum').innerText = `#PED-${String(p.id).padStart(4, '0')}`;
-      document.getElementById('recOrderDate').innerText = new Date().toLocaleDateString('es-CO');
-      
-      document.getElementById('recClientName').innerText = p.client || 'Cliente General';
-      document.getElementById('recClientPhone').innerText = p.phone || 'No registrado';
-      document.getElementById('recClientDoc').innerText = (clientObj && clientObj.document) ? clientObj.document : 'N/A';
-      
-      document.getElementById('recProjName').innerText = p.name;
-      
+      const titleEl = document.getElementById('recDocTypeTitle');
+      const subEl = document.getElementById('recDocTypeSubtitle');
+      const numLabelEl = document.getElementById('recOrderNumLabel');
+      const noticeEl = document.getElementById('recValidityNotice');
+      const btnWaText = document.getElementById('btnRecWhatsAppText');
+
+      if (isQuote) {
+        if (titleEl) titleEl.innerText = 'PRESUPUESTO / COTIZACIÓN FORMAL';
+        if (subEl) subEl.innerText = 'Documento Informativo - Sin Efecto Tributario';
+        if (numLabelEl) numLabelEl.innerText = 'N° Cotización:';
+        if (noticeEl) noticeEl.style.display = 'block';
+        if (btnWaText) btnWaText.innerText = 'Enviar Presupuesto por WhatsApp';
+      } else {
+        if (titleEl) titleEl.innerText = 'FACTURA DE VENTA / RECIBO OFICIAL';
+        if (subEl) subEl.innerText = 'Comprobante de Pago y Entrega de Mercancía';
+        if (numLabelEl) numLabelEl.innerText = 'N° Factura:';
+        if (noticeEl) noticeEl.style.display = 'none';
+        if (btnWaText) btnWaText.innerText = 'Enviar Factura por WhatsApp';
+      }
+
+      document.getElementById('recOrderNum').innerText = data.consecutivo;
+      document.getElementById('recOrderDate').innerText = data.date;
+      document.getElementById('recClientName').innerText = data.clientName || 'Cliente Mostrador';
+      document.getElementById('recClientPhone').innerText = data.clientPhone || 'No registrado';
+      document.getElementById('recClientDoc').innerText = data.clientDoc || 'N/A';
+      document.getElementById('recProjName').innerText = data.orderName;
+
       const badgeEl = document.getElementById('recProjStatusBadge');
       if (badgeEl) {
-        let icon = '🎨';
-        if (p.status === 'Cotización') icon = '📋';
-        if (p.status === 'Producción') icon = '✂️';
-        if (p.status === 'Empaque') icon = '📦';
-        if (p.status === 'Entregado') icon = '✅';
-        badgeEl.innerText = `${icon} ${p.status}`;
+        if (isQuote) {
+          badgeEl.innerText = '📋 Presupuesto';
+          badgeEl.style.background = '#FEF3C7';
+          badgeEl.style.color = '#B45309';
+        } else {
+          badgeEl.innerText = data.saldo <= 0 ? '✅ Facturado / Pagado' : '⏳ Con Saldo';
+          badgeEl.style.background = '#DCFCE7';
+          badgeEl.style.color = '#15803D';
+        }
       }
 
       const tbody = document.getElementById('recTableBody');
       tbody.innerHTML = '';
-      if (p.items && p.items.length > 0) {
-        p.items.forEach(it => {
-          const tr = document.createElement('tr');
-          const unit = it.unitPrice || 0;
-          const sub = it.subtotal || (it.quantity * unit);
-          tr.innerHTML = `
-            <td style="font-weight:700; color:#0B1C30;">${it.quantity}x</td>
-            <td>
-              <div style="font-weight:600; color:#1E293B;">${it.name}</div>
-            </td>
-            <td style="text-align:right; color:#64748B;">$${unit.toLocaleString('es-CO')}</td>
-            <td style="text-align:right; font-weight:700; color:#0B1C30;">$${sub.toLocaleString('es-CO')}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-      } else {
+      (data.items || []).forEach(it => {
         const tr = document.createElement('tr');
+        const unit = it.unitPrice || 0;
+        const sub = it.subtotal || (it.quantity * unit);
         tr.innerHTML = `
-          <td style="font-weight:700;">1x</td>
-          <td><div style="font-weight:600;">${p.services || p.name}</div></td>
-          <td style="text-align:right; color:#64748B;">$${p.total.toLocaleString('es-CO')}</td>
-          <td style="text-align:right; font-weight:700;">$${p.total.toLocaleString('es-CO')}</td>
+          <td style="font-weight:700; color:#0B1C30;">${it.quantity}x</td>
+          <td><div style="font-weight:600; color:#1E293B;">${it.name}</div></td>
+          <td style="text-align:right; color:#64748B;">$${unit.toLocaleString('es-CO')}</td>
+          <td style="text-align:right; font-weight:700; color:#0B1C30;">$${sub.toLocaleString('es-CO')}</td>
         `;
         tbody.appendChild(tr);
+      });
+
+      document.getElementById('lblRecTotalTitle').innerText = isQuote ? 'Total Cotizado:' : 'Total Factura:';
+      document.getElementById('recTotalVal').innerText = `$${data.total.toLocaleString('es-CO')}`;
+      
+      const cobradoRow = document.getElementById('recCobradoRow');
+      const saldoRow = document.getElementById('recSaldoRow');
+
+      if (isQuote) {
+        if (cobradoRow) cobradoRow.style.display = 'none';
+        if (saldoRow) saldoRow.style.display = 'none';
+      } else {
+        if (cobradoRow) {
+          cobradoRow.style.display = 'flex';
+          document.getElementById('lblRecCobradoTitle').innerText = 'Pagado en Caja / Transferencia:';
+          document.getElementById('recCobradoVal').innerText = `$${data.cobrado.toLocaleString('es-CO')}`;
+        }
+        if (saldoRow) {
+          saldoRow.style.display = data.saldo > 0 ? 'flex' : 'none';
+          document.getElementById('recSaldoVal').innerText = `$${data.saldo.toLocaleString('es-CO')}`;
+        }
       }
 
-      document.getElementById('recTotalVal').innerText = `$${p.total.toLocaleString('es-CO')}`;
-      document.getElementById('recCobradoVal').innerText = `$${p.cobrado.toLocaleString('es-CO')}`;
-      document.getElementById('recSaldoVal').innerText = `$${saldo.toLocaleString('es-CO')}`;
-      
       const stampEl = document.getElementById('recPaymentStatusStamp');
-      if (saldo <= 0) {
+      if (isQuote) {
+        stampEl.style.background = '#FEF3C7';
+        stampEl.style.border = '1.5px solid #F59E0B';
+        stampEl.style.color = '#92400E';
+        stampEl.innerHTML = '📋 PRESUPUESTO PENDIENTE DE APROBACIÓN (Válido 15 días)';
+      } else if (data.saldo <= 0) {
         stampEl.style.background = '#ECFDF5';
         stampEl.style.border = '1.5px solid #10B981';
         stampEl.style.color = '#047857';
-        stampEl.innerHTML = '✓ PEDIDO PAGADO EN SU TOTALIDAD';
+        stampEl.innerHTML = '✓ FACTURA PAGADA EN SU TOTALIDAD (EN CAJA)';
       } else {
         stampEl.style.background = '#FFFBEB';
         stampEl.style.border = '1px solid #FCD34D';
         stampEl.style.color = '#B45309';
-        stampEl.innerHTML = `⏳ SALDO PENDIENTE POR COBRAR: $${saldo.toLocaleString('es-CO')}`;
+        stampEl.innerHTML = `⏳ ABONO RECIBIDO - SALDO PENDIENTE: $${data.saldo.toLocaleString('es-CO')}`;
       }
 
       document.getElementById('recNequiNum').innerText = bizProfile.nequi || bizProfile.phone || 'Consultar';
@@ -4395,79 +4633,100 @@
     }
 
     function enviarReciboWhatsApp() {
-      const p = projectsData[selectedProjectIdx];
-      if (!p) return;
-      const saldo = Math.max(0, p.total - p.cobrado);
-      const clientObj = clients.find(c => c.id === p.clientId || c.phone === p.phone || c.name === p.client);
-      const clientDoc = clientObj && clientObj.document ? `\n📄 *Cédula/NIT:* ${clientObj.document}` : '';
+      if (!currentReceiptData) return;
+      const d = currentReceiptData;
+      const isQuote = d.mode === 'cotizacion';
+      const clientDoc = d.clientDoc && d.clientDoc !== 'N/A' ? `\n📄 *Cédula/NIT:* ${d.clientDoc}` : '';
 
-      let itemsBreakdown = '';
-      if (p.items && p.items.length > 0) {
-        itemsBreakdown = '\n📦 *DETALLE DE ARTÍCULOS:*\n' + 
-          p.items.map(it => `• ${it.quantity}x ${it.name} ($${it.unitPrice.toLocaleString('es-CO')} c/u) = $${(it.subtotal || it.quantity * it.unitPrice).toLocaleString('es-CO')}`).join('\n') + '\n';
-      } else {
-        itemsBreakdown = `\n📦 *Concepto:* ${p.services || p.name}\n`;
-      }
+      let itemsBreakdown = '\n📦 *DETALLE DE ARTÍCULOS:*\n' + 
+        (d.items || []).map(it => `• ${it.quantity}x ${it.name} ($${it.unitPrice.toLocaleString('es-CO')} c/u) = $${(it.subtotal || it.quantity * it.unitPrice).toLocaleString('es-CO')}`).join('\n') + '\n';
 
-      const estadoBadge = saldo <= 0 ? '✅ TOTALMENTE CANCELADO' : `⏳ SALDO PENDIENTE: $${saldo.toLocaleString('es-CO')}`;
-
-      const msg = 
-`🧾 *COMPROBANTE DE PEDIDO / FACTURA*
+      let msg = '';
+      if (isQuote) {
+        msg = 
+`📋 *PRESUPUESTO / COTIZACIÓN COMERCIAL*
 ✨ *${(bizProfile.name || 'ZENTRA').toUpperCase()}* ✨
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏷️ *N° de Pedido:* #PED-${String(p.id).padStart(4, '0')}
-📋 *Proyecto:* ${p.name}
-👤 *Cliente:* ${p.client}${clientDoc}
-📅 *Fecha:* ${new Date().toLocaleDateString('es-CO')}
+🏷️ *N° Cotización:* ${d.consecutivo}
+📋 *Concepto:* ${d.orderName}
+👤 *Cliente:* ${d.clientName}${clientDoc}
+📅 *Fecha:* ${d.date}
 ${itemsBreakdown}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-💰 *RESUMEN DE CUENTA:*
-• *Valor Total:* $${p.total.toLocaleString('es-CO')}
-• *Abonado a la fecha:* $${p.cobrado.toLocaleString('es-CO')}
-• *ESTADO:* ${estadoBadge}
+💰 *VALOR TOTAL COTIZADO:* $${d.total.toLocaleString('es-CO')} COP
+⏳ *Validez de la oferta:* 15 días calendario
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🏦 *MEDIOS DE PAGO HABILITADOS:*
+🏦 *CUENTAS AUTORIZADAS PARA CONFIRMAR PEDIDO:*
 • 📱 *Nequi:* ${bizProfile.nequi || bizProfile.phone || 'Consultar'}
 • 🟡 *Daviplata:* ${bizProfile.daviplata || bizProfile.phone || 'Consultar'}
 • 🔵 *Bancolombia:* ${bizProfile.bancolombia || 'Consultar cuenta'}
-• 💵 *Efectivo contra entrega*
-📞 *Contacto:* ${bizProfile.phone || ''}
+• 💵 *Efectivo en tienda / mostrador*
+📞 *Contacto directo:* ${bizProfile.phone || ''}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-¡Muchas gracias por su confianza y preferencia! 🌸`;
+¡Quedamos atentos a cualquier inquietud para iniciar tu encargo! 🌸`;
+      } else {
+        const estadoBadge = d.saldo <= 0 ? '✅ TOTALMENTE CANCELADO' : `⏳ SALDO PENDIENTE: $${d.saldo.toLocaleString('es-CO')}`;
+        msg = 
+`🧾 *FACTURA DE VENTA / RECIBO OFICIAL*
+✨ *${(bizProfile.name || 'ZENTRA').toUpperCase()}* ✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏷️ *N° Factura:* ${d.consecutivo}
+📋 *Concepto:* ${d.orderName}
+👤 *Cliente:* ${d.clientName}${clientDoc}
+📅 *Fecha:* ${d.date}
+${itemsBreakdown}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 *RESUMEN DE CUENTA:*
+• *Valor Total:* $${d.total.toLocaleString('es-CO')} COP
+• *Pagado / Abonado:* $${d.cobrado.toLocaleString('es-CO')} COP
+• *ESTADO:* ${estadoBadge}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏦 *DATOS DEL COMERCIO:*
+• 📞 *Tel / WhatsApp:* ${bizProfile.phone || ''}
+• 🏪 *Atendido por:* ${bizProfile.owner || 'Equipo Zentra'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+¡Muchas gracias por su compra y apoyar nuestro negocio! 🌸`;
+      }
 
-      const cleanPhone = (p.phone || '').replace(/\D/g, '');
+      const cleanPhone = (d.clientPhone || '').replace(/\D/g, '');
       const url = cleanPhone ? `https://wa.me/57${cleanPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank');
-      showToast('✓ Abriendo WhatsApp con el recibo...');
+      showToast(isQuote ? '✓ Abriendo WhatsApp con la cotización...' : '✓ Abriendo WhatsApp con la factura...');
     }
 
     function copiarTextoRecibo() {
-      const p = projectsData[selectedProjectIdx];
-      if (!p) return;
-      const saldo = Math.max(0, p.total - p.cobrado);
-      const clientObj = clients.find(c => c.id === p.clientId || c.phone === p.phone || c.name === p.client);
-      const clientDoc = clientObj && clientObj.document ? `\n📄 Cédula/NIT: ${clientObj.document}` : '';
+      if (!currentReceiptData) return;
+      const d = currentReceiptData;
+      const isQuote = d.mode === 'cotizacion';
+      const clientDoc = d.clientDoc && d.clientDoc !== 'N/A' ? `\n📄 Cédula/NIT: ${d.clientDoc}` : '';
 
-      let itemsBreakdown = '';
-      if (p.items && p.items.length > 0) {
-        itemsBreakdown = '\nDETALLE DE ARTÍCULOS:\n' + 
-          p.items.map(it => `• ${it.quantity}x ${it.name} - $${(it.subtotal || it.quantity * it.unitPrice).toLocaleString('es-CO')}`).join('\n') + '\n';
+      let itemsBreakdown = '\nDETALLE DE ARTÍCULOS:\n' + 
+        (d.items || []).map(it => `• ${it.quantity}x ${it.name} - $${(it.subtotal || it.quantity * it.unitPrice).toLocaleString('es-CO')}`).join('\n') + '\n';
+
+      let text = '';
+      if (isQuote) {
+        text = `PRESUPUESTO / COTIZACIÓN - ${(bizProfile.name || 'ZENTRA').toUpperCase()}\n` +
+          `N°: ${d.consecutivo} | Fecha: ${d.date}\n` +
+          `Cliente: ${d.clientName}${clientDoc}\n` +
+          `Concepto: ${d.orderName}\n` +
+          `${itemsBreakdown}\n` +
+          `Total Cotizado: $${d.total.toLocaleString('es-CO')} COP\n` +
+          `Validez: 15 días calendario\n\n` +
+          `Cuentas autorizadas:\n- Nequi: ${bizProfile.nequi || bizProfile.phone}\n- Daviplata: ${bizProfile.daviplata || bizProfile.phone}\n- Bancolombia: ${bizProfile.bancolombia}`;
       } else {
-        itemsBreakdown = `\nConcepto: ${p.services || p.name}\n`;
+        text = `FACTURA DE VENTA - ${(bizProfile.name || 'ZENTRA').toUpperCase()}\n` +
+          `N°: ${d.consecutivo} | Fecha: ${d.date}\n` +
+          `Cliente: ${d.clientName}${clientDoc}\n` +
+          `Concepto: ${d.orderName}\n` +
+          `${itemsBreakdown}\n` +
+          `Total: $${d.total.toLocaleString('es-CO')} COP\n` +
+          `Pagado: $${d.cobrado.toLocaleString('es-CO')} COP\n` +
+          `Saldo: $${d.saldo.toLocaleString('es-CO')} COP\n\n` +
+          `Contacto: ${bizProfile.phone}`;
       }
 
-      const text = `COMPROBANTE DE PEDIDO / FACTURA - ${(bizProfile.name || 'ZENTRA').toUpperCase()}\n` +
-        `N°: #PED-${String(p.id).padStart(4, '0')} | Fecha: ${new Date().toLocaleDateString('es-CO')}\n` +
-        `Cliente: ${p.client}${clientDoc}\n` +
-        `Proyecto: ${p.name}\n` +
-        `${itemsBreakdown}\n` +
-        `Total: $${p.total.toLocaleString('es-CO')}\n` +
-        `Abonado: $${p.cobrado.toLocaleString('es-CO')}\n` +
-        `Saldo: $${saldo.toLocaleString('es-CO')}\n\n` +
-        `Medios de pago:\n- Nequi: ${bizProfile.nequi || bizProfile.phone}\n- Daviplata: ${bizProfile.daviplata || bizProfile.phone}\n- Bancolombia: ${bizProfile.bancolombia}`;
-
       navigator.clipboard.writeText(text).catch(() => {});
-      showToast('✓ Texto del recibo copiado al portapapeles');
+      showToast(isQuote ? '✓ Texto de cotización copiado' : '✓ Texto de factura copiado');
     }
 
     function imprimirFacturaRecibo() {
@@ -4684,25 +4943,127 @@ ${itemsBreakdown}
       renderCatalogItems();
     }
 
+    function filtrarCatalogoPorTipo(tipo) {
+      catalogTypeFilter = tipo;
+      ['chipCatTodos', 'chipCatProductos', 'chipCatServicios'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('active');
+      });
+      if (tipo === 'todos' && document.getElementById('chipCatTodos')) document.getElementById('chipCatTodos').classList.add('active');
+      if (tipo === 'producto' && document.getElementById('chipCatProductos')) document.getElementById('chipCatProductos').classList.add('active');
+      if (tipo === 'servicio' && document.getElementById('chipCatServicios')) document.getElementById('chipCatServicios').classList.add('active');
+      renderCatalogItems();
+    }
+
+    function seleccionarTipoItemCatalogo(tipo) {
+      const typeInp = document.getElementById('prodTypeInp');
+      if (typeInp) typeInp.value = tipo;
+
+      const btnProd = document.getElementById('btnTypeProducto');
+      const btnServ = document.getElementById('btnTypeServicio');
+      const boxStock = document.getElementById('boxProdStock');
+      const boxNotice = document.getElementById('boxProdServiceNotice');
+      const lblName = document.getElementById('lblProdNameTitle');
+      const inpName = document.getElementById('prodNameInp');
+      const lblCost = document.getElementById('lblProdCostTitle');
+
+      if (tipo === 'servicio') {
+        if (btnServ) {
+          btnServ.style.background = 'var(--card-bg)';
+          btnServ.style.color = 'var(--primary)';
+          btnServ.style.fontWeight = '700';
+          btnServ.style.boxShadow = 'var(--shadow-sm)';
+        }
+        if (btnProd) {
+          btnProd.style.background = 'transparent';
+          btnProd.style.color = 'var(--text-muted)';
+          btnProd.style.fontWeight = '600';
+          btnProd.style.boxShadow = 'none';
+        }
+        if (boxStock) boxStock.style.display = 'none';
+        if (boxNotice) boxNotice.style.display = 'block';
+        if (lblName) lblName.innerText = 'Nombre del Servicio o Proyecto Elaborado *';
+        if (inpName) inpName.placeholder = 'Ej: Tarjetas de Invitación x50, Libreta Personalizada, Logo';
+        if (lblCost) lblCost.innerText = 'Costo Insumos / Elaboración ($ COP)';
+      } else {
+        if (btnProd) {
+          btnProd.style.background = 'var(--card-bg)';
+          btnProd.style.color = 'var(--primary)';
+          btnProd.style.fontWeight = '700';
+          btnProd.style.boxShadow = 'var(--shadow-sm)';
+        }
+        if (btnServ) {
+          btnServ.style.background = 'transparent';
+          btnServ.style.color = 'var(--text-muted)';
+          btnServ.style.fontWeight = '600';
+          btnServ.style.boxShadow = 'none';
+        }
+        if (boxStock) boxStock.style.display = 'grid';
+        if (boxNotice) boxNotice.style.display = 'none';
+        if (lblName) lblName.innerText = 'Nombre del Producto *';
+        if (inpName) inpName.placeholder = 'Ej: Cake Topper Shaker, Agendas, Portaplatos';
+        if (lblCost) lblCost.innerText = 'Costo Unitario ($ COP)';
+      }
+
+      calcularMargenNuevoProducto();
+    }
+
+    function calcularMargenNuevoProducto() {
+      const price = parseFloat(document.getElementById('prodPriceInp').value) || 0;
+      const cost = parseFloat(document.getElementById('prodCostInp').value) || 0;
+      const box = document.getElementById('boxProfitMarginLive');
+      const lbl = document.getElementById('lblProfitLive');
+
+      if (!box || !lbl) return;
+
+      if (price <= 0) {
+        box.style.background = 'var(--surface-subtle)';
+        box.style.borderColor = 'var(--surface-border)';
+        lbl.style.color = 'var(--text-muted)';
+        lbl.innerText = '$0 COP (0% margen)';
+        return;
+      }
+
+      const ganancia = price - cost;
+      const margenPct = ((ganancia / price) * 100);
+
+      if (ganancia >= 0) {
+        box.style.background = '#F0FDF4';
+        box.style.borderColor = '#BBF7D0';
+        lbl.style.color = '#15803D';
+        lbl.innerText = `+$${ganancia.toLocaleString('es-CO')} COP (${margenPct.toFixed(1)}% margen)`;
+      } else {
+        box.style.background = '#FEF2F2';
+        box.style.borderColor = '#FECACA';
+        lbl.style.color = '#DC2626';
+        lbl.innerText = `Costo excede precio: -$${Math.abs(ganancia).toLocaleString('es-CO')} COP`;
+      }
+    }
+
     function renderCatalogItems() {
       const container = document.getElementById('catalogItemsList');
       if (!container) return;
       container.innerHTML = '';
 
-      // Todos los productos pertenecen 100% exclusivamente a este negocio
       const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
-      const items = catalogItems.filter(i => !i.mode || i.mode === mode);
+      let items = catalogItems.filter(i => !i.mode || i.mode === mode);
+
+      if (catalogTypeFilter === 'producto') {
+        items = items.filter(i => (!i.itemType || i.itemType === 'producto'));
+      } else if (catalogTypeFilter === 'servicio') {
+        items = items.filter(i => i.itemType === 'servicio');
+      }
 
       const totalCountEl = document.getElementById('lblCatTotalCount');
-      if (totalCountEl) totalCountEl.innerText = `${items.length} productos`;
+      if (totalCountEl) totalCountEl.innerText = `${items.length} ítems`;
 
       if (items.length === 0) {
         container.innerHTML = `
           <div style="text-align:center; padding:32px 18px; background:var(--card-bg); border-radius:20px; border:1.5px dashed var(--surface-border); margin:12px 0;">
             <div style="font-size:36px; margin-bottom:10px;">🏷️</div>
             <div style="font-weight:700; font-size:15px; margin-bottom:6px; color:var(--text);">Catálogo Vacío</div>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:18px; line-height:1.4;">Este negocio aún no tiene productos registrados. Los productos que agregues serán 100% exclusivos de tu negocio.</div>
-            <button class="primary-btn" onclick="abrirModalNuevoProducto()" style="max-width:240px; margin:0 auto;">+ AGREGAR PRODUCTO</button>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:18px; line-height:1.4;">No hay productos o servicios registrados en esta sección. Crea tus artículos con costos y valores de venta.</div>
+            <button class="primary-btn" onclick="abrirModalNuevoProducto()" style="max-width:240px; margin:0 auto;">+ AGREGAR ÍTEM</button>
           </div>
         `;
         return;
@@ -4711,52 +5072,90 @@ ${itemsBreakdown}
       items.forEach(item => {
         const card = document.createElement('div');
         card.className = 'catalog-item-card';
-        const isLow = item.stock <= 5;
-        const gananciaUnidad = item.price - item.cost;
+        card.style.cssText = 'background:#FFFFFF; border:1px solid var(--surface-border); border-radius:16px; padding:12px 14px; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; box-shadow:var(--shadow-sm);';
+        
+        const isServ = item.itemType === 'servicio';
+        const isLow = !isServ && item.stock <= 5;
+        const gananciaUnidad = (item.price || 0) - (item.cost || 0);
+        const margenPct = item.price > 0 ? ((gananciaUnidad / item.price) * 100).toFixed(0) : 0;
+
         const thumbHtml = item.image
           ? `<img src="${item.image}" class="prod-thumb" style="width:48px; height:48px; border-radius:12px; object-fit:cover; border:1px solid #E5E7EB; flex-shrink:0;">`
-          : `<div class="prod-thumb" style="width:48px; height:48px; border-radius:12px; background:var(--bg); border:1px solid var(--surface-border); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">🎁</div>`;
+          : `<div class="prod-thumb" style="width:48px; height:48px; border-radius:12px; background:var(--bg); border:1px solid var(--surface-border); display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;">${isServ ? '✂️' : '🎁'}</div>`;
+
+        const stockBadge = isServ 
+          ? `<span style="font-size:10px; color:#4F46E5; font-weight:700; background:#EEF2FF; padding:2px 6px; border-radius:6px;">✂️ Bajo Encargo</span>`
+          : `<span style="font-size:11px; font-weight:700; color:${isLow ? 'var(--alert)' : '#15803D'};">${isLow ? '⚠️ ' : ''}${item.stock} disp</span>`;
+
+        const actionBtn = (mode === 'retail')
+          ? `<button onclick="agregarAlCarritoRetail(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="background:var(--primary); color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">+ Carrito</button>`
+          : `<button onclick="venderProductoCatalogo('${item.id}')" style="background:#38A169; color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">Vender 1</button>`;
 
         card.innerHTML = `
           <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
             ${thumbHtml}
             <div style="min-width:0; flex:1;">
+              <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:2px;">
+                <span style="font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:5px; background:${isServ ? '#EEF2FF; color:#4F46E5;' : '#ECFDF5; color:#065F46;'}">${isServ ? '✂️ SERVICIO' : '📦 PRODUCTO'}</span>
+                <span style="font-size:10px; color:var(--text-muted);">${item.cat || 'General'}</span>
+              </div>
               <div style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</div>
-              <div style="font-size:11px; color:#777;">Cat: ${item.cat} • Costo: $${item.cost.toLocaleString('es-CO')}</div>
-              <div style="font-size:13px; font-weight:700; color:var(--secondary); margin-top:2px;">
-                $${item.price.toLocaleString('es-CO')} 
-                <span style="font-size:10px; font-weight:500; color:#38A169;">(Ganancia: +$${gananciaUnidad.toLocaleString('es-CO')})</span>
+              <div style="font-size:11px; color:#64748B; margin-top:1px;">
+                Costo: <b>$${(item.cost || 0).toLocaleString('es-CO')}</b> • Venta: <b style="color:var(--text);">$${(item.price || 0).toLocaleString('es-CO')}</b>
+              </div>
+              <div style="font-size:11px; font-weight:700; color:#15803D; margin-top:2px;">
+                Ganancia: +$${gananciaUnidad.toLocaleString('es-CO')} (${margenPct}% margen)
               </div>
             </div>
           </div>
-          <div style="text-align:right; margin-left:8px;">
-            <div style="font-size:11px; font-weight:700; margin-bottom:6px; color:${isLow ? 'var(--alert)' : '#38A169'};">
-              ${isLow ? '⚠️ ' : ''}${item.stock} disp
+          <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0;">
+            ${stockBadge}
+            <div style="display:flex; align-items:center; gap:5px;">
+              ${actionBtn}
+              <button onclick="eliminarProductoCatalogo('${item.id}')" title="Eliminar ítem" style="background:#FEE2E2; border:none; color:#DC2626; width:28px; height:28px; border-radius:8px; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                🗑️
+              </button>
             </div>
-            <button onclick="venderProductoCatalogo('${item.id}')" style="background:#38A169; color:#fff; border:none; padding:6px 12px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
-              Vender 1
-            </button>
           </div>
         `;
         container.appendChild(card);
       });
     }
 
+    function eliminarProductoCatalogo(id) {
+      const idx = catalogItems.findIndex(i => i.id === id);
+      if (idx === -1) return;
+      const item = catalogItems[idx];
+
+      if (!confirm(`¿Deseas eliminar "${item.name}" del catálogo?`)) return;
+
+      catalogItems.splice(idx, 1);
+      retailCart = retailCart.filter(x => x.id !== id);
+      cart = retailCart;
+      persistirEstadoLocal();
+      renderCatalogItems();
+      renderPos();
+      renderRetailCartBadge();
+      showToast(`✓ "${item.name}" eliminado del catálogo`);
+    }
+
     function venderProductoCatalogo(id) {
       const item = catalogItems.find(i => i.id === id);
       if (!item) return;
 
-      if (item.stock <= 0) {
+      const isServ = item.itemType === 'servicio';
+      if (!isServ && item.stock <= 0) {
         showToast(`¡Agotado! No hay unidades disponibles de ${item.name}`);
         return;
       }
 
-      item.stock--;
+      if (!isServ) item.stock--;
       generalIncomes.unshift({
         desc: `Venta catálogo: ${item.name}`,
         amount: item.price
       });
 
+      persistirEstadoLocal();
       renderCatalogItems();
       recalcularTodo();
       showToast(`✓ Venta de 1 ${item.name} registrada (+$${item.price.toLocaleString('es-CO')} COP en ingresos)`);
@@ -4769,7 +5168,11 @@ ${itemsBreakdown}
       document.getElementById('prodStockInp').value = '10';
       const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
       document.getElementById('prodCatInp').value = mode === 'servicios' ? 'Papelería' : 'Abarrotes';
+      if (document.getElementById('prodServiceCatInp')) {
+        document.getElementById('prodServiceCatInp').value = 'Diseño & Elaboración';
+      }
       removeProductPhoto();
+      seleccionarTipoItemCatalogo('producto');
       document.getElementById('newProductModal').style.display = 'flex';
       setTimeout(() => document.getElementById('prodNameInp').focus(), 100);
     }
@@ -4783,8 +5186,15 @@ ${itemsBreakdown}
       const name = document.getElementById('prodNameInp').value.trim();
       const price = parseFloat(document.getElementById('prodPriceInp').value) || 0;
       const cost = parseFloat(document.getElementById('prodCostInp').value) || 0;
-      const stock = parseInt(document.getElementById('prodStockInp').value) || 1;
-      const cat = document.getElementById('prodCatInp').value.trim() || 'General';
+      const itemType = document.getElementById('prodTypeInp').value || 'producto';
+      const stock = itemType === 'servicio' ? 999 : (parseInt(document.getElementById('prodStockInp').value) || 1);
+      
+      let cat = 'General';
+      if (itemType === 'servicio') {
+        cat = (document.getElementById('prodServiceCatInp')?.value || '').trim() || 'Servicios';
+      } else {
+        cat = (document.getElementById('prodCatInp')?.value || '').trim() || 'Abarrotes';
+      }
 
       if (!name || price <= 0) {
         showToast('Ingresa nombre y precio de venta válido.');
@@ -4800,6 +5210,7 @@ ${itemsBreakdown}
         cost: cost,
         stock: stock,
         cat: cat,
+        itemType: itemType,
         image: tempProductPhoto || null,
         mode: mode
       });
@@ -4809,7 +5220,18 @@ ${itemsBreakdown}
       cerrarModalNuevoProducto();
       renderCatalogItems();
       renderPos();
-      showToast(`✓ Producto "${name}" agregado al catálogo con ${stock} unidades`);
+      showToast(`✓ ${itemType === 'servicio' ? 'Servicio' : 'Producto'} "${name}" agregado al catálogo exitosamente`);
+    }
+
+    // ==========================================
+    // PUNTO DE VENTA Y CARRITO RETAIL (MOSTRADOR)
+    // ==========================================
+    let posSearchFilter = '';
+
+    function filtrarPosGrid() {
+      const inp = document.getElementById('posSearchInp');
+      posSearchFilter = inp ? inp.value.trim().toLowerCase() : '';
+      renderPos();
     }
 
     function renderPos() {
@@ -4817,8 +5239,15 @@ ${itemsBreakdown}
       if (!grid) return;
       grid.innerHTML = '';
       
-      const retailItems = catalogItems.filter(p => !p.mode || p.mode === 'retail');
-      const lowStockCount = retailItems.filter(p => p.stock <= 5).length;
+      let retailItems = catalogItems.filter(p => !p.mode || p.mode === 'retail');
+      if (posSearchFilter) {
+        retailItems = retailItems.filter(p => 
+          p.name.toLowerCase().includes(posSearchFilter) || 
+          (p.cat && p.cat.toLowerCase().includes(posSearchFilter))
+        );
+      }
+
+      const lowStockCount = retailItems.filter(p => p.itemType !== 'servicio' && p.stock <= 5).length;
 
       const lblStock = document.getElementById('lblStockAviso');
       if (lblStock) {
@@ -4831,9 +5260,8 @@ ${itemsBreakdown}
         }
       }
 
-      // Ventas de hoy y caja calculadas de forma dinámica y real (cero demo)
       const totalVentasPOS = generalIncomes
-        .filter(i => (i.desc && (i.desc.includes('Venta POS') || i.desc.includes('Venta catálogo'))))
+        .filter(i => (i.desc && (i.desc.includes('Venta POS') || i.desc.includes('Venta catálogo') || i.desc.includes('Factura'))))
         .reduce((sum, i) => sum + (i.amount || 0), 0);
       const totalGastosPOS = generalExpenses.reduce((sum, g) => sum + (g.amount || 0), 0);
       const cajaActual = Math.max(0, totalVentasPOS - totalGastosPOS);
@@ -4848,65 +5276,310 @@ ${itemsBreakdown}
           <div style="grid-column: 1 / -1; text-align:center; padding:32px 18px; background:var(--card-bg); border-radius:20px; border:1.5px dashed var(--surface-border);">
             <div style="font-size:36px; margin-bottom:10px;">🛒</div>
             <div style="font-weight:700; font-size:15px; margin-bottom:6px; color:var(--text);">Punto de Venta Vacío</div>
-            <div style="font-size:12px; color:#777; margin-bottom:18px;">Agrega productos a tu inventario para vender desde aquí.</div>
-            <button class="primary-btn" onclick="abrirModalCatalogoInventario()" style="max-width:240px; margin:0 auto;">+ AGREGAR PRODUCTOS AL POS</button>
+            <div style="font-size:12px; color:#777; margin-bottom:18px;">Agrega productos o servicios a tu inventario para vender desde aquí.</div>
+            <button class="primary-btn" onclick="abrirModalNuevoProducto()" style="max-width:240px; margin:0 auto;">+ AGREGAR ÍTEM AL POS</button>
           </div>
         `;
+        renderRetailCartBadge();
         return;
       }
 
       retailItems.forEach(p => {
-        const isLow = p.stock <= 5;
+        const isServ = p.itemType === 'servicio';
+        const isLow = !isServ && p.stock <= 5;
         const el = document.createElement('div');
         el.className = 'pos-product';
         const thumbHtml = p.image 
           ? `<img src="${p.image}" style="width:100%; height:75px; object-fit:cover; border-radius:10px; margin-bottom:6px;">`
-          : '';
+          : `<div style="width:100%; height:75px; background:var(--bg); border-radius:10px; margin-bottom:6px; display:flex; align-items:center; justify-content:center; font-size:26px;">${isServ ? '✂️' : '📦'}</div>`;
+        
+        const stockHtml = isServ
+          ? `<span class="pos-stock" style="color:#4F46E5;">✂️ Encargo</span>`
+          : `<span class="pos-stock ${isLow ? 'stock-warning' : ''}">${isLow ? '⚠️ ' : ''}${p.stock} disp</span>`;
+
         el.innerHTML = `
           ${thumbHtml}
           <div>
-            <span style="font-size: 9px; opacity: 0.6;">${p.cat || 'General'}</span>
-            <div class="pos-name">${p.name}</div>
+            <span style="font-size: 9px; opacity: 0.7; text-transform:uppercase; font-weight:700;">${isServ ? 'Servicio • ' : ''}${p.cat || 'General'}</span>
+            <div class="pos-name" style="font-size:12.5px; font-weight:700; line-height:1.2; margin-top:2px;">${p.name}</div>
           </div>
-          <div class="pos-bottom">
-            <span class="pos-price">$${p.price.toLocaleString('es-CO')}</span>
-            <span class="pos-stock ${isLow ? 'stock-warning' : ''}">${isLow ? '⚠️ ' : ''}${p.stock} disp</span>
+          <div class="pos-bottom" style="margin-top:6px;">
+            <span class="pos-price" style="font-size:13px; font-weight:800;">$${p.price.toLocaleString('es-CO')}</span>
+            ${stockHtml}
           </div>
         `;
-        el.onclick = () => addToCart(p);
+        el.onclick = () => agregarAlCarritoRetail(p);
         grid.appendChild(el);
       });
+
+      renderRetailCartBadge();
     }
 
-    function addToCart(p) {
-      if (p.stock <= 0) {
+    function agregarAlCarritoRetail(p) {
+      const isServ = p.itemType === 'servicio';
+      if (!isServ && p.stock <= 0) {
         showToast(`¡Agotado! No hay existencias de ${p.name}`);
         return;
       }
-      p.stock--;
-      cart.push(p);
-      document.getElementById('cartCount').innerText = cart.length;
-      renderPos();
-      persistirEstadoLocal();
-      showToast(`+ ${p.name} agregado al carrito`);
+
+      const existing = retailCart.find(i => i.id === p.id);
+      if (existing) {
+        if (!isServ && existing.quantity >= p.stock) {
+          showToast(`⚠️ Stock máximo alcanzado (${p.stock} unid. de ${p.name})`);
+          return;
+        }
+        existing.quantity++;
+        existing.subtotal = existing.quantity * existing.price;
+      } else {
+        retailCart.push({
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          cost: p.cost || 0,
+          cat: p.cat || 'General',
+          image: p.image || null,
+          itemType: p.itemType || 'producto',
+          quantity: 1,
+          maxStock: isServ ? 999 : p.stock,
+          subtotal: p.price
+        });
+      }
+
+      cart = retailCart; // retrocompatibilidad
+      renderRetailCartBadge();
+      showToast(`+ 1 ${p.name} agregado al carrito`);
     }
 
-    function cobrarCarrito() {
-      if (cart.length === 0) {
-        showToast('El carrito está vacío. Toca un producto para agregar.');
+    function addToCart(p) {
+      agregarAlCarritoRetail(p);
+    }
+
+    function renderRetailCartBadge() {
+      const totalUnits = retailCart.reduce((sum, i) => sum + i.quantity, 0);
+      const totalAmount = retailCart.reduce((sum, i) => sum + (i.quantity * i.price), 0);
+
+      const countEl = document.getElementById('cartCount');
+      if (countEl) countEl.innerText = totalUnits;
+
+      const sumEl = document.getElementById('cartTotalSum');
+      if (sumEl) sumEl.innerText = `$${totalAmount.toLocaleString('es-CO')} COP`;
+    }
+
+    function abrirCarritoRetail() {
+      if (retailCart.length === 0) {
+        showToast('El carrito está vacío. Toca productos en el mostrador para agregarlos.');
         return;
       }
-      const total = cart.reduce((sum, item) => sum + item.price, 0);
+      renderRetailCartModal();
+      document.getElementById('retailCartModal').style.display = 'flex';
+    }
+
+    function cerrarCarritoRetail() {
+      document.getElementById('retailCartModal').style.display = 'none';
+    }
+
+    function renderRetailCartModal() {
+      const container = document.getElementById('retailCartItemsList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (retailCart.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:16px; color:#888; font-size:12px;">El carrito está vacío.</div>';
+        const totalUnitsEl = document.getElementById('retailCartTotalUnits');
+        if (totalUnitsEl) totalUnitsEl.innerText = '0 unid.';
+        const totalAmountEl = document.getElementById('retailCartTotalAmount');
+        if (totalAmountEl) totalAmountEl.innerText = '$0 COP';
+        return;
+      }
+
+      let totalUnits = 0;
+      let totalAmount = 0;
+
+      retailCart.forEach((item, idx) => {
+        totalUnits += item.quantity;
+        const sub = item.quantity * item.price;
+        totalAmount += sub;
+
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex; align-items:center; justify-content:space-between; background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; gap:8px;';
+        
+        const isServ = item.itemType === 'servicio';
+        const thumbHtml = item.image
+          ? `<img src="${item.image}" style="width:34px; height:34px; border-radius:8px; object-fit:cover; flex-shrink:0;">`
+          : `<span style="font-size:20px; flex-shrink:0;">${isServ ? '✂️' : '🎁'}</span>`;
+
+        row.innerHTML = `
+          <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+            ${thumbHtml}
+            <div style="min-width:0; flex:1;">
+              <div style="font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</div>
+              <div style="font-size:11px; color:var(--text-muted);">$${item.price.toLocaleString('es-CO')} c/u</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" class="stepper-btn" onclick="cambiarCantidadCarritoRetail(${idx}, -1)">-</button>
+            <span style="font-size:13px; font-weight:800; min-width:18px; text-align:center;">${item.quantity}</span>
+            <button type="button" class="stepper-btn" onclick="cambiarCantidadCarritoRetail(${idx}, 1)">+</button>
+            <div style="font-size:12.5px; font-weight:800; color:var(--text); min-width:65px; text-align:right;">
+              $${sub.toLocaleString('es-CO')}
+            </div>
+            <button type="button" onclick="eliminarItemCarritoRetail(${idx})" style="background:transparent; border:none; color:var(--alert); font-size:14px; cursor:pointer; padding:2px 4px;">✕</button>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      const totalUnitsEl = document.getElementById('retailCartTotalUnits');
+      if (totalUnitsEl) totalUnitsEl.innerText = `${totalUnits} unid.`;
+      const totalAmountEl = document.getElementById('retailCartTotalAmount');
+      if (totalAmountEl) totalAmountEl.innerText = `$${totalAmount.toLocaleString('es-CO')} COP`;
+
+      renderRetailCartBadge();
+    }
+
+    function cambiarCantidadCarritoRetail(idx, delta) {
+      if (!retailCart[idx]) return;
+      const it = retailCart[idx];
+      const isServ = it.itemType === 'servicio';
+
+      if (delta > 0 && !isServ && it.quantity >= it.maxStock) {
+        showToast(`Stock máximo alcanzado (${it.maxStock} unidades disponibles)`);
+        return;
+      }
+
+      it.quantity += delta;
+      if (it.quantity <= 0) {
+        retailCart.splice(idx, 1);
+      } else {
+        it.subtotal = it.quantity * it.price;
+      }
+
+      cart = retailCart;
+      renderRetailCartModal();
+      if (retailCart.length === 0) {
+        cerrarCarritoRetail();
+      }
+    }
+
+    function eliminarItemCarritoRetail(idx) {
+      if (!retailCart[idx]) return;
+      retailCart.splice(idx, 1);
+      cart = retailCart;
+      renderRetailCartModal();
+      if (retailCart.length === 0) {
+        cerrarCarritoRetail();
+      }
+    }
+
+    function vaciarCarritoRetail() {
+      if (retailCart.length === 0) return;
+      if (!confirm('¿Deseas vaciar todos los artículos del carrito?')) return;
+      retailCart = [];
+      cart = [];
+      renderRetailCartBadge();
+      cerrarCarritoRetail();
+      showToast('Carrito vaciado');
+    }
+
+    function procesarCobroRetail() {
+      if (retailCart.length === 0) {
+        showToast('El carrito está vacío.');
+        return;
+      }
+
+      const total = retailCart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+      const cliName = (document.getElementById('retailCliNameInp')?.value || '').trim() || 'Cliente Mostrador';
+      const cliPhone = (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+
+      // Descontar existencias físicas de los productos vendidos
+      retailCart.forEach(cartItem => {
+        if (cartItem.itemType !== 'servicio') {
+          const catItem = catalogItems.find(x => x.id === cartItem.id);
+          if (catItem) {
+            catItem.stock = Math.max(0, catItem.stock - cartItem.quantity);
+          }
+        }
+      });
+
+      const itemsSummary = retailCart.map(x => `${x.quantity}x ${x.name}`).join(', ');
+
       generalIncomes.unshift({
-        desc: `Venta POS (${cart.length} productos)`,
+        desc: `Factura POS: ${itemsSummary} (${cliName})`,
         amount: total
       });
-      showToast(`¡Cobro exitoso de $${total.toLocaleString('es-CO')} COP en Caja!`);
+
+      // Preparar recibo en modo FACTURA OFICIAL PAGADA
+      const ticketNum = Math.floor(1000 + Math.random() * 9000);
+      const receiptData = {
+        mode: 'factura',
+        consecutivo: `#FAC-POS-${ticketNum}`,
+        date: new Date().toLocaleDateString('es-CO'),
+        clientName: cliName,
+        clientPhone: cliPhone,
+        clientDoc: 'Consumidor Final',
+        orderName: 'Venta de Mostrador POS',
+        orderStatus: 'Entregado y Pagado',
+        items: retailCart.map(x => ({
+          quantity: x.quantity,
+          name: x.name,
+          unitPrice: x.price,
+          subtotal: x.quantity * x.price
+        })),
+        total: total,
+        cobrado: total,
+        saldo: 0
+      };
+
+      retailCart = [];
       cart = [];
-      document.getElementById('cartCount').innerText = '0';
+      renderRetailCartBadge();
       persistirEstadoLocal();
       recalcularTodo();
       renderPos();
+      cerrarCarritoRetail();
+
+      abrirFacturaReciboConDatos(receiptData);
+      showToast(`¡Cobro exitoso de $${total.toLocaleString('es-CO')} COP en Caja y Factura generada!`);
+    }
+
+    function generarComprobanteRetail(isQuote = true) {
+      if (retailCart.length === 0) {
+        showToast('El carrito está vacío.');
+        return;
+      }
+
+      const total = retailCart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+      const cliName = (document.getElementById('retailCliNameInp')?.value || '').trim() || 'Cliente Mostrador';
+      const cliPhone = (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+
+      const ticketNum = Math.floor(1000 + Math.random() * 9000);
+      const receiptData = {
+        mode: 'cotizacion',
+        consecutivo: `#COT-POS-${ticketNum}`,
+        date: new Date().toLocaleDateString('es-CO'),
+        clientName: cliName,
+        clientPhone: cliPhone,
+        clientDoc: 'N/A',
+        orderName: 'Presupuesto de Mostrador',
+        orderStatus: 'Cotización',
+        items: retailCart.map(x => ({
+          quantity: x.quantity,
+          name: x.name,
+          unitPrice: x.price,
+          subtotal: x.quantity * x.price
+        })),
+        total: total,
+        cobrado: 0,
+        saldo: total
+      };
+
+      cerrarCarritoRetail();
+      abrirFacturaReciboConDatos(receiptData);
+      showToast('✓ Presupuesto / Cotización de mostrador generada exitosamente (Sin cobro)');
+    }
+
+    function cobrarCarrito() {
+      abrirCarritoRetail();
     }
 
     function openThemeModal() {

@@ -1156,17 +1156,17 @@
         <div class="stats-grid">
           <div class="stat-card">
             <div class="stat-title">Ventas Hoy</div>
-            <div class="stat-value val-income" id="txtVentasHoy">$84.500</div>
+            <div class="stat-value val-income" id="txtVentasHoy">$0</div>
           </div>
           <div class="stat-card">
             <div class="stat-title">En Caja (Base+Ventas)</div>
-            <div class="stat-value val-profit" id="txtCajaHoy">$184.500</div>
+            <div class="stat-value val-profit" id="txtCajaHoy">$0</div>
           </div>
         </div>
 
         <div class="section-title">
           <span>Punto de Venta (Toca para cobrar)</span>
-          <span style="font-size: 11px; color: var(--alert);" id="lblStockAviso">2 con bajo stock</span>
+          <span style="font-size: 11px; color: var(--alert); display: none;" id="lblStockAviso"></span>
         </div>
 
         <div class="pos-grid" id="posGrid">
@@ -1580,7 +1580,7 @@
         <div id="authSecLogin">
           <div style="margin-bottom:12px;">
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:#0B1C30;">Correo, Usuario o Celular Registrado</label>
-            <input type="text" id="loginUserInp" placeholder="Ej: tatiana@tmdisenos.com o 3124567890" style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
+            <input type="text" id="loginUserInp" placeholder="Ej: usuario@minegocio.com o 3124567890" style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
           </div>
           <div style="margin-bottom:16px;">
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:#0B1C30;">Contraseña o PIN Secreto</label>
@@ -1611,12 +1611,12 @@
         <div id="authSecRegister" style="display:none;">
           <div style="margin-bottom:10px;">
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:#0B1C30;">1. Nombre del Negocio / Marca *</label>
-            <input type="text" id="setupNameInp" placeholder="Ej: TM Diseños Creativos" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
+            <input type="text" id="setupNameInp" placeholder="Ej: Mi Negocio, Papelería San José, Taller Creativo" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
           </div>
 
           <div style="margin-bottom:10px;">
             <label style="font-size:11px; font-weight:700; display:block; margin-bottom:3px; color:#0B1C30;">2. Propietario(a) *</label>
-            <input type="text" id="setupOwnerInp" placeholder="Ej: Tatiana Marín" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
+            <input type="text" id="setupOwnerInp" placeholder="Ej: María Gómez, Carlos Pérez" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
           </div>
 
           <div style="margin-bottom:10px;">
@@ -1872,15 +1872,15 @@
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <div>
             <div style="font-size:17px; font-weight:700;">📦 Catálogo & Inventario</div>
-            <div style="font-size:11px; color:#777;">Control de stock y venta de productos terminados</div>
+            <div style="font-size:11px; color:var(--text-muted);" id="lblCatalogModalSub">Control de stock y venta de productos terminados</div>
           </div>
           <button onclick="cerrarModalCatalogoInventario()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
         </div>
 
-        <!-- Selector de pestaña de catálogo -->
-        <div style="display:flex; gap:6px; margin-bottom:12px;">
-          <button id="catTabServicios" onclick="filtrarCatalogo('servicios')" style="flex:1; padding:8px; border-radius:12px; font-size:11.5px; font-weight:700; border:1px solid var(--secondary); background:var(--secondary); color:#fff; cursor:pointer;">TM Diseños (Servicios)</button>
-          <button id="catTabRetail" onclick="filtrarCatalogo('retail')" style="flex:1; padding:8px; border-radius:12px; font-size:11.5px; font-weight:600; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); cursor:pointer;">Don Pedro (Retail)</button>
+        <!-- Indicador de catálogo exclusivo del negocio activo (Sin referencias a otros comercios) -->
+        <div id="catNoticeContainer" style="margin-bottom:12px; font-size:11px; color:var(--text-muted); display:flex; align-items:center; justify-content:space-between; background:var(--surface-subtle); padding:8px 12px; border-radius:12px; border:1px solid var(--surface-border);">
+          <span id="lblCatModeNotice" style="font-weight:600; color:var(--text);">📦 Catálogo exclusivo de tu negocio</span>
+          <span id="lblCatTotalCount" style="font-weight:700; color:var(--primary); background:var(--primary-soft); padding:2px 8px; border-radius:10px;">0 productos</span>
         </div>
 
         <button onclick="abrirModalNuevoProducto()" style="width:100%; background:transparent; border:1.5px dashed var(--secondary); color:var(--secondary); padding:9px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; margin-bottom:14px;">+ AGREGAR NUEVO PRODUCTO AL CATÁLOGO</button>
@@ -3739,6 +3739,11 @@
       if (document.getElementById('lblBizType')) {
         document.getElementById('lblBizType').innerText = mode === 'servicios' ? '🎨 Servicios / Por Encargo' : '🛒 Retail / Mostrador';
       }
+      if (mode === 'retail') {
+        renderPos();
+      } else {
+        recalcularTodo();
+      }
     }
 
     function calcularComprasProyecto(p) {
@@ -3921,6 +3926,9 @@
       if (document.getElementById('dGananciaNeta')) document.getElementById('dGananciaNeta').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
 
       renderProjectsList();
+      if (bizProfile && bizProfile.type === 'retail') {
+        renderPos();
+      }
     }
 
     function verDetalleProyecto(idx) {
@@ -4655,6 +4663,14 @@ ${itemsBreakdown}
 
     // Modal de Catálogo e Inventario
     function abrirModalCatalogoInventario() {
+      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
+      catalogFilter = mode;
+      const notice = document.getElementById('lblCatModeNotice');
+      if (notice) {
+        notice.innerText = mode === 'retail' 
+          ? '🛒 Productos POS de Mostrador' 
+          : '🎨 Productos para Proyectos y Encargos';
+      }
       renderCatalogItems();
       document.getElementById('catalogModal').style.display = 'flex';
     }
@@ -4665,10 +4681,6 @@ ${itemsBreakdown}
 
     function filtrarCatalogo(mode) {
       catalogFilter = mode;
-      document.getElementById('catTabServicios').style.background = mode === 'servicios' ? 'var(--secondary)' : 'var(--bg)';
-      document.getElementById('catTabServicios').style.color = mode === 'servicios' ? '#fff' : 'var(--text)';
-      document.getElementById('catTabRetail').style.background = mode === 'retail' ? 'var(--secondary)' : 'var(--bg)';
-      document.getElementById('catTabRetail').style.color = mode === 'retail' ? '#fff' : 'var(--text)';
       renderCatalogItems();
     }
 
@@ -4677,14 +4689,19 @@ ${itemsBreakdown}
       if (!container) return;
       container.innerHTML = '';
 
-      const items = catalogItems.filter(i => i.mode === catalogFilter);
+      // Todos los productos pertenecen 100% exclusivamente a este negocio
+      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
+      const items = catalogItems.filter(i => !i.mode || i.mode === mode);
+
+      const totalCountEl = document.getElementById('lblCatTotalCount');
+      if (totalCountEl) totalCountEl.innerText = `${items.length} productos`;
 
       if (items.length === 0) {
         container.innerHTML = `
           <div style="text-align:center; padding:32px 18px; background:var(--card-bg); border-radius:20px; border:1.5px dashed var(--surface-border); margin:12px 0;">
             <div style="font-size:36px; margin-bottom:10px;">🏷️</div>
-            <div style="font-weight:700; font-size:15px; margin-bottom:6px; color:var(--text);">Catálogo Exclusivo Vacío</div>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:18px; line-height:1.4;">Este negocio no tiene productos registrados en esta modalidad. Los productos que crees serán 100% exclusivos de este negocio.</div>
+            <div style="font-weight:700; font-size:15px; margin-bottom:6px; color:var(--text);">Catálogo Vacío</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-bottom:18px; line-height:1.4;">Este negocio aún no tiene productos registrados. Los productos que agregues serán 100% exclusivos de tu negocio.</div>
             <button class="primary-btn" onclick="abrirModalNuevoProducto()" style="max-width:240px; margin:0 auto;">+ AGREGAR PRODUCTO</button>
           </div>
         `;
@@ -4750,7 +4767,8 @@ ${itemsBreakdown}
       document.getElementById('prodPriceInp').value = '';
       document.getElementById('prodCostInp').value = '';
       document.getElementById('prodStockInp').value = '10';
-      document.getElementById('prodCatInp').value = catalogFilter === 'servicios' ? 'Papelería' : 'Abarrotes';
+      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
+      document.getElementById('prodCatInp').value = mode === 'servicios' ? 'Papelería' : 'Abarrotes';
       removeProductPhoto();
       document.getElementById('newProductModal').style.display = 'flex';
       setTimeout(() => document.getElementById('prodNameInp').focus(), 100);
@@ -4773,6 +4791,8 @@ ${itemsBreakdown}
         return;
       }
 
+      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
+
       catalogItems.unshift({
         id: 'c_' + Date.now(),
         name: name,
@@ -4781,7 +4801,7 @@ ${itemsBreakdown}
         stock: stock,
         cat: cat,
         image: tempProductPhoto || null,
-        mode: catalogFilter
+        mode: mode
       });
 
       removeProductPhoto();
@@ -4796,7 +4816,32 @@ ${itemsBreakdown}
       const grid = document.getElementById('posGrid');
       if (!grid) return;
       grid.innerHTML = '';
-      const retailItems = catalogItems.filter(p => p.mode === 'retail');
+      
+      const retailItems = catalogItems.filter(p => !p.mode || p.mode === 'retail');
+      const lowStockCount = retailItems.filter(p => p.stock <= 5).length;
+
+      const lblStock = document.getElementById('lblStockAviso');
+      if (lblStock) {
+        if (lowStockCount > 0) {
+          lblStock.style.display = 'inline';
+          lblStock.innerText = `${lowStockCount} con bajo stock`;
+        } else {
+          lblStock.style.display = 'none';
+          lblStock.innerText = '';
+        }
+      }
+
+      // Ventas de hoy y caja calculadas de forma dinámica y real (cero demo)
+      const totalVentasPOS = generalIncomes
+        .filter(i => (i.desc && (i.desc.includes('Venta POS') || i.desc.includes('Venta catálogo'))))
+        .reduce((sum, i) => sum + (i.amount || 0), 0);
+      const totalGastosPOS = generalExpenses.reduce((sum, g) => sum + (g.amount || 0), 0);
+      const cajaActual = Math.max(0, totalVentasPOS - totalGastosPOS);
+
+      const txtVentas = document.getElementById('txtVentasHoy');
+      if (txtVentas) txtVentas.innerText = `$${totalVentasPOS.toLocaleString('es-CO')}`;
+      const txtCaja = document.getElementById('txtCajaHoy');
+      if (txtCaja) txtCaja.innerText = `$${cajaActual.toLocaleString('es-CO')}`;
 
       if (retailItems.length === 0) {
         grid.innerHTML = `

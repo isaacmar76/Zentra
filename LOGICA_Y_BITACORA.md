@@ -194,8 +194,8 @@ class CatalogItemModel {
 | **2026-09-30** | `61041bb` | Feature / Auth / Multi-item | CRUD de Usuarios (Dueño vs Colaborador), Catálogo con Fotos (Cámara/Galería), Proyectos Multi-Producto y Cotizaciones WhatsApp | ✅ Completado |
 | **2026-09-30** | `0c59e31` | UI / UX / Design System | Adopción de Sistema Visual Fintech Clarity (nuevo_diseño.md): Plus Jakarta Sans + Inter, Cockpit Hero con micro-gráfica SVG, Bento cards | ✅ Completado |
 | **2026-10-01** | `e1d1f05` | Security / Multi-Tenant | Aislamiento estricto de productos y datos por negocio (multi-tenancy, registro central, llaves namespaced y control de acceso por PIN) | ✅ Completado |
-| **2026-10-01** | `bfa4840` | UI / Theming / UX | Colección Fintech Zentra (Clarity, Midnight, Cobalt), preservación de temas personalizados en Perfil/Configuración y retiro del botón del header | ✅ Completado |
-| **2026-10-03** | `current` | Fix / Mobile UX | Blindaje de contraste total en inputs de Registro/Login (solución de texto invisible/blanco en celular y modo oscuro) | ✅ Completado |
+| **2026-10-03** | `dd5f890` | Fix / Mobile UX | Blindaje de contraste total en inputs de Registro/Login (solución de texto invisible/blanco en celular y modo oscuro) | ✅ Completado |
+| **2026-10-03** | `current` | Clean / Isolation | Eliminación total de datos demo y referencias cruzadas en Retail y Catálogo (cero mención a otros negocios y saldos en $0) | ✅ Completado |
 
 ---
 
@@ -335,6 +335,16 @@ class CatalogItemModel {
   2. Se fijó el color del texto digitado a `#0F172A !important` (grafito oscuro profundo) y `-webkit-text-fill-color: #0F172A !important`, con fondo `#FFFFFF` y bordes `#CBD5E1`.
   3. Se aseguraron las etiquetas del formulario, títulos de las tarjetas operativas (`#txtSetupServiciosTitle`, `#txtSetupRetailTitle`) y botones de pestañas con colores de alto contraste.
   4. En Flutter (`app_theme.dart`, `login_screen.dart`, `mode_selection_screen.dart`), se vinculó explícitamente el color de los `TextField` a `theme.textDark` para mantener sincronía visual y legibilidad garantizada en todas las plataformas.
+
+#### Hito 14: Eliminación Definitiva de Datos Demo en Retail y Purga de Referencias Cruzadas en Catálogo
+- **Problema previo:**
+  1. La vista Retail (`viewRetail`) conservaba cifras estáticas de maqueta en el HTML (`$84.500` en Ventas Hoy, `$184.500` en Caja y `2 con bajo stock`). Al crear un nuevo negocio de tipo Retail, el usuario veía estos saldos demo como si pertenecieran a su cuenta o a otro negocio.
+  2. El modal de Catálogo e Inventario contenía pestañas estáticas tituladas `TM Diseños (Servicios)` y `Don Pedro (Retail)`. En negocios nuevos (incluso en Retail), abría por defecto en Servicios mostrando los nombres de otras empresas y diciendo erróneamente que no había productos registrados en esa modalidad.
+- **Solución implementada:**
+  1. Se eliminaron todas las cifras y etiquetas estáticas de `viewRetail`: `txtVentasHoy` y `txtCajaHoy` arrancan en `$0`, y la alerta de stock bajo arranca oculta.
+  2. Se reprogramó `renderPos()` y `recalcularTodo()` para calcular las ventas del POS, la caja real y el stock bajo en tiempo real a partir de las transacciones efectivas del negocio activo.
+  3. Se retiraron las pestañas con nombres de otros comercios del modal de catálogo. Ahora el catálogo es 100% exclusivo y adaptado automáticamente a la modalidad del negocio activo (`bizProfile.type`), sin filtros ajenos ni mención a terceras marcas.
+  4. Se neutralizaron todos los placeholders del sistema (`usuario@minegocio.com`, `Mi Negocio`, etc.) y los segmentos de Flutter en `catalog_inventory_screen.dart` (`Servicios (Por Encargo)` y `Retail (Mostrador POS)`).
 
 ---
 

@@ -268,8 +268,8 @@ class _CatalogInventoryScreenState extends State<CatalogInventoryScreen> {
                 Expanded(
                   child: SegmentedButton<String>(
                     segments: const [
-                      ButtonSegment(value: 'servicios', label: Text('TM Diseños (Servicios)', style: TextStyle(fontSize: 12))),
-                      ButtonSegment(value: 'retail', label: Text('Don Pedro (Retail)', style: TextStyle(fontSize: 12))),
+                      ButtonSegment(value: 'servicios', label: Text('Servicios (Por Encargo)', style: TextStyle(fontSize: 12))),
+                      ButtonSegment(value: 'retail', label: Text('Retail (Mostrador POS)', style: TextStyle(fontSize: 12))),
                     ],
                     selected: {_currentFilter},
                     onSelectionChanged: (val) {

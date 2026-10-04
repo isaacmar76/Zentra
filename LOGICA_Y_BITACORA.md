@@ -198,8 +198,8 @@ class CatalogItemModel {
 | **2026-10-03** | `1090b4a` | Feature / POS / Facturación | Administración avanzada del propietario: Catálogo con costo y venta (márgenes), Carrito mostrador/retail, Pedidos multi-ítem a medida, y ciclo Cotización vs Factura | ✅ Completado |
 | **2026-10-03** | `e151d1a` | UX / Sales Flow | Flujo rápido de ventas: Botón Tomar Pedido, Carrito permanente superior derecho, Acciones directas Cotizar (copia + WhatsApp) y Cobrar (factura) | ✅ Completado |
 | **2026-10-03** | `321ec68` | Fix / Multi-Tenant Auth | Auto-recuperación de negocios, acceso directo 1-toque en login y búsqueda flexible por nombre de negocio | ✅ Completado |
-| **2026-10-04** | `321ec68` | Feature / POS / CRM | Selector y Creación Express de Clientes en Carrito: vinculación con directorio para cotizaciones y facturas sin perder el flujo de venta | ✅ Completado |
-| **2026-10-04** | `current` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
+| **2026-10-04** | `1ae5d84` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
+| **2026-10-04** | `current` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
 
 ---
 
@@ -444,6 +444,38 @@ class CatalogItemModel {
   - **Refinamiento de Envío de Imagen QR y Regla de Factura Pagada:**
     - **Envío de QR en Cotizaciones:** Se implementó `compartirOEnviarCotizacionWhatsApp(receiptData)` junto con `dataURLtoFile()`, `descargarImagenQR()` y `copiarQRAlPortapapeles()`. En dispositivos móviles (Android/iOS) utiliza el Web Share API (`navigator.share`) para adjuntar el archivo nativo de imagen del QR directamente al chat de WhatsApp junto con el texto formateado. En escritorio o navegadores sin share de archivos, descarga la imagen del código QR automáticamente y la copia al portapapeles (`Ctrl+V`) informando al comerciante para adjuntarla al chat de WhatsApp Web.
     - **Exclusión Absoluta del QR en Facturas:** En la factura el código QR permanece **100% oculto** tanto en el modal como en cualquier exportación (`qrWrapper.style.display = 'none'`), cumpliendo la regla de negocio de que el cliente ya canceló. Asimismo, si la factura está totalmente saldada (`saldo <= 0`), la caja completa de medios de pago se oculta automáticamente. Si existe un saldo pendiente por cobrar, únicamente se enlistan los datos bancarios de transferencia sin imagen de código QR.
+
+#### Hito 20: Personalización Dinámica de Pantalla de Inicio (Selector de 4 Layouts en Vivo)
+- **Requerimiento del Usuario:**
+  - Sustituir la sección de "Personalizar / Temas de Colores" previa para no limitarse a paletas estéticas que se abordarán en una etapa posterior.
+  - Ofrecer en la opción de "Personalizar" (accesible desde el Perfil del Negocio `⚙️`) las **4 propuestas de pantalla de inicio**, permitiendo al comerciante alternar entre ellas en vivo, probarlas directamente con sus datos reales y definir cuál se adapta mejor a su operación diaria.
+- **Implementación Técnica:**
+  1. **Eliminación de Paletas Antiguas:** Se retiraron las combinaciones cromáticas previas (`theme-light`, `theme-midnight`, etc.) para dar paso a la selección de arquitectura y experiencia de usuario.
+  2. **Las 4 Pantallas de Inicio Implementadas e Interactivas:**
+     - **Opción A: Cockpit Operativo Diario (`layout_a`):**
+       - Saludo y fecha en tiempo real.
+       - Semáforo de prioridades ejecutivas: pedidos con fecha de entrega para hoy, cotizaciones pendientes de seguimiento comercial con botón de contacto WhatsApp en 1 toque, e insumos/productos con stock crítico.
+       - Balance y cuadre de caja del día (ingresos, cobros y ventas recientes).
+     - **Opción B: Terminal Mostrador Rápido / POS-First (`layout_b`):**
+       - Indicadores comerciales directos (ventas hoy, ticket promedio).
+       - Buscador instantáneo de catálogo y filtro táctil por categorías (Todos, Servicios, Ropa, etc.).
+       - Cuadrícula ágil de productos con botón directo `+` para agregar al carrito en un toque y barra flotante de cobro inmediato.
+     - **Opción C: Tablero Visual Kanban de Producción (`layout_c`):**
+       - Visión global de pedidos en curso y monto pendiente por cobrar.
+       - Selector de fases operativas: `Cotización`, `Diseño`, `Producción`, `Empaque`, `Entregado`.
+       - Tarjetas interactivas con avance de estado en 1 clic (`Avanzar a Producción ➔`) y acceso directo a la lista de chequeo / insumos del pedido.
+     - **Opción D: Enfoque Híbrido Modular por Widgets (`layout_d`):**
+       - Widget de Saldo Disponible en tiempo real + Botón protagonista `⚡ Tomar Pedido`.
+       - Barra de 4 Accesos Rápidos: `Vender`, `Gasto`, `Catálogo`, `Clientes`.
+       - Bloques de alertas prioritarias y actividad reciente interactiva.
+  3. **Selector Modal de Experiencia (`#themeModal`):**
+     - Tarjetas táctiles descriptivas con ícono, título y resumen funcional.
+     - Badge dinámico `✓ Activo` y activación reactiva en tiempo real al tocar cualquier opción.
+  4. **Persistencia en LocalStorage:**
+     - Guardado automático de la preferencia en `zentra_active_layout`.
+     - Integración con el perfil del negocio (`#bizModal`), mostrando el diseño activo bajo el campo "Diseño de Pantalla de Inicio".
+  5. **Mantenimiento de Subsecciones Operativas:**
+     - Clientes, Movimientos Generales de Caja y Catálogo se conservan como subsecciones navegables con botones de retorno `← Volver al Inicio`.
 
 ---
 

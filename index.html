@@ -1023,198 +1023,297 @@
 
     <!-- Contenido dinámico -->
     <main class="app-content">
-      
-      <!-- VISTA SERVICIOS -->
-      <section id="viewServicios">
-        <!-- Tarjeta Hero de Balance Fintech Clarity (Cockpit de nuevo_diseño.md) -->
-        <div class="hero-balance-card" onclick="verDesgloseGlobal()" title="Toca para ver desglose financiero">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span class="material-symbols-outlined" style="font-size:16px; color:var(--primary);">account_balance_wallet</span>
-              <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted);">Saldo Disponible Real</span>
-            </div>
-            <div style="display:inline-flex; align-items:center; gap:4px; font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 8px; border-radius:20px; font-weight:700;">
-              <span style="width:6px; height:6px; border-radius:50%; background:var(--primary-container); display:inline-block;"></span>
-              <span>En vivo</span>
-              <span class="material-symbols-outlined" style="font-size:12px; margin-left:1px;">chevron_right</span>
-            </div>
-          </div>
 
-          <div style="margin: 6px 0 2px;">
-            <div class="metric-display" id="txtGanancia" style="font-size:29px; font-weight:800; color:var(--text); letter-spacing:-0.03em;">$0</div>
-          </div>
-
-          <!-- Micro Gráfico SVG de Flujo Operativo (inspirado en nuevo_diseño.md) -->
-          <div style="width:100%; height:32px; margin: 4px 0 10px; position:relative;">
-            <svg preserveAspectRatio="none" viewBox="0 0 320 50" style="width:100%; height:100%; overflow:visible;">
-              <defs>
-                <linearGradient id="heroGradient" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stop-color="#00D68F" stop-opacity="0.28"></stop>
-                  <stop offset="100%" stop-color="#00D68F" stop-opacity="0.0"></stop>
-                </linearGradient>
-              </defs>
-              <path d="M0,42 C50,38 90,26 140,30 C190,34 230,16 270,12 C290,10 310,6 320,4 L320,50 L0,50 Z" fill="url(#heroGradient)"></path>
-              <path d="M0,42 C50,38 90,26 140,30 C190,34 230,16 270,12 C290,10 310,6 320,4" fill="none" stroke="#00D68F" stroke-linecap="round" stroke-width="2.5"></path>
-              <circle cx="270" cy="12" fill="#00D68F" r="3.5" stroke="#FFFFFF" stroke-width="1.5"></circle>
-            </svg>
-          </div>
-
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding-top:10px; border-top:1px solid var(--surface-border);">
-            <div style="background:var(--surface-subtle); padding:8px 10px; border-radius:12px;">
-              <div style="font-size:10px; color:var(--text-muted); display:flex; align-items:center; gap:4px;">
-                <span class="material-symbols-outlined" style="font-size:13px; color:var(--primary);">arrow_downward</span>
-                <span>Ingresos / Abonos</span>
-              </div>
-              <div style="font-size:13px; font-weight:800; color:var(--primary); margin-top:2px;" id="txtIngresos">$0</div>
+      <!-- ========================================== -->
+      <!-- OPCIÓN A: COCKPIT OPERATIVO DIARIO         -->
+      <!-- ========================================== -->
+      <section id="layoutViewA" class="home-layout-section">
+        <!-- Saludo y Estado del Día -->
+        <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:20px; padding:14px 16px; margin-bottom:12px; box-shadow:0 2px 10px rgba(0,0,0,0.03);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;" id="cockpitDateStr">Hoy</div>
+              <div style="font-size:16px; font-weight:800; color:var(--text); margin-top:2px;" id="cockpitGreeting">Hola 👋</div>
             </div>
-            <div style="background:var(--surface-subtle); padding:8px 10px; border-radius:12px;">
-              <div style="font-size:10px; color:var(--text-muted); display:flex; align-items:center; gap:4px;">
-                <span class="material-symbols-outlined" style="font-size:13px; color:var(--alert);">arrow_upward</span>
-                <span>Gastos / Compras</span>
-              </div>
-              <div style="font-size:13px; font-weight:800; color:var(--alert); margin-top:2px;" id="txtGastos">$0</div>
+            <div style="display:flex; align-items:center; gap:5px; background:#DCFCE7; color:#166534; padding:3px 8px; border-radius:12px; font-size:10.5px; font-weight:700; border:1px solid #86EFAC;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#16A34A; display:inline-block;"></span>
+              <span>Negocio Abierto</span>
             </div>
           </div>
-        </div>
 
-        <!-- Pestañas Segmentadas para no sobrecargar la pantalla -->
-        <div class="tab-segments">
-          <button class="seg-btn active" id="segTabPedidos" onclick="switchServiciosTab('pedidos')">
-            <span>Encargos</span>
-            <span class="seg-badge" id="lblProyectosCount">0</span>
-          </button>
-          <button class="seg-btn" id="segTabClientes" onclick="switchServiciosTab('clientes')">
-            <span>Clientes</span>
-            <span class="seg-badge" id="lblClientesCount">0</span>
-          </button>
-          <button class="seg-btn" id="segTabMovimientos" onclick="switchServiciosTab('movimientos')">
-            <span>Cuentas & Gastos</span>
-          </button>
-          <button class="seg-btn" id="segTabCatalogo" onclick="switchServiciosTab('catalogo')">
-            <span>Catálogo</span>
-          </button>
-        </div>
-
-        <!-- Subsección 1: Encargos / Proyectos -->
-        <div id="subSecPedidos">
-          <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:8px; margin-bottom:12px;">
-            <button class="primary-btn" onclick="abrirTomarPedido()" style="margin:0; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); font-weight:800; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
+          <!-- Hero Actions -->
+          <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:8px; margin-top:12px;">
+            <button class="primary-btn" onclick="abrirTomarPedido()" style="margin:0; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); font-weight:800; font-size:13px; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
               <span>⚡</span> TOMAR PEDIDO
             </button>
-            <button class="sec-btn" onclick="abrirModalNuevoPedido()" style="margin:0; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; gap:5px; border:1.5px solid var(--surface-border); background:var(--card-bg); color:var(--text); border-radius:14px;">
-              <span>✂️</span> Encargo a Medida
+            <button class="sec-btn" onclick="abrirModalNuevoPedido()" style="margin:0; font-weight:700; font-size:11.5px; display:flex; align-items:center; justify-content:center; gap:4px; border:1.5px solid var(--surface-border); background:var(--surface-subtle); color:var(--text); border-radius:14px;">
+              <span>✂️</span> + A Medida
             </button>
           </div>
+        </div>
 
-          <!-- Alerta sutil cuando hay pedidos próximos a vencer -->
-          <div id="alertBannerVencer" onclick="verPedidosPorVencer()" style="display:none; margin-bottom:12px; background:#FFF5F5; border:1px solid #FED7D7; padding:9px 12px; border-radius:12px; color:#C53030; font-size:11.5px; font-weight:600; cursor:pointer;">
-            <span>⚠️ Tienes pedidos próximos a entregar. Toca aquí para verlos.</span>
+        <!-- Semáforo Inteligente de Prioridades (Feed de lo Urgente) -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px; display:flex; align-items:center; gap:5px;">
+            <span>🚨 Semáforo de Prioridades</span>
           </div>
-
-          <div id="projectsList">
-            <!-- Renderizado dinámico de pedidos -->
+          <div id="cockpitUrgentFeed" style="display:flex; flex-direction:column; gap:8px;">
+            <!-- Tarjetas inyectadas dinámicamente -->
           </div>
         </div>
 
-        <!-- Subsección: Directorio y CRUD de Clientes -->
-        <div id="subSecClientes" style="display:none;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
-            <div style="position:relative; flex:1;">
-              <input type="text" id="inpBuscarCliente" oninput="filtrarClientesUI()" placeholder="🔍 Buscar cliente, teléfono o documento..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:#FFFFFF; font-size:12px; color:var(--text); box-sizing:border-box;">
+        <!-- Cuadre Rápido de Caja del Día -->
+        <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:18px; padding:14px; margin-bottom:12px; cursor:pointer;" onclick="verDesgloseGlobal()">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:11.5px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:5px;">
+              <span>💰 Cuadre de Caja de Hoy</span>
             </div>
-            <button onclick="abrirModalCliente()" style="background:var(--primary); color:#fff; border:none; padding:9px 12px; border-radius:12px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 2px 8px rgba(0,108,70,0.2);">
-              <span>+</span> Nuevo Cliente
-            </button>
+            <span style="font-size:10.5px; color:var(--primary); font-weight:700;">Ver Desglose ➔</span>
           </div>
-          <div id="clientesListContainer">
-            <!-- Renderizado dinámico de clientes -->
-          </div>
-        </div>
-
-        <!-- Subsección 2: Movimientos / Gastos Generales e Ingresos -->
-        <div id="subSecMovimientos" style="display:none;">
-          <div style="background:#FFFFFF; border:1px solid #ECEEF2; border-radius:18px; padding:14px; margin-bottom:12px;">
-            <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Cuentas Generales del Negocio</div>
-            <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Egresos e ingresos independientes que no pertenecen a ningún pedido específico.</div>
-            <div style="display:flex; gap:8px;">
-              <button onclick="abrirModalGastoGeneral()" class="sec-btn alert-sec">+ Registrar Gasto</button>
-              <button onclick="abrirModalOtroIngreso()" class="sec-btn success-sec">+ Registrar Ingreso</button>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div style="background:var(--surface-subtle); padding:9px 11px; border-radius:12px;">
+              <div style="font-size:10px; color:var(--text-muted); font-weight:600;">Ingresos / Abonos</div>
+              <div style="font-size:15px; font-weight:800; color:var(--primary); margin-top:2px;" id="cockpitIngresosHoy">$0</div>
+            </div>
+            <div style="background:var(--surface-subtle); padding:9px 11px; border-radius:12px;">
+              <div style="font-size:10px; color:var(--text-muted); font-weight:600;">Gastos / Compras</div>
+              <div style="font-size:15px; font-weight:800; color:var(--alert); margin-top:2px;" id="cockpitGastosHoy">$0</div>
             </div>
           </div>
-          <div class="section-title">
-            <span>Movimientos Registrados</span>
-          </div>
-          <div id="generalMovimientosList" style="display:flex; flex-direction:column; gap:8px;">
-            <!-- Renderizado dinámico de movimientos -->
-          </div>
         </div>
 
-        <!-- Subsección 3: Catálogo e Inventario Integrado -->
-        <div id="subSecCatalogo" style="display:none;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <div style="font-size:13px; font-weight:700;">Catálogo de Productos</div>
-            <button onclick="abrirModalNuevoProducto()" style="background:var(--secondary); color:#fff; border:none; padding:7px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer;">+ Nuevo Ítem</button>
+        <!-- Últimas Ventas y Pedidos -->
+        <div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="font-size:12px; font-weight:800; color:var(--text);">📋 Últimas Ventas & Encargos</div>
+            <button onclick="abrirModalCatalogoInventario()" style="background:none; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer;">Ver Catálogo</button>
           </div>
-          <div id="catalogIntegratedList">
-            <!-- Renderizado dinámico de productos del catálogo -->
+          <div id="cockpitRecentOrders" style="display:flex; flex-direction:column; gap:8px;">
+            <!-- Últimos 3 pedidos -->
           </div>
         </div>
       </section>
 
-      <!-- VISTA RETAIL -->
-      <section id="viewRetail" style="display: none;">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-title">Ventas Hoy</div>
-            <div class="stat-value val-income" id="txtVentasHoy">$0</div>
+      <!-- ========================================== -->
+      <!-- OPCIÓN B: TERMINAL MOSTRADOR RÁPIDO (POS)  -->
+      <!-- ========================================== -->
+      <section id="layoutViewB" class="home-layout-section" style="display:none;">
+        <!-- Barra de métricas POS -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+          <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px;">
+            <div style="font-size:9.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Ventas de Hoy</div>
+            <div style="font-size:15px; font-weight:800; color:var(--primary); margin-top:2px;" id="posVentasHoyVal">$0</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-title">En Caja (Base+Ventas)</div>
-            <div class="stat-value val-profit" id="txtCajaHoy">$0</div>
+          <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between;">
+            <div>
+              <div style="font-size:9.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Encargo</div>
+              <div style="font-size:11.5px; font-weight:800; color:var(--text); margin-top:2px;">Personalizado</div>
+            </div>
+            <button onclick="abrirModalItemMedida()" style="background:var(--primary-soft); color:var(--primary); border:none; border-radius:8px; padding:5px 8px; font-size:11px; font-weight:700; cursor:pointer;">
+              ✂️ + A Medida
+            </button>
           </div>
         </div>
 
-        <div class="section-title">
-          <span>Punto de Venta / Mostrador (Toca para agregar)</span>
-          <span style="font-size: 11px; color: var(--alert); display: none;" id="lblStockAviso"></span>
+        <!-- Buscador rápido en vivo -->
+        <div style="margin-bottom:8px;">
+          <input type="text" id="posBuscadorInp" oninput="filtrarPosLayoutB()" placeholder="🔍 Buscar producto por nombre o categoría..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:12.5px; box-sizing:border-box;">
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
-          <button class="primary-btn" onclick="abrirTomarPedido()" style="margin:0; flex:1; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); font-weight:800; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
-            <span>⚡</span> TOMAR PEDIDO / VER CATÁLOGO
-          </button>
-          <button onclick="abrirModalItemMedida()" style="background:var(--card-bg); border:1.5px solid var(--surface-border); color:var(--text); padding:9px 12px; border-radius:14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px;">
-            <span>✂️</span> + A Medida
-          </button>
+        <!-- Chips de Categoría -->
+        <div id="posCategoryChips" style="display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:8px; scrollbar-width:none;">
+          <!-- Chips inyectados por JS -->
         </div>
 
-        <!-- Buscador rápido en POS -->
-        <div style="margin-bottom: 10px;">
-          <input type="text" id="posSearchInp" oninput="filtrarPosGrid()" placeholder="🔍 Buscar producto en mostrador..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:12.5px; box-sizing:border-box;">
+        <!-- Cuadrícula táctil POS -->
+        <div class="pos-grid" id="posLayoutBGrid" style="margin-bottom:70px;">
+          <!-- Inyectado por JS -->
         </div>
 
-        <div class="pos-grid" id="posGrid">
-          <!-- Productos inyectados por JS -->
-        </div>
-
-        <!-- Barra flotante de Carrito en Mostrador -->
-        <div id="retailCartBar" style="position:sticky; bottom:64px; left:0; width:100%; z-index:90; margin-top:14px;">
-          <div style="background:var(--card-bg); border:1.5px solid var(--primary); border-radius:18px; padding:12px 14px; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:flex; justify-content:space-between; align-items:center; gap:10px;">
-            <div style="display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="abrirCarritoRetail()">
-              <div style="background:var(--primary-soft); color:var(--primary); width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; flex-shrink:0;">
+        <!-- Barra flotante de carrito siempre visible en POS -->
+        <div id="posFloatingCartBar" style="position:sticky; bottom:64px; left:0; width:100%; z-index:90;">
+          <div style="background:var(--card-bg); border:1.5px solid var(--primary); border-radius:18px; padding:10px 14px; box-shadow:0 8px 24px rgba(0,0,0,0.12); display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <div style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="abrirCarritoRetail()">
+              <div style="background:var(--primary-soft); color:var(--primary); width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0;">
                 🛒
               </div>
               <div>
-                <div style="font-size:11px; color:var(--text-muted); font-weight:600;"><span id="cartCount">0</span> artículos en carrito</div>
-                <div style="font-size:15px; font-weight:800; color:var(--text);" id="cartTotalSum">$0 COP</div>
+                <div style="font-size:10.5px; color:var(--text-muted); font-weight:600;"><span id="posCartUnits">0</span> ítems en orden</div>
+                <div style="font-size:14px; font-weight:800; color:var(--text);" id="posCartAmount">$0 COP</div>
               </div>
             </div>
-            <button class="primary-btn" onclick="abrirCarritoRetail()" style="width:auto; padding:10px 16px; font-size:12.5px; font-weight:700; margin:0; box-shadow:0 4px 12px rgba(0,108,70,0.25);">
-              VER CARRITO ➔
+            <button class="primary-btn" onclick="abrirCarritoRetail()" style="width:auto; padding:8px 14px; font-size:12px; font-weight:700; margin:0; box-shadow:0 3px 10px rgba(0,108,70,0.25);">
+              COBRAR / COTIZAR ➔
             </button>
           </div>
         </div>
       </section>
+
+      <!-- ========================================== -->
+      <!-- OPCIÓN C: TABLERO VISUAL KANBAN            -->
+      <!-- ========================================== -->
+      <section id="layoutViewC" class="home-layout-section" style="display:none;">
+        <!-- Header Kanban con balance de producción -->
+        <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:18px; padding:12px 14px; margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div>
+              <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Flujo de Producción</div>
+              <div style="font-size:14px; font-weight:800; color:var(--text);" id="kanbanPendingAmount">⏳ $0 COP por cobrar</div>
+            </div>
+            <button class="primary-btn" onclick="abrirTomarPedido()" style="width:auto; padding:6px 12px; font-size:11px; font-weight:800; margin:0;">
+              ⚡ Tomar Pedido
+            </button>
+          </div>
+
+          <!-- Selector de Columnas Kanban por Tabs Horizontales -->
+          <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:2px; scrollbar-width:none;" id="kanbanColumnTabs">
+            <!-- Tabs inyectados dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Tarjetas Kanban del Estado Activo -->
+        <div id="kanbanCardsContainer" style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Tarjetas inyectadas dinámicamente -->
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- OPCIÓN D: ENFOQUE HÍBRIDO MODULAR (WIDGETS)-->
+      <!-- ========================================== -->
+      <section id="layoutViewD" class="home-layout-section" style="display:none;">
+        <!-- Bloque 1: Saldo y Tomar Pedido -->
+        <div class="hero-balance-card" onclick="verDesgloseGlobal()" style="margin-bottom:12px; cursor:pointer;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Saldo Disponible Real</span>
+            <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 8px; border-radius:12px; font-weight:700;">En vivo ➔</span>
+          </div>
+          <div style="font-size:26px; font-weight:800; color:var(--text); margin:4px 0 10px;" id="hybridSaldoDisplay">$0</div>
+          <button class="primary-btn" onclick="event.stopPropagation(); abrirTomarPedido()" style="margin:0; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); font-weight:800;">
+            ⚡ TOMAR PEDIDO / COTIZAR
+          </button>
+        </div>
+
+        <!-- Bloque 2: 4 Accesos Rápidos (Grid 2x2) -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+          <div onclick="abrirTomarPedido()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <span style="font-size:20px;">🛒</span>
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--text);">Vender</div>
+              <div style="font-size:9.5px; color:var(--text-muted);">Catálogo y POS</div>
+            </div>
+          </div>
+          <div onclick="abrirModalGastoGeneral()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <span style="font-size:20px;">💸</span>
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--text);">Gasto</div>
+              <div style="font-size:9.5px; color:var(--text-muted);">Registrar egreso</div>
+            </div>
+          </div>
+          <div onclick="abrirModalNuevoProducto()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <span style="font-size:20px;">📦</span>
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--text);">Catálogo</div>
+              <div style="font-size:9.5px; color:var(--text-muted);">Precios y stock</div>
+            </div>
+          </div>
+          <div onclick="mostrarSubseccionClientes()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <span style="font-size:20px;">👥</span>
+            <div>
+              <div style="font-size:12px; font-weight:700; color:var(--text);">Clientes</div>
+              <div style="font-size:9.5px; color:var(--text-muted);">Directorio CRM</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bloque 3: Alertas Prioritarias -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Alertas Prioritarias</div>
+          <div id="hybridAlertsContainer" style="display:flex; flex-direction:column; gap:6px;">
+            <!-- Alertas dinámicas -->
+          </div>
+        </div>
+
+        <!-- Bloque 4: Actividad Reciente -->
+        <div>
+          <div style="font-size:11px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Actividad y Encargos Recientes</div>
+          <div id="hybridRecentList" style="display:flex; flex-direction:column; gap:6px;">
+            <!-- Actividad reciente -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SUBSECCIONES COMPLEMENTARIAS COMPARTIDAS   -->
+      <!-- ========================================== -->
+      <!-- Subsección: Directorio y CRUD de Clientes -->
+      <section id="subSecClientes" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
+          <button onclick="irInicio()" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px;">
+            <span>‹ Volver al Inicio</span>
+          </button>
+          <button onclick="abrirModalCliente()" style="background:var(--primary); color:#fff; border:none; padding:7px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+            <span>+</span> Nuevo Cliente
+          </button>
+        </div>
+        <div style="margin-bottom:10px;">
+          <input type="text" id="inpBuscarCliente" oninput="filtrarClientesUI()" placeholder="🔍 Buscar cliente, teléfono o documento..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:#FFFFFF; font-size:12px; color:var(--text); box-sizing:border-box;">
+        </div>
+        <div id="clientesListContainer">
+          <!-- Renderizado dinámico de clientes -->
+        </div>
+      </section>
+
+      <!-- Subsección: Movimientos / Gastos Generales e Ingresos -->
+      <section id="subSecMovimientos" style="display:none;">
+        <div style="margin-bottom:10px;">
+          <button onclick="irInicio()" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px;">
+            <span>‹ Volver al Inicio</span>
+          </button>
+        </div>
+        <div style="background:#FFFFFF; border:1px solid #ECEEF2; border-radius:18px; padding:14px; margin-bottom:12px;">
+          <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Cuentas Generales del Negocio</div>
+          <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Egresos e ingresos independientes que no pertenecen a ningún pedido específico.</div>
+          <div style="display:flex; gap:8px;">
+            <button onclick="abrirModalGastoGeneral()" class="sec-btn alert-sec">+ Registrar Gasto</button>
+            <button onclick="abrirModalOtroIngreso()" class="sec-btn success-sec">+ Registrar Ingreso</button>
+          </div>
+        </div>
+        <div class="section-title">
+          <span>Movimientos Registrados</span>
+        </div>
+        <div id="generalMovimientosList" style="display:flex; flex-direction:column; gap:8px;">
+          <!-- Renderizado dinámico de movimientos -->
+        </div>
+      </section>
+
+      <!-- Subsección: Catálogo e Inventario Integrado -->
+      <section id="subSecCatalogo" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <button onclick="irInicio()" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px;">
+            <span>‹ Volver al Inicio</span>
+          </button>
+          <button onclick="abrirModalNuevoProducto()" style="background:var(--secondary); color:#fff; border:none; padding:7px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer;">+ Nuevo Ítem</button>
+        </div>
+        <div id="catalogIntegratedList">
+          <!-- Renderizado dinámico de productos del catálogo -->
+        </div>
+      </section>
+
+      <!-- Contenedores legacy ocultos para total compatibilidad -->
+      <div style="display:none;">
+        <section id="viewServicios"></section>
+        <section id="viewRetail"></section>
+        <span id="txtGanancia">$0</span>
+        <span id="txtIngresos">$0</span>
+        <span id="txtGastos">$0</span>
+        <span id="txtVentasHoy">$0</span>
+        <span id="txtCajaHoy">$0</span>
+        <div id="projectsList"></div>
+        <div id="posGrid"></div>
+        <div id="retailCartBar"></div>
+        <span id="lblProyectosCount">0</span>
+        <span id="lblClientesCount">0</span>
+      </div>
 
     </main>
 
@@ -1234,133 +1333,81 @@
       </button>
     </nav>
 
-    <!-- Modal de Selección de Temas (Accesible desde Perfil de Negocio) -->
+    <!-- Modal de Selección de Diseño de Pantalla de Inicio -->
     <div class="theme-modal" id="themeModal" onclick="closeThemeModal(event)">
-      <div class="theme-sheet" onclick="event.stopPropagation()">
+      <div class="theme-sheet" onclick="event.stopPropagation()" style="max-height:86%;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-          <h3 style="font-size: 15px; font-weight:800; color: var(--text);">Apariencia y Estilo Visual</h3>
+          <h3 style="font-size: 15px; font-weight:800; color: var(--text); display:flex; align-items:center; gap:6px;">
+            <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px;">dashboard_customize</span>
+            <span>Personalizar Pantalla de Inicio</span>
+          </h3>
           <button onclick="closeThemeModal()" style="background:none; border:none; font-size:18px; cursor:pointer; color:var(--text-muted);">✕</button>
         </div>
-        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">Elige la identidad visual para tu interfaz de trabajo:</p>
+        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
+          Prueba y elige el diseño de inicio que mejor se adapte a tu forma de trabajar. Puedes cambiarlo cuando quieras:
+        </p>
 
-        <!-- SECCIÓN 1: LÍNEA ZENTRA FINTECH (Basada en nuevo_diseño.md) -->
-        <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--primary); margin-bottom:8px; display:flex; align-items:center; gap:5px;">
-          <span>💎 Colección Zentra Fintech</span>
-          <span style="font-size:9px; background:var(--primary-soft); padding:1px 6px; border-radius:6px;">Oficial</span>
-        </div>
-
-        <!-- Tema 1: Zentra Fintech Clarity (Predeterminado) -->
-        <div class="theme-option active" id="opt-zentra_clarity" onclick="applyTheme('zentra_clarity')">
-          <div class="dots-preview">
-            <div class="color-dot" style="background: #F8F9FF; border: 1px solid #CBD5E1;"></div>
-            <div class="color-dot" style="background: #006C46;"></div>
-            <div class="color-dot" style="background: #00D68F;"></div>
-            <div class="color-dot" style="background: #0B1C30;"></div>
+        <!-- Opción A: Cockpit Operativo Diario -->
+        <div class="theme-option active" id="opt-layout_a" onclick="applyHomeLayout('layout_a')" style="border-radius:16px; padding:12px 14px; gap:12px; margin-bottom:10px;">
+          <div style="font-size:22px; width:38px; height:38px; border-radius:12px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            🎯
           </div>
           <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size: 12.5px; font-weight: 700; color: #0B1C30;">Zentra Clarity</span>
-              <span style="font-size: 9px; background: #006C46; color: #fff; padding: 1px 6px; border-radius: 6px; font-weight: 700;">CORE</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+              <span style="font-size: 12.5px; font-weight: 800; color: var(--text);">Opción A: Cockpit Operativo</span>
+              <span style="font-size: 9px; background: var(--primary); color: #fff; padding: 2px 7px; border-radius: 6px; font-weight: 800;">RECOMENDADO</span>
             </div>
-            <div style="font-size: 10px; color: #596273;">Blanco perlado, Verde Esmeralda y Menta Neón de alto impacto</div>
+            <div style="font-size: 10.5px; color: var(--text-muted); line-height:1.35;">
+              Hero de venta rápida, semáforo de entregas del día, cotizaciones por cerrar y cuadre de caja diario.
+            </div>
           </div>
         </div>
 
-        <!-- Tema 2: Zentra Midnight (Modo Oscuro Fintech) -->
-        <div class="theme-option" id="opt-zentra_midnight" onclick="applyTheme('zentra_midnight')">
-          <div class="dots-preview" style="background:rgba(255,255,255,0.06);">
-            <div class="color-dot" style="background: #0B1C30; border: 1px solid #1E3555;"></div>
-            <div class="color-dot" style="background: #13233A;"></div>
-            <div class="color-dot" style="background: #00D68F;"></div>
-            <div class="color-dot" style="background: #F8F9FF;"></div>
+        <!-- Opción B: Terminal Mostrador Rápido (POS First) -->
+        <div class="theme-option" id="opt-layout_b" onclick="applyHomeLayout('layout_b')" style="border-radius:16px; padding:12px 14px; gap:12px; margin-bottom:10px;">
+          <div style="font-size:22px; width:38px; height:38px; border-radius:12px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            ⚡
           </div>
           <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size: 12.5px; font-weight: 700; color: var(--text);">Zentra Midnight</span>
-              <span style="font-size: 9px; background: #13233A; color: #00D68F; border:1px solid #00D68F; padding: 1px 6px; border-radius: 6px; font-weight: 700;">DARK MODE</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+              <span style="font-size: 12.5px; font-weight: 800; color: var(--text);">Opción B: Mostrador Rápido (POS)</span>
+              <span style="font-size: 9px; background: #0284C7; color: #fff; padding: 2px 7px; border-radius: 6px; font-weight: 800;">VENTA DIRECTA</span>
             </div>
-            <div style="font-size: 10px; color: var(--text-muted);">Grafito medianoche profundo con acentos neón luminosos</div>
+            <div style="font-size: 10.5px; color: var(--text-muted); line-height:1.35;">
+              El catálogo y buscador táctil como pantalla de inicio con fotos, precios y botón (+) para venta en 1 toque.
+            </div>
           </div>
         </div>
 
-        <!-- Tema 3: Zentra Cobalt (Azul Ejecutivo) -->
-        <div class="theme-option" id="opt-zentra_cobalt" onclick="applyTheme('zentra_cobalt')">
-          <div class="dots-preview">
-            <div class="color-dot" style="background: #F8F9FF; border: 1px solid #CBD5E1;"></div>
-            <div class="color-dot" style="background: #0052FF;"></div>
-            <div class="color-dot" style="background: #00D8FF;"></div>
-            <div class="color-dot" style="background: #0B192C;"></div>
+        <!-- Opción C: Tablero Visual Kanban de Producción -->
+        <div class="theme-option" id="opt-layout_c" onclick="applyHomeLayout('layout_c')" style="border-radius:16px; padding:12px 14px; gap:12px; margin-bottom:10px;">
+          <div style="font-size:22px; width:38px; height:38px; border-radius:12px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            📋
           </div>
           <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size: 12.5px; font-weight: 700; color: #0B192C;">Zentra Cobalt</span>
-              <span style="font-size: 9px; background: #0052FF; color: #fff; padding: 1px 6px; border-radius: 6px; font-weight: 700;">EJECUTIVO</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+              <span style="font-size: 12.5px; font-weight: 800; color: var(--text);">Opción C: Tablero Kanban</span>
+              <span style="font-size: 9px; background: #7C3AED; color: #fff; padding: 2px 7px; border-radius: 6px; font-weight: 800;">TALLER & PEDIDOS</span>
             </div>
-            <div style="font-size: 10px; color: #4B5E78;">Azul cobalto financiero internacional y cyan neón</div>
+            <div style="font-size: 10.5px; color: var(--text-muted); line-height:1.35;">
+              Columnas por estado (Cotizados, Diseño, Producción, Listos para Entrega) con dinero por cobrar.
+            </div>
           </div>
         </div>
 
-        <!-- SECCIÓN 2: LÍNEA DE PERSONALIZACIÓN -->
-        <div style="font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); margin:14px 0 8px;">
-          🎨 Colección de Personalización
-        </div>
-
-        <!-- Tema 4: TM Diseños Creativos -->
-        <div class="theme-option" id="opt-tm_disenos" onclick="applyTheme('tm_disenos')">
-          <div class="dots-preview">
-            <div class="color-dot" style="background: #FFFFFF; border: 1.5px solid #FF2B78;"></div>
-            <div class="color-dot" style="background: #FF2B78;"></div>
-            <div class="color-dot" style="background: #FF4400;"></div>
-            <div class="color-dot" style="background: #1E2329;"></div>
+        <!-- Opción D: Enfoque Híbrido Modular -->
+        <div class="theme-option" id="opt-layout_d" onclick="applyHomeLayout('layout_d')" style="border-radius:16px; padding:12px 14px; gap:12px; margin-bottom:10px;">
+          <div style="font-size:22px; width:38px; height:38px; border-radius:12px; background:var(--primary-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            🧩
           </div>
           <div style="flex:1;">
-            <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size: 12.5px; font-weight: 700; color: #1E2329;">TM Diseños</span>
-              <span style="font-size: 9px; background: #FF2B78; color: #fff; padding: 1px 6px; border-radius: 6px; font-weight: 700;">CREATIVO</span>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+              <span style="font-size: 12.5px; font-weight: 800; color: var(--text);">Opción D: Híbrido Modular</span>
+              <span style="font-size: 9px; background: #D97706; color: #fff; padding: 2px 7px; border-radius: 6px; font-weight: 800;">4 WIDGETS</span>
             </div>
-            <div style="font-size: 10px; color: #777;">Fondo blanco pulcro con acentos fucsia y naranja cálido</div>
-          </div>
-        </div>
-
-        <!-- Tema 5: Nude & Blush -->
-        <div class="theme-option" id="opt-nude" onclick="applyTheme('nude')">
-          <div class="dots-preview">
-            <div class="color-dot" style="background: #F5EFE6;"></div>
-            <div class="color-dot" style="background: #E8C4C4;"></div>
-            <div class="color-dot" style="background: #D4A5A5;"></div>
-            <div class="color-dot" style="background: #5C4A3E;"></div>
-          </div>
-          <div>
-            <div style="font-size: 12px; font-weight: 700;">Nude & Blush</div>
-            <div style="font-size: 10px; color: #777;">Neutro, arena claro y blush rosado para papelería o estética</div>
-          </div>
-        </div>
-
-        <!-- Tema 6: Esmeralda Suave -->
-        <div class="theme-option" id="opt-esmeralda" onclick="applyTheme('esmeralda')">
-          <div class="dots-preview">
-            <div class="color-dot" style="background: #F0F7F4;"></div>
-            <div class="color-dot" style="background: #A7D7C5;"></div>
-            <div class="color-dot" style="background: #2C7A7B;"></div>
-            <div class="color-dot" style="background: #13322B;"></div>
-          </div>
-          <div>
-            <div style="font-size: 12px; font-weight: 700;">Esmeralda & Menta Suave</div>
-            <div style="font-size: 10px; color: #777;">Comercios de víveres, mostrador y confianzas botánicas</div>
-          </div>
-        </div>
-
-        <!-- Tema 7: Lavanda & Ciruela -->
-        <div class="theme-option" id="opt-lavanda" onclick="applyTheme('lavanda')">
-          <div class="dots-preview">
-            <div class="color-dot" style="background: #F8F5FA;"></div>
-            <div class="color-dot" style="background: #D6C7E2;"></div>
-            <div class="color-dot" style="background: #7B5294;"></div>
-            <div class="color-dot" style="background: #2E2036;"></div>
-          </div>
-          <div>
-            <div style="font-size: 12px; font-weight: 700;">Lavanda & Ciruela</div>
-            <div style="font-size: 10px; color: #777;">Elegancia floral, salones de belleza y eventos</div>
+            <div style="font-size: 10.5px; color: var(--text-muted); line-height:1.35;">
+              4 bloques ordenados: Saldo y Tomar Pedido, 4 accesos rápidos, alertas prioritarias y actividad reciente.
+            </div>
           </div>
         </div>
 
@@ -1580,12 +1627,12 @@
 
         <button onclick="guardarDatosNegocio()" class="primary-btn">GUARDAR CAMBIOS</button>
 
-        <!-- Personalización Visual / Tema (Fintech Zentra) -->
+        <!-- Personalización de Pantalla de Inicio -->
         <div style="margin-top:16px; margin-bottom:16px; padding:14px; background:var(--surface-container-low); border:1px solid var(--surface-border); border-radius:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
             <div style="display:flex; align-items:center; gap:6px;">
-              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">palette</span>
-              <span style="font-size:12.5px; font-weight:700; color:var(--text);">Tema y Apariencia Visual</span>
+              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">dashboard_customize</span>
+              <span style="font-size:12.5px; font-weight:700; color:var(--text);">Diseño de Pantalla de Inicio</span>
             </div>
             <button onclick="openThemeModal()" style="background:var(--primary); color:#FFFFFF; border:none; padding:5px 12px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
               <span>Personalizar</span>
@@ -1593,8 +1640,8 @@
             </button>
           </div>
           <div style="font-size:11px; color:var(--text-muted); display:flex; align-items:center; justify-content:space-between;">
-            <span>Tema activo:</span>
-            <span id="lblThemeProfileActive" style="font-weight:700; color:var(--primary);">Zentra Clarity (Fintech Core)</span>
+            <span>Diseño activo:</span>
+            <span id="lblThemeProfileActive" style="font-weight:700; color:var(--primary);">Opción A: Cockpit Operativo</span>
           </div>
         </div>
 
@@ -2904,9 +2951,9 @@
         // 1. Migración de versión anterior si aplica
         migrarDatosLegadosSiAplica();
 
-        // 2. Tema visual
-        const savedTheme = localStorage.getItem('zentra_active_theme') || 'zentra_clarity';
-        applyTheme(savedTheme, false);
+        // 2. Diseño de pantalla de inicio activo
+        const savedLayout = localStorage.getItem('zentra_active_layout') || 'layout_a';
+        applyHomeLayout(savedLayout, false);
 
         // 3. Verificar si hay un negocio autenticado activo
         const activeBizId = localStorage.getItem('zentra_active_biz_id');
@@ -4397,6 +4444,7 @@
       if (document.getElementById('dGananciaNeta')) document.getElementById('dGananciaNeta').innerText = `$${gananciaNetaGlobal.toLocaleString('es-CO')}`;
 
       renderProjectsList();
+      renderCurrentHomeLayout();
       if (bizProfile && bizProfile.type === 'retail') {
         renderPos();
       }
@@ -4687,19 +4735,9 @@
         if (btnRemove) btnRemove.style.display = 'none';
       }
 
-      const activeTheme = localStorage.getItem('zentra_active_theme') || 'zentra_clarity';
-      const lblTheme = document.getElementById('lblThemeProfileActive');
-      if (lblTheme) {
-        const themeNames = {
-          zentra_clarity: 'Zentra Clarity (Fintech Core)',
-          zentra_midnight: 'Zentra Midnight (Modo Oscuro)',
-          zentra_cobalt: 'Zentra Cobalt (Azul Ejecutivo)',
-          tm_disenos: 'TM Diseños Creativos',
-          nude: 'Nude & Blush',
-          esmeralda: 'Esmeralda & Menta Suave',
-          lavanda: 'Lavanda & Ciruela'
-        };
-        lblTheme.innerText = themeNames[activeTheme] || activeTheme;
+      const lblLayout = document.getElementById('lblThemeProfileActive');
+      if (lblLayout) {
+        lblLayout.innerText = layoutNames[currentHomeLayout] || 'Opción A: Cockpit Operativo';
       }
 
       document.getElementById('bizModal').style.display = 'flex';
@@ -6441,7 +6479,26 @@ ${estadoStr}${contactText}
       abrirCarritoRetail();
     }
 
+    // ==========================================
+    // SISTEMA DINÁMICO DE PANTALLA DE INICIO (LAYOUTS)
+    // ==========================================
+    let currentHomeLayout = 'layout_a';
+    let currentKanbanCol = 'Cotización';
+    let posCategoryFilterB = 'todos';
+    let posSearchFilterB = '';
+
+    const layoutNames = {
+      layout_a: 'Opción A: Cockpit Operativo',
+      layout_b: 'Opción B: Mostrador Rápido (POS)',
+      layout_c: 'Opción C: Tablero Kanban',
+      layout_d: 'Opción D: Híbrido Modular'
+    };
+
     function openThemeModal() {
+      // Actualizar selección visual
+      document.querySelectorAll('#themeModal .theme-option').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`opt-${currentHomeLayout}`);
+      if (activeEl) activeEl.classList.add('active');
       document.getElementById('themeModal').style.display = 'flex';
     }
 
@@ -6449,43 +6506,460 @@ ${estadoStr}${contactText}
       document.getElementById('themeModal').style.display = 'none';
     }
 
-    function applyTheme(themeKey, showNotification = true) {
-      const root = document.getElementById('appRoot');
-      const validTheme = themeKey || 'zentra_clarity';
-      root.setAttribute('data-theme', validTheme);
+    function ocultarTodosLosLayouts() {
+      ['layoutViewA', 'layoutViewB', 'layoutViewC', 'layoutViewD', 'subSecClientes', 'subSecMovimientos', 'subSecCatalogo', 'viewServicios', 'viewRetail'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
+    }
 
-      document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
-      const activeEl = document.getElementById(`opt-${validTheme}`);
-      if (activeEl) activeEl.classList.add('active');
-
-      const metaTheme = document.querySelector('meta[name="theme-color"]');
-      if (metaTheme) {
-        metaTheme.setAttribute('content', validTheme === 'zentra_midnight' ? '#0B1C30' : '#FFFFFF');
-      }
-
+    function applyHomeLayout(layoutKey, showNotification = true) {
+      currentHomeLayout = layoutKey || 'layout_a';
       try {
-        localStorage.setItem('zentra_active_theme', validTheme);
+        localStorage.setItem('zentra_active_layout', currentHomeLayout);
       } catch (e) {}
 
-      const themeNames = {
-        zentra_clarity: 'Zentra Clarity (Fintech Core)',
-        zentra_midnight: 'Zentra Midnight (Modo Oscuro)',
-        zentra_cobalt: 'Zentra Cobalt (Azul Ejecutivo)',
-        tm_disenos: 'TM Diseños Creativos',
-        nude: 'Nude & Blush',
-        esmeralda: 'Esmeralda & Menta Suave',
-        lavanda: 'Lavanda & Ciruela'
-      };
+      // Actualizar opción activa en modal de personalización
+      document.querySelectorAll('#themeModal .theme-option').forEach(el => el.classList.remove('active'));
+      const activeEl = document.getElementById(`opt-${currentHomeLayout}`);
+      if (activeEl) activeEl.classList.add('active');
 
-      const lblTheme = document.getElementById('lblThemeProfileActive');
-      if (lblTheme) {
-        lblTheme.innerText = themeNames[validTheme] || validTheme;
+      // Actualizar label en perfil de negocio
+      const lblProfile = document.getElementById('lblThemeProfileActive');
+      if (lblProfile) {
+        lblProfile.innerText = layoutNames[currentHomeLayout] || 'Opción A: Cockpit Operativo';
       }
+
+      // Ocultar todos los contenedores y activar el seleccionado
+      ocultarTodosLosLayouts();
+      const targetMap = {
+        layout_a: 'layoutViewA',
+        layout_b: 'layoutViewB',
+        layout_c: 'layoutViewC',
+        layout_d: 'layoutViewD'
+      };
+      const activeTargetId = targetMap[currentHomeLayout] || 'layoutViewA';
+      const targetEl = document.getElementById(activeTargetId);
+      if (targetEl) targetEl.style.display = 'block';
+
+      renderCurrentHomeLayout();
 
       if (showNotification) {
-        showToast(`Tema ${themeNames[validTheme] || validTheme} activado`);
+        showToast(`✓ ${layoutNames[currentHomeLayout]} activado`);
         closeThemeModal();
       }
+    }
+
+    function renderCurrentHomeLayout() {
+      if (currentHomeLayout === 'layout_a') {
+        renderLayoutCockpit();
+      } else if (currentHomeLayout === 'layout_b') {
+        renderLayoutPos();
+      } else if (currentHomeLayout === 'layout_c') {
+        renderLayoutKanban();
+      } else if (currentHomeLayout === 'layout_d') {
+        renderLayoutHibrido();
+      }
+      renderRetailCartBadge();
+    }
+
+    // ------------------------------------------
+    // OPCIÓN A: COCKPIT OPERATIVO DIARIO
+    // ------------------------------------------
+    function renderLayoutCockpit() {
+      const owner = (bizProfile.owner || bizProfile.name || 'Emprendedor').trim();
+      const elGreeting = document.getElementById('cockpitGreeting');
+      if (elGreeting) elGreeting.innerText = `¡Hola, ${owner}! 👋`;
+
+      const elDate = document.getElementById('cockpitDateStr');
+      if (elDate) {
+        const now = new Date();
+        const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        elDate.innerText = `Hoy es ${dias[now.getDay()]}, ${now.getDate()} de ${meses[now.getMonth()]}`;
+      }
+
+      // 1. Semáforo inteligente de prioridades
+      const feed = document.getElementById('cockpitUrgentFeed');
+      if (feed) {
+        feed.innerHTML = '';
+        let hasAlert = false;
+
+        // 🔴 Entregas pendientes (no entregadas)
+        const pendientes = projectsData.filter(p => p.status !== 'Entregado');
+        if (pendientes.length > 0) {
+          hasAlert = true;
+          const card = document.createElement('div');
+          card.style.cssText = 'background:#FEF2F2; border:1px solid #FECACA; border-radius:14px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;';
+          card.innerHTML = `
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#991B1B;">🔴 Entregas Pendientes (${pendientes.length})</div>
+              <div style="font-size:10.5px; color:#B91C1C; margin-top:2px;">${pendientes[0].name} (${pendientes[0].client}) • Saldo: $${(pendientes[0].total - pendientes[0].cobrado).toLocaleString('es-CO')}</div>
+            </div>
+            <button onclick="verDetalleProyecto(0)" style="background:#EF4444; color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">Ver</button>
+          `;
+          feed.appendChild(card);
+        }
+
+        // 🟡 Cotizaciones por cerrar
+        const cots = projectsData.filter(p => p.status === 'Cotización');
+        if (cots.length > 0) {
+          hasAlert = true;
+          const card = document.createElement('div');
+          card.style.cssText = 'background:#FFFBEB; border:1px solid #FDE68A; border-radius:14px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;';
+          card.innerHTML = `
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#92400E;">🟡 Cotizaciones por Aprobar (${cots.length})</div>
+              <div style="font-size:10.5px; color:#B45309; margin-top:2px;">${cots[0].client || 'Cliente'} • $${cots[0].total.toLocaleString('es-CO')}</div>
+            </div>
+            <button onclick="copiarWhatsAppCotizacion()" style="background:#25D366; color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">📲 Recordar</button>
+          `;
+          feed.appendChild(card);
+        }
+
+        // 🟠 Stock bajo (<= 5)
+        const lowStock = catalogItems.filter(p => p.stock !== undefined && p.stock <= 5);
+        if (lowStock.length > 0) {
+          hasAlert = true;
+          const card = document.createElement('div');
+          card.style.cssText = 'background:#FFF7ED; border:1px solid #FED7AA; border-radius:14px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;';
+          card.innerHTML = `
+            <div>
+              <div style="font-size:12px; font-weight:800; color:#9A3412;">🟠 Insumos con Stock Bajo (${lowStock.length})</div>
+              <div style="font-size:10.5px; color:#C2410C; margin-top:2px;">${lowStock[0].name}: ${lowStock[0].stock} unidades disponibles</div>
+            </div>
+            <button onclick="abrirModalNuevoProducto()" style="background:#F97316; color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">Ajustar</button>
+          `;
+          feed.appendChild(card);
+        }
+
+        if (!hasAlert) {
+          feed.innerHTML = `
+            <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:14px; padding:10px 12px; color:#15803D; font-size:11.5px; font-weight:600; display:flex; align-items:center; gap:6px;">
+              <span>✓ Todo al día: no tienes entregas vencidas ni stock crítico hoy.</span>
+            </div>
+          `;
+        }
+      }
+
+      // 2. Cuadre rápido de caja de hoy
+      const totalAbonos = projectsData.reduce((s, p) => s + (p.cobrado || 0), 0);
+      const totalGastos = projectsData.reduce((s, p) => s + calcularComprasProyecto(p), 0) + generalExpenses.reduce((s, g) => s + g.amount, 0);
+      const elIngresos = document.getElementById('cockpitIngresosHoy');
+      if (elIngresos) elIngresos.innerText = `$${totalAbonos.toLocaleString('es-CO')}`;
+      const elGastos = document.getElementById('cockpitGastosHoy');
+      if (elGastos) elGastos.innerText = `$${totalGastos.toLocaleString('es-CO')}`;
+
+      // 3. Últimas ventas y pedidos
+      const recentCont = document.getElementById('cockpitRecentOrders');
+      if (recentCont) {
+        recentCont.innerHTML = '';
+        const recents = projectsData.slice(0, 3);
+        if (recents.length === 0) {
+          recentCont.innerHTML = '<div style="text-align:center; padding:16px; color:#888; font-size:11.5px; background:var(--card-bg); border-radius:14px; border:1px dashed #E2E8F0;">Sin ventas recientes registradas. Presiona "⚡ TOMAR PEDIDO".</div>';
+        } else {
+          recents.forEach((p, i) => {
+            const card = document.createElement('div');
+            card.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;';
+            card.onclick = () => verDetalleProyecto(i);
+            card.innerHTML = `
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--text);">${p.name}</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">${p.client || 'Cliente'} • <b style="color:var(--primary);">$${p.total.toLocaleString('es-CO')}</b></div>
+              </div>
+              <div style="text-align:right;">
+                <span style="font-size:10px; font-weight:700; background:var(--primary-soft); color:var(--primary); padding:3px 7px; border-radius:8px;">${p.status || 'Activo'}</span>
+              </div>
+            `;
+            recentCont.appendChild(card);
+          });
+        }
+      }
+    }
+
+    // ------------------------------------------
+    // OPCIÓN B: TERMINAL MOSTRADOR RÁPIDO (POS)
+    // ------------------------------------------
+    function renderLayoutPos() {
+      const totalVentas = projectsData.reduce((s, p) => s + (p.cobrado || 0), 0);
+      const elVentas = document.getElementById('posVentasHoyVal');
+      if (elVentas) elVentas.innerText = `$${totalVentas.toLocaleString('es-CO')}`;
+
+      // Chips de categorías
+      const chipsCont = document.getElementById('posCategoryChips');
+      if (chipsCont) {
+        chipsCont.innerHTML = '';
+        const cats = ['todos', ...new Set(catalogItems.map(p => p.cat || 'General'))];
+        cats.forEach(cat => {
+          const btn = document.createElement('button');
+          const isAct = posCategoryFilterB === cat;
+          btn.style.cssText = `padding:5px 12px; border-radius:20px; font-size:11px; font-weight:700; white-space:nowrap; cursor:pointer; border:1px solid ${isAct ? 'var(--primary)' : 'var(--surface-border)'}; background:${isAct ? 'var(--primary)' : 'var(--card-bg)'}; color:${isAct ? '#fff' : 'var(--text)'};`;
+          btn.innerText = cat === 'todos' ? 'Todos los ítems' : cat;
+          btn.onclick = () => seleccionarCategoriaPosB(cat);
+          chipsCont.appendChild(btn);
+        });
+      }
+
+      renderLayoutPosGrid();
+    }
+
+    function seleccionarCategoriaPosB(cat) {
+      posCategoryFilterB = cat;
+      renderLayoutPos();
+    }
+
+    function filtrarPosLayoutB() {
+      const inp = document.getElementById('posBuscadorInp');
+      posSearchFilterB = inp ? inp.value.trim().toLowerCase() : '';
+      renderLayoutPosGrid();
+    }
+
+    function renderLayoutPosGrid() {
+      const grid = document.getElementById('posLayoutBGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      let items = catalogItems;
+      if (posCategoryFilterB !== 'todos') {
+        items = items.filter(p => (p.cat || 'General') === posCategoryFilterB);
+      }
+      if (posSearchFilterB) {
+        items = items.filter(p => p.name.toLowerCase().includes(posSearchFilterB) || (p.cat && p.cat.toLowerCase().includes(posSearchFilterB)));
+      }
+
+      if (items.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:24px; color:#888; font-size:12px;">No se encontraron productos en el catálogo.</div>';
+        return;
+      }
+
+      items.forEach(p => {
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:16px; padding:10px; display:flex; flex-direction:column; justify-content:space-between; height:120px; box-shadow:0 2px 6px rgba(0,0,0,0.02); cursor:pointer;';
+        card.onclick = () => agregarProductoAlCarritoRetail(p.id);
+
+        const thumb = p.image
+          ? `<img src="${p.image}" style="width:28px; height:28px; border-radius:8px; object-fit:cover;">`
+          : `<span style="font-size:18px;">${p.itemType === 'servicio' ? '✂️' : '🎁'}</span>`;
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="font-size:12px; font-weight:700; color:var(--text); line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.name}</div>
+            <div style="flex-shrink:0; margin-left:4px;">${thumb}</div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+            <div>
+              <div style="font-size:13.5px; font-weight:800; color:var(--primary);">$${p.price.toLocaleString('es-CO')}</div>
+              <div style="font-size:9.5px; color:var(--text-muted);">${p.itemType === 'servicio' ? 'Servicio' : `${p.stock} disp.`}</div>
+            </div>
+            <button style="background:var(--primary-soft); color:var(--primary); border:none; width:28px; height:28px; border-radius:8px; font-size:16px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center;">+</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Actualizar barra flotante de carrito
+      const units = retailCart.reduce((s, it) => s + it.quantity, 0);
+      const total = retailCart.reduce((s, it) => s + (it.quantity * it.price), 0);
+      const elUnits = document.getElementById('posCartUnits');
+      if (elUnits) elUnits.innerText = units;
+      const elTotal = document.getElementById('posCartAmount');
+      if (elTotal) elTotal.innerText = `$${total.toLocaleString('es-CO')} COP`;
+    }
+
+    // ------------------------------------------
+    // OPCIÓN C: TABLERO VISUAL KANBAN
+    // ------------------------------------------
+    function renderLayoutKanban() {
+      const estados = [
+        { key: 'Cotización', label: '📋 Cotizados' },
+        { key: 'Diseño', label: '🎨 En Diseño' },
+        { key: 'Producción', label: '✂️ En Producción' },
+        { key: 'Empaque', label: '📦 Listos Entrega' },
+        { key: 'Entregado', label: '✅ Entregados' }
+      ];
+
+      // Dinero pendiente por cobrar en pedidos activos
+      const pendienteCobro = projectsData
+        .filter(p => p.status !== 'Entregado')
+        .reduce((sum, p) => sum + (p.total - (p.cobrado || 0)), 0);
+      const elPending = document.getElementById('kanbanPendingAmount');
+      if (elPending) elPending.innerText = `⏳ $${pendienteCobro.toLocaleString('es-CO')} COP por cobrar`;
+
+      // Tabs de columnas
+      const tabsCont = document.getElementById('kanbanColumnTabs');
+      if (tabsCont) {
+        tabsCont.innerHTML = '';
+        estados.forEach(est => {
+          const count = projectsData.filter(p => (p.status || 'Diseño') === est.key).length;
+          const isAct = currentKanbanCol === est.key;
+          const btn = document.createElement('button');
+          btn.style.cssText = `padding:6px 12px; border-radius:14px; font-size:11px; font-weight:700; white-space:nowrap; cursor:pointer; display:inline-flex; align-items:center; gap:5px; border:1px solid ${isAct ? 'var(--primary)' : 'var(--surface-border)'}; background:${isAct ? 'var(--primary)' : 'var(--card-bg)'}; color:${isAct ? '#fff' : 'var(--text)'};`;
+          btn.innerHTML = `<span>${est.label}</span> <span style="background:${isAct ? 'rgba(255,255,255,0.25)' : 'var(--surface-subtle)'}; color:${isAct ? '#fff' : 'var(--text-muted)'}; padding:1px 6px; border-radius:10px; font-size:10px;">${count}</span>`;
+          btn.onclick = () => seleccionarColumnaKanban(est.key);
+          tabsCont.appendChild(btn);
+        });
+      }
+
+      // Tarjetas de pedidos en la columna activa
+      const cardsCont = document.getElementById('kanbanCardsContainer');
+      if (cardsCont) {
+        cardsCont.innerHTML = '';
+        const items = projectsData.filter(p => (p.status || 'Diseño') === currentKanbanCol);
+        if (items.length === 0) {
+          cardsCont.innerHTML = `<div style="text-align:center; padding:30px 16px; background:var(--card-bg); border-radius:18px; border:1px dashed #CBD5E1; color:#888; font-size:12px;">Sin pedidos en etapa de ${currentKanbanCol}.</div>`;
+          return;
+        }
+
+        const nextStatusMap = {
+          'Cotización': 'Diseño',
+          'Diseño': 'Producción',
+          'Producción': 'Empaque',
+          'Empaque': 'Entregado',
+          'Entregado': null
+        };
+
+        items.forEach(p => {
+          const realIdx = projectsData.indexOf(p);
+          const saldo = p.total - (p.cobrado || 0);
+          const nextEst = nextStatusMap[p.status || 'Diseño'];
+          const card = document.createElement('div');
+          card.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:18px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,0.03);';
+          
+          card.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+              <div>
+                <div style="font-size:13.5px; font-weight:800; color:var(--text);">${p.name}</div>
+                <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Cliente: <b>${p.client || 'General'}</b> • ${p.phone || 'Sin WhatsApp'}</div>
+              </div>
+              <span style="font-size:10px; font-weight:800; background:var(--primary-soft); color:var(--primary); padding:3px 8px; border-radius:8px;">${p.status || 'Diseño'}</span>
+            </div>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; background:var(--surface-subtle); padding:8px 10px; border-radius:12px; margin-bottom:10px; font-size:11px;">
+              <div><span style="color:var(--text-muted);">Total:</span> <b>$${p.total.toLocaleString('es-CO')}</b></div>
+              <div><span style="color:var(--text-muted);">Saldo:</span> <b style="color:${saldo > 0 ? 'var(--alert)' : 'var(--success)'};">$${saldo.toLocaleString('es-CO')}</b></div>
+            </div>
+
+            <div style="display:flex; gap:6px;">
+              <button onclick="verDetalleProyecto(${realIdx})" style="flex:1; background:var(--card-bg); border:1px solid var(--surface-border); padding:7px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">Ver Checklist</button>
+              ${nextEst ? `<button onclick="moverPedidoKanban(${realIdx}, '${nextEst}')" style="flex:1.4; background:var(--primary); color:#fff; border:none; padding:7px; border-radius:10px; font-size:11px; font-weight:800; cursor:pointer;">Avanzar a ${nextEst} ➔</button>` : ''}
+            </div>
+          `;
+          cardsCont.appendChild(card);
+        });
+      }
+    }
+
+    function seleccionarColumnaKanban(col) {
+      currentKanbanCol = col;
+      renderLayoutKanban();
+    }
+
+    function moverPedidoKanban(projIdx, nuevoEstado) {
+      if (!projectsData[projIdx]) return;
+      projectsData[projIdx].status = nuevoEstado;
+      persistirEstadoLocal();
+      renderLayoutKanban();
+      showToast(`✓ "${projectsData[projIdx].name}" avanzado a ${nuevoEstado}`);
+    }
+
+    // ------------------------------------------
+    // OPCIÓN D: ENFOQUE HÍBRIDO MODULAR (WIDGETS)
+    // ------------------------------------------
+    function renderLayoutHibrido() {
+      // Bloque 1: Saldo Disponible
+      const totalIngresos = projectsData.reduce((s, p) => s + (p.cobrado || 0), 0) + generalIncomes.reduce((s, i) => s + i.amount, 0);
+      const totalGastos = projectsData.reduce((s, p) => s + calcularComprasProyecto(p), 0) + generalExpenses.reduce((s, g) => s + g.amount, 0);
+      const ganancia = totalIngresos - totalGastos;
+      const elSaldo = document.getElementById('hybridSaldoDisplay');
+      if (elSaldo) elSaldo.innerText = `$${ganancia.toLocaleString('es-CO')}`;
+
+      // Bloque 3: Alertas prioritarias
+      const alertsCont = document.getElementById('hybridAlertsContainer');
+      if (alertsCont) {
+        alertsCont.innerHTML = '';
+        const pend = projectsData.filter(p => p.status !== 'Entregado').slice(0, 2);
+        if (pend.length === 0) {
+          alertsCont.innerHTML = '<div style="font-size:11px; color:#15803D; background:#F0FDF4; padding:8px 10px; border-radius:10px; border:1px solid #BBF7D0;">✓ Todo al día: no hay pedidos urgentes pendientes.</div>';
+        } else {
+          pend.forEach(p => {
+            const row = document.createElement('div');
+            row.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:12px; padding:8px 10px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px;';
+            row.innerHTML = `
+              <div>
+                <b>${p.name}</b> <span style="color:var(--text-muted);">(${p.client})</span>
+              </div>
+              <span style="font-size:10px; font-weight:700; color:var(--alert);">$${(p.total - p.cobrado).toLocaleString('es-CO')} pend.</span>
+            `;
+            alertsCont.appendChild(row);
+          });
+        }
+      }
+
+      // Bloque 4: Actividad Reciente
+      const recList = document.getElementById('hybridRecentList');
+      if (recList) {
+        recList.innerHTML = '';
+        const rec = projectsData.slice(0, 3);
+        if (rec.length === 0) {
+          recList.innerHTML = '<div style="font-size:11px; color:#888; text-align:center; padding:12px;">Sin pedidos recientes.</div>';
+        } else {
+          rec.forEach((p, idx) => {
+            const row = document.createElement('div');
+            row.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:12px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;';
+            row.onclick = () => verDetalleProyecto(idx);
+            row.innerHTML = `
+              <div>
+                <div style="font-size:12px; font-weight:700; color:var(--text);">${p.name}</div>
+                <div style="font-size:10px; color:var(--text-muted);">$${p.total.toLocaleString('es-CO')} COP • ${p.client || 'Cliente'}</div>
+              </div>
+              <span style="font-size:10px; font-weight:700; background:var(--primary-soft); color:var(--primary); padding:2px 7px; border-radius:6px;">${p.status || 'Diseño'}</span>
+            `;
+            recList.appendChild(row);
+          });
+        }
+      }
+    }
+
+    // ------------------------------------------
+    // NAVEGACIÓN Y SUBSECCIONES COMPLEMENTARIAS
+    // ------------------------------------------
+    function irInicio() {
+      ocultarTodosLosLayouts();
+      const targetMap = {
+        layout_a: 'layoutViewA',
+        layout_b: 'layoutViewB',
+        layout_c: 'layoutViewC',
+        layout_d: 'layoutViewD'
+      };
+      const activeTargetId = targetMap[currentHomeLayout] || 'layoutViewA';
+      const targetEl = document.getElementById(activeTargetId);
+      if (targetEl) targetEl.style.display = 'block';
+      renderCurrentHomeLayout();
+    }
+
+    function mostrarSubseccionClientes() {
+      ocultarTodosLosLayouts();
+      const s = document.getElementById('subSecClientes');
+      if (s) s.style.display = 'block';
+      filtrarClientesUI();
+    }
+
+    function mostrarSubseccionMovimientos() {
+      ocultarTodosLosLayouts();
+      const s = document.getElementById('subSecMovimientos');
+      if (s) s.style.display = 'block';
+      renderGeneralMovimientos();
+    }
+
+    function mostrarSubseccionCatalogo() {
+      ocultarTodosLosLayouts();
+      const s = document.getElementById('subSecCatalogo');
+      if (s) s.style.display = 'block';
+      renderCatalogIntegrated();
+    }
+
+    function applyTheme(themeKey, showNotification = true) {
+      // Función conservada para retrocompatibilidad
     }
 
     function showToast(msg) {

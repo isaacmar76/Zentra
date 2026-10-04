@@ -561,9 +561,9 @@ class CatalogItemModel {
   4. **Interruptor Dinámico Habilitar/Deshabilitar (`bizProfile.showPendingTasks`):**
      - Sincronizado en tiempo real tanto en `#themeModal` como en `#bizModal` mediante `sincronizarToggleTareasPendientesUI()`.
      - Si está deshabilitado (`false`), los contenedores de tareas se ocultan totalmente del DOM (`display: none`), manteniendo la pantalla limpia para quienes no requieran el módulo.
-  5. **Unificación a 1 Solo Botón en el Hero (Eliminación de Redundancias):**
-     - Se eliminó el botón de *"Mi Negocio"* de la barra de navegación inferior (`bottom-bar`), dejando la barra optimizada con 3 accesos operativos principales: `Inicio`, `Catálogo` y `Cotizaciones`.
-     - En el header/hero superior se retiró el badge del dueño que abría el mismo modal y se unificó en un único botón con ícono y texto: `[ 🏪 Mi Negocio ]`, eliminando la triple duplicidad de accesos para la misma acción.
+  5. **Depuración y Limpieza del Hero (Eliminación Total de Redundancias):**
+     - Se retiró el botón redundante de Cotizaciones del hero/header, conservándolo exclusivamente en la barra inferior (`bottom-bar`) donde pertenece como sección operativa con su badge de seguimiento.
+     - Se simplificó el acceso de Mi Negocio en el hero a únicamente su **ícono minimalista** (`storefront`), eliminando el texto extra y el badge de dueño previo, dejando una cabecera limpia con solo 2 íconos funcionales: `🛒 Carrito` y `🏪 Mi Negocio`.
 
 ---
 

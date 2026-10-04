@@ -201,7 +201,8 @@ class CatalogItemModel {
 | **2026-10-04** | `1ae5d84` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
 | **2026-10-04** | `c81ec7e` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
 | **2026-10-04** | `f36dfc0` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
-| **2026-10-04** | `current` | Feature / Catálogo / Móvil | Hito 22: Soporte completo para subir imágenes desde la galería y almacenamiento del teléfono en la edición de productos del catálogo | ✅ Completado |
+| **2026-10-04** | `7bd2df4` | Feature / Catálogo / Móvil | Hito 22: Soporte completo para subir imágenes desde la galería y almacenamiento del teléfono en la edición de productos del catálogo | ✅ Completado |
+| **2026-10-04** | `current` | Feature / Tareas / Taller | Hito 23: Flujo Directo de Personalización sin Modales Huérfanos y Módulo de Tareas Pendientes con Seguimiento Interactivo en Pantalla de Inicio (Ideal Taller) y Control Habilitar/Deshabilitar | ✅ Completado |
 
 ---
 
@@ -535,6 +536,31 @@ class CatalogItemModel {
      - Reseteo automático de los campos de archivo para permitir cambiar de foto o volver a subir una corregida sin necesidad de recargar la página.
   4. **Persistencia y Sincronización:**
      - Al guardar la edición (`guardarNuevoProducto()`), la nueva foto se actualiza inmediatamente en el catálogo (`catalogItems`), se sincroniza en caliente en el carrito de compras (`retailCart`) si el ítem ya estaba agregado, y se almacena en `localStorage`.
+
+---
+
+#### Hito 23: Flujo Directo de Personalización sin Modales Huérfanos y Módulo de Tareas Pendientes con Seguimiento Interactivo en Inicio
+- **Requerimiento del Usuario:**
+  1. **Flujo de Personalización sin Fricción:** Al hacer clic en "Personalizar" dentro del modal del perfil del negocio (`#bizModal`), este debe cerrarse automáticamente para que al seleccionar o cambiar el diseño de inicio el comerciante quede directamente en la pantalla de inicio, sin tener que cerrar manualmente la pestaña de perfil que quedaba abierta detrás.
+  2. **Módulo de Tareas Pendientes con Seguimiento en Inicio (Especial para Taller):** Agregar una función práctica para crear tareas y llevar su seguimiento con checklist interactivo visible directamente en la pantalla de inicio principal (crucial para operaciones de taller, reparaciones y encargos del día a día).
+  3. **Control Habilitar/Deshabilitar:** Integrar la opción de activar o desactivar este módulo de tareas tanto en el menú de *Personalizar* (`#themeModal`) como en el *Perfil del Negocio* (`#bizModal`), de modo que el comerciante decida si lo quiere ver y usar o si prefiere ocultarlo.
+- **Implementación Técnica:**
+  1. **Redirección Fluida en `openThemeModal()`:**
+     - Se vinculó el cierre automático de `#bizModal` (`cerrarBusinessProfileModal()`) de modo que al pulsar "Personalizar", el perfil se oculta de inmediato y se presenta el selector de experiencia. Al elegir cualquier modo o pulsar "Aceptar y Continuar", se regresa inmediatamente a la pantalla de inicio activa limpia.
+  2. **Módulo de Tareas Pendientes (`pendingTasks`):**
+     - Estructura de cada tarea: `id`, `text`, `priority` (`'alta'` 🔴 Urgente / `'normal'`), `completed` (booleano), `createdAt` y `completedAt`.
+     - Aislamiento multi-tenant en `localStorage` bajo `zentra_tasks_${bizId}`.
+     - Operaciones CRUD completas:
+       - `agregarNuevaTarea(text, priority)` y `agregarNuevaTareaDesdeWidget(suffix)` con tecla Enter y botón rápido `+ Agregar`.
+       - Checkbox circular amplio (24px) que alterna entre pendiente y completada (`toggleEstadoTarea(taskId)`), con animación, tachado visual de texto y opacidad atenuada.
+       - Selector de prioridad en 1 toque (`🔴 Urgente`).
+       - Eliminación individual (`eliminarTarea(taskId)`) y acción masiva `🧹 Limpiar completadas` (`limpiarTareasCompletadas()`).
+  3. **Widget Reactivo en Pantalla de Inicio:**
+     - Inyectado en los layouts principales: **Cockpit Operativo (Opción A)**, **Tablero Kanban de Taller (Opción C)**, **Híbrido Modular (Opción D)** y **POS Mostrador (Opción B)** mediante `actualizarWidgetsTareasPendientes()`.
+     - Badge reactivo en tiempo real: muestra conteo de pendientes (ej. `2 pendientes`) o badge verde `✓ Todo al día` cuando no hay pendientes.
+  4. **Interruptor Dinámico Habilitar/Deshabilitar (`bizProfile.showPendingTasks`):**
+     - Sincronizado en tiempo real tanto en `#themeModal` como en `#bizModal` mediante `sincronizarToggleTareasPendientesUI()`.
+     - Si está deshabilitado (`false`), los contenedores de tareas se ocultan totalmente del DOM (`display: none`), manteniendo la pantalla limpia para quienes no requieran el módulo.
 
 ---
 

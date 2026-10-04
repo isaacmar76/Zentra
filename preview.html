@@ -1067,6 +1067,9 @@
           </div>
         </div>
 
+        <!-- Widget de Tareas Pendientes en Cockpit Operativo -->
+        <div id="tasksWidgetContainer_a" style="margin-bottom:12px;"></div>
+
         <!-- Cuadre Rápido de Caja del Día -->
         <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:18px; padding:14px; margin-bottom:12px; cursor:pointer;" onclick="verDesgloseGlobal()">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -1185,6 +1188,9 @@
           </div>
         </div>
 
+        <!-- Widget de Tareas Pendientes en Tablero Kanban / Taller -->
+        <div id="tasksWidgetContainer_c" style="margin-bottom:12px;"></div>
+
         <!-- Tarjetas Kanban del Estado Activo -->
         <div id="kanbanCardsContainer" style="display:flex; flex-direction:column; gap:10px;">
           <!-- Tarjetas inyectadas dinámicamente -->
@@ -1257,6 +1263,9 @@
             <!-- Alertas dinámicas -->
           </div>
         </div>
+
+        <!-- Widget de Tareas Pendientes en Híbrido Modular -->
+        <div id="tasksWidgetContainer_d" style="margin-bottom:12px;"></div>
 
         <!-- Bloque 4: Actividad Reciente -->
         <div>
@@ -1441,7 +1450,23 @@
           </div>
         </div>
 
-        <button class="primary-btn" style="margin-top: 14px;" onclick="closeThemeModal()">ACEPTAR Y CONTINUAR</button>
+        <!-- Opción de Configuración: Tareas Pendientes en Pantalla de Inicio -->
+        <div style="margin-top:14px; margin-bottom:12px; padding:12px 14px; background:var(--surface-container-low); border:1px solid var(--surface-border); border-radius:16px; display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:10px; flex:1; padding-right:10px;">
+            <div style="font-size:20px; width:36px; height:36px; border-radius:10px; background:var(--primary-soft); color:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              📝
+            </div>
+            <div>
+              <div style="font-size:12.5px; font-weight:800; color:var(--text);">Tareas Pendientes en Inicio</div>
+              <div style="font-size:10.5px; color:var(--text-muted); line-height:1.3;">Seguimiento diario de tareas y pendientes del taller en la pantalla de inicio.</div>
+            </div>
+          </div>
+          <button type="button" id="btnToggleTasksTheme" onclick="toggleShowPendingTasks(!bizProfile.showPendingTasks)" style="background:var(--primary); color:#FFFFFF; border:none; padding:7px 12px; border-radius:12px; font-size:11px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; flex-shrink:0; box-shadow:0 2px 6px rgba(0,108,70,0.15);">
+            <span id="txtToggleTasksTheme">Activado ✓</span>
+          </button>
+        </div>
+
+        <button class="primary-btn" style="margin-top: 10px;" onclick="closeThemeModal()">ACEPTAR Y CONTINUAR</button>
       </div>
     </div>
 
@@ -1672,6 +1697,19 @@
           <div style="font-size:11px; color:var(--text-muted); display:flex; align-items:center; justify-content:space-between;">
             <span>Diseño activo:</span>
             <span id="lblThemeProfileActive" style="font-weight:700; color:var(--primary);">Opción A: Cockpit Operativo</span>
+          </div>
+
+          <!-- Módulo de Tareas Pendientes en Pantalla de Inicio -->
+          <div style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--surface-border); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:11.5px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:5px;">
+                <span>📝</span> Tareas Pendientes en Inicio
+              </div>
+              <div style="font-size:10px; color:var(--text-muted);">Seguimiento de pendientes y taller en pantalla de inicio</div>
+            </div>
+            <button type="button" id="btnToggleTasksBiz" onclick="toggleShowPendingTasks(!bizProfile.showPendingTasks)" style="background:var(--primary); color:#FFFFFF; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+              <span id="txtToggleTasksBiz">Activado ✓</span>
+            </button>
           </div>
         </div>
 
@@ -2613,6 +2651,7 @@
       otherPayment: '',
       qrImage: null,
       type: 'servicios', // 'servicios' | 'retail'
+      showPendingTasks: true, // Habilitar o deshabilitar módulo en pantalla de inicio
       configured: false
     };
 
@@ -2633,6 +2672,9 @@
     let activeWorkingQuoteId = null;
     let quotesFilterTab = 'activas';
     let quotesSearchQuery = '';
+
+    // Estado de Tareas Pendientes (Seguimiento Operativo y de Taller)
+    let pendingTasks = [];
 
     // Estado del CRUD de Usuarios y Roles
     let users = [];
@@ -2845,6 +2887,7 @@
         localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(users));
         localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(clients));
         localStorage.setItem(`zentra_quotes_${bizId}`, JSON.stringify(savedQuotes));
+        localStorage.setItem(`zentra_tasks_${bizId}`, JSON.stringify(pendingTasks));
         if (currentUser) localStorage.setItem(`zentra_current_user_${bizId}`, JSON.stringify(currentUser));
         localStorage.setItem('zentra_active_biz_id', bizId);
 
@@ -2975,6 +3018,21 @@
         depurarCotizacionesAutomaticas();
         actualizarBadgesCotizaciones();
 
+        // AISLAMIENTO TOTAL: Tareas pendientes del negocio / taller
+        const tasksStr = localStorage.getItem(`zentra_tasks_${bizId}`);
+        if (tasksStr !== null) {
+          try { pendingTasks = JSON.parse(tasksStr); } catch (_) { pendingTasks = []; }
+        } else {
+          pendingTasks = [
+            { id: 'task_demo_1', text: 'Revisar pedidos y entregas programadas de hoy', priority: 'alta', completed: false, createdAt: new Date().toISOString(), completedAt: null },
+            { id: 'task_demo_2', text: 'Confirmar insumos y repuestos con proveedores', priority: 'normal', completed: false, createdAt: new Date().toISOString(), completedAt: null }
+          ];
+          localStorage.setItem(`zentra_tasks_${bizId}`, JSON.stringify(pendingTasks));
+        }
+        if (bizProfile.showPendingTasks === undefined) {
+          bizProfile.showPendingTasks = true;
+        }
+
         localStorage.setItem('zentra_active_biz_id', bizId);
         retailCart = [];
         cart = [];
@@ -2986,6 +3044,7 @@
         recalcularTodo();
         renderCatalogItems();
         renderPos();
+        actualizarWidgetsTareasPendientes();
 
         return true;
       } catch (e) {
@@ -3006,6 +3065,7 @@
         otherPayment: '',
         qrImage: null,
         type: 'servicios',
+        showPendingTasks: true,
         configured: false
       };
       projectsData = [];
@@ -3015,6 +3075,7 @@
       clients = [];
       users = [];
       savedQuotes = [];
+      pendingTasks = [];
       activeWorkingQuoteId = null;
       currentUser = null;
       retailCart = [];
@@ -4011,6 +4072,7 @@
         otherPayment: '',
         qrImage: null,
         type: selectedSetupMode,
+        showPendingTasks: true,
         configured: true,
         createdAt: new Date().toISOString()
       };
@@ -4052,6 +4114,9 @@
       clients = [];      // Lista de clientes exclusiva en blanco para este nuevo negocio
       savedQuotes = [];  // Cotizaciones limpias
       activeWorkingQuoteId = null;
+      pendingTasks = [
+        { id: 'task_demo_1', text: 'Bienvenida a Zentra: configurar datos del negocio y catálogo', priority: 'alta', completed: false, createdAt: new Date().toISOString(), completedAt: null }
+      ];
       retailCart = [];
       cart = [];
 
@@ -4887,6 +4952,7 @@
         lblLayout.innerText = layoutNames[currentHomeLayout] || 'Opción A: Cockpit Operativo';
       }
 
+      sincronizarToggleTareasPendientesUI();
       document.getElementById('bizModal').style.display = 'flex';
     }
 
@@ -6676,10 +6742,12 @@ ${estadoStr}${contactText}
     };
 
     function openThemeModal() {
+      cerrarBusinessProfileModal();
       // Actualizar selección visual
       document.querySelectorAll('#themeModal .theme-option').forEach(el => el.classList.remove('active'));
       const activeEl = document.getElementById(`opt-${currentHomeLayout}`);
       if (activeEl) activeEl.classList.add('active');
+      sincronizarToggleTareasPendientesUI();
       document.getElementById('themeModal').style.display = 'flex';
     }
 
@@ -6742,6 +6810,7 @@ ${estadoStr}${contactText}
         renderLayoutHibrido();
       }
       renderRetailCartBadge();
+      actualizarWidgetsTareasPendientes();
     }
 
     // ------------------------------------------
@@ -7176,6 +7245,250 @@ ${estadoStr}${contactText}
 
     function applyTheme(themeKey, showNotification = true) {
       // Función conservada para retrocompatibilidad
+    }
+
+    // =======================================================
+    // MÓDULO DE TAREAS PENDIENTES Y SEGUIMIENTO (TALLER / POS)
+    // =======================================================
+    function escaparHTML(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function toggleShowPendingTasks(enabled) {
+      bizProfile.showPendingTasks = !!enabled;
+      persistirEstadoLocal();
+      actualizarWidgetsTareasPendientes();
+      showToast(bizProfile.showPendingTasks ? '✓ Tareas pendientes habilitadas en pantalla de inicio' : 'Tareas pendientes ocultas');
+    }
+
+    function sincronizarToggleTareasPendientesUI() {
+      const enabled = bizProfile.showPendingTasks !== false;
+
+      const btnTheme = document.getElementById('btnToggleTasksTheme');
+      const txtTheme = document.getElementById('txtToggleTasksTheme');
+      if (btnTheme && txtTheme) {
+        if (enabled) {
+          btnTheme.style.background = 'var(--primary)';
+          btnTheme.style.color = '#FFFFFF';
+          btnTheme.style.border = 'none';
+          txtTheme.innerText = 'Activado ✓';
+        } else {
+          btnTheme.style.background = 'var(--surface-subtle)';
+          btnTheme.style.color = 'var(--text-muted)';
+          btnTheme.style.border = '1px solid var(--surface-border)';
+          txtTheme.innerText = 'Desactivado ✕';
+        }
+      }
+
+      const btnBiz = document.getElementById('btnToggleTasksBiz');
+      const txtBiz = document.getElementById('txtToggleTasksBiz');
+      if (btnBiz && txtBiz) {
+        if (enabled) {
+          btnBiz.style.background = 'var(--primary)';
+          btnBiz.style.color = '#FFFFFF';
+          btnBiz.style.border = 'none';
+          txtBiz.innerText = 'Activado ✓';
+        } else {
+          btnBiz.style.background = 'var(--surface-subtle)';
+          btnBiz.style.color = 'var(--text-muted)';
+          btnBiz.style.border = '1px solid var(--surface-border)';
+          txtBiz.innerText = 'Desactivado ✕';
+        }
+      }
+    }
+
+    function agregarNuevaTarea(text, priority = 'normal') {
+      const cleanText = (text || '').trim();
+      if (!cleanText) {
+        showToast('Escribe una descripción para la tarea');
+        return false;
+      }
+      const newTask = {
+        id: 'task_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        text: cleanText,
+        priority: priority === 'alta' ? 'alta' : 'normal',
+        completed: false,
+        createdAt: new Date().toISOString(),
+        completedAt: null
+      };
+      pendingTasks.unshift(newTask);
+      persistirEstadoLocal();
+      actualizarWidgetsTareasPendientes();
+      showToast('✓ Tarea agregada al taller');
+      return true;
+    }
+
+    function agregarNuevaTareaDesdeWidget(suffix) {
+      const inp = document.getElementById(`inpNewTaskText_${suffix}`);
+      const chkUrgent = document.getElementById(`chkNewTaskUrgent_${suffix}`);
+      if (!inp) return;
+      const text = inp.value.trim();
+      const priority = (chkUrgent && chkUrgent.checked) ? 'alta' : 'normal';
+      if (agregarNuevaTarea(text, priority)) {
+        inp.value = '';
+        if (chkUrgent) chkUrgent.checked = false;
+      }
+    }
+
+    function toggleEstadoTarea(taskId) {
+      const task = pendingTasks.find(t => t.id === taskId);
+      if (!task) return;
+      task.completed = !task.completed;
+      task.completedAt = task.completed ? new Date().toISOString() : null;
+      persistirEstadoLocal();
+      actualizarWidgetsTareasPendientes();
+      showToast(task.completed ? '🎉 ¡Tarea completada!' : 'Tarea marcada como pendiente');
+    }
+
+    function eliminarTarea(taskId) {
+      pendingTasks = pendingTasks.filter(t => t.id !== taskId);
+      persistirEstadoLocal();
+      actualizarWidgetsTareasPendientes();
+      showToast('Tarea eliminada');
+    }
+
+    function limpiarTareasCompletadas() {
+      const completadasCount = pendingTasks.filter(t => t.completed).length;
+      if (completadasCount === 0) {
+        showToast('No hay tareas completadas para limpiar');
+        return;
+      }
+      pendingTasks = pendingTasks.filter(t => !t.completed);
+      persistirEstadoLocal();
+      actualizarWidgetsTareasPendientes();
+      showToast(`🧹 Se limpiaron ${completadasCount} tareas completadas`);
+    }
+
+    function renderPendingTasksWidgetMarkup(suffix) {
+      const pendientes = pendingTasks.filter(t => !t.completed);
+      const completadas = pendingTasks.filter(t => t.completed);
+      const total = pendingTasks.length;
+
+      const countBadge = pendientes.length > 0
+        ? `<span style="font-size:10px; font-weight:800; background:#FEF3C7; color:#92400E; padding:2px 8px; border-radius:10px; border:1px solid #FDE68A;">${pendientes.length} pendiente${pendientes.length > 1 ? 's' : ''}</span>`
+        : `<span style="font-size:10px; font-weight:800; background:#DCFCE7; color:#166534; padding:2px 8px; border-radius:10px; border:1px solid #86EFAC;">✓ Todo al día</span>`;
+
+      const btnLimpiar = completadas.length > 0
+        ? `<button onclick="limpiarTareasCompletadas()" title="Limpiar tareas realizadas" style="background:none; border:none; color:var(--text-muted); font-size:10.5px; cursor:pointer; font-weight:600; text-decoration:underline;">Limpiar (${completadas.length})</button>`
+        : '';
+
+      let tareasHtml = '';
+      if (total === 0) {
+        tareasHtml = `
+          <div style="text-align:center; padding:16px 12px; background:var(--surface-subtle); border-radius:14px; border:1px dashed var(--surface-border); color:var(--text-muted); font-size:11.5px;">
+            ✨ No hay tareas pendientes registradas. Escribe una arriba para iniciar tu seguimiento.
+          </div>
+        `;
+      } else {
+        const tareasOrdenadas = [
+          ...pendientes.filter(t => t.priority === 'alta'),
+          ...pendientes.filter(t => t.priority !== 'alta'),
+          ...completadas
+        ];
+
+        tareasHtml = tareasOrdenadas.map(t => {
+          const isComp = !!t.completed;
+          const isUrgent = t.priority === 'alta';
+
+          const checkIcon = isComp 
+            ? `<div style="width:24px; height:24px; border-radius:50%; background:#16A34A; color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:800; flex-shrink:0;">✓</div>`
+            : `<div style="width:24px; height:24px; border-radius:50%; border:2px solid ${isUrgent ? '#DC2626' : 'var(--text-muted)'}; background:var(--card-bg); display:flex; align-items:center; justify-content:center; flex-shrink:0;"></div>`;
+
+          const priorityTag = (!isComp && isUrgent)
+            ? `<span style="font-size:9.5px; font-weight:800; background:#FEE2E2; color:#B91C1C; padding:1px 6px; border-radius:6px; margin-left:6px;">🔴 Urgente</span>`
+            : '';
+
+          const fechaStr = t.createdAt ? new Date(t.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+          return `
+            <div style="background:${isComp ? 'var(--surface-subtle)' : 'var(--card-bg)'}; border:1px solid ${isComp ? 'transparent' : 'var(--surface-border)'}; border-left:${(!isComp && isUrgent) ? '3.5px solid #DC2626' : (isComp ? '1px solid transparent' : '1px solid var(--surface-border)')}; border-radius:12px; padding:9px 10px; display:flex; align-items:center; justify-content:space-between; gap:10px; opacity:${isComp ? '0.65' : '1'}; transition:all 0.2s;">
+              <div style="display:flex; align-items:center; gap:9px; flex:1; cursor:pointer;" onclick="toggleEstadoTarea('${t.id}')">
+                ${checkIcon}
+                <div style="flex:1;">
+                  <div style="font-size:12px; font-weight:${isComp ? '500' : '700'}; color:var(--text); text-decoration:${isComp ? 'line-through' : 'none'}; word-break:break-word;">
+                    ${escaparHTML(t.text)}${priorityTag}
+                  </div>
+                  <div style="font-size:9.5px; color:var(--text-muted); margin-top:2px;">
+                    ${isComp ? '✓ Realizada' : (fechaStr ? `Registrada a las ${fechaStr}` : 'Pendiente')}
+                  </div>
+                </div>
+              </div>
+              <button onclick="event.stopPropagation(); eliminarTarea('${t.id}')" title="Eliminar tarea" style="background:none; border:none; color:var(--text-muted); font-size:15px; cursor:pointer; padding:4px 6px; border-radius:6px; display:flex; align-items:center; justify-content:center;">
+                🗑️
+              </button>
+            </div>
+          `;
+        }).join('');
+      }
+
+      return `
+        <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:18px; padding:13px 14px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+          <!-- Cabecera del widget -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:16px;">📝</span>
+              <span style="font-size:12.5px; font-weight:800; color:var(--text);">Tareas Pendientes</span>
+              ${countBadge}
+            </div>
+            ${btnLimpiar}
+          </div>
+
+          <!-- Formulario de ingreso rápido en 1 toque -->
+          <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:10px;">
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="inpNewTaskText_${suffix}" placeholder="Escribe pendiente o reparación de taller..." onkeydown="if(event.key==='Enter') agregarNuevaTareaDesdeWidget('${suffix}')" style="flex:1; padding:8px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--surface-subtle); color:var(--text); font-size:12px; box-sizing:border-box;">
+              <button onclick="agregarNuevaTareaDesdeWidget('${suffix}')" class="primary-btn" style="width:auto; padding:8px 14px; font-size:12px; font-weight:800; margin:0; border-radius:12px; display:flex; align-items:center; gap:4px; box-shadow:none;">
+                <span>+</span> Agregar
+              </button>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <div style="font-size:10px; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+                <span>Prioridad:</span>
+                <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer; font-weight:700;">
+                  <input type="checkbox" id="chkNewTaskUrgent_${suffix}" style="cursor:pointer; accent-color:#DC2626;">
+                  <span style="color:#B91C1C;">🔴 Urgente</span>
+                </label>
+              </div>
+              <span style="font-size:9.5px; color:var(--text-muted);">Toca la tarea para marcar como lista ✓</span>
+            </div>
+          </div>
+
+          <!-- Lista interactiva de tareas -->
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            ${tareasHtml}
+          </div>
+        </div>
+      `;
+    }
+
+    function actualizarWidgetsTareasPendientes() {
+      const showTasks = bizProfile.showPendingTasks !== false;
+      sincronizarToggleTareasPendientesUI();
+
+      const containers = [
+        { id: 'tasksWidgetContainer_a', suffix: 'a' },
+        { id: 'tasksWidgetContainer_b', suffix: 'b' },
+        { id: 'tasksWidgetContainer_c', suffix: 'c' },
+        { id: 'tasksWidgetContainer_d', suffix: 'd' }
+      ];
+
+      containers.forEach(item => {
+        const el = document.getElementById(item.id);
+        if (!el) return;
+        if (!showTasks) {
+          el.style.display = 'none';
+          el.innerHTML = '';
+        } else {
+          el.style.display = 'block';
+          el.innerHTML = renderPendingTasksWidgetMarkup(item.suffix);
+        }
+      });
     }
 
     // =======================================================

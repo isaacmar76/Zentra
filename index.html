@@ -1017,11 +1017,10 @@
           <span class="material-symbols-outlined" style="font-size:21px;">request_quote</span>
           <span id="headerQuotesBadge" style="position:absolute; top:-4px; right:-4px; background:#0284C7; color:#FFFFFF; font-size:10px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.25); display:none;">0</span>
         </button>
-        <span id="userBadgeHeader" onclick="openBusinessProfileModal()" title="Toca para ver o cambiar usuario" style="font-size:11px; font-weight:700; background:var(--surface-container-low); color:var(--text); padding:4px 10px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; border:1px solid var(--surface-border);">
-          <span id="lblUserRoleIcon">👑</span> <span id="lblUserName">Dueño</span>
-        </span>
-        <button class="icon-btn" id="btnBusinessProfile" title="Datos del negocio y configuración" onclick="openBusinessProfileModal()">
-          <span class="material-symbols-outlined" style="font-size:18px;">storefront</span>
+        <!-- Botón Único de Mi Negocio en el Hero -->
+        <button class="icon-btn" id="btnBusinessProfile" title="Datos del negocio y configuración" onclick="openBusinessProfileModal()" style="background:var(--surface-container-low); border:1px solid var(--surface-border); color:var(--text); padding:0 10px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; height:38px;">
+          <span class="material-symbols-outlined" style="font-size:19px; color:var(--primary);">storefront</span>
+          <span>Mi Negocio</span>
         </button>
       </div>
     </header>
@@ -1365,10 +1364,6 @@
         <span class="material-symbols-outlined" style="font-size:20px;">request_quote</span>
         <span>Cotizaciones</span>
         <span id="navQuotesBadge" style="position:absolute; top:3px; right:16px; background:#0284C7; color:#FFFFFF; font-size:9.5px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.2); display:none;">0</span>
-      </button>
-      <button class="nav-btn" onclick="openBusinessProfileModal()">
-        <span class="material-symbols-outlined" style="font-size:20px;">storefront</span>
-        <span>Mi Negocio</span>
       </button>
     </nav>
 

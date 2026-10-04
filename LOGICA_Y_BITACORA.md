@@ -202,7 +202,7 @@ class CatalogItemModel {
 | **2026-10-04** | `c81ec7e` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
 | **2026-10-04** | `f36dfc0` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
 | **2026-10-04** | `7bd2df4` | Feature / Catálogo / Móvil | Hito 22: Soporte completo para subir imágenes desde la galería y almacenamiento del teléfono en la edición de productos del catálogo | ✅ Completado |
-| **2026-10-04** | `current` | Feature / Tareas / Taller | Hito 23: Flujo Directo de Personalización sin Modales Huérfanos y Módulo de Tareas Pendientes con Seguimiento Interactivo en Pantalla de Inicio (Ideal Taller) y Control Habilitar/Deshabilitar | ✅ Completado |
+| **2026-10-04** | `current` | UX / UI / Simplificación | Hito 23: Flujo Directo de Personalización, Tareas Pendientes en Inicio y Unificación a 1 Solo Botón de Mi Negocio en el Hero (eliminando duplicados de la barra inferior y badge de usuario) | ✅ Completado |
 
 ---
 
@@ -561,6 +561,9 @@ class CatalogItemModel {
   4. **Interruptor Dinámico Habilitar/Deshabilitar (`bizProfile.showPendingTasks`):**
      - Sincronizado en tiempo real tanto en `#themeModal` como en `#bizModal` mediante `sincronizarToggleTareasPendientesUI()`.
      - Si está deshabilitado (`false`), los contenedores de tareas se ocultan totalmente del DOM (`display: none`), manteniendo la pantalla limpia para quienes no requieran el módulo.
+  5. **Unificación a 1 Solo Botón en el Hero (Eliminación de Redundancias):**
+     - Se eliminó el botón de *"Mi Negocio"* de la barra de navegación inferior (`bottom-bar`), dejando la barra optimizada con 3 accesos operativos principales: `Inicio`, `Catálogo` y `Cotizaciones`.
+     - En el header/hero superior se retiró el badge del dueño que abría el mismo modal y se unificó en un único botón con ícono y texto: `[ 🏪 Mi Negocio ]`, eliminando la triple duplicidad de accesos para la misma acción.
 
 ---
 

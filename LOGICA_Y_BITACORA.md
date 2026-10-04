@@ -200,7 +200,8 @@ class CatalogItemModel {
 | **2026-10-03** | `321ec68` | Fix / Multi-Tenant Auth | Auto-recuperación de negocios, acceso directo 1-toque en login y búsqueda flexible por nombre de negocio | ✅ Completado |
 | **2026-10-04** | `1ae5d84` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
 | **2026-10-04** | `c81ec7e` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
-| **2026-10-04** | `current` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
+| **2026-10-04** | `f36dfc0` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
+| **2026-10-04** | `current` | Feature / Catálogo / Móvil | Hito 22: Soporte completo para subir imágenes desde la galería y almacenamiento del teléfono en la edición de productos del catálogo | ✅ Completado |
 
 ---
 
@@ -517,6 +518,23 @@ class CatalogItemModel {
     - Botón interactivo en la barra de navegación inferior (`bottom-bar`) con badge `#navQuotesBadge`.
     - Indicador en POS Mostrador (`#posQuotesCountVal`) y contador en el carrito (`#cartQuotesCountBadge`).
     - Alerta en tiempo real en el semáforo del Cockpit y en las alertas del Híbrido.
+
+#### Hito 22: Soporte Completo para Subida de Imágenes desde Galería del Teléfono y Cámara en Catálogo
+- **Problema previo:**
+  - En teléfonos móviles (Android Chrome, iOS Safari), el input de foto del catálogo utilizaba exclusivamente el atributo `capture="environment"`, lo cual forzaba la apertura directa de la cámara trasera y bloqueaba la posibilidad de seleccionar fotos previamente tomadas, descargadas o guardadas en la galería del teléfono.
+  - Además, el trigger dependía de llamadas a `.click()` sobre inputs con `display: none;`, lo cual en algunos navegadores móviles es restringido por políticas de seguridad táctil.
+- **Solución implementada:**
+  1. **Selector Dual Independiente en Móvil:**
+     - **`📁 Galería / Fotos`:** Conectado a un input `<input type="file" id="prodPhotoGalleryInp" accept="image/*">` **sin capture**, permitiendo al usuario abrir el carrete de fotos, Google Fotos, descargas y almacenamiento interno de su celular.
+     - **`📸 Cámara`:** Conectado a un input `<input type="file" id="prodPhotoCameraInp" accept="image/*" capture="environment">` para quienes prefieran capturar la foto en vivo del producto en la mesa de trabajo.
+  2. **Activación Nativa por `<label for="...">`:**
+     - La asociación táctil se realiza mediante etiquetas `<label>` nativas del navegador, garantizando que el diálogo del sistema operativo se abra el 100% de las veces en dispositivos móviles sin bloqueos de eventos sintéticos.
+  3. **Optimización Canvas y Feedback:**
+     - Redimensionamiento proporcional automático en cliente (máx 400px, compresión JPEG 0.8) para garantizar nitidez visual sin desbordar la cuota de `localStorage` del dispositivo.
+     - Indicadores de estado visual: *"⏳ Procesando imagen..."*, *"✓ Foto cargada exitosamente"* y *"✓ Foto actual cargada (puedes cambiarla o quitarla)"* al entrar a editar un producto.
+     - Reseteo automático de los campos de archivo para permitir cambiar de foto o volver a subir una corregida sin necesidad de recargar la página.
+  4. **Persistencia y Sincronización:**
+     - Al guardar la edición (`guardarNuevoProducto()`), la nueva foto se actualiza inmediatamente en el catálogo (`catalogItems`), se sincroniza en caliente en el carrito de compras (`retailCart`) si el ítem ya estaba agregado, y se almacena en `localStorage`.
 
 ---
 

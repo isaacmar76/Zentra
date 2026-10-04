@@ -2115,22 +2115,36 @@
         </div>
         <input type="hidden" id="prodTypeInp" value="producto">
 
-        <!-- Campo: Foto del Producto (Subir o Tomar con Cámara) -->
+        <!-- Campo: Foto del Producto (Subir de Galería o Tomar con Cámara) -->
         <div style="margin-bottom:12px;">
           <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px;">Foto o Imagen de Referencia</label>
           <div style="display:flex; align-items:center; gap:10px;">
-            <div id="prodImgPreview" onclick="document.getElementById('prodPhotoInp').click()" style="width:62px; height:62px; border-radius:14px; background:#F8F9FA; border:1.5px dashed var(--secondary); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:24px; cursor:pointer; flex-shrink:0;">
+            <!-- Vista previa interactiva que abre galería -->
+            <label for="prodPhotoGalleryInp" id="prodImgPreview" title="Toca para seleccionar foto de galería o archivo" style="width:64px; height:64px; border-radius:14px; background:#F8F9FA; border:1.5px dashed var(--secondary); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:24px; cursor:pointer; flex-shrink:0;">
               📷
-            </div>
+            </label>
             <div style="flex:1;">
-              <input type="file" id="prodPhotoInp" accept="image/*" capture="environment" style="display:none;" onchange="handleProductPhotoSelect(event)">
-              <button type="button" onclick="document.getElementById('prodPhotoInp').click()" style="background:var(--bg); border:1px solid var(--secondary); color:var(--secondary); padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
-                📸 Tomar Foto / Galería
-              </button>
-              <button type="button" id="btnRemoveProdPhoto" onclick="removeProductPhoto()" style="display:none; background:transparent; border:none; color:var(--alert); font-size:11px; font-weight:600; cursor:pointer; margin-left:4px;">
-                ✕ Quitar
-              </button>
-              <div style="font-size:10px; color:var(--text-muted); margin-top:3px;">Cámara o archivo para mostrar en catálogo</div>
+              <!-- Input para Galería / Archivos del Teléfono (SIN capture para permitir seleccionar de galería/fotos) -->
+              <input type="file" id="prodPhotoGalleryInp" accept="image/*" style="display:none;" onchange="handleProductPhotoSelect(event)">
+              <!-- Input para Cámara directa del dispositivo -->
+              <input type="file" id="prodPhotoCameraInp" accept="image/*" capture="environment" style="display:none;" onchange="handleProductPhotoSelect(event)">
+              <!-- Input legado para retrocompatibilidad -->
+              <input type="file" id="prodPhotoInp" accept="image/*" style="display:none;" onchange="handleProductPhotoSelect(event)">
+              
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <label for="prodPhotoGalleryInp" style="background:var(--primary-soft); border:1px solid var(--primary); color:var(--primary); padding:6px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+                  📁 Galería / Fotos
+                </label>
+                <label for="prodPhotoCameraInp" style="background:var(--surface-subtle); border:1px solid var(--surface-border); color:var(--text); padding:6px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+                  📸 Cámara
+                </label>
+                <button type="button" id="btnRemoveProdPhoto" onclick="removeProductPhoto()" style="display:none; background:transparent; border:none; color:var(--alert); font-size:11px; font-weight:700; cursor:pointer; padding:4px;">
+                  ✕ Quitar
+                </button>
+              </div>
+              <div style="font-size:10px; color:var(--text-muted); margin-top:4px;" id="prodPhotoStatusText">
+                Selecciona una foto de tu teléfono o toma una con la cámara
+              </div>
             </div>
           </div>
         </div>
@@ -3270,17 +3284,20 @@
     }
 
     // ==========================================
-    // FOTOS DE PRODUCTOS (CÁMARA / SUBIR)
+    // FOTOS DE PRODUCTOS (GALERÍA / CÁMARA / SUBIR)
     // ==========================================
     function handleProductPhotoSelect(event) {
       const file = event.target.files && event.target.files[0];
       if (!file) return;
 
+      const statusText = document.getElementById('prodPhotoStatusText');
+      if (statusText) statusText.innerText = '⏳ Procesando imagen...';
+
       const reader = new FileReader();
       reader.onload = function(e) {
         const img = new Image();
         img.onload = function() {
-          const maxDim = 320;
+          const maxDim = 400; // Calidad visual clara sin sobrecargar localStorage
           let w = img.width;
           let h = img.height;
           if (w > maxDim || h > maxDim) {
@@ -3297,23 +3314,44 @@
           canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
-          tempProductPhoto = canvas.toDataURL('image/jpeg', 0.75);
+          tempProductPhoto = canvas.toDataURL('image/jpeg', 0.8);
 
           const preview = document.getElementById('prodImgPreview');
-          preview.innerHTML = `<img src="${tempProductPhoto}" style="width:100%; height:100%; object-fit:cover;">`;
-          document.getElementById('btnRemoveProdPhoto').style.display = 'inline-block';
+          if (preview) {
+            preview.innerHTML = `<img src="${tempProductPhoto}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">`;
+          }
+          const btnRem = document.getElementById('btnRemoveProdPhoto');
+          if (btnRem) btnRem.style.display = 'inline-block';
+          if (statusText) statusText.innerText = '✓ Foto cargada exitosamente';
+          showToast('✓ Foto lista para guardar');
+        };
+        img.onerror = function() {
+          showToast('No se pudo procesar la imagen seleccionada.');
+          if (statusText) statusText.innerText = 'Error al cargar imagen';
         };
         img.src = e.target.result;
       };
+      reader.onerror = function() {
+        showToast('Error al leer el archivo de imagen.');
+      };
       reader.readAsDataURL(file);
+
+      // Resetear el valor para que vuelva a disparar change si se elige el mismo archivo
+      event.target.value = '';
     }
 
     function removeProductPhoto() {
       tempProductPhoto = null;
-      document.getElementById('prodPhotoInp').value = '';
+      ['prodPhotoGalleryInp', 'prodPhotoCameraInp', 'prodPhotoInp'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
       const preview = document.getElementById('prodImgPreview');
-      preview.innerHTML = '📷';
-      document.getElementById('btnRemoveProdPhoto').style.display = 'none';
+      if (preview) preview.innerHTML = '📷';
+      const btnRem = document.getElementById('btnRemoveProdPhoto');
+      if (btnRem) btnRem.style.display = 'none';
+      const statusText = document.getElementById('prodPhotoStatusText');
+      if (statusText) statusText.innerText = 'Selecciona una foto de tu teléfono o toma una con la cámara';
     }
 
     // ==========================================
@@ -5927,9 +5965,11 @@ ${estadoStr}${contactText}
       tempProductPhoto = item.image || null;
       const prev = document.getElementById('prodImgPreview');
       const btnRemove = document.getElementById('btnRemoveProdPhoto');
+      const statusText = document.getElementById('prodPhotoStatusText');
       if (tempProductPhoto && prev) {
         prev.innerHTML = `<img src="${tempProductPhoto}" style="width:100%; height:100%; object-fit:cover; border-radius:12px;">`;
         if (btnRemove) btnRemove.style.display = 'inline-block';
+        if (statusText) statusText.innerText = '✓ Foto actual cargada (puedes cambiarla o quitarla)';
       } else {
         removeProductPhoto();
       }

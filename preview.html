@@ -2182,7 +2182,7 @@
     </div>
 
     <!-- Modal: CRUD de Clientes (Crear / Editar Cliente) -->
-    <div id="clientModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:360; align-items:center; justify-content:center; padding:18px;">
+    <div id="clientModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:420; align-items:center; justify-content:center; padding:18px;">
       <div style="background:var(--card-bg); width:100%; max-width:350px; border-radius:24px; padding:22px 18px; color:var(--text); box-shadow:0 12px 36px rgba(0,0,0,0.25); max-height:90%; overflow-y:auto;">
         <div style="font-size:16px; font-weight:800; margin-bottom:2px;" id="cliModalTitle">+ Nuevo Cliente</div>
         <div style="font-size:11px; color:var(--text-muted); margin-bottom:14px;">Registra los datos para pedidos, cotizaciones y facturas</div>
@@ -2236,15 +2236,39 @@
           <button onclick="cerrarCarritoRetail()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
         </div>
 
-        <!-- Sección Cliente para la Venta (Opcional) -->
-        <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; margin-bottom:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <label style="font-size:11px; font-weight:700; color:var(--text); margin:0;">👤 Datos del Cliente (Para Cotización / WhatsApp)</label>
-            <span style="font-size:10px; color:var(--text-muted);">Opcional</span>
+        <!-- Sección Cliente para la Venta / Cotización -->
+        <div style="background:var(--surface-subtle); border:1.5px solid var(--surface-border); border-radius:16px; padding:12px; margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label style="font-size:11.5px; font-weight:800; color:var(--text); margin:0; display:flex; align-items:center; gap:5px;">
+              <span>👤 Cliente de la Orden:</span>
+            </label>
+            <span id="lblCartClientBadge" style="font-size:10px; font-weight:700; background:#E2E8F0; color:#475569; padding:2px 8px; border-radius:10px;">Cliente Genérico</span>
           </div>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
-            <input type="text" id="retailCliNameInp" placeholder="Nombre cliente (ej: Don Carlos)" style="padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--card-bg); color:var(--text);">
-            <input type="text" id="retailCliPhoneInp" placeholder="WhatsApp (ej: 312...)" style="padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--card-bg); color:var(--text);">
+
+          <!-- Selector de clientes registrados y botón nuevo cliente -->
+          <div style="display:flex; gap:6px; margin-bottom:8px;">
+            <div style="position:relative; flex:1;">
+              <select id="cartClientSelect" onchange="alSeleccionarClienteEnCarrito(this.value)" style="width:100%; padding:8px 10px; border-radius:10px; border:1.5px solid var(--surface-border); font-size:12px; font-weight:600; background:var(--card-bg); color:var(--text); cursor:pointer; box-sizing:border-box;">
+                <option value="">👤 Escoger cliente del directorio...</option>
+                <!-- Opciones inyectadas dinámicamente -->
+              </select>
+            </div>
+            <button type="button" onclick="abrirCrearClienteDesdeCarrito()" title="Registrar nuevo cliente en directorio" style="background:var(--primary-soft); color:var(--primary); border:1.5px solid var(--primary); padding:8px 12px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.15);">
+              <span>➕</span> Nuevo
+            </button>
+          </div>
+
+          <!-- Campos de nombre y WhatsApp (pre-llenados al escoger o editables libremente) -->
+          <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:6px;">
+            <input type="text" id="retailCliNameInp" oninput="alEditarDatosManualesCliente()" placeholder="Nombre o Cliente Mostrador" style="padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--card-bg); color:var(--text); font-weight:600;">
+            <input type="tel" id="retailCliPhoneInp" oninput="alEditarDatosManualesCliente()" placeholder="WhatsApp (312...)" style="padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--card-bg); color:var(--text); font-weight:600;">
+          </div>
+          <input type="hidden" id="selectedCartClientId" value="">
+
+          <!-- Aviso sutil de estado del cliente -->
+          <div id="cartClientNotice" style="font-size:10px; color:var(--text-muted); margin-top:5px; display:flex; justify-content:space-between; align-items:center;">
+            <span>Si no escoges ninguno, se enviará como cliente genérico ("Cliente Mostrador").</span>
+            <button type="button" id="btnDesvincularCliente" onclick="desvincularClienteDeCarrito()" style="display:none; background:transparent; border:none; color:var(--alert); font-size:10px; font-weight:700; cursor:pointer; padding:2px;">✕ Desvincular</button>
           </div>
         </div>
 
@@ -2464,6 +2488,8 @@
     let clients = [];
     let editingClientId = null;
     let selectedOrderClientId = null;
+    let clientModalTarget = 'clients'; // 'clients' | 'order' | 'cart'
+    let selectedCartClientId = null;
 
     // Clientes de muestra EXCLUSIVOS para TM Diseños Creativos (Migración legada)
     const DEFAULT_CLIENTS_TM = [
@@ -3968,6 +3994,22 @@
     function cerrarModalCliente() {
       document.getElementById('clientModal').style.display = 'none';
       editingClientId = null;
+      clientModalTarget = 'clients';
+    }
+
+    function abrirCrearClienteDesdeCarrito() {
+      clientModalTarget = 'cart';
+      abrirModalCliente(null);
+      const preName = (document.getElementById('retailCliNameInp')?.value || '').trim();
+      const prePhone = (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+      if (preName && preName.toLowerCase() !== 'cliente mostrador' && preName.toLowerCase() !== 'cliente') {
+        const nameInp = document.getElementById('cliNameInp');
+        if (nameInp) nameInp.value = preName;
+      }
+      if (prePhone) {
+        const phoneInp = document.getElementById('cliPhoneInp');
+        if (phoneInp) phoneInp.value = prePhone;
+      }
     }
 
     function guardarCliente() {
@@ -3983,6 +4025,7 @@
         return;
       }
 
+      let savedClientId = null;
       if (editingClientId) {
         const c = clients.find(x => x.id === editingClientId);
         if (c) {
@@ -3992,6 +4035,7 @@
           c.email = email;
           c.address = addr;
           c.notes = notes;
+          savedClientId = c.id;
           showToast(`✓ Cliente "${name}" actualizado.`);
         }
       } else {
@@ -4006,14 +4050,23 @@
           createdAt: new Date().toISOString()
         };
         clients.unshift(newCli);
+        savedClientId = newCli.id;
         showToast(`✓ Cliente "${name}" registrado exitosamente.`);
       }
 
       persistirEstadoLocal();
+      const previousTarget = clientModalTarget;
       cerrarModalCliente();
       renderClientesList();
       if (document.getElementById('lblClientesCount')) {
         document.getElementById('lblClientesCount').innerText = clients.length;
+      }
+
+      // Si fue abierto desde el carrito de mostrador, vincular de inmediato
+      if (previousTarget === 'cart' && savedClientId) {
+        actualizarSelectorClientesCarrito(savedClientId);
+        alSeleccionarClienteEnCarrito(savedClientId);
+        showToast(`✓ Cliente "${name}" vinculado al pedido del carrito.`);
       }
     }
 
@@ -5688,7 +5741,138 @@ ${itemsBreakdown}
       document.getElementById('retailCartModal').style.display = 'none';
     }
 
+    // ==========================================
+    // GESTIÓN DE CLIENTES EN EL CARRITO DE COMPRAS
+    // ==========================================
+    function actualizarSelectorClientesCarrito(forceSelectId = null) {
+      const sel = document.getElementById('cartClientSelect');
+      if (!sel) return;
+
+      const currentVal = forceSelectId || selectedCartClientId || sel.value;
+      sel.innerHTML = '<option value="">👤 Escoger cliente del directorio...</option>';
+
+      if (clients && clients.length > 0) {
+        clients.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `${c.name} (${c.phone || 'Sin WhatsApp'})`;
+          sel.appendChild(opt);
+        });
+      }
+
+      if (currentVal && clients.some(c => c.id === currentVal)) {
+        sel.value = currentVal;
+        selectedCartClientId = currentVal;
+      } else {
+        sel.value = '';
+        if (selectedCartClientId && !clients.some(c => c.id === selectedCartClientId)) {
+          selectedCartClientId = null;
+        }
+      }
+      actualizarEstadoVisualClienteCarrito();
+    }
+
+    function alSeleccionarClienteEnCarrito(clientId) {
+      const nameInp = document.getElementById('retailCliNameInp');
+      const phoneInp = document.getElementById('retailCliPhoneInp');
+      const hiddenInp = document.getElementById('selectedCartClientId');
+
+      if (!clientId) {
+        selectedCartClientId = null;
+        if (hiddenInp) hiddenInp.value = '';
+        actualizarEstadoVisualClienteCarrito();
+        return;
+      }
+
+      const c = clients.find(x => x.id === clientId);
+      if (c) {
+        selectedCartClientId = c.id;
+        if (nameInp) nameInp.value = c.name;
+        if (phoneInp) phoneInp.value = c.phone || '';
+        if (hiddenInp) hiddenInp.value = c.id;
+        actualizarEstadoVisualClienteCarrito();
+      }
+    }
+
+    function alEditarDatosManualesCliente() {
+      const nameVal = (document.getElementById('retailCliNameInp')?.value || '').trim();
+      const phoneVal = (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+      const sel = document.getElementById('cartClientSelect');
+      const hiddenInp = document.getElementById('selectedCartClientId');
+
+      if (selectedCartClientId) {
+        const c = clients.find(x => x.id === selectedCartClientId);
+        if (!c || c.name !== nameVal || (c.phone || '') !== phoneVal) {
+          // El usuario personalizó o cambió los datos manualmente
+          selectedCartClientId = null;
+          if (sel) sel.value = '';
+          if (hiddenInp) hiddenInp.value = '';
+        }
+      }
+      actualizarEstadoVisualClienteCarrito();
+    }
+
+    function desvincularClienteDeCarrito() {
+      selectedCartClientId = null;
+      const sel = document.getElementById('cartClientSelect');
+      const nameInp = document.getElementById('retailCliNameInp');
+      const phoneInp = document.getElementById('retailCliPhoneInp');
+      const hiddenInp = document.getElementById('selectedCartClientId');
+
+      if (sel) sel.value = '';
+      if (nameInp) nameInp.value = '';
+      if (phoneInp) phoneInp.value = '';
+      if (hiddenInp) hiddenInp.value = '';
+
+      actualizarEstadoVisualClienteCarrito();
+      showToast('Cliente desvinculado (quedó como cliente genérico).');
+    }
+
+    function actualizarEstadoVisualClienteCarrito() {
+      const badge = document.getElementById('lblCartClientBadge');
+      const btnDesvincular = document.getElementById('btnDesvincularCliente');
+      const noticeSpan = document.querySelector('#cartClientNotice > span');
+      const nameVal = (document.getElementById('retailCliNameInp')?.value || '').trim();
+
+      if (selectedCartClientId) {
+        const c = clients.find(x => x.id === selectedCartClientId);
+        if (badge) {
+          badge.innerText = '✓ Cliente Vinculado';
+          badge.style.background = '#DCFCE7';
+          badge.style.color = '#166534';
+          badge.style.border = '1px solid #86EFAC';
+        }
+        if (btnDesvincular) btnDesvincular.style.display = 'inline-block';
+        if (noticeSpan && c) {
+          noticeSpan.innerHTML = `Vinculado: <b>${c.name}</b> ${c.document ? `(Doc: ${c.document})` : ''}`;
+        }
+      } else if (nameVal && nameVal.toLowerCase() !== 'cliente mostrador' && nameVal.toLowerCase() !== 'cliente') {
+        if (badge) {
+          badge.innerText = 'Cliente Personalizado';
+          badge.style.background = '#FEF3C7';
+          badge.style.color = '#92400E';
+          badge.style.border = '1px solid #FCD34D';
+        }
+        if (btnDesvincular) btnDesvincular.style.display = 'inline-block';
+        if (noticeSpan) {
+          noticeSpan.innerText = 'Datos manuales para esta cotización/orden.';
+        }
+      } else {
+        if (badge) {
+          badge.innerText = 'Cliente Genérico';
+          badge.style.background = '#E2E8F0';
+          badge.style.color = '#475569';
+          badge.style.border = 'none';
+        }
+        if (btnDesvincular) btnDesvincular.style.display = 'none';
+        if (noticeSpan) {
+          noticeSpan.innerText = 'Si no escoges ninguno, se enviará como cliente genérico ("Cliente Mostrador").';
+        }
+      }
+    }
+
     function renderRetailCartModal() {
+      actualizarSelectorClientesCarrito();
       const container = document.getElementById('retailCartItemsList');
       if (!container) return;
       container.innerHTML = '';
@@ -5786,6 +5970,7 @@ ${itemsBreakdown}
       if (!confirm('¿Deseas vaciar todos los artículos del carrito?')) return;
       retailCart = [];
       cart = [];
+      desvincularClienteDeCarrito();
       renderRetailCartBadge();
       cerrarCarritoRetail();
       showToast('Carrito vaciado');
@@ -5798,8 +5983,11 @@ ${itemsBreakdown}
       }
 
       const total = retailCart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-      const cliName = (document.getElementById('retailCliNameInp')?.value || '').trim() || 'Cliente Mostrador';
-      const cliPhone = (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+      const linkedCli = selectedCartClientId ? clients.find(c => c.id === selectedCartClientId) : null;
+      const manualName = (document.getElementById('retailCliNameInp')?.value || '').trim();
+      const cliName = linkedCli ? linkedCli.name : (manualName || 'Cliente Mostrador');
+      const cliPhone = linkedCli ? (linkedCli.phone || '') : (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+      const clientDoc = (linkedCli && linkedCli.document) ? linkedCli.document : 'Consumidor Final';
 
       // Descontar existencias físicas de los productos vendidos
       retailCart.forEach(cartItem => {
@@ -5826,7 +6014,7 @@ ${itemsBreakdown}
         date: new Date().toLocaleDateString('es-CO'),
         clientName: cliName,
         clientPhone: cliPhone,
-        clientDoc: 'Consumidor Final',
+        clientDoc: clientDoc,
         orderName: 'Venta de Mostrador POS',
         orderStatus: 'Entregado y Pagado',
         items: retailCart.map(x => ({
@@ -5842,12 +6030,13 @@ ${itemsBreakdown}
 
       // Preparar mensaje para WhatsApp y portapapeles
       const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'Zentra';
+      const clientDocLine = (linkedCli && linkedCli.document) ? `\n📄 *CC / NIT:* ${linkedCli.document}` : '';
       const waReceiptMsg = 
 `🧾 *FACTURA DE VENTA / RECIBO OFICIAL*
 ✨ *${bizName.toUpperCase()}* ✨
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🏷️ *N° Factura:* #FAC-POS-${ticketNum}
-👤 *Cliente:* ${cliName}
+👤 *Cliente:* ${cliName}${clientDocLine}
 📅 *Fecha:* ${receiptData.date}
 
 📦 *DETALLE DE COMPRA:*
@@ -5865,6 +6054,7 @@ ${receiptData.items.map(x => `• ${x.quantity}x ${x.name} = $${x.subtotal.toLoc
 
       retailCart = [];
       cart = [];
+      desvincularClienteDeCarrito();
       renderRetailCartBadge();
       persistirEstadoLocal();
       recalcularTodo();
@@ -5890,12 +6080,16 @@ ${receiptData.items.map(x => `• ${x.quantity}x ${x.name} = $${x.subtotal.toLoc
       }
 
       const total = retailCart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-      const cliName = (document.getElementById('retailCliNameInp')?.value || '').trim() || 'Cliente';
-      const cliPhone = (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+      const linkedCli = selectedCartClientId ? clients.find(c => c.id === selectedCartClientId) : null;
+      const manualName = (document.getElementById('retailCliNameInp')?.value || '').trim();
+      const cliName = linkedCli ? linkedCli.name : (manualName || 'Cliente');
+      const cliPhone = linkedCli ? (linkedCli.phone || '') : (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+      const clientDoc = (linkedCli && linkedCli.document) ? linkedCli.document : 'N/A';
       const ticketNum = Math.floor(1000 + Math.random() * 9000);
       const date = new Date().toLocaleDateString('es-CO');
       const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'Zentra';
 
+      let clientDocLine = (linkedCli && linkedCli.document) ? `\n📄 *CC / NIT:* ${linkedCli.document}` : '';
       let itemsText = retailCart.map(it => `• ${it.quantity}x ${it.name} ($${it.price.toLocaleString('es-CO')} c/u) = *$${(it.quantity * it.price).toLocaleString('es-CO')} COP*`).join('\n');
 
       let cuentasText = '';
@@ -5914,7 +6108,7 @@ ${receiptData.items.map(x => `• ${x.quantity}x ${x.name} = $${x.subtotal.toLoc
 ✨ *${bizName.toUpperCase()}* ✨
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 🏷️ *N° Cotización:* #COT-POS-${ticketNum}
-👤 *Cliente:* ${cliName}
+👤 *Cliente:* ${cliName}${clientDocLine}
 📅 *Fecha:* ${date}
 
 📦 *DETALLE DE ARTÍCULOS:*
@@ -5938,7 +6132,7 @@ ${itemsText}
         date: date,
         clientName: cliName,
         clientPhone: cliPhone,
-        clientDoc: 'N/A',
+        clientDoc: clientDoc,
         orderName: 'Presupuesto Comercial',
         orderStatus: 'Cotización',
         items: retailCart.map(x => ({

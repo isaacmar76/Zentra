@@ -197,7 +197,8 @@ class CatalogItemModel {
 | **2026-10-03** | `dd5f890` | Fix / Mobile UX | Blindaje de contraste total en inputs de Registro/Login (solución de texto invisible/blanco en celular y modo oscuro) | ✅ Completado |
 | **2026-10-03** | `1090b4a` | Feature / POS / Facturación | Administración avanzada del propietario: Catálogo con costo y venta (márgenes), Carrito mostrador/retail, Pedidos multi-ítem a medida, y ciclo Cotización vs Factura | ✅ Completado |
 | **2026-10-03** | `e151d1a` | UX / Sales Flow | Flujo rápido de ventas: Botón Tomar Pedido, Carrito permanente superior derecho, Acciones directas Cotizar (copia + WhatsApp) y Cobrar (factura) | ✅ Completado |
-| **2026-10-03** | `current` | Fix / Multi-Tenant Auth | Auto-recuperación de negocios, acceso directo 1-toque en login y búsqueda flexible por nombre de negocio | ✅ Completado |
+| **2026-10-03** | `321ec68` | Fix / Multi-Tenant Auth | Auto-recuperación de negocios, acceso directo 1-toque en login y búsqueda flexible por nombre de negocio | ✅ Completado |
+| **2026-10-04** | `current` | Feature / POS / CRM | Selector y Creación Express de Clientes en Carrito: vinculación con directorio para cotizaciones y facturas sin perder el flujo de venta | ✅ Completado |
 
 ---
 
@@ -396,6 +397,25 @@ class CatalogItemModel {
   2. **Acceso Visual 1-Toque (`boxSavedBusinesses`):** El portal de entrada ahora lista automáticamente las tarjetas de todos los negocios presentes en el dispositivo con su nombre comercial, modalidad y propietario, permitiendo ingresar a "Better Life" con un solo clic en `[ Entrar ➔ ]`.
   3. **Búsqueda Flexible:** `iniciarSesionUsuario()` ahora busca coincidencias por nombre del negocio (ej: `Better Life`, `better life`, `betterlife`), nombre del propietario, teléfono o usuario, permitiendo el ingreso sin fricciones.
   4. **Visibilidad de PIN:** Se añadió botón de visualización de PIN (`👁️`) para verificar la clave digitada (con soporte para el PIN predeterminado `1234`).
+
+#### Hito 18: Selector y Creación Express de Clientes en Carrito de Ventas / Cotización
+- **Requerimiento del Usuario:**
+  - En la cotización y factura se incluye el dato del cliente. Si no se escogió un cliente con anterioridad, se requirió una opción interactiva dentro del carrito que permita:
+    1. **Escoger un cliente existente** del directorio registrado del negocio.
+    2. **Crear un nuevo cliente** al vuelo desde el mismo carrito sin perder los productos seleccionados.
+    3. Si no se escoge ni crea ningún cliente, mantener la experiencia de **cliente genérico ("Cliente Mostrador")** tal como funcionaba antes, sin bloqueos ni pasos innecesarios.
+- **Implementación Técnica:**
+  - **Selector Directo en Carrito (`cartClientSelect`):** Desplegable dinámico alimentado en tiempo real con los clientes pertenecientes exclusivamente al negocio activo (`clients`), mostrando nombre y WhatsApp.
+  - **Creación Express (`abrirCrearClienteDesdeCarrito()`):**
+    - Botón `➕ Nuevo` en la cabecera del cliente dentro del carrito que despliega el modal completo de cliente (`clientModal`, elevado a `z-index: 420` para superponerse con seguridad sobre el carrito).
+    - Pre-llenado inteligente con cualquier nombre o teléfono que el usuario haya empezado a digitar en el carrito.
+    - Al guardar, el cliente recién creado queda vinculado de inmediato a la orden (`selectedCartClientId`) y sus datos se reflejan automáticamente en el carrito.
+  - **Indicadores Visuales y Desvinculación:**
+    - Badge reactivo (`#lblCartClientBadge`): alterna entre `Cliente Genérico` (gris), `✓ Cliente Vinculado` (verde) y `Cliente Personalizado` (amarillo si se editan datos manualmente).
+    - Botón `✕ Desvincular` para regresar con un toque al estado genérico ("Cliente Mostrador").
+  - **Integración con Cotizaciones y Facturas:**
+    - `cotizarYCopiarWhatsApp()` y `procesarCobroRetail()` incorporan automáticamente el nombre, WhatsApp y documento/NIT del cliente vinculado en el texto preformateado y en el comprobante oficial (`invoiceReceiptModal`), preservando la validez de 15 días y cuentas bancarias.
+    - Si no se selecciona cliente, se genera de forma inmediata con "Cliente Mostrador" / "Consumidor Final" conservando la máxima agilidad en el punto de venta.
 
 ---
 

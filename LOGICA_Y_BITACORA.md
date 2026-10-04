@@ -196,7 +196,8 @@ class CatalogItemModel {
 | **2026-10-01** | `e1d1f05` | Security / Multi-Tenant | Aislamiento estricto de productos y datos por negocio (multi-tenancy, registro central, llaves namespaced y control de acceso por PIN) | ✅ Completado |
 | **2026-10-03** | `dd5f890` | Fix / Mobile UX | Blindaje de contraste total en inputs de Registro/Login (solución de texto invisible/blanco en celular y modo oscuro) | ✅ Completado |
 | **2026-10-03** | `1090b4a` | Feature / POS / Facturación | Administración avanzada del propietario: Catálogo con costo y venta (márgenes), Carrito mostrador/retail, Pedidos multi-ítem a medida, y ciclo Cotización vs Factura | ✅ Completado |
-| **2026-10-03** | `current` | UX / Sales Flow | Flujo rápido de ventas: Botón Tomar Pedido, Carrito permanente superior derecho, Acciones directas Cotizar (copia + WhatsApp) y Cobrar (factura) | ✅ Completado |
+| **2026-10-03** | `e151d1a` | UX / Sales Flow | Flujo rápido de ventas: Botón Tomar Pedido, Carrito permanente superior derecho, Acciones directas Cotizar (copia + WhatsApp) y Cobrar (factura) | ✅ Completado |
+| **2026-10-03** | `current` | Fix / Multi-Tenant Auth | Auto-recuperación de negocios, acceso directo 1-toque en login y búsqueda flexible por nombre de negocio | ✅ Completado |
 
 ---
 
@@ -386,6 +387,15 @@ class CatalogItemModel {
   - **Soporte de Ítems a Medida:** Integración de `+ Ítem a Medida` dentro del catálogo y del carrito (`guardarItemMedida()` sincronizado con `retailCart`).
   - **Motor de Cotización y Copia WhatsApp:** Función `cotizarYCopiarWhatsApp()` con invocación a `navigator.clipboard.writeText()`, feedback toast y pre-llenado de enlace `https://wa.me/...`.
   - **Motor de Facturación Oficial:** Función `procesarCobroRetail()` con actualización contable, deducción de stock y generación de comprobante cancelado `#FAC-...`.
+
+#### Hito 17: Auto-Recuperación de Negocios y Acceso Directo en Portal de Entrada
+- **Problema previo:**
+  - Al cerrar sesión en un negocio recién creado (por ejemplo, "Better Life"), el usuario quedaba bloqueado en la pantalla de inicio de sesión porque el formulario exigía exclusivamente el nombre del usuario o teléfono original. Si el usuario digitaba el nombre comercial del negocio ("Better Life"), el buscador interno no lo encontraba al comparar solo los nombres de usuario de los colaboradores.
+- **Solución implementada:**
+  1. **Auto-Descubrimiento y Recuperación:** `obtenerRegistroNegocios()` ahora escanea proactivamente todas las llaves `zentra_biz_profile_*` en `localStorage`, asegurando que cualquier negocio creado en el dispositivo se detecte y preserve automáticamente en el registro general.
+  2. **Acceso Visual 1-Toque (`boxSavedBusinesses`):** El portal de entrada ahora lista automáticamente las tarjetas de todos los negocios presentes en el dispositivo con su nombre comercial, modalidad y propietario, permitiendo ingresar a "Better Life" con un solo clic en `[ Entrar ➔ ]`.
+  3. **Búsqueda Flexible:** `iniciarSesionUsuario()` ahora busca coincidencias por nombre del negocio (ej: `Better Life`, `better life`, `betterlife`), nombre del propietario, teléfono o usuario, permitiendo el ingreso sin fricciones.
+  4. **Visibilidad de PIN:** Se añadió botón de visualización de PIN (`👁️`) para verificar la clave digitada (con soporte para el PIN predeterminado `1234`).
 
 ---
 

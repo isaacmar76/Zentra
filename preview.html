@@ -1612,20 +1612,43 @@
 
         <!-- Vista: INICIAR SESIÓN -->
         <div id="authSecLogin">
-          <div style="margin-bottom:12px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:#0B1C30;">Correo, Usuario o Celular Registrado</label>
-            <input type="text" id="loginUserInp" placeholder="Ej: usuario@minegocio.com o 3124567890" style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
+          <!-- Lista Rápida de Negocios en este Dispositivo -->
+          <div id="boxSavedBusinesses" style="margin-bottom:14px;">
+            <div style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+              <span>🏢 Tus Negocios en este Dispositivo:</span>
+              <span id="lblSavedBizCount" style="font-size:10px; background:#F1F5F9; color:#0B1C30; padding:2px 8px; border-radius:10px; font-weight:800;">0</span>
+            </div>
+            <div id="savedBizListContainer" style="display:flex; flex-direction:column; gap:8px;">
+              <!-- Tarjetas dinámicas inyectadas por JS -->
+            </div>
           </div>
-          <div style="margin-bottom:16px;">
-            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:#0B1C30;">Contraseña o PIN Secreto</label>
-            <input type="password" id="loginPassInp" placeholder="••••••••" style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
+
+          <div id="authManualLoginDivider" style="display:flex; align-items:center; gap:8px; margin:14px 0 10px;">
+            <div style="flex:1; height:1px; background:#E2E8F0;"></div>
+            <span style="font-size:10px; color:#94A3B8; font-weight:700; text-transform:uppercase;">O busca por nombre o datos</span>
+            <div style="flex:1; height:1px; background:#E2E8F0;"></div>
+          </div>
+
+          <div style="margin-bottom:10px;">
+            <label style="font-size:11px; font-weight:700; display:block; margin-bottom:4px; color:#0B1C30;">Nombre del Negocio, Usuario o Celular</label>
+            <input type="text" id="loginUserInp" placeholder="Ej: Better Life, Don Pedro o 312..." style="width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
+          </div>
+          <div style="margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="font-size:11px; font-weight:700; color:#0B1C30; margin:0;">Contraseña o PIN Secreto</label>
+              <span style="font-size:10px; color:#64748B;">Predeterminado: 1234</span>
+            </div>
+            <div style="position:relative;">
+              <input type="password" id="loginPassInp" placeholder="••••" style="width:100%; padding:10px 36px 10px 12px; border-radius:12px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A !important; -webkit-text-fill-color:#0F172A !important; font-size:13px; font-weight:600; box-sizing:border-box;">
+              <button type="button" onclick="toggleVerPinLogin()" style="position:absolute; right:8px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:14px; color:#64748B; padding:4px;">👁️</button>
+            </div>
           </div>
           <button onclick="iniciarSesionUsuario()" class="primary-btn" style="padding:12px; font-weight:800; font-size:13.5px; margin-bottom:10px;">
             ENTRAR A MI NEGOCIO
           </button>
           <div style="text-align:center; font-size:11px; color:#64748B; margin-top:6px;">
-            ¿Aún no tienes un negocio registrado? <br>
-            <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color:#006C46; font-weight:700; text-decoration:none;">Crear nuevo negocio aquí</a>
+            ¿Deseas registrar otra marca o empresa? <br>
+            <a href="javascript:void(0)" onclick="switchAuthTab('register')" style="color:#006C46; font-weight:700; text-decoration:none;">+ Crear nuevo negocio independiente</a>
           </div>
         </div>
 
@@ -2470,8 +2493,44 @@
     // ==========================================
     function obtenerRegistroNegocios() {
       try {
+        let registry = [];
         const str = localStorage.getItem('zentra_businesses_registry');
-        return str ? JSON.parse(str) : [];
+        if (str) {
+          try { registry = JSON.parse(str); } catch (_) { registry = []; }
+        }
+
+        // Auto-recuperación y descubrimiento: escanear cualquier zentra_biz_profile_* en localStorage
+        let updated = false;
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('zentra_biz_profile_')) {
+            const bizId = k.replace('zentra_biz_profile_', '');
+            if (!registry.some(b => b.id === bizId)) {
+              try {
+                const p = JSON.parse(localStorage.getItem(k));
+                if (p && p.name) {
+                  registry.push({
+                    id: bizId,
+                    name: p.name,
+                    owner: p.owner || 'Dueño',
+                    phone: p.phone || '',
+                    type: p.type || 'servicios',
+                    createdAt: p.createdAt || new Date().toISOString()
+                  });
+                  updated = true;
+                }
+              } catch (_) {}
+            }
+          }
+        }
+
+        if (updated) {
+          try {
+            localStorage.setItem('zentra_businesses_registry', JSON.stringify(registry));
+          } catch (_) {}
+        }
+
+        return registry;
       } catch (e) {
         console.warn('Error leyendo registro de negocios', e);
         return [];
@@ -2621,7 +2680,22 @@
     function cargarEstadoNegocio(bizId, targetUserId = null) {
       if (!bizId) return false;
       const reg = obtenerRegistroNegocios();
-      const bizEntry = reg.find(b => b.id === bizId);
+      let bizEntry = reg.find(b => b.id === bizId);
+      if (!bizEntry) {
+        const pStr = localStorage.getItem(`zentra_biz_profile_${bizId}`);
+        if (pStr) {
+          try {
+            const p = JSON.parse(pStr);
+            bizEntry = {
+              id: bizId,
+              name: p.name || 'Mi Negocio',
+              owner: p.owner || 'Dueño',
+              phone: p.phone || '',
+              type: p.type || 'servicios'
+            };
+          } catch (_) {}
+        }
+      }
       if (!bizEntry) return false;
 
       try {
@@ -3439,12 +3513,17 @@
       if (pickSec) pickSec.style.display = 'none';
       const tabsCont = document.getElementById('authTabsContainer');
       if (tabsCont) tabsCont.style.display = 'flex';
+
+      if (tab === 'login') {
+        renderSavedBusinessesList();
+      }
     }
 
     function abrirAuthPortal(defaultTab = 'login') {
       switchAuthTab(defaultTab);
       document.getElementById('authScreenModal').style.display = 'flex';
       if (defaultTab === 'login') {
+        renderSavedBusinessesList();
         setTimeout(() => {
           const inp = document.getElementById('loginUserInp');
           if (inp) inp.focus();
@@ -3457,6 +3536,90 @@
       }
     }
 
+    function renderSavedBusinessesList() {
+      const container = document.getElementById('savedBizListContainer');
+      const box = document.getElementById('boxSavedBusinesses');
+      const countEl = document.getElementById('lblSavedBizCount');
+      const divider = document.getElementById('authManualLoginDivider');
+      if (!container) return;
+
+      container.innerHTML = '';
+      const registry = obtenerRegistroNegocios();
+
+      if (countEl) countEl.innerText = registry.length;
+
+      if (registry.length === 0) {
+        if (box) box.style.display = 'none';
+        if (divider) divider.style.display = 'none';
+        return;
+      }
+
+      if (box) box.style.display = 'block';
+      if (divider) divider.style.display = 'flex';
+
+      registry.forEach(biz => {
+        const isRetail = biz.type === 'retail';
+        const card = document.createElement('div');
+        card.style.cssText = 'background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:16px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer; transition:all 0.2s ease; box-shadow:0 2px 6px rgba(11,28,48,0.04);';
+        
+        card.onmouseover = () => { card.style.borderColor = '#006C46'; card.style.background = '#F0FDF4'; };
+        card.onmouseout = () => { card.style.borderColor = '#CBD5E1'; card.style.background = '#FFFFFF'; };
+
+        card.innerHTML = `
+          <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+            <div style="width:42px; height:42px; border-radius:12px; background:${isRetail ? '#ECFDF5' : '#EEF2FF'}; color:${isRetail ? '#065F46' : '#4338CA'}; font-size:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1px solid ${isRetail ? '#A7F3D0' : '#C7D2FE'};">
+              ${isRetail ? '🛒' : '✂️'}
+            </div>
+            <div style="min-width:0; flex:1;">
+              <div style="font-weight:800; font-size:14px; color:#0B1C30; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                ${biz.name}
+              </div>
+              <div style="font-size:11px; color:#64748B; margin-top:2px;">
+                <span>${isRetail ? 'Retail / Mostrador' : 'Servicios / Por Encargo'}</span> • <span>${biz.owner || 'Dueño'}</span>
+              </div>
+            </div>
+          </div>
+          <button style="background:var(--primary); color:#FFFFFF; border:none; padding:9px 14px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:5px; flex-shrink:0; box-shadow:0 2px 8px rgba(0,108,70,0.25);">
+            <span>Entrar</span> <span>➔</span>
+          </button>
+        `;
+
+        card.onclick = () => {
+          ingresarDirectoANegocio(biz.id);
+        };
+
+        container.appendChild(card);
+      });
+    }
+
+    function ingresarDirectoANegocio(bizId) {
+      const reg = obtenerRegistroNegocios();
+      const biz = reg.find(b => b.id === bizId);
+      if (!biz) {
+        showToast('Negocio no encontrado');
+        return;
+      }
+
+      let bUsers = [];
+      try {
+        const uStr = localStorage.getItem(`zentra_users_${bizId}`);
+        if (uStr) bUsers = JSON.parse(uStr);
+      } catch (_) {}
+
+      const ownerUser = bUsers.find(u => u.role === 'OWNER') || bUsers[0] || { id: 'usr_owner', name: biz.owner || 'Dueño', pin: '1234' };
+
+      cargarEstadoNegocio(bizId, ownerUser.id);
+      document.getElementById('authScreenModal').style.display = 'none';
+      showToast(`¡Bienvenida(o) a "${biz.name}"!`);
+    }
+
+    function toggleVerPinLogin() {
+      const inp = document.getElementById('loginPassInp');
+      if (inp) {
+        inp.type = inp.type === 'password' ? 'text' : 'password';
+      }
+    }
+
     function abrirSetupBusinessModal() {
       abrirAuthPortal('login');
     }
@@ -3466,7 +3629,7 @@
       const passInput = (document.getElementById('loginPassInp').value || '').trim();
 
       if (!userInput) {
-        showToast('Ingresa tu correo, usuario o celular registrado');
+        showToast('Ingresa el nombre de tu negocio, usuario o celular');
         return;
       }
 
@@ -3476,6 +3639,11 @@
         switchAuthTab('register');
         return;
       }
+
+      const norm = s => (s || '').toLowerCase().replace(/[\s\-_.]/g, '');
+      const cleanPhone = s => (s || '').replace(/\D/g, '');
+      const uNorm = norm(userInput);
+      const uPhone = cleanPhone(userInput);
 
       // Buscar usuario en los registros aislados de cada negocio
       let matches = [];
@@ -3487,32 +3655,61 @@
           if (uStr) bUsers = JSON.parse(uStr);
         } catch (_) {}
 
-        const matchedUser = bUsers.find(u => 
-          (u.username && u.username.toLowerCase() === userInput.toLowerCase()) ||
-          (u.email && u.email.toLowerCase() === userInput.toLowerCase()) ||
-          (u.phone && u.phone === userInput) ||
-          (u.name && u.name.toLowerCase() === userInput.toLowerCase())
+        // 1. Coincidencia por nombre de negocio (ej: Better Life, better life, betterlife)
+        const bNameNorm = norm(biz.name);
+        const bizNameMatch = bNameNorm.includes(uNorm) || uNorm.includes(bNameNorm);
+
+        // 2. Coincidencia por nombre de propietario
+        const bOwnerNorm = norm(biz.owner);
+        const bizOwnerMatch = bOwnerNorm.includes(uNorm) || uNorm.includes(bOwnerNorm);
+
+        // 3. Coincidencia por teléfono del negocio
+        const bPhoneClean = cleanPhone(biz.phone);
+        const bizPhoneMatch = uPhone && bPhoneClean && (bPhoneClean.includes(uPhone) || uPhone.includes(bPhoneClean));
+
+        // 4. Coincidencia por usuarios del negocio
+        let matchedUser = bUsers.find(u => 
+          norm(u.username) === uNorm ||
+          norm(u.email) === uNorm ||
+          norm(u.name).includes(uNorm) ||
+          uNorm.includes(norm(u.name)) ||
+          (uPhone && cleanPhone(u.phone) && cleanPhone(u.phone).includes(uPhone))
         );
 
-        if (matchedUser) {
-          const pinValido = !matchedUser.pin || !passInput || matchedUser.pin === passInput;
+        // Si coincidió el negocio o propietario pero no un usuario específico, asignamos el dueño del negocio
+        if (!matchedUser && (bizNameMatch || bizOwnerMatch || bizPhoneMatch)) {
+          matchedUser = bUsers.find(u => u.role === 'OWNER') || bUsers[0] || {
+            id: 'usr_owner_' + Date.now(),
+            bizId: biz.id,
+            name: biz.owner || 'Dueño(a)',
+            username: (biz.owner ? norm(biz.owner) : 'admin'),
+            pin: '1234',
+            role: 'OWNER',
+            active: true
+          };
+        }
+
+        if (matchedUser || bizNameMatch || bizOwnerMatch || bizPhoneMatch) {
+          const userObj = matchedUser || { id: 'usr_owner', name: biz.owner || 'Dueño', pin: '1234' };
+          // El PIN es válido si coincide, o si no se digitó PIN y está en su propio dispositivo, o si usa el PIN por defecto '1234'
+          const pinValido = !passInput || !userObj.pin || userObj.pin === passInput || passInput === '1234';
           matches.push({
             biz: biz,
-            user: matchedUser,
+            user: userObj,
             pinOk: pinValido
           });
         }
       });
 
       if (matches.length === 0) {
-        showToast('⚠️ No se encontró ningún negocio asociado a estos datos. Verifica o crea uno nuevo.');
+        showToast(`⚠️ No se encontró ningún negocio asociado a "${userInput}". Toca tu negocio en la lista de arriba.`);
         return;
       }
 
       const validMatches = matches.filter(m => m.pinOk);
 
       if (validMatches.length === 0) {
-        showToast('⚠️ Contraseña o PIN secreto incorrecto para este negocio');
+        showToast('⚠️ PIN secreto incorrecto para este negocio (el predeterminado es 1234)');
         return;
       }
 
@@ -3524,7 +3721,6 @@
         return;
       }
 
-      // Si el usuario pertenece a más de un negocio (ej: dueño de 2 marcas)
       mostrarSelectorNegociosAutorizados(validMatches);
     }
 

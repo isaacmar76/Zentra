@@ -2415,22 +2415,25 @@
 
         <!-- Medios de Pago y QR (Condicional: SOLO los configurados, sin inventar datos) -->
         <div id="recPaymentContainer" style="display:none; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px; margin-bottom:12px;">
-          <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:5px;">💳 Medios de Pago Disponibles:</div>
+          <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:5px;" id="lblRecPaymentTitle">💳 Medios para Pagar Cotización:</div>
           <div style="display:flex; gap:10px; align-items:center; justify-content:space-between;">
             <div id="recPaymentMethodsList" style="flex:1; font-size:11px; display:flex; flex-direction:column; gap:4px; color:#475569;">
               <!-- Inyectado dinámicamente -->
             </div>
             <div id="recQrWrapper" style="display:none; text-align:center; flex-shrink:0;">
-              <img id="recQrImg" src="" style="width:68px; height:68px; border-radius:8px; border:1px solid #CBD5E1; object-fit:contain; background:#fff;">
-              <div style="font-size:9px; color:#64748B; font-weight:700; margin-top:2px;">📲 Paga con QR</div>
+              <img id="recQrImg" src="" onclick="descargarImagenQR()" title="Toca para descargar código QR" style="width:72px; height:72px; border-radius:8px; border:1.5px solid #0284C7; object-fit:contain; background:#fff; cursor:pointer;">
+              <div style="font-size:9.5px; color:#0284C7; font-weight:700; margin-top:2px; cursor:pointer;" onclick="descargarImagenQR()">📥 Descargar QR</div>
             </div>
           </div>
         </div>
 
         <!-- Botones de Acción (Ocultos en Impresión) -->
         <div class="no-print" style="display:flex; flex-direction:column; gap:8px;">
-          <button onclick="enviarReciboWhatsApp()" style="width:100%; background:#25D366; color:#fff; border:none; padding:10px; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 10px rgba(37,211,102,0.25);">
+          <button onclick="enviarReciboWhatsApp()" id="btnRecWhatsAppMain" style="width:100%; background:#25D366; color:#fff; border:none; padding:10px; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 10px rgba(37,211,102,0.25);">
             <span>📲</span> <span id="btnRecWhatsAppText">Enviar por WhatsApp</span>
+          </button>
+          <button onclick="descargarImagenQR()" id="btnRecQrAction" style="display:none; width:100%; background:#0284C7; color:#fff; border:none; padding:8px; border-radius:10px; font-weight:700; font-size:11.5px; cursor:pointer; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(2,132,199,0.25);">
+            <span>📥</span> <span>Descargar Imagen QR de Pago</span>
           </button>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
             <button onclick="imprimirFacturaRecibo()" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; background:#FFFFFF; color:#334155; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
@@ -4549,9 +4552,118 @@
         lines.push(`• ${m.icon} ${m.tipo}: ${m.dato}`);
       });
       if (bizProfile && bizProfile.qrImage) {
-        lines.push('• 📲 Código QR disponible para escanear y pagar');
+        lines.push('• 📲 Adjuntamos imagen de Código QR para transferir');
       }
       return lines.join('\n') + '\n';
+    }
+
+    function dataURLtoFile(dataurl, filename = 'QR-Pago.png') {
+      try {
+        if (!dataurl || typeof dataurl !== 'string' || !dataurl.includes(',')) return null;
+        const arr = dataurl.split(',');
+        const mimeMatch = arr[0].match(/:(.*?);/);
+        const mime = mimeMatch ? mimeMatch[1] : 'image/png';
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, { type: mime });
+      } catch (e) {
+        console.warn('Error al convertir dataURL a File:', e);
+        return null;
+      }
+    }
+
+    function descargarImagenQR() {
+      if (!bizProfile || !bizProfile.qrImage) {
+        showToast('No hay imagen de código QR registrada en el perfil.');
+        return;
+      }
+      const link = document.createElement('a');
+      link.href = bizProfile.qrImage;
+      const safeName = (bizProfile.name || 'Negocio').replace(/[^a-zA-Z0-9]/g, '_');
+      link.download = `QR_Pago_${safeName}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('✓ Código QR descargado exitosamente');
+    }
+
+    async function copiarQRAlPortapapeles() {
+      if (!bizProfile || !bizProfile.qrImage) return false;
+      try {
+        const res = await fetch(bizProfile.qrImage);
+        const blob = await res.blob();
+        if (navigator.clipboard && window.ClipboardItem) {
+          await navigator.clipboard.write([
+            new ClipboardItem({ [blob.type || 'image/png']: blob })
+          ]);
+          return true;
+        }
+      } catch (e) {
+        console.warn('No se pudo copiar QR al portapapeles:', e);
+      }
+      return false;
+    }
+
+    async function compartirOEnviarCotizacionWhatsApp(d) {
+      if (!d) return;
+      const isQuote = d.mode === 'cotizacion';
+      const msg = isQuote
+        ? generarTextoCotizacionWhatsApp(d.consecutivo, d.clientName, d.clientDoc, d.date, d.items, d.total)
+        : generarTextoFacturaWhatsApp(d.consecutivo, d.clientName, d.clientDoc, d.date, d.items, d.total, d.cobrado, d.saldo);
+
+      // Copiar texto al portapapeles siempre
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).catch(() => {});
+      }
+
+      const cliPhone = d.clientPhone || '';
+      const cleanPhone = cliPhone.replace(/\D/g, '');
+      const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+      const waUrl = fullPhone ? `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+      // REGLA CLAVE: En FACTURA nunca se envía ni adjunta QR ("se supone que ya pagaron")
+      if (!isQuote) {
+        window.open(waUrl, '_blank');
+        showToast('✓ Factura copiada y abierta en WhatsApp');
+        return;
+      }
+
+      // EN COTIZACIÓN: enviar o adjuntar imagen QR
+      const hasQr = !!(bizProfile && bizProfile.qrImage);
+      if (hasQr) {
+        // En móviles Android/iOS: Web Share API con archivo adjunto
+        if (navigator.share && navigator.canShare) {
+          try {
+            const qrFile = dataURLtoFile(bizProfile.qrImage, `QR_Pago_${(bizProfile.name || 'Zentra').replace(/[^a-zA-Z0-9]/g, '_')}.png`);
+            if (qrFile && navigator.canShare({ files: [qrFile] })) {
+              await navigator.share({
+                title: `Cotización ${d.consecutivo} - ${bizProfile.name || 'Zentra'}`,
+                text: msg,
+                files: [qrFile]
+              });
+              showToast('✓ Cotización y código QR compartidos');
+              return;
+            }
+          } catch (err) {
+            if (err.name === 'AbortError') return; // Cancelado por usuario
+            console.warn('Fallo en navigator.share:', err);
+          }
+        }
+
+        // Si es PC o navegador sin soporte de files en share:
+        // Descargamos el QR para adjuntarlo y abrimos WhatsApp con el texto
+        descargarImagenQR();
+        copiarQRAlPortapapeles().catch(() => {});
+        window.open(waUrl, '_blank');
+        showToast('📋 WhatsApp abierto. Se descargó el QR para adjuntarlo al chat');
+      } else {
+        window.open(waUrl, '_blank');
+        showToast('✓ Cotización copiada y abierta en WhatsApp');
+      }
     }
 
     // Modal de Datos del Negocio
@@ -5077,40 +5189,77 @@ ${estadoStr}${contactText}
         }
       }
 
-      // Medios de pago dinámicos (SOLO los configurados, sin inventar datos)
+      // Medios de pago y QR (REGLA: En factura NUNCA se muestra QR porque ya pagaron)
       const payContainer = document.getElementById('recPaymentContainer');
+      const payTitle = document.getElementById('lblRecPaymentTitle');
       const payList = document.getElementById('recPaymentMethodsList');
       const qrWrapper = document.getElementById('recQrWrapper');
       const qrImg = document.getElementById('recQrImg');
+      const btnQrAction = document.getElementById('btnRecQrAction');
 
       const metodos = obtenerMediosDePagoActivos();
       const hasQr = !!(bizProfile && bizProfile.qrImage);
 
-      if (payContainer && (metodos.length > 0 || hasQr)) {
-        payContainer.style.display = 'block';
-        if (payList) {
-          payList.innerHTML = '';
-          if (metodos.length > 0) {
+      if (isQuote) {
+        // EN COTIZACIÓN: se habilita el código QR para que el cliente pague
+        if (payTitle) payTitle.innerText = '💳 Medios para Pagar Cotización:';
+        if (hasQr && qrWrapper && qrImg) {
+          qrWrapper.style.display = 'block';
+          qrImg.src = bizProfile.qrImage;
+          if (btnQrAction) btnQrAction.style.display = 'flex';
+        } else {
+          if (qrWrapper) qrWrapper.style.display = 'none';
+          if (btnQrAction) btnQrAction.style.display = 'none';
+        }
+
+        if (payContainer && (metodos.length > 0 || hasQr)) {
+          payContainer.style.display = 'block';
+          if (payList) {
+            payList.innerHTML = '';
+            if (metodos.length > 0) {
+              metodos.forEach(m => {
+                const row = document.createElement('div');
+                row.innerHTML = `<span>${m.icon} <b>${m.tipo}:</b> ${m.dato}</span>`;
+                payList.appendChild(row);
+              });
+            } else {
+              payList.innerHTML = '<span>📲 <b>Transferencia:</b> Escanea o descarga el código QR</span>';
+            }
+          }
+        } else if (payContainer) {
+          payContainer.style.display = 'none';
+        }
+
+        if (btnWaText) {
+          btnWaText.innerText = hasQr ? 'Enviar Cotización + QR por WhatsApp' : 'Enviar Cotización por WhatsApp';
+        }
+      } else {
+        // EN FACTURA: NUNCA se muestra la imagen del QR ("se supone que ya pagaron")
+        if (qrWrapper) qrWrapper.style.display = 'none';
+        if (btnQrAction) btnQrAction.style.display = 'none';
+
+        if (data.saldo <= 0) {
+          // Si ya está pagada por completo, se oculta la sección de pago
+          if (payContainer) payContainer.style.display = 'none';
+        } else if (metodos.length > 0) {
+          // Factura con saldo pendiente: mostrar solo cuentas bancarias para transferir el resto
+          if (payTitle) payTitle.innerText = '💳 Cuentas para Saldo Pendiente:';
+          if (payContainer) payContainer.style.display = 'block';
+          if (payList) {
+            payList.innerHTML = '';
             metodos.forEach(m => {
               const row = document.createElement('div');
               row.innerHTML = `<span>${m.icon} <b>${m.tipo}:</b> ${m.dato}</span>`;
               payList.appendChild(row);
             });
-          } else {
-            payList.innerHTML = '<span>📲 <b>Transferencia:</b> Escanea el código QR</span>';
           }
+        } else if (payContainer) {
+          payContainer.style.display = 'none';
         }
 
-        if (qrWrapper && qrImg) {
-          if (hasQr) {
-            qrWrapper.style.display = 'block';
-            qrImg.src = bizProfile.qrImage;
-          } else {
-            qrWrapper.style.display = 'none';
-          }
+        if (btnWaText) {
+          btnWaText.innerText = 'Enviar Factura por WhatsApp';
         }
-      } else if (payContainer) {
-        payContainer.style.display = 'none';
       }
 
       document.getElementById('invoiceReceiptModal').style.display = 'flex';
@@ -5122,17 +5271,7 @@ ${estadoStr}${contactText}
 
     function enviarReciboWhatsApp() {
       if (!currentReceiptData) return;
-      const d = currentReceiptData;
-      const isQuote = d.mode === 'cotizacion';
-      const msg = isQuote
-        ? generarTextoCotizacionWhatsApp(d.consecutivo, d.clientName, d.clientDoc, d.date, d.items, d.total)
-        : generarTextoFacturaWhatsApp(d.consecutivo, d.clientName, d.clientDoc, d.date, d.items, d.total, d.cobrado, d.saldo);
-
-      const cleanPhone = (d.clientPhone || '').replace(/\D/g, '');
-      const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
-      const url = fullPhone ? `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
-      showToast(isQuote ? '✓ Abriendo WhatsApp con cotización...' : '✓ Abriendo WhatsApp con factura...');
+      compartirOEnviarCotizacionWhatsApp(currentReceiptData);
     }
 
     function copiarTextoRecibo() {
@@ -5171,19 +5310,23 @@ ${estadoStr}${contactText}
       if (!p) return;
       const clientObj = clients.find(c => c.id === p.clientId || c.phone === p.phone || c.name === p.client);
       const items = (p.items && p.items.length > 0) ? p.items : [{ quantity: 1, name: p.services || p.name, unitPrice: p.total, subtotal: p.total }];
-      const msg = generarTextoCotizacionWhatsApp(
-        `#COT-${String(p.id).padStart(4, '0')}`,
-        p.client || 'Cliente General',
-        (clientObj && clientObj.document) ? clientObj.document : 'N/A',
-        new Date().toLocaleDateString('es-CO'),
-        items,
-        p.total
-      );
+      const receiptData = {
+        mode: 'cotizacion',
+        consecutivo: `#COT-${String(p.id).padStart(4, '0')}`,
+        date: new Date().toLocaleDateString('es-CO'),
+        clientName: p.client || 'Cliente General',
+        clientPhone: p.phone || (clientObj ? clientObj.phone : ''),
+        clientDoc: (clientObj && clientObj.document) ? clientObj.document : 'N/A',
+        orderName: p.name || 'Cotización de Servicio',
+        orderStatus: 'Cotización',
+        items: items,
+        total: p.total,
+        cobrado: p.advance || 0,
+        saldo: p.total - (p.advance || 0)
+      };
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(msg).catch(() => {});
-      }
-      showToast('✓ Cotización copiada para WhatsApp');
+      abrirFacturaReciboConDatos(receiptData);
+      compartirOEnviarCotizacionWhatsApp(receiptData);
     }
 
     function verPedidosPorVencer() {
@@ -6281,22 +6424,9 @@ ${estadoStr}${contactText}
         total
       );
 
-      // Copiar automáticamente al portapapeles
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(msg).catch(() => {});
-      }
-
       cerrarCarritoRetail();
       abrirFacturaReciboConDatos(receiptData);
-
-      if (cliPhone) {
-        const cleanPhone = cliPhone.replace(/\D/g, '');
-        const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
-        const waUrl = `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
-        window.open(waUrl, '_blank');
-      }
-
-      showToast('📋 ¡Cotización generada y copiada al portapapeles!');
+      compartirOEnviarCotizacionWhatsApp(receiptData);
     }
 
     function generarComprobanteRetail(isQuote = true) {

@@ -441,6 +441,9 @@ class CatalogItemModel {
     - **WhatsApp (`generarTextoCotizacionWhatsApp()` y `generarTextoFacturaWhatsApp()`):** Formato limpio, directo y elegante: título claro, consecutivo, fecha, cliente, desglose conciso de ítems, total en COP, medios de pago activos y teléfono de contacto.
     - **Modal Visual (`invoiceReceiptModal`):** Despeje tipográfico, tabla simplificada de ítems, distintivo claro según estado (Cotización en amarillo vs Factura en verde), y bloque dinámico `#recPaymentContainer` que renderiza las cuentas activas y el código QR (`#recQrImg`) con un diseño estético y moderno.
     - Sincronización completa en los disparadores `copiarWhatsAppCotizacion()`, `cotizarYCopiarWhatsApp()`, `enviarReciboWhatsApp()`, `copiarTextoRecibo()` y `procesarCobroRetail()`.
+  - **Refinamiento de Envío de Imagen QR y Regla de Factura Pagada:**
+    - **Envío de QR en Cotizaciones:** Se implementó `compartirOEnviarCotizacionWhatsApp(receiptData)` junto con `dataURLtoFile()`, `descargarImagenQR()` y `copiarQRAlPortapapeles()`. En dispositivos móviles (Android/iOS) utiliza el Web Share API (`navigator.share`) para adjuntar el archivo nativo de imagen del QR directamente al chat de WhatsApp junto con el texto formateado. En escritorio o navegadores sin share de archivos, descarga la imagen del código QR automáticamente y la copia al portapapeles (`Ctrl+V`) informando al comerciante para adjuntarla al chat de WhatsApp Web.
+    - **Exclusión Absoluta del QR en Facturas:** En la factura el código QR permanece **100% oculto** tanto en el modal como en cualquier exportación (`qrWrapper.style.display = 'none'`), cumpliendo la regla de negocio de que el cliente ya canceló. Asimismo, si la factura está totalmente saldada (`saldo <= 0`), la caja completa de medios de pago se oculta automáticamente. Si existe un saldo pendiente por cobrar, únicamente se enlistan los datos bancarios de transferencia sin imagen de código QR.
 
 ---
 

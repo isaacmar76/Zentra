@@ -199,7 +199,8 @@ class CatalogItemModel {
 | **2026-10-03** | `e151d1a` | UX / Sales Flow | Flujo rápido de ventas: Botón Tomar Pedido, Carrito permanente superior derecho, Acciones directas Cotizar (copia + WhatsApp) y Cobrar (factura) | ✅ Completado |
 | **2026-10-03** | `321ec68` | Fix / Multi-Tenant Auth | Auto-recuperación de negocios, acceso directo 1-toque en login y búsqueda flexible por nombre de negocio | ✅ Completado |
 | **2026-10-04** | `1ae5d84` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
-| **2026-10-04** | `current` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
+| **2026-10-04** | `c81ec7e` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
+| **2026-10-04** | `current` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
 
 ---
 
@@ -476,6 +477,46 @@ class CatalogItemModel {
      - Integración con el perfil del negocio (`#bizModal`), mostrando el diseño activo bajo el campo "Diseño de Pantalla de Inicio".
   5. **Mantenimiento de Subsecciones Operativas:**
      - Clientes, Movimientos Generales de Caja y Catálogo se conservan como subsecciones navegables con botones de retorno `← Volver al Inicio`.
+
+#### Hito 21: Registro Directo de Otros Ingresos y Módulo de Seguimiento de Cotizaciones / Carritos Guardados
+- **Requerimiento del Usuario:**
+  1. **Botón para Registrar Otros Ingresos:** Asegurar un acceso visual claro y directo para registrar ingresos independientes (no atados a un pedido o proyecto particular), reflejándolos en el cuadre de caja de hoy y en las finanzas del negocio.
+  2. **Seguimiento Comercial de Cotizaciones y Carritos:** Las cotizaciones de carritos no podían recuperarse si el cliente no cancelaba el mismo día. Se requirió una solución integral para:
+     - Guardar automáticamente las cotizaciones para retomar la venta en cualquier momento.
+     - Permitir recuperar con 1 clic los ítems cotizados en el carrito para cobrar o editar.
+     - Eliminar definitivamente las cotizaciones que ya no van.
+     - Establecer una caducidad de tiempo automática para descartar cotizaciones sin respuesta.
+     - Ofrecer una opción para **extender la vigencia (+15 días)** si el negocio aún sigue viable.
+- **Implementación Técnica:**
+  - **Accesos Rápidos para Registrar Otros Ingresos:**
+    - Botones directos `➕ Registrar Ingreso` y `➖ Registrar Gasto` incorporados en:
+      - La tarjeta de *Cuadre Rápido de Caja de Hoy* en el **Cockpit Operativo (Opción A)**.
+      - El bloque financiero de *Saldo Disponible* en el **Híbrido Modular (Opción D)**.
+      - La subsección de *Movimientos Generales (`subSecMovimientos`)*.
+    - Integración en `renderLayoutCockpit()` y `recalcularTodo()` sumando `generalIncomes` al cálculo de dinero real ingresado hoy.
+  - **Estructura de Datos y Aislamiento Multi-Tenant (`savedQuotes`):**
+    - Colección de cotizaciones aislada por negocio en `localStorage` bajo `zentra_quotes_${bizId}`.
+    - Campos por cotización: `id`, `consecutivo`, `date`, `createdAt`, `expiresAt` (15 días por defecto), `clientName`, `clientPhone`, `clientDoc`, `clientId`, `items` (copia profunda del carrito), `total`, `status` (`'activa'`, `'por_vencer'`, `'vencida'`, `'facturada'`) y `extendedCount`.
+  - **Motor de Caducidad Dinámica (`calcularEstadoCotizacion(q)`):**
+    - Evalúa en milisegundos los días restantes de vigencia:
+      - `> 3 días`: Badge azul `Vence en X días`.
+      - `≤ 3 días`: Alerta naranja `⏰ Vence en X días`.
+      - `< 0 días`: Alerta roja `⚠️ Expiró hace X días`.
+      - Facturada: Badge verde `✓ Facturada`.
+    - Depuración automática (`depurarCotizacionesAutomaticas()`): purga automática en background de cotizaciones vencidas hace más de 30 días sin renovar.
+    - Botón de acción masiva `🧹 Depurar Vencidas` para descartar cotizaciones expiradas con confirmación.
+  - **Flujo de Retoma de Ventas (`retomarVentaCotizacion(id)`):**
+    - Carga en 1 toque todos los productos, cantidades y cliente vinculado en el carrito de compras (`retailCart`, `selectedCartClientId`), abriendo el carrito listo para cobrar (`💳 COBRAR`) o añadir ítems.
+    - Vínculo activo `activeWorkingQuoteId`: al presionar `COBRAR` en `procesarCobroRetail()`, la cotización pasa automáticamente a estado `'facturada'` vinculando el número de factura `#FAC-...`.
+  - **Extensión de Vigencia y Seguimiento Comercial WhatsApp:**
+    - Botón `⏰ +15 días` (`extenderVigenciaCotizacion(id)`): añade 15 días adicionales a partir de la fecha actual y restablece el estado a vigente.
+    - Botón `💬 WhatsApp` (`enviarSeguimientoCotizacionWhatsApp(id)`): genera un mensaje preformateado de seguimiento comercial al cliente con el desglose de productos y total para concretar el cierre de la venta.
+    - Botón `💾 Guardar Cotización` dentro del carrito de ventas para guardar borradores sin necesidad de enviar por WhatsApp.
+  - **Indicadores y Accesos UI:**
+    - Botón `#btnHeaderQuotes` en la cabecera superior con badge `#headerQuotesBadge`.
+    - Botón interactivo en la barra de navegación inferior (`bottom-bar`) con badge `#navQuotesBadge`.
+    - Indicador en POS Mostrador (`#posQuotesCountVal`) y contador en el carrito (`#cartQuotesCountBadge`).
+    - Alerta en tiempo real en el semáforo del Cockpit y en las alertas del Híbrido.
 
 ---
 

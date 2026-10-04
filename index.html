@@ -1012,6 +1012,11 @@
           <span class="material-symbols-outlined" style="font-size:21px;">shopping_cart</span>
           <span id="headerCartBadge" style="position:absolute; top:-4px; right:-4px; background:#E53E3E; color:#FFFFFF; font-size:10px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.25); display:none;">0</span>
         </button>
+        <!-- Ícono de Cotizaciones y Carritos Guardados (Seguimiento Comercial) -->
+        <button class="icon-btn" id="btnHeaderQuotes" onclick="abrirModalCotizaciones()" title="Ver Cotizaciones y Carritos Guardados" style="position:relative; background:var(--surface-subtle); color:var(--text); border:1px solid var(--surface-border); width:38px; height:38px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+          <span class="material-symbols-outlined" style="font-size:21px;">request_quote</span>
+          <span id="headerQuotesBadge" style="position:absolute; top:-4px; right:-4px; background:#0284C7; color:#FFFFFF; font-size:10px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.25); display:none;">0</span>
+        </button>
         <span id="userBadgeHeader" onclick="openBusinessProfileModal()" title="Toca para ver o cambiar usuario" style="font-size:11px; font-weight:700; background:var(--surface-container-low); color:var(--text); padding:4px 10px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; border:1px solid var(--surface-border);">
           <span id="lblUserRoleIcon">👑</span> <span id="lblUserName">Dueño</span>
         </span>
@@ -1080,6 +1085,15 @@
               <div style="font-size:15px; font-weight:800; color:var(--alert); margin-top:2px;" id="cockpitGastosHoy">$0</div>
             </div>
           </div>
+          <!-- Acciones Rápidas Financieras -->
+          <div style="display:flex; gap:8px; margin-top:10px;" onclick="event.stopPropagation();">
+            <button onclick="abrirModalOtroIngreso()" style="flex:1; background:var(--primary-soft); color:var(--primary); border:1px solid rgba(0,108,70,0.3); padding:7px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+              <span>➕</span> Registrar Ingreso
+            </button>
+            <button onclick="abrirModalGastoGeneral()" style="flex:1; background:#FEF2F2; color:#B91C1C; border:1px solid #FECACA; padding:7px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+              <span>➖</span> Registrar Gasto
+            </button>
+          </div>
         </div>
 
         <!-- Últimas Ventas y Pedidos -->
@@ -1104,14 +1118,14 @@
             <div style="font-size:9.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Ventas de Hoy</div>
             <div style="font-size:15px; font-weight:800; color:var(--primary); margin-top:2px;" id="posVentasHoyVal">$0</div>
           </div>
-          <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between;">
+          <div onclick="abrirModalCotizaciones()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
             <div>
-              <div style="font-size:9.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Encargo</div>
-              <div style="font-size:11.5px; font-weight:800; color:var(--text); margin-top:2px;">Personalizado</div>
+              <div style="font-size:9.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Cotizaciones</div>
+              <div style="font-size:12px; font-weight:800; color:#0284C7; margin-top:2px;" id="posQuotesCountVal">0 Activas ➔</div>
             </div>
-            <button onclick="abrirModalItemMedida()" style="background:var(--primary-soft); color:var(--primary); border:none; border-radius:8px; padding:5px 8px; font-size:11px; font-weight:700; cursor:pointer;">
-              ✂️ + A Medida
-            </button>
+            <div style="width:30px; height:30px; border-radius:8px; background:#E0F2FE; display:flex; align-items:center; justify-content:center; color:#0284C7; font-size:15px;">
+              📋
+            </div>
           </div>
         </div>
 
@@ -1187,13 +1201,24 @@
             <span style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--text-muted);">Saldo Disponible Real</span>
             <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 8px; border-radius:12px; font-weight:700;">En vivo ➔</span>
           </div>
-          <div style="font-size:26px; font-weight:800; color:var(--text); margin:4px 0 10px;" id="hybridSaldoDisplay">$0</div>
+          <div style="font-size:26px; font-weight:800; color:var(--text); margin:4px 0 8px;" id="hybridSaldoDisplay">$0</div>
+          
+          <!-- Botones Directos de Ingreso y Gasto -->
+          <div style="display:flex; gap:8px; margin-bottom:10px;" onclick="event.stopPropagation();">
+            <button onclick="abrirModalOtroIngreso()" style="flex:1; background:var(--card-bg); color:var(--primary); border:1.5px solid var(--primary); padding:7px 10px; border-radius:12px; font-size:11.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.1);">
+              <span>➕</span> Registrar Ingreso
+            </button>
+            <button onclick="abrirModalGastoGeneral()" style="flex:1; background:var(--card-bg); color:var(--alert); border:1.5px solid var(--alert); padding:7px 10px; border-radius:12px; font-size:11.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; box-shadow:0 2px 6px rgba(186,26,26,0.1);">
+              <span>➖</span> Registrar Gasto
+            </button>
+          </div>
+
           <button class="primary-btn" onclick="event.stopPropagation(); abrirTomarPedido()" style="margin:0; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); font-weight:800;">
             ⚡ TOMAR PEDIDO / COTIZAR
           </button>
         </div>
 
-        <!-- Bloque 2: 4 Accesos Rápidos (Grid 2x2) -->
+        <!-- Bloque 2: Accesos Rápidos (Grid 2x2) -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
           <div onclick="abrirTomarPedido()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
             <span style="font-size:20px;">🛒</span>
@@ -1202,11 +1227,11 @@
               <div style="font-size:9.5px; color:var(--text-muted);">Catálogo y POS</div>
             </div>
           </div>
-          <div onclick="abrirModalGastoGeneral()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
-            <span style="font-size:20px;">💸</span>
+          <div onclick="abrirModalCotizaciones()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
+            <span style="font-size:20px;">📋</span>
             <div>
-              <div style="font-size:12px; font-weight:700; color:var(--text);">Gasto</div>
-              <div style="font-size:9.5px; color:var(--text-muted);">Registrar egreso</div>
+              <div style="font-size:12px; font-weight:700; color:var(--text);">Cotizaciones</div>
+              <div style="font-size:9.5px; color:#0284C7; font-weight:600;" id="lblHybridQuotesSub">Seguimiento</div>
             </div>
           </div>
           <div onclick="abrirModalNuevoProducto()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; gap:8px; cursor:pointer;">
@@ -1326,6 +1351,11 @@
       <button class="nav-btn" onclick="abrirModalCatalogoInventario()">
         <span class="material-symbols-outlined" style="font-size:20px;">inventory_2</span>
         <span>Catálogo</span>
+      </button>
+      <button class="nav-btn" id="btnNavQuotes" onclick="abrirModalCotizaciones()" style="position:relative;">
+        <span class="material-symbols-outlined" style="font-size:20px;">request_quote</span>
+        <span>Cotizaciones</span>
+        <span id="navQuotesBadge" style="position:absolute; top:3px; right:16px; background:#0284C7; color:#FFFFFF; font-size:9.5px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.2); display:none;">0</span>
       </button>
       <button class="nav-btn" onclick="openBusinessProfileModal()">
         <span class="material-symbols-outlined" style="font-size:20px;">storefront</span>
@@ -2311,10 +2341,13 @@
     <!-- Modal: Carrito de Compras / Mostrador (Retail POS) -->
     <div id="retailCartModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:360; align-items:flex-end; justify-content:center;">
       <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
           <div>
             <div style="font-size:17px; font-weight:800; color:var(--text);">🛒 Carrito de Mostrador / Pedido</div>
-            <div style="font-size:11px; color:var(--text-muted);">Revisa las cantidades, genera presupuesto o cobra al cliente</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">Revisa las cantidades, genera presupuesto o cobra al cliente</div>
+            <button onclick="abrirModalCotizaciones()" style="background:#E0F2FE; color:#0284C7; border:1px solid #BAE6FD; padding:4px 9px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+              <span>📋</span> Ver Cotizaciones Guardadas <span id="cartQuotesCountBadge"></span>
+            </button>
           </div>
           <button onclick="cerrarCarritoRetail()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
         </div>
@@ -2391,12 +2424,15 @@
               <span style="font-size:9.5px; opacity:0.9; font-weight:600;">Factura y Registra Caja</span>
             </button>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; padding:0 4px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; padding:0 4px; gap:8px;">
             <button onclick="abrirModalItemMedida()" style="background:transparent; border:none; color:var(--primary); font-size:11.5px; font-weight:700; cursor:pointer;">
               ✂️ + Ítem a Medida
             </button>
+            <button onclick="guardarCotizacionBorrador()" style="background:transparent; border:none; color:#0284C7; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px;">
+              💾 Guardar Cotización
+            </button>
             <button onclick="vaciarCarritoRetail()" style="background:transparent; border:none; color:var(--alert); font-size:11.5px; font-weight:600; cursor:pointer;">
-              🗑️ Vaciar Carrito
+              🗑️ Vaciar
             </button>
           </div>
         </div>
@@ -2495,6 +2531,55 @@
       </div>
     </div>
 
+    <!-- Modal de Gestión y Seguimiento de Cotizaciones y Carritos Guardados -->
+    <div id="quotesModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:370; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; max-width:480px; border-radius:28px 28px 0 0; padding:20px 16px; max-height:88%; overflow-y:auto; color:var(--text); box-sizing:border-box; box-shadow:0 -10px 30px rgba(0,0,0,0.25);">
+        
+        <!-- Header del Modal -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+          <div>
+            <div style="font-size:16px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:6px;">
+              <span>📋</span> Cotizaciones y Carritos Guardados
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Seguimiento comercial, retoma de pedidos y control de caducidad</div>
+          </div>
+          <button onclick="cerrarModalCotizaciones()" style="background:none; border:none; font-size:20px; font-weight:700; cursor:pointer; color:var(--text-muted); padding:2px 6px;">✕</button>
+        </div>
+
+        <!-- Buscador en Vivo -->
+        <div style="margin:10px 0 8px;">
+          <input type="text" id="inpSearchQuotes" oninput="alBuscarCotizaciones(this.value)" placeholder="🔍 Buscar por cliente o #COT..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--surface-subtle); color:var(--text); font-size:12px; box-sizing:border-box;">
+        </div>
+
+        <!-- Pestañas de Filtro -->
+        <div style="display:flex; gap:6px; margin-bottom:10px; border-bottom:1px solid var(--surface-border); padding-bottom:8px; overflow-x:auto;">
+          <button id="tabQuotesActivas" onclick="cambiarTabCotizaciones('activas')" style="background:var(--primary-soft); color:var(--primary); border:none; padding:6px 12px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap;">
+            Vigentes (<span id="countQuotesActivas">0</span>)
+          </button>
+          <button id="tabQuotesVencidas" onclick="cambiarTabCotizaciones('vencidas')" style="background:transparent; color:var(--text-muted); border:none; padding:6px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap;">
+            Por Vencer / Vencidas (<span id="countQuotesVencidas">0</span>)
+          </button>
+          <button id="tabQuotesFacturadas" onclick="cambiarTabCotizaciones('facturadas')" style="background:transparent; color:var(--text-muted); border:none; padding:6px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; white-space:nowrap;">
+            Facturadas (<span id="countQuotesFacturadas">0</span>)
+          </button>
+        </div>
+
+        <!-- Barra de Acciones y Regla de Caducidad -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:10.5px; background:var(--surface-subtle); padding:6px 10px; border-radius:10px;">
+          <span style="color:var(--text-muted);">Vigencia estándar: <b>15 días</b> • Caducidad automática</span>
+          <button onclick="depurarCotizacionesVencidasManual()" style="background:none; border:none; color:var(--alert); font-size:10.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px;">
+            <span>🧹</span> Depurar Vencidas
+          </button>
+        </div>
+
+        <!-- Listado Dinámico de Cotizaciones -->
+        <div id="quotesListContainer" style="display:flex; flex-direction:column; gap:10px; min-height:120px; margin-bottom:10px;">
+          <!-- Inyectado por JS -->
+        </div>
+
+      </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toastMsg">Venta registrada</div>
   </div>
@@ -2528,6 +2613,12 @@
     let selectedProjectIdx = 0;
     let catalogFilter = 'servicios';
     let currentFormAction = null;
+
+    // Estado de Cotizaciones y Carritos Guardados (Seguimiento Comercial)
+    let savedQuotes = [];
+    let activeWorkingQuoteId = null;
+    let quotesFilterTab = 'activas';
+    let quotesSearchQuery = '';
 
     // Estado del CRUD de Usuarios y Roles
     let users = [];
@@ -2739,6 +2830,7 @@
         localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(catalogItems));
         localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(users));
         localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(clients));
+        localStorage.setItem(`zentra_quotes_${bizId}`, JSON.stringify(savedQuotes));
         if (currentUser) localStorage.setItem(`zentra_current_user_${bizId}`, JSON.stringify(currentUser));
         localStorage.setItem('zentra_active_biz_id', bizId);
 
@@ -2859,6 +2951,16 @@
           }
         }
 
+        // AISLAMIENTO TOTAL: Cotizaciones y carritos guardados para seguimiento comercial
+        const qStr = localStorage.getItem(`zentra_quotes_${bizId}`);
+        if (qStr !== null) {
+          try { savedQuotes = JSON.parse(qStr); } catch (_) { savedQuotes = []; }
+        } else {
+          savedQuotes = [];
+        }
+        depurarCotizacionesAutomaticas();
+        actualizarBadgesCotizaciones();
+
         localStorage.setItem('zentra_active_biz_id', bizId);
         retailCart = [];
         cart = [];
@@ -2898,11 +3000,14 @@
       catalogItems = [];
       clients = [];
       users = [];
+      savedQuotes = [];
+      activeWorkingQuoteId = null;
       currentUser = null;
       retailCart = [];
       cart = [];
       tempOrderItems = [];
       tempProductPhoto = null;
+      actualizarBadgesCotizaciones();
 
       // Limpiar UI visual
       const hTitle = document.getElementById('headerTitle');
@@ -3907,6 +4012,9 @@
       generalIncomes = [];
       catalogItems = []; // Catálogo exclusivo en blanco para este nuevo negocio
       clients = [];      // Lista de clientes exclusiva en blanco para este nuevo negocio
+      savedQuotes = [];  // Cotizaciones limpias
+      activeWorkingQuoteId = null;
+      retailCart = [];
       cart = [];
 
       // Registrar en el directorio de negocios del dispositivo
@@ -4445,6 +4553,7 @@
 
       renderProjectsList();
       renderCurrentHomeLayout();
+      actualizarBadgesCotizaciones();
       if (bizProfile && bizProfile.type === 'retail') {
         renderPos();
       }
@@ -6397,10 +6506,21 @@ ${estadoStr}${contactText}
         navigator.clipboard.writeText(waReceiptMsg).catch(() => {});
       }
 
+      // Si se cobró una cotización guardada, marcarla como facturada
+      if (activeWorkingQuoteId) {
+        const qIdx = savedQuotes.findIndex(x => x.id === activeWorkingQuoteId);
+        if (qIdx !== -1) {
+          savedQuotes[qIdx].status = 'facturada';
+          savedQuotes[qIdx].facturaConsecutivo = receiptData.consecutivo;
+        }
+        activeWorkingQuoteId = null;
+      }
+
       retailCart = [];
       cart = [];
       desvincularClienteDeCarrito();
       renderRetailCartBadge();
+      actualizarBadgesCotizaciones();
       persistirEstadoLocal();
       recalcularTodo();
       renderPos();
@@ -6452,6 +6572,27 @@ ${estadoStr}${contactText}
         cobrado: 0,
         saldo: total
       };
+
+      // Guardar automáticamente en el seguimiento de cotizaciones (vigencia 15 días)
+      const quoteObj = {
+        id: 'quote_' + Date.now(),
+        consecutivo: receiptData.consecutivo,
+        date: date,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + (15 * 24 * 60 * 60 * 1000),
+        clientName: cliName,
+        clientPhone: cliPhone,
+        clientDoc: clientDoc,
+        clientId: selectedCartClientId,
+        items: JSON.parse(JSON.stringify(retailCart)),
+        total: total,
+        status: 'activa',
+        extendedCount: 0
+      };
+      savedQuotes.unshift(quoteObj);
+      activeWorkingQuoteId = quoteObj.id;
+      persistirEstadoLocal();
+      actualizarBadgesCotizaciones();
 
       const msg = generarTextoCotizacionWhatsApp(
         receiptData.consecutivo,
@@ -6601,18 +6742,25 @@ ${estadoStr}${contactText}
           feed.appendChild(card);
         }
 
-        // 🟡 Cotizaciones por cerrar
-        const cots = projectsData.filter(p => p.status === 'Cotización');
-        if (cots.length > 0) {
+        // 🟡 Cotizaciones por cerrar (proyectos cotizados + carritos guardados)
+        const cotsProj = projectsData.filter(p => p.status === 'Cotización');
+        const cotsSaved = savedQuotes.filter(q => q.status !== 'facturada' && calcularEstadoCotizacion(q).status !== 'vencida');
+        const totalCots = cotsProj.length + cotsSaved.length;
+        if (totalCots > 0) {
           hasAlert = true;
+          const firstCotDesc = cotsSaved.length > 0 
+            ? `${cotsSaved[0].clientName || 'Cliente'} • $${cotsSaved[0].total.toLocaleString('es-CO')}` 
+            : `${cotsProj[0].client || 'Cliente'} • $${cotsProj[0].total.toLocaleString('es-CO')}`;
           const card = document.createElement('div');
           card.style.cssText = 'background:#FFFBEB; border:1px solid #FDE68A; border-radius:14px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center;';
           card.innerHTML = `
             <div>
-              <div style="font-size:12px; font-weight:800; color:#92400E;">🟡 Cotizaciones por Aprobar (${cots.length})</div>
-              <div style="font-size:10.5px; color:#B45309; margin-top:2px;">${cots[0].client || 'Cliente'} • $${cots[0].total.toLocaleString('es-CO')}</div>
+              <div style="font-size:12px; font-weight:800; color:#92400E;">🟡 Cotizaciones por Cerrar (${totalCots})</div>
+              <div style="font-size:10.5px; color:#B45309; margin-top:2px;">${firstCotDesc}</div>
             </div>
-            <button onclick="copiarWhatsAppCotizacion()" style="background:#25D366; color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">📲 Recordar</button>
+            <button onclick="abrirModalCotizaciones()" style="background:#0284C7; color:#fff; border:none; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px;">
+              <span>📋</span> Ver (${totalCots})
+            </button>
           `;
           feed.appendChild(card);
         }
@@ -6643,7 +6791,7 @@ ${estadoStr}${contactText}
       }
 
       // 2. Cuadre rápido de caja de hoy
-      const totalAbonos = projectsData.reduce((s, p) => s + (p.cobrado || 0), 0);
+      const totalAbonos = projectsData.reduce((s, p) => s + (p.cobrado || 0), 0) + generalIncomes.reduce((s, i) => s + i.amount, 0);
       const totalGastos = projectsData.reduce((s, p) => s + calcularComprasProyecto(p), 0) + generalExpenses.reduce((s, g) => s + g.amount, 0);
       const elIngresos = document.getElementById('cockpitIngresosHoy');
       if (elIngresos) elIngresos.innerText = `$${totalAbonos.toLocaleString('es-CO')}`;
@@ -6878,9 +7026,12 @@ ${estadoStr}${contactText}
       if (alertsCont) {
         alertsCont.innerHTML = '';
         const pend = projectsData.filter(p => p.status !== 'Entregado').slice(0, 2);
-        if (pend.length === 0) {
-          alertsCont.innerHTML = '<div style="font-size:11px; color:#15803D; background:#F0FDF4; padding:8px 10px; border-radius:10px; border:1px solid #BBF7D0;">✓ Todo al día: no hay pedidos urgentes pendientes.</div>';
-        } else {
+        const cotsAlerta = savedQuotes.filter(q => q.status !== 'facturada' && (calcularEstadoCotizacion(q).status === 'por_vencer' || calcularEstadoCotizacion(q).status === 'vencida'));
+        
+        let hasAlerts = false;
+
+        if (pend.length > 0) {
+          hasAlerts = true;
           pend.forEach(p => {
             const row = document.createElement('div');
             row.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:12px; padding:8px 10px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px;';
@@ -6893,6 +7044,31 @@ ${estadoStr}${contactText}
             alertsCont.appendChild(row);
           });
         }
+
+        if (cotsAlerta.length > 0) {
+          hasAlerts = true;
+          const rowC = document.createElement('div');
+          rowC.style.cssText = 'background:#FFFBEB; border:1px solid #FDE68A; border-radius:12px; padding:8px 10px; display:flex; justify-content:space-between; align-items:center; font-size:11.5px; cursor:pointer;';
+          rowC.onclick = () => abrirModalCotizaciones();
+          rowC.innerHTML = `
+            <div>
+              <b style="color:#92400E;">📋 ${cotsAlerta.length} Cotización(es) por vencer o vencidas</b>
+            </div>
+            <span style="font-size:10px; font-weight:800; color:#0284C7;">Ver ➔</span>
+          `;
+          alertsCont.appendChild(rowC);
+        }
+
+        if (!hasAlerts) {
+          alertsCont.innerHTML = '<div style="font-size:11px; color:#15803D; background:#F0FDF4; padding:8px 10px; border-radius:10px; border:1px solid #BBF7D0;">✓ Todo al día: no hay pedidos urgentes ni cotizaciones vencidas.</div>';
+        }
+      }
+
+      // Actualizar label de cotizaciones en acceso rápido
+      const lblHybQ = document.getElementById('lblHybridQuotesSub');
+      if (lblHybQ) {
+        const cAct = savedQuotes.filter(q => q.status !== 'facturada' && calcularEstadoCotizacion(q).status !== 'vencida').length;
+        lblHybQ.innerText = `${cAct} activas`;
       }
 
       // Bloque 4: Actividad Reciente
@@ -6960,6 +7136,416 @@ ${estadoStr}${contactText}
 
     function applyTheme(themeKey, showNotification = true) {
       // Función conservada para retrocompatibilidad
+    }
+
+    // =======================================================
+    // SEGUIMIENTO DE COTIZACIONES Y CARRITOS GUARDADOS (POS)
+    // =======================================================
+    function calcularEstadoCotizacion(q) {
+      if (q.status === 'facturada') {
+        return {
+          status: 'facturada',
+          label: '✓ Facturada',
+          color: '#166534',
+          bg: '#DCFCE7',
+          border: '#86EFAC',
+          dias: 0
+        };
+      }
+      const ahora = Date.now();
+      const exp = q.expiresAt || (q.createdAt + (15 * 24 * 60 * 60 * 1000));
+      const diffMs = exp - ahora;
+      const diasRestantes = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diasRestantes < 0) {
+        const diasVencida = Math.abs(diasRestantes);
+        return {
+          status: 'vencida',
+          label: `⚠️ Expiró hace ${diasVencida} d`,
+          color: '#991B1B',
+          bg: '#FEE2E2',
+          border: '#FCA5A5',
+          dias: diasRestantes
+        };
+      } else if (diasRestantes <= 3) {
+        return {
+          status: 'por_vencer',
+          label: `⏰ Vence en ${diasRestantes} d`,
+          color: '#9A3412',
+          bg: '#FFEDD5',
+          border: '#FDBA74',
+          dias: diasRestantes
+        };
+      } else {
+        return {
+          status: 'activa',
+          label: `Vence en ${diasRestantes} días`,
+          color: '#0369A1',
+          bg: '#E0F2FE',
+          border: '#BAE6FD',
+          dias: diasRestantes
+        };
+      }
+    }
+
+    function depurarCotizacionesAutomaticas() {
+      const ahora = Date.now();
+      const limiteEliminacionMs = 30 * 24 * 60 * 60 * 1000; // 30 días después de vencida
+      const antes = savedQuotes.length;
+      savedQuotes = savedQuotes.filter(q => {
+        if (q.status === 'facturada') return true;
+        const exp = q.expiresAt || (q.createdAt + (15 * 24 * 60 * 60 * 1000));
+        const vencidaHace = ahora - exp;
+        return vencidaHace < limiteEliminacionMs;
+      });
+      if (savedQuotes.length !== antes) {
+        persistirEstadoLocal();
+      }
+    }
+
+    function abrirModalCotizaciones() {
+      depurarCotizacionesAutomaticas();
+      quotesSearchQuery = '';
+      const inp = document.getElementById('inpSearchQuotes');
+      if (inp) inp.value = '';
+      cambiarTabCotizaciones(quotesFilterTab || 'activas');
+      document.getElementById('quotesModal').style.display = 'flex';
+      renderQuotesList();
+    }
+
+    function cerrarModalCotizaciones() {
+      document.getElementById('quotesModal').style.display = 'none';
+    }
+
+    function cambiarTabCotizaciones(tab) {
+      quotesFilterTab = tab;
+      ['tabQuotesActivas', 'tabQuotesVencidas', 'tabQuotesFacturadas'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.background = 'transparent';
+          el.style.color = 'var(--text-muted)';
+        }
+      });
+      const activeMap = {
+        activas: 'tabQuotesActivas',
+        vencidas: 'tabQuotesVencidas',
+        facturadas: 'tabQuotesFacturadas'
+      };
+      const activeBtn = document.getElementById(activeMap[tab]);
+      if (activeBtn) {
+        activeBtn.style.background = 'var(--primary-soft)';
+        activeBtn.style.color = 'var(--primary)';
+      }
+      renderQuotesList();
+    }
+
+    function alBuscarCotizaciones(val) {
+      quotesSearchQuery = (val || '').trim().toLowerCase();
+      renderQuotesList();
+    }
+
+    function renderQuotesList() {
+      const cont = document.getElementById('quotesListContainer');
+      if (!cont) return;
+      cont.innerHTML = '';
+
+      let cActivas = 0;
+      let cVencidas = 0;
+      let cFacturadas = 0;
+
+      savedQuotes.forEach(q => {
+        if (q.status === 'facturada') {
+          cFacturadas++;
+        } else {
+          const est = calcularEstadoCotizacion(q);
+          if (est.status === 'vencida') cVencidas++;
+          else cActivas++;
+        }
+      });
+
+      const elAct = document.getElementById('countQuotesActivas');
+      const elVen = document.getElementById('countQuotesVencidas');
+      const elFac = document.getElementById('countQuotesFacturadas');
+      if (elAct) elAct.innerText = cActivas;
+      if (elVen) elVen.innerText = cVencidas;
+      if (elFac) elFac.innerText = cFacturadas;
+
+      let filtradas = savedQuotes.filter(q => {
+        const est = calcularEstadoCotizacion(q);
+        if (quotesFilterTab === 'activas') {
+          return q.status !== 'facturada' && est.status !== 'vencida';
+        } else if (quotesFilterTab === 'vencidas') {
+          return q.status !== 'facturada' && (est.status === 'vencida' || est.status === 'por_vencer');
+        } else if (quotesFilterTab === 'facturadas') {
+          return q.status === 'facturada';
+        }
+        return true;
+      });
+
+      if (quotesSearchQuery) {
+        filtradas = filtradas.filter(q => {
+          const cName = (q.clientName || '').toLowerCase();
+          const cPhone = (q.clientPhone || '').toLowerCase();
+          const cNum = (q.consecutivo || '').toLowerCase();
+          return cName.includes(quotesSearchQuery) || cPhone.includes(quotesSearchQuery) || cNum.includes(quotesSearchQuery);
+        });
+      }
+
+      if (filtradas.length === 0) {
+        let emptyMsg = 'No hay cotizaciones vigentes.';
+        if (quotesFilterTab === 'vencidas') emptyMsg = 'No hay cotizaciones vencidas o por vencer.';
+        if (quotesFilterTab === 'facturadas') emptyMsg = 'No hay cotizaciones facturadas registradas.';
+        if (quotesSearchQuery) emptyMsg = `Sin resultados para "${quotesSearchQuery}".`;
+        cont.innerHTML = `
+          <div style="text-align:center; padding:32px 14px; background:var(--surface-subtle); border-radius:18px; border:1px dashed var(--surface-border); color:var(--text-muted); font-size:12px;">
+            <div style="font-size:26px; margin-bottom:6px;">📋</div>
+            <div>${emptyMsg}</div>
+          </div>
+        `;
+        return;
+      }
+
+      filtradas.forEach(q => {
+        const est = calcularEstadoCotizacion(q);
+        const card = document.createElement('div');
+        card.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:18px; padding:13px 14px; box-shadow:0 2px 8px rgba(0,0,0,0.03); display:flex; flex-direction:column; gap:8px;';
+
+        const itemsSummary = (q.items || []).map(i => `<span style="display:inline-block; background:var(--surface-subtle); padding:2px 7px; border-radius:6px; font-size:11px; margin-right:4px; margin-bottom:4px; color:var(--text);"><b>${i.quantity}x</b> ${i.name}</span>`).join('');
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+            <div>
+              <div style="font-size:13.5px; font-weight:800; color:var(--text);">${q.consecutivo}</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+                👤 <b>${q.clientName || 'Cliente Mostrador'}</b> ${q.clientPhone ? '• ' + q.clientPhone : ''}
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:14px; font-weight:800; color:var(--primary);">$${(q.total || 0).toLocaleString('es-CO')}</div>
+              <span style="font-size:10px; font-weight:700; background:${est.bg}; color:${est.color}; border:1px solid ${est.border}; padding:2px 7px; border-radius:8px; display:inline-block; margin-top:2px;">
+                ${est.label}
+              </span>
+            </div>
+          </div>
+
+          <div style="margin-top:2px;">
+            ${itemsSummary || '<span style="font-size:11px; color:#888;">Sin ítems registrados.</span>'}
+          </div>
+
+          <!-- Botones de Acción -->
+          <div style="display:flex; flex-wrap:wrap; gap:6px; padding-top:6px; border-top:1px solid var(--surface-border); margin-top:2px;">
+            ${q.status !== 'facturada' ? `
+              <button onclick="retomarVentaCotizacion('${q.id}')" style="flex:1.4; min-width:130px; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); color:#fff; border:none; padding:8px 10px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px; box-shadow:0 2px 6px rgba(0,108,70,0.2);">
+                <span>🛒</span> Retomar Venta
+              </button>
+              ${q.clientPhone ? `
+                <button onclick="enviarSeguimientoCotizacionWhatsApp('${q.id}')" style="background:#25D366; color:#fff; border:none; padding:8px 10px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;" title="Seguimiento por WhatsApp">
+                  <span>💬</span> WhatsApp
+                </button>
+              ` : ''}
+              <button onclick="extenderVigenciaCotizacion('${q.id}')" style="background:var(--card-bg); color:var(--text); border:1px solid var(--surface-border); padding:8px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;" title="Ampliar vigencia 15 días más si el negocio sigue viable">
+                ⏰ +15 días
+              </button>
+            ` : `
+              <div style="flex:1; font-size:11px; color:#15803D; font-weight:700; display:flex; align-items:center; gap:4px;">
+                <span>✓ Facturado</span> ${q.facturaConsecutivo ? `(${q.facturaConsecutivo})` : ''}
+              </div>
+            `}
+            <button onclick="eliminarCotizacion('${q.id}')" style="background:none; border:none; color:var(--alert); padding:8px 10px; font-size:12px; font-weight:700; cursor:pointer;" title="Eliminar definitivamente esta cotización">
+              🗑️
+            </button>
+          </div>
+        `;
+        cont.appendChild(card);
+      });
+    }
+
+    function retomarVentaCotizacion(quoteId) {
+      const q = savedQuotes.find(x => x.id === quoteId);
+      if (!q) return;
+
+      if (retailCart.length > 0) {
+        const confirmar = confirm(`Tu carrito actual tiene ${retailCart.length} producto(s). ¿Deseas reemplazarlo con la cotización "${q.consecutivo}" de ${q.clientName}?`);
+        if (!confirmar) return;
+      }
+
+      retailCart = JSON.parse(JSON.stringify(q.items || []));
+      selectedCartClientId = q.clientId || null;
+
+      const inpName = document.getElementById('retailCliNameInp');
+      const inpPhone = document.getElementById('retailCliPhoneInp');
+      const selCli = document.getElementById('cartClientSelect');
+      if (inpName) inpName.value = q.clientName || '';
+      if (inpPhone) inpPhone.value = q.clientPhone || '';
+      if (selCli) selCli.value = q.clientId || '';
+
+      const badge = document.getElementById('lblCartClientBadge');
+      if (badge) {
+        if (q.clientId) {
+          badge.innerText = '✓ Cliente Vinculado';
+          badge.style.background = '#DCFCE7';
+          badge.style.color = '#166534';
+        } else if (q.clientName && q.clientName !== 'Cliente Mostrador') {
+          badge.innerText = 'Cliente Personalizado';
+          badge.style.background = '#FEF3C7';
+          badge.style.color = '#92400E';
+        } else {
+          badge.innerText = 'Cliente Genérico';
+          badge.style.background = '#E2E8F0';
+          badge.style.color = '#475569';
+        }
+      }
+
+      activeWorkingQuoteId = q.id;
+
+      cerrarModalCotizaciones();
+      renderRetailCartBadge();
+      abrirCarritoRetail();
+      showToast(`✓ Cotización ${q.consecutivo} cargada. ¡Puedes modificarla o cobrarla!`);
+    }
+
+    function extenderVigenciaCotizacion(quoteId) {
+      const q = savedQuotes.find(x => x.id === quoteId);
+      if (!q) return;
+      const base = Math.max(Date.now(), q.expiresAt || Date.now());
+      q.expiresAt = base + (15 * 24 * 60 * 60 * 1000);
+      q.status = 'activa';
+      q.extendedCount = (q.extendedCount || 0) + 1;
+      persistirEstadoLocal();
+      renderQuotesList();
+      actualizarBadgesCotizaciones();
+      recalcularTodo();
+      showToast(`✓ Vigencia extendida por 15 días más para ${q.clientName || 'la cotización'}`);
+    }
+
+    function enviarSeguimientoCotizacionWhatsApp(quoteId) {
+      const q = savedQuotes.find(x => x.id === quoteId);
+      if (!q || !q.clientPhone) return;
+      const cleanPhone = q.clientPhone.replace(/\D/g, '');
+      const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+      const itemsStr = (q.items || []).map(i => `• ${i.quantity}x ${i.name}`).join('\n');
+      const msg = `¡Hola ${q.clientName || ''}! 👋 Te escribo de *${bizProfile.name || 'nuestro negocio'}* para hacer seguimiento a tu cotización *${q.consecutivo}*:\n\n${itemsStr}\n\n*Total:* $${(q.total || 0).toLocaleString('es-CO')} COP\n\n¿Deseas confirmar tu pedido o tienes alguna duda? ¡Con gusto te atendemos!`;
+      const waUrl = `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank');
+    }
+
+    function eliminarCotizacion(quoteId) {
+      const q = savedQuotes.find(x => x.id === quoteId);
+      if (!q) return;
+      if (!confirm(`¿Eliminar definitivamente la cotización "${q.consecutivo}" de ${q.clientName}?`)) return;
+      savedQuotes = savedQuotes.filter(x => x.id !== quoteId);
+      if (activeWorkingQuoteId === quoteId) activeWorkingQuoteId = null;
+      persistirEstadoLocal();
+      renderQuotesList();
+      actualizarBadgesCotizaciones();
+      recalcularTodo();
+      showToast(`✓ Cotización eliminada.`);
+    }
+
+    function depurarCotizacionesVencidasManual() {
+      const vencidas = savedQuotes.filter(q => {
+        if (q.status === 'facturada') return false;
+        const est = calcularEstadoCotizacion(q);
+        return est.status === 'vencida';
+      });
+      if (vencidas.length === 0) {
+        showToast('No hay cotizaciones vencidas para depurar.');
+        return;
+      }
+      if (!confirm(`¿Deseas eliminar definitivamente las ${vencidas.length} cotización(es) vencida(s)?`)) return;
+      savedQuotes = savedQuotes.filter(q => {
+        if (q.status === 'facturada') return true;
+        const est = calcularEstadoCotizacion(q);
+        return est.status !== 'vencida';
+      });
+      persistirEstadoLocal();
+      renderQuotesList();
+      actualizarBadgesCotizaciones();
+      recalcularTodo();
+      showToast(`✓ Se eliminaron ${vencidas.length} cotizaciones vencidas.`);
+    }
+
+    function guardarCotizacionBorrador() {
+      if (retailCart.length === 0) {
+        showToast('El carrito está vacío. Agrega productos o ítems antes de guardar.');
+        return;
+      }
+      const total = retailCart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+      const linkedCli = selectedCartClientId ? clients.find(c => c.id === selectedCartClientId) : null;
+      const manualName = (document.getElementById('retailCliNameInp')?.value || '').trim();
+      const cliName = linkedCli ? linkedCli.name : (manualName || 'Cliente Mostrador');
+      const cliPhone = linkedCli ? (linkedCli.phone || '') : (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+      const clientDoc = (linkedCli && linkedCli.document) ? linkedCli.document : 'N/A';
+      const ticketNum = Math.floor(1000 + Math.random() * 9000);
+      const date = new Date().toLocaleDateString('es-CO');
+
+      const quoteObj = {
+        id: 'quote_' + Date.now(),
+        consecutivo: `#COT-POS-${ticketNum}`,
+        date: date,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + (15 * 24 * 60 * 60 * 1000),
+        clientName: cliName,
+        clientPhone: cliPhone,
+        clientDoc: clientDoc,
+        clientId: selectedCartClientId,
+        items: JSON.parse(JSON.stringify(retailCart)),
+        total: total,
+        status: 'activa',
+        extendedCount: 0
+      };
+
+      savedQuotes.unshift(quoteObj);
+      activeWorkingQuoteId = quoteObj.id;
+      persistirEstadoLocal();
+      actualizarBadgesCotizaciones();
+      recalcularTodo();
+      showToast(`✓ Cotización ${quoteObj.consecutivo} guardada con éxito (Vence en 15 días).`);
+      cerrarCarritoRetail();
+    }
+
+    function actualizarBadgesCotizaciones() {
+      const activas = savedQuotes.filter(q => {
+        if (q.status === 'facturada') return false;
+        const est = calcularEstadoCotizacion(q);
+        return est.status !== 'vencida';
+      });
+      const count = activas.length;
+
+      const bHeader = document.getElementById('headerQuotesBadge');
+      if (bHeader) {
+        if (count > 0) {
+          bHeader.innerText = count;
+          bHeader.style.display = 'inline-block';
+        } else {
+          bHeader.style.display = 'none';
+        }
+      }
+
+      const bNav = document.getElementById('navQuotesBadge');
+      if (bNav) {
+        if (count > 0) {
+          bNav.innerText = count;
+          bNav.style.display = 'inline-block';
+        } else {
+          bNav.style.display = 'none';
+        }
+      }
+
+      const bCart = document.getElementById('cartQuotesCountBadge');
+      if (bCart) {
+        bCart.innerText = count > 0 ? `(${count})` : '';
+      }
+
+      const bPos = document.getElementById('posQuotesCountVal');
+      if (bPos) {
+        bPos.innerText = `${count} Activas ➔`;
+      }
+
+      const bHyb = document.getElementById('lblHybridQuotesSub');
+      if (bHyb) {
+        bHyb.innerText = `${count} activas`;
+      }
     }
 
     function showToast(msg) {

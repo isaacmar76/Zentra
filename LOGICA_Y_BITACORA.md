@@ -195,8 +195,8 @@ class CatalogItemModel {
 | **2026-09-30** | `0c59e31` | UI / UX / Design System | Adopción de Sistema Visual Fintech Clarity (nuevo_diseño.md): Plus Jakarta Sans + Inter, Cockpit Hero con micro-gráfica SVG, Bento cards | ✅ Completado |
 | **2026-10-01** | `e1d1f05` | Security / Multi-Tenant | Aislamiento estricto de productos y datos por negocio (multi-tenancy, registro central, llaves namespaced y control de acceso por PIN) | ✅ Completado |
 | **2026-10-03** | `dd5f890` | Fix / Mobile UX | Blindaje de contraste total en inputs de Registro/Login (solución de texto invisible/blanco en celular y modo oscuro) | ✅ Completado |
-| **2026-10-03** | `e74c832` | Clean / Isolation | Eliminación total de datos demo y referencias cruzadas en Retail y Catálogo (cero mención a otros negocios y saldos en $0) | ✅ Completado |
-| **2026-10-03** | `current` | Feature / POS / Facturación | Administración avanzada del propietario: Catálogo con costo y venta (márgenes), Carrito mostrador/retail, Pedidos multi-ítem a medida, y ciclo Cotización vs Factura | ✅ Completado |
+| **2026-10-03** | `1090b4a` | Feature / POS / Facturación | Administración avanzada del propietario: Catálogo con costo y venta (márgenes), Carrito mostrador/retail, Pedidos multi-ítem a medida, y ciclo Cotización vs Factura | ✅ Completado |
+| **2026-10-03** | `current` | UX / Sales Flow | Flujo rápido de ventas: Botón Tomar Pedido, Carrito permanente superior derecho, Acciones directas Cotizar (copia + WhatsApp) y Cobrar (factura) | ✅ Completado |
 
 ---
 
@@ -369,6 +369,23 @@ class CatalogItemModel {
     - Flujo de transición directa desde la pantalla del proyecto: botón `💳 CLIENTE PAGÓ -> REGISTRAR PAGO Y FACTURAR` que actualiza el estado de `Cotización` a `Facturado / En Producción`.
   - **Sincronización en Flutter (`catalog_item_model.dart`):**
     - Adición de `itemType` ('producto' | 'servicio'), getter `isService`, y persistencia en `toMap()` y `fromMap()`.
+
+#### Hito 16: Flujo Rápido de Toma de Pedidos, Carrito Superior Derecho Permanente y Acciones Directas (Cotizar / Cobrar)
+- **Requerimiento del Usuario:**
+  1. **Botón Tomar Pedido:** Crear un botón directo en la pantalla principal para iniciar la toma de pedido, abriendo el catálogo interactivo para agregar artículos al carrito.
+  2. **Ícono del Carrito Permanente Arriba a la Derecha:** Mantener visible en todo momento el carrito de compras en la esquina superior derecha con contador numérico animado, tanto en el header principal como dentro del catálogo al armar el pedido.
+  3. **Dos Acciones Claras en el Carrito:**
+     - **`📋 Cotizar`**: Genera la cotización comercial (`#COT-...`), copia de inmediato el texto preformateado al portapapeles y facilita el envío por WhatsApp con cuentas bancarias y validez de 15 días.
+     - **`💳 Cobrar`**: Genera la factura oficial (`#FAC-...`), descuenta existencias físicas, registra el ingreso en la caja diaria y facilita el envío del recibo pagado al cliente.
+- **Implementación Técnica:**
+  - **Botón `⚡ TOMAR PEDIDO`:** Integrado en la vista principal de Servicios y en Mostrador Retail con acceso directo a `abrirTomarPedido()`.
+  - **Carrito Permanente Superior Derecho:**
+    - Botón `#btnHeaderCart` en `.header-actions` del app header con badge en vivo `#headerCartBadge`.
+    - Botón `#btnModalCatCart` en la esquina superior derecha del modal de catálogo con badge `#modalCatCartCount`.
+    - Barra flotante de carrito `#catalogModalBottomCart` al pie del catálogo cuando hay ítems acumulados.
+  - **Soporte de Ítems a Medida:** Integración de `+ Ítem a Medida` dentro del catálogo y del carrito (`guardarItemMedida()` sincronizado con `retailCart`).
+  - **Motor de Cotización y Copia WhatsApp:** Función `cotizarYCopiarWhatsApp()` con invocación a `navigator.clipboard.writeText()`, feedback toast y pre-llenado de enlace `https://wa.me/...`.
+  - **Motor de Facturación Oficial:** Función `procesarCobroRetail()` con actualización contable, deducción de stock y generación de comprobante cancelado `#FAC-...`.
 
 ---
 

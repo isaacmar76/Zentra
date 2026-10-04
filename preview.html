@@ -1007,6 +1007,11 @@
         </div>
       </div>
       <div class="header-actions">
+        <!-- Ícono del Carrito de Compras SIEMPRE VISIBLE arriba a la derecha -->
+        <button class="icon-btn" id="btnHeaderCart" onclick="abrirCarritoRetail()" title="Ver Carrito de Pedido" style="position:relative; background:var(--primary-soft); color:var(--primary); border:1px solid rgba(0,108,70,0.25); width:38px; height:38px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+          <span class="material-symbols-outlined" style="font-size:21px;">shopping_cart</span>
+          <span id="headerCartBadge" style="position:absolute; top:-4px; right:-4px; background:#E53E3E; color:#FFFFFF; font-size:10px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.25); display:none;">0</span>
+        </button>
         <span id="userBadgeHeader" onclick="openBusinessProfileModal()" title="Toca para ver o cambiar usuario" style="font-size:11px; font-weight:700; background:var(--surface-container-low); color:var(--text); padding:4px 10px; border-radius:12px; cursor:pointer; display:inline-flex; align-items:center; gap:5px; border:1px solid var(--surface-border);">
           <span id="lblUserRoleIcon">👑</span> <span id="lblUserName">Dueño</span>
         </span>
@@ -1092,9 +1097,14 @@
 
         <!-- Subsección 1: Encargos / Proyectos -->
         <div id="subSecPedidos">
-          <button class="primary-btn" onclick="abrirModalNuevoPedido()">
-            <span>+</span> NUEVO PEDIDO / ENCARGO
-          </button>
+          <div style="display:grid; grid-template-columns:1.25fr 1fr; gap:8px; margin-bottom:12px;">
+            <button class="primary-btn" onclick="abrirTomarPedido()" style="margin:0; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); font-weight:800; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
+              <span>⚡</span> TOMAR PEDIDO
+            </button>
+            <button class="sec-btn" onclick="abrirModalNuevoPedido()" style="margin:0; font-weight:700; font-size:12px; display:flex; align-items:center; justify-content:center; gap:5px; border:1.5px solid var(--surface-border); background:var(--card-bg); color:var(--text); border-radius:14px;">
+              <span>✂️</span> Encargo a Medida
+            </button>
+          </div>
 
           <!-- Alerta sutil cuando hay pedidos próximos a vencer -->
           <div id="alertBannerVencer" onclick="verPedidosPorVencer()" style="display:none; margin-bottom:12px; background:#FFF5F5; border:1px solid #FED7D7; padding:9px 12px; border-radius:12px; color:#C53030; font-size:11.5px; font-weight:600; cursor:pointer;">
@@ -1167,6 +1177,15 @@
         <div class="section-title">
           <span>Punto de Venta / Mostrador (Toca para agregar)</span>
           <span style="font-size: 11px; color: var(--alert); display: none;" id="lblStockAviso"></span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
+          <button class="primary-btn" onclick="abrirTomarPedido()" style="margin:0; flex:1; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); font-weight:800; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
+            <span>⚡</span> TOMAR PEDIDO / VER CATÁLOGO
+          </button>
+          <button onclick="abrirModalItemMedida()" style="background:var(--card-bg); border:1.5px solid var(--surface-border); color:var(--text); padding:9px 12px; border-radius:14px; font-size:12px; font-weight:700; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px;">
+            <span>✂️</span> + A Medida
+          </button>
         </div>
 
         <!-- Buscador rápido en POS -->
@@ -1886,10 +1905,18 @@
       <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <div>
-            <div style="font-size:17px; font-weight:700;">📦 Catálogo & Inventario</div>
-            <div style="font-size:11px; color:var(--text-muted);" id="lblCatalogModalSub">Control de productos físicos, servicios y elaboración</div>
+            <div style="font-size:17px; font-weight:800; color:var(--text);">📦 Catálogo & Pedidos</div>
+            <div style="font-size:11px; color:var(--text-muted);" id="lblCatalogModalSub">Agrega productos o servicios al carrito de pedido</div>
           </div>
-          <button onclick="cerrarModalCatalogoInventario()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text);">✕</button>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <!-- Ícono del Carrito SIEMPRE VISIBLE arriba a la derecha en el catálogo -->
+            <button type="button" id="btnModalCatCart" onclick="abrirCarritoRetail()" style="position:relative; background:var(--primary-soft); color:var(--primary); border:1.5px solid var(--primary); border-radius:12px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:800; cursor:pointer; box-shadow:0 2px 8px rgba(0,108,70,0.18);">
+              <span style="font-size:16px;">🛒</span>
+              <span id="modalCatCartCount" style="background:#E53E3E; color:#fff; border-radius:10px; padding:1px 6px; font-size:11px; font-weight:800;">0</span>
+              <span style="font-size:11.5px;">Carrito</span>
+            </button>
+            <button onclick="cerrarModalCatalogoInventario()" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text); padding:2px;">✕</button>
+          </div>
         </div>
 
         <!-- Indicador de catálogo exclusivo del negocio activo -->
@@ -1905,12 +1932,32 @@
           <button type="button" class="status-chip" id="chipCatServicios" onclick="filtrarCatalogoPorTipo('servicio')">✂️ Servicios / Proyectos</button>
         </div>
 
-        <button onclick="abrirModalNuevoProducto()" style="width:100%; background:transparent; border:1.5px dashed var(--secondary); color:var(--secondary); padding:10px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:6px;">
-          <span>+</span> AGREGAR PRODUCTO O SERVICIO AL CATÁLOGO
-        </button>
+        <!-- Acciones rápidas: Nuevo al Catálogo vs Ítem a Medida para el Pedido -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
+          <button onclick="abrirModalNuevoProducto()" style="background:var(--card-bg); border:1.5px dashed var(--secondary); color:var(--secondary); padding:9px 8px; border-radius:12px; font-weight:700; font-size:11.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+            <span>+</span> Nuevo al Catálogo
+          </button>
+          <button onclick="abrirModalItemMedida()" style="background:#EEF2FF; border:1px solid #6366F1; color:#4F46E5; padding:9px 8px; border-radius:12px; font-weight:700; font-size:11.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+            <span>✂️</span> + Ítem a Medida
+          </button>
+        </div>
 
         <div id="catalogItemsList">
           <!-- Renderizado dinámico de productos -->
+        </div>
+
+        <!-- Barra flotante de carrito dentro del catálogo -->
+        <div id="catalogModalBottomCart" style="display:none; position:sticky; bottom:0; left:0; width:100%; margin-top:12px; padding-top:6px; background:var(--card-bg);">
+          <button onclick="abrirCarritoRetail()" style="width:100%; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); color:#fff; border:none; padding:12px 16px; border-radius:16px; font-weight:800; font-size:13px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; box-shadow:0 6px 18px rgba(0,108,70,0.3);">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span>🛒</span>
+              <span>Ver Carrito (<b id="lblCatBottomUnits">0</b>)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span id="lblCatBottomTotal">$0 COP</span>
+              <span>➔</span>
+            </div>
+          </button>
         </div>
       </div>
     </div>
@@ -2198,15 +2245,30 @@
 
         <!-- Botones de Acción: Cotización vs Facturación -->
         <div style="display:flex; flex-direction:column; gap:8px;">
-          <button onclick="procesarCobroRetail()" style="width:100%; background:linear-gradient(135deg, #006C46 0%, #004D32 100%); color:#fff; border:none; padding:13px; border-radius:14px; font-weight:800; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(0,108,70,0.3);">
-            <span>💵</span> COBRAR Y FACTURAR (DESCONTAR STOCK)
-          </button>
-          <button onclick="generarComprobanteRetail(true)" style="width:100%; background:var(--card-bg); color:var(--text); border:1.5px solid var(--surface-border); padding:11px; border-radius:14px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-            <span>📋</span> GENERAR PRESUPUESTO / COTIZACIÓN (SIN COBRO)
-          </button>
-          <button onclick="vaciarCarritoRetail()" style="background:transparent; border:none; color:var(--alert); font-size:11.5px; font-weight:600; cursor:pointer; padding:4px; text-align:center;">
-            🗑️ Vaciar todo el carrito
-          </button>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button onclick="cotizarYCopiarWhatsApp()" style="background:#0284C7; color:#fff; border:none; padding:12px 8px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; box-shadow:0 4px 14px rgba(2,132,199,0.3);">
+              <div style="display:flex; align-items:center; gap:5px;">
+                <span style="font-size:16px;">📋</span>
+                <span>COTIZAR</span>
+              </div>
+              <span style="font-size:9.5px; opacity:0.9; font-weight:600;">Copia y Envía WhatsApp</span>
+            </button>
+            <button onclick="procesarCobroRetail()" style="background:linear-gradient(135deg, #006C46 0%, #004D32 100%); color:#fff; border:none; padding:12px 8px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; box-shadow:0 4px 14px rgba(0,108,70,0.35);">
+              <div style="display:flex; align-items:center; gap:5px;">
+                <span style="font-size:16px;">💳</span>
+                <span>COBRAR</span>
+              </div>
+              <span style="font-size:9.5px; opacity:0.9; font-weight:600;">Factura y Registra Caja</span>
+            </button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; padding:0 4px;">
+            <button onclick="abrirModalItemMedida()" style="background:transparent; border:none; color:var(--primary); font-size:11.5px; font-weight:700; cursor:pointer;">
+              ✂️ + Ítem a Medida
+            </button>
+            <button onclick="vaciarCarritoRetail()" style="background:transparent; border:none; color:var(--alert); font-size:11.5px; font-weight:600; cursor:pointer;">
+              🗑️ Vaciar Carrito
+            </button>
+          </div>
         </div>
 
       </div>
@@ -3158,6 +3220,24 @@
           renderProjectItems();
           showToast(`✓ Ítem a medida añadido al proyecto: ${name}`);
         }
+      } else {
+        // Añadir directo al carrito de compras / pedido
+        retailCart.push({
+          id: newItem.id,
+          name: newItem.name,
+          price: newItem.unitPrice,
+          cost: newItem.costPrice || 0,
+          cat: 'Personalizado',
+          image: null,
+          itemType: 'servicio',
+          quantity: newItem.quantity,
+          maxStock: 999,
+          subtotal: newItem.subtotal
+        });
+        cart = retailCart;
+        renderRetailCartBadge();
+        renderRetailCartModal();
+        showToast(`✓ "${name}" agregado al carrito de pedido`);
       }
       cerrarModalItemMedida();
     }
@@ -5087,9 +5167,11 @@ ${itemsBreakdown}
           ? `<span style="font-size:10px; color:#4F46E5; font-weight:700; background:#EEF2FF; padding:2px 6px; border-radius:6px;">✂️ Bajo Encargo</span>`
           : `<span style="font-size:11px; font-weight:700; color:${isLow ? 'var(--alert)' : '#15803D'};">${isLow ? '⚠️ ' : ''}${item.stock} disp</span>`;
 
-        const actionBtn = (mode === 'retail')
-          ? `<button onclick="agregarAlCarritoRetail(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="background:var(--primary); color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">+ Carrito</button>`
-          : `<button onclick="venderProductoCatalogo('${item.id}')" style="background:#38A169; color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">Vender 1</button>`;
+        const actionBtn = (catalogPickerTarget === 'active_project')
+          ? `<button onclick="seleccionarProductoParaProyecto(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="background:var(--secondary); color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">+ Proyecto</button>`
+          : (catalogPickerTarget === 'new_order')
+          ? `<button onclick="agregarItemDesdePicker('${item.id}')" style="background:var(--secondary); color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">+ Encargo</button>`
+          : `<button onclick="agregarAlCarritoRetail(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="background:var(--primary); color:#fff; border:none; padding:6px 12px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.2);"><span>🛒</span> + Agregar</button>`;
 
         card.innerHTML = `
           <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
@@ -5354,21 +5436,53 @@ ${itemsBreakdown}
       agregarAlCarritoRetail(p);
     }
 
+    function abrirTomarPedido() {
+      catalogPickerTarget = 'cart';
+      abrirModalCatalogoInventario();
+      showToast('🛒 Modo Toma de Pedido: toca "+ Agregar" en los productos o añade un ítem a la medida');
+    }
+
     function renderRetailCartBadge() {
       const totalUnits = retailCart.reduce((sum, i) => sum + i.quantity, 0);
       const totalAmount = retailCart.reduce((sum, i) => sum + (i.quantity * i.price), 0);
 
+      // 1. Badge superior derecho del Header Principal
+      const headerBadge = document.getElementById('headerCartBadge');
+      if (headerBadge) {
+        if (totalUnits > 0) {
+          headerBadge.style.display = 'inline-block';
+          headerBadge.innerText = totalUnits > 99 ? '99+' : totalUnits;
+        } else {
+          headerBadge.style.display = 'none';
+        }
+      }
+
+      // 2. Badge superior derecho del modal del Catálogo
+      const modalCatCount = document.getElementById('modalCatCartCount');
+      if (modalCatCount) {
+        modalCatCount.innerText = totalUnits;
+      }
+
+      // 3. Barra flotante inferior dentro del modal del Catálogo
+      const catBottomBar = document.getElementById('catalogModalBottomCart');
+      if (catBottomBar) {
+        catBottomBar.style.display = totalUnits > 0 ? 'block' : 'none';
+        const bUnits = document.getElementById('lblCatBottomUnits');
+        if (bUnits) bUnits.innerText = `${totalUnits} ${totalUnits === 1 ? 'ítem' : 'ítems'}`;
+        const bTotal = document.getElementById('lblCatBottomTotal');
+        if (bTotal) bTotal.innerText = `$${totalAmount.toLocaleString('es-CO')} COP`;
+      }
+
+      // 4. Barra flotante mostrador retail
       const countEl = document.getElementById('cartCount');
       if (countEl) countEl.innerText = totalUnits;
-
       const sumEl = document.getElementById('cartTotalSum');
       if (sumEl) sumEl.innerText = `$${totalAmount.toLocaleString('es-CO')} COP`;
     }
 
     function abrirCarritoRetail() {
       if (retailCart.length === 0) {
-        showToast('El carrito está vacío. Toca productos en el mostrador para agregarlos.');
-        return;
+        showToast('El carrito está vacío. Agrega productos o ítems a la medida.');
       }
       renderRetailCartModal();
       document.getElementById('retailCartModal').style.display = 'flex';
@@ -5530,6 +5644,29 @@ ${itemsBreakdown}
         saldo: 0
       };
 
+      // Preparar mensaje para WhatsApp y portapapeles
+      const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'Zentra';
+      const waReceiptMsg = 
+`🧾 *FACTURA DE VENTA / RECIBO OFICIAL*
+✨ *${bizName.toUpperCase()}* ✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏷️ *N° Factura:* #FAC-POS-${ticketNum}
+👤 *Cliente:* ${cliName}
+📅 *Fecha:* ${receiptData.date}
+
+📦 *DETALLE DE COMPRA:*
+${receiptData.items.map(x => `• ${x.quantity}x ${x.name} = $${x.subtotal.toLocaleString('es-CO')} COP`).join('\n')}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 *TOTAL PAGADO: $${total.toLocaleString('es-CO')} COP*
+✅ *ESTADO: CANCELADO Y PAGADO*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+¡Muchas gracias por tu compra y preferencia! 🙌`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(waReceiptMsg).catch(() => {});
+      }
+
       retailCart = [];
       cart = [];
       renderRetailCartBadge();
@@ -5539,28 +5676,74 @@ ${itemsBreakdown}
       cerrarCarritoRetail();
 
       abrirFacturaReciboConDatos(receiptData);
+
+      if (cliPhone) {
+        const cleanPhone = cliPhone.replace(/\D/g, '');
+        const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+        const waUrl = `https://wa.me/${fullPhone}?text=${encodeURIComponent(waReceiptMsg)}`;
+        window.open(waUrl, '_blank');
+      }
+
       showToast(`¡Cobro exitoso de $${total.toLocaleString('es-CO')} COP en Caja y Factura generada!`);
     }
 
-    function generarComprobanteRetail(isQuote = true) {
+    function cotizarYCopiarWhatsApp() {
       if (retailCart.length === 0) {
-        showToast('El carrito está vacío.');
+        showToast('El carrito está vacío. Agrega productos o ítems antes de cotizar.');
         return;
       }
 
       const total = retailCart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-      const cliName = (document.getElementById('retailCliNameInp')?.value || '').trim() || 'Cliente Mostrador';
+      const cliName = (document.getElementById('retailCliNameInp')?.value || '').trim() || 'Cliente';
       const cliPhone = (document.getElementById('retailCliPhoneInp')?.value || '').trim();
-
       const ticketNum = Math.floor(1000 + Math.random() * 9000);
+      const date = new Date().toLocaleDateString('es-CO');
+      const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'Zentra';
+
+      let itemsText = retailCart.map(it => `• ${it.quantity}x ${it.name} ($${it.price.toLocaleString('es-CO')} c/u) = *$${(it.quantity * it.price).toLocaleString('es-CO')} COP*`).join('\n');
+
+      let cuentasText = '';
+      if (bizProfile) {
+        const accs = [];
+        if (bizProfile.nequi) accs.push(`• 📱 Nequi: ${bizProfile.nequi}`);
+        if (bizProfile.daviplata) accs.push(`• 🟡 Daviplata: ${bizProfile.daviplata}`);
+        if (bizProfile.bancolombia) accs.push(`• 🔵 Bancolombia: ${bizProfile.bancolombia}`);
+        if (accs.length > 0) {
+          cuentasText = `\n\n🏦 *Cuentas autorizadas para confirmar pedido:*\n` + accs.join('\n');
+        }
+      }
+
+      const msg = 
+`📋 *PRESUPUESTO / COTIZACIÓN COMERCIAL*
+✨ *${bizName.toUpperCase()}* ✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🏷️ *N° Cotización:* #COT-POS-${ticketNum}
+👤 *Cliente:* ${cliName}
+📅 *Fecha:* ${date}
+
+📦 *DETALLE DE ARTÍCULOS:*
+${itemsText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 *VALOR TOTAL COTIZADO: $${total.toLocaleString('es-CO')} COP*
+⏳ *Validez de la oferta:* 15 días calendario${cuentasText}
+📞 *Contacto directo:* ${bizProfile ? (bizProfile.phone || '') : ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+¡Quedamos atentos a cualquier inquietud para confirmar tu pedido! ✨`;
+
+      // Copiar automáticamente al portapapeles
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(msg).catch(() => {});
+      }
+
       const receiptData = {
         mode: 'cotizacion',
         consecutivo: `#COT-POS-${ticketNum}`,
-        date: new Date().toLocaleDateString('es-CO'),
+        date: date,
         clientName: cliName,
         clientPhone: cliPhone,
         clientDoc: 'N/A',
-        orderName: 'Presupuesto de Mostrador',
+        orderName: 'Presupuesto Comercial',
         orderStatus: 'Cotización',
         items: retailCart.map(x => ({
           quantity: x.quantity,
@@ -5575,7 +5758,23 @@ ${itemsBreakdown}
 
       cerrarCarritoRetail();
       abrirFacturaReciboConDatos(receiptData);
-      showToast('✓ Presupuesto / Cotización de mostrador generada exitosamente (Sin cobro)');
+
+      if (cliPhone) {
+        const cleanPhone = cliPhone.replace(/\D/g, '');
+        const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+        const waUrl = `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, '_blank');
+      }
+
+      showToast('📋 ¡Cotización generada y copiada al portapapeles!');
+    }
+
+    function generarComprobanteRetail(isQuote = true) {
+      if (isQuote) {
+        cotizarYCopiarWhatsApp();
+      } else {
+        procesarCobroRetail();
+      }
     }
 
     function cobrarCarrito() {

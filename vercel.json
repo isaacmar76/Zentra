@@ -3,6 +3,9 @@
   "name": "zentra",
   "cleanUrls": true,
   "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/landing", "dest": "/landing.html" },
+    { "src": "/app", "dest": "/index.html" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]

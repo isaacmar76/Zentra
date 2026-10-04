@@ -1702,6 +1702,51 @@
           </div>
         </div>
 
+        <!-- Sección Copia de Seguridad y Respaldo del Negocio -->
+        <div style="margin-top:16px; margin-bottom:16px; padding:14px; background:var(--surface-container-low); border:1px solid var(--surface-border); border-radius:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">shield</span>
+              <span style="font-size:13px; font-weight:800; color:var(--text);">Copia de Seguridad y Respaldo</span>
+            </div>
+            <span style="font-size:9.5px; background:var(--primary-soft); color:var(--primary); padding:2px 7px; border-radius:8px; font-weight:800;">100% SEGURO</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.35; margin-bottom:12px;">
+            Descarga o envía a tu correo un respaldo de tu catálogo, finanzas, pedidos y tareas para restaurar tu negocio cuando lo necesites.
+          </div>
+
+          <!-- Correo electrónico del dueño para respaldo -->
+          <div style="margin-bottom:10px;">
+            <label style="font-size:10.5px; font-weight:700; color:var(--text); margin-bottom:3px; display:block;">Correo para recibir respaldos:</label>
+            <input type="email" id="bizBackupEmailInp" placeholder="ejemplo@correo.com" style="width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); font-size:12px; color:var(--text); box-sizing:border-box;">
+          </div>
+
+          <!-- Botones de Acción de Respaldo -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
+            <button type="button" onclick="descargarCopiaSeguridad()" style="background:var(--card-bg); border:1.5px solid var(--primary); color:var(--primary); padding:8px; border-radius:12px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; box-shadow:0 2px 5px rgba(0,0,0,0.02);">
+              <span class="material-symbols-outlined" style="font-size:16px;">download</span>
+              <span>Descargar Copia</span>
+            </button>
+            <button type="button" onclick="enviarCopiaSeguridadCorreo()" style="background:var(--primary); color:#FFFFFF; border:none; padding:8px; border-radius:12px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.2);">
+              <span class="material-symbols-outlined" style="font-size:16px;">mail</span>
+              <span>Enviar a mi Correo</span>
+            </button>
+          </div>
+
+          <!-- Bloque de Restauración -->
+          <div style="padding-top:10px; border-top:1px dashed var(--surface-border); display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:11px; font-weight:700; color:var(--text);">¿Cambiaste de teléfono o navegador?</div>
+              <div style="font-size:9.5px; color:var(--text-muted);">Restaura todo tu negocio desde un archivo de respaldo</div>
+            </div>
+            <input type="file" id="inpRestoreBackupFile" accept=".json,application/json" onchange="procesarArchivoRestauracion(event)" style="display:none;">
+            <label for="inpRestoreBackupFile" style="background:var(--surface-subtle); border:1px solid var(--surface-border); color:var(--text); padding:6px 10px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px; white-space:nowrap;">
+              <span class="material-symbols-outlined" style="font-size:15px; color:var(--primary);">settings_backup_restore</span>
+              <span>Restaurar</span>
+            </label>
+          </div>
+        </div>
+
         <!-- Sección CRUD de Usuarios y Accesos -->
         <div style="margin-top:16px; border-top:1px solid #ECEEF2; padding-top:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
@@ -1726,6 +1771,13 @@
         <button onclick="cerrarSesionNegocio(true)" style="width:100%; margin-top:6px; background:transparent; border:1.5px dashed var(--secondary); color:var(--secondary); padding:9px; border-radius:14px; font-weight:700; font-size:11.5px; cursor:pointer;">
           ✨ CERRAR Y CREAR OTRO NEGOCIO
         </button>
+
+        <div style="text-align:center; margin-top:14px; padding-top:10px; border-top:1px solid var(--surface-border);">
+          <a href="landing.html" target="_blank" style="color:var(--primary); font-size:11.5px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
+            <span class="material-symbols-outlined" style="font-size:15px;">open_in_new</span>
+            <span>Ver Página Web Oficial de Zentra</span>
+          </a>
+        </div>
       </div>
     </div>
 
@@ -4941,6 +4993,9 @@
         lblLayout.innerText = layoutNames[currentHomeLayout] || 'Opción A: Cockpit Operativo';
       }
 
+      const inpBackupEmail = document.getElementById('bizBackupEmailInp');
+      if (inpBackupEmail) inpBackupEmail.value = bizProfile.email || '';
+
       sincronizarToggleTareasPendientesUI();
       document.getElementById('bizModal').style.display = 'flex';
     }
@@ -4962,6 +5017,8 @@
       if (document.getElementById('bizDaviplataInp')) bizProfile.daviplata = document.getElementById('bizDaviplataInp').value.trim();
       bizProfile.bancolombia = document.getElementById('bizBankInp').value.trim();
       if (document.getElementById('bizOtherPaymentInp')) bizProfile.otherPayment = document.getElementById('bizOtherPaymentInp').value.trim();
+      const inpBackupEmail = document.getElementById('bizBackupEmailInp');
+      if (inpBackupEmail) bizProfile.email = inpBackupEmail.value.trim();
       bizProfile.qrImage = tempBizQrPhoto || null;
 
       document.getElementById('headerTitle').innerText = `${bizProfile.name} • Servicios`;
@@ -7895,6 +7952,199 @@ ${estadoStr}${contactText}
       t.innerText = msg;
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2400);
+    }
+
+    // =======================================================
+    // MOTOR DE COPIA DE SEGURIDAD Y RESTAURACIÓN (BACKUP & RESTORE)
+    // =======================================================
+    function generarBackupNegocio() {
+      if (!bizProfile || !bizProfile.id) {
+        showToast('No hay un negocio activo para respaldar.');
+        return null;
+      }
+      const bizId = bizProfile.id;
+      const backup = {
+        zentraVersion: '1.2.0',
+        exportDate: new Date().toISOString(),
+        exportTimestamp: Date.now(),
+        bizId: bizId,
+        bizProfile: JSON.parse(JSON.stringify(bizProfile)),
+        projectsData: JSON.parse(JSON.stringify(projectsData || [])),
+        generalExpenses: JSON.parse(JSON.stringify(generalExpenses || [])),
+        generalIncomes: JSON.parse(JSON.stringify(generalIncomes || [])),
+        catalogItems: JSON.parse(JSON.stringify(catalogItems || [])),
+        savedQuotes: JSON.parse(JSON.stringify(savedQuotes || [])),
+        pendingTasks: JSON.parse(JSON.stringify(pendingTasks || [])),
+        clients: JSON.parse(JSON.stringify(clients || [])),
+        users: JSON.parse(JSON.stringify(users || [])),
+        activeLayout: localStorage.getItem('zentra_active_layout') || currentHomeLayout || 'layout_a',
+        summary: {
+          totalProyectos: (projectsData || []).length,
+          totalCatalogo: (catalogItems || []).length,
+          totalCotizaciones: (savedQuotes || []).length,
+          totalTareas: (pendingTasks || []).length,
+          totalClientes: (clients || []).length
+        }
+      };
+      return backup;
+    }
+
+    function descargarCopiaSeguridad() {
+      const backup = generarBackupNegocio();
+      if (!backup) return;
+
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backup, null, 2));
+      const safeName = (bizProfile.name || 'Zentra').replace(/[^a-zA-Z0-9]/g, '_');
+      const dateStr = new Date().toISOString().slice(0, 10);
+      const filename = `Zentra_Backup_${safeName}_${dateStr}.json`;
+
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute('href', dataStr);
+      downloadAnchor.setAttribute('download', filename);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast(`✓ Copia descargada: ${filename}`);
+    }
+
+    async function enviarCopiaSeguridadCorreo() {
+      const backup = generarBackupNegocio();
+      if (!backup) return;
+
+      let email = (document.getElementById('bizBackupEmailInp')?.value || bizProfile.email || '').trim();
+      if (!email || !email.includes('@')) {
+        const inputEmail = prompt('Ingresa el correo del dueño para recibir el respaldo:', email || '');
+        if (!inputEmail || !inputEmail.includes('@')) {
+          showToast('Ingresa un correo electrónico válido');
+          return;
+        }
+        email = inputEmail.trim();
+      }
+
+      bizProfile.email = email;
+      persistirEstadoLocal();
+      const inpField = document.getElementById('bizBackupEmailInp');
+      if (inpField) inpField.value = email;
+
+      showToast('⏳ Preparando y enviando copia de seguridad...');
+
+      const safeName = (bizProfile.name || 'Zentra');
+      const dateStr = new Date().toLocaleString('es-CO');
+      const jsonContent = JSON.stringify(backup, null, 2);
+
+      let envioExitoso = false;
+      try {
+        const res = await fetch('/api/send-backup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            bizName: safeName,
+            bizOwner: bizProfile.owner || 'Dueño(a)',
+            backupDate: dateStr,
+            backupJson: jsonContent,
+            summary: backup.summary
+          })
+        });
+
+        const data = await res.json().catch(() => ({}));
+        if (res.ok && data.success) {
+          envioExitoso = true;
+          showToast(`✉️ ¡Copia de seguridad enviada con éxito a ${email}!`);
+          return;
+        }
+      } catch (err) {
+        console.warn('API serverless de correo no disponible directamente:', err);
+      }
+
+      // Fallback universal: Descargar copia de respaldo y preparar correo con mailto
+      descargarCopiaSeguridad();
+      const subject = encodeURIComponent(`🛡️ Copia de Seguridad Zentra - ${safeName} (${dateStr})`);
+      const body = encodeURIComponent(`Hola ${bizProfile.owner || ''},\n\nSe ha generado el respaldo completo de tu negocio "${safeName}" el ${dateStr}.\n\nResumen de datos guardados:\n- Proyectos / Encargos: ${backup.summary.totalProyectos}\n- Productos en catálogo: ${backup.summary.totalCatalogo}\n- Cotizaciones activas: ${backup.summary.totalCotizaciones}\n- Tareas pendientes: ${backup.summary.totalTareas}\n- Directorio de clientes: ${backup.summary.totalClientes}\n\nGuarda este archivo. En caso de cambiar de teléfono o necesitar restaurar tu negocio, entra a Zentra y pulsa "Restaurar Negocio desde Copia".\n\nZentra • Gestión Ágil para Micronegocios`);
+      window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+      showToast(`📋 Se descargó el archivo y se preparó el correo para ${email}.`);
+    }
+
+    function restaurarNegocioDesdeJSON(backup) {
+      try {
+        if (!backup || !backup.bizId || !backup.bizProfile) {
+          showToast('❌ El archivo no corresponde a una copia válida de Zentra');
+          return false;
+        }
+
+        const bizName = backup.bizProfile.name || 'Negocio';
+        const fecha = backup.exportDate ? new Date(backup.exportDate).toLocaleString('es-CO') : 'Desconocida';
+
+        const confirmar = confirm(`¿Deseas restaurar la copia de seguridad de "${bizName}" del ${fecha}?\n\nEsto restaurará ${backup.projectsData?.length || 0} proyectos, ${backup.catalogItems?.length || 0} productos y todas tus configuraciones.`);
+        if (!confirmar) return false;
+
+        const bizId = backup.bizId;
+
+        // 1. Guardar en localStorage bajo el namespace de este negocio
+        localStorage.setItem(`zentra_biz_profile_${bizId}`, JSON.stringify(backup.bizProfile));
+        localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(backup.projectsData || []));
+        localStorage.setItem(`zentra_expenses_${bizId}`, JSON.stringify(backup.generalExpenses || []));
+        localStorage.setItem(`zentra_incomes_${bizId}`, JSON.stringify(backup.generalIncomes || []));
+        localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(backup.catalogItems || []));
+        localStorage.setItem(`zentra_quotes_${bizId}`, JSON.stringify(backup.savedQuotes || []));
+        localStorage.setItem(`zentra_tasks_${bizId}`, JSON.stringify(backup.pendingTasks || []));
+        localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(backup.clients || []));
+        localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(backup.users || []));
+        if (backup.activeLayout) {
+          localStorage.setItem('zentra_active_layout', backup.activeLayout);
+        }
+        localStorage.setItem('zentra_active_biz_id', bizId);
+
+        // 2. Actualizar registro central de negocios
+        const reg = obtenerRegistroNegocios();
+        const idx = reg.findIndex(b => b.id === bizId);
+        const bizEntry = {
+          id: bizId,
+          name: backup.bizProfile.name,
+          owner: backup.bizProfile.owner,
+          phone: backup.bizProfile.phone,
+          type: backup.bizProfile.type || 'servicios',
+          createdAt: backup.bizProfile.createdAt || backup.exportDate
+        };
+        if (idx !== -1) {
+          reg[idx] = bizEntry;
+        } else {
+          reg.push(bizEntry);
+        }
+        guardarRegistroNegocios(reg);
+
+        // 3. Cargar en memoria y refrescar la app al 100%
+        cargarEstadoNegocio(bizId);
+        if (backup.activeLayout) {
+          applyHomeLayout(backup.activeLayout, false);
+        }
+        cerrarBusinessProfileModal();
+        irInicio();
+
+        showToast(`🎉 ¡Negocio "${bizName}" restaurado exitosamente!`);
+        return true;
+      } catch (err) {
+        console.error('Error al restaurar respaldo:', err);
+        showToast('❌ Error al procesar el archivo de copia de seguridad');
+        return false;
+      }
+    }
+
+    function procesarArchivoRestauracion(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          restaurarNegocioDesdeJSON(data);
+        } catch (err) {
+          showToast('❌ El archivo seleccionado no tiene formato JSON válido');
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
     }
 
     // Inicialización y arranque con verificación multi-inquilino

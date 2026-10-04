@@ -201,8 +201,8 @@ class CatalogItemModel {
 | **2026-10-04** | `1ae5d84` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
 | **2026-10-04** | `c81ec7e` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
 | **2026-10-04** | `f36dfc0` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
-| **2026-10-04** | `7bd2df4` | Feature / Catálogo / Móvil | Hito 22: Soporte completo para subir imágenes desde la galería y almacenamiento del teléfono en la edición de productos del catálogo | ✅ Completado |
-| **2026-10-04** | `current` | UX / UI / Simplificación | Hito 23: Flujo Directo de Personalización, Tareas Pendientes en Inicio y Unificación a 1 Solo Botón de Mi Negocio en el Hero (eliminando duplicados de la barra inferior y badge de usuario) | ✅ Completado |
+| **2026-10-04** | `538316a` | UX / UI / Simplificación | Hito 23: Flujo Directo de Personalización, Tareas Pendientes en Inicio y Unificación a 1 Solo Botón de Mi Negocio en el Hero (eliminando duplicados de la barra inferior y badge de usuario) | ✅ Completado |
+| **2026-10-04** | `current` | Web / Respaldo / Vercel | Hito 24: Despliegue de Página Web Oficial de Zentra (landing.html), Motor de Copia de Seguridad con Envío al Correo del Dueño y Restauración en 1 Toque ($0 USD Vercel) | ✅ Completado |
 
 ---
 
@@ -564,6 +564,31 @@ class CatalogItemModel {
   5. **Depuración y Limpieza del Hero (Eliminación Total de Redundancias):**
      - Se retiró el botón redundante de Cotizaciones del hero/header, conservándolo exclusivamente en la barra inferior (`bottom-bar`) donde pertenece como sección operativa con su badge de seguimiento.
      - Se simplificó el acceso de Mi Negocio en el hero a únicamente su **ícono minimalista** (`storefront`), eliminando el texto extra y el badge de dueño previo, dejando una cabecera limpia con solo 2 íconos funcionales: `🛒 Carrito` y `🏪 Mi Negocio`.
+
+#### Hito 24: Despliegue de Página Web Oficial de Zentra (landing.html), Motor de Respaldo con Envío al Correo y Restauración en 1 Toque
+- **Requerimiento del Usuario:**
+  1. **Página Web Oficial de Zentra:** Crear un portal web de presentación comercial donde se explique la propuesta de valor de la app, sus ventajas (sin DIAN, offline-first, Taller vs POS) y permita a nuevos y antiguos usuarios ingresar a operar su negocio o configurar su perfil.
+  2. **Copia de Seguridad y Respaldo Completo:** Diseñar una herramienta para empaquetar de forma íntegra todos los datos del negocio (catálogo con fotos, finanzas, proyectos, cotizaciones guardadas, clientes y tareas de taller).
+  3. **Envío al Correo Electrónico del Dueño:** Permitir que la copia de seguridad se envíe directamente al correo del propietario como archivo adjunto (`.json`) para tranquilidad total ante pérdida de dispositivo.
+  4. **Restauración en 1 Toque:** Permitir que en cualquier teléfono o computador nuevo el usuario pueda subir su archivo de respaldo recibido por correo y recuperar su negocio al 100% en segundos.
+  5. **Despliegue y Viabilidad en Vercel:** Evaluar y estructurar la solución para Vercel con costo cero ($0 USD) aprovechando Serverless Functions y hosting global.
+- **Implementación Técnica:**
+  1. **Página Web de Presentación Oficial ([landing.html](file:///c:/Proyectos/MyBusiness/landing.html)):**
+     - Desarrollada bajo el sistema de diseño Fintech Clarity (Google Fonts *Plus Jakarta Sans* e *Inter*, paleta blanco perlado y acentos esmeralda/menta neón).
+     - Hero con propuesta de valor para Colombia, bento grid de funcionalidades (Modo Taller, Mostrador POS, Cotizaciones WhatsApp, Tareas Pendientes).
+     - Testimonios reales de casos de uso (Tatiana Marín - TM Diseños Creativos y Don Pedro - Tienda & POS).
+     - Detección reactiva de negocio existente en el navegador (`localStorage.getItem('zentra_active_biz_id')`) con banner de bienvenida y acceso directo en 1 toque.
+     - Módulo interactivo de Restauración directa desde la misma Landing Page para usuarios que ingresan desde un dispositivo nuevo.
+  2. **Motor de Respaldo y Exportación en la App ([index.html](file:///c:/Proyectos/MyBusiness/index.html)):**
+     - `generarBackupNegocio()`: Empaqueta con metadatos de versión, fecha ISO y resumen cuantitativo los objetos aislados del negocio activo (`bizProfile`, `projectsData`, `generalExpenses`, `generalIncomes`, `catalogItems`, `savedQuotes`, `pendingTasks`, `clients`, `users`, `activeLayout`).
+     - `descargarCopiaSeguridad()`: Descarga inmediata en el celular o PC del archivo `Zentra_Backup_[Nombre]_[Fecha].json`.
+  3. **Envío Serverless y Fallback Universal (`enviarCopiaSeguridadCorreo()`):**
+     - Función Serverless en Vercel ([api/send-backup.js](file:///c:/Proyectos/MyBusiness/api/send-backup.js)): Procesador POST que admite conexión directa con APIs transaccionales gratuitas (Resend) para despachar el correo con el archivo `.json` adjunto en Base64.
+     - Fallback Inteligente: En caso de no contar aún con API keys configuradas o en entorno local, el sistema descarga el archivo automáticamente, prepara el borrador con asunto y resumen detallado en el cliente de correo predeterminado del usuario (`mailto:`), garantizando que el usuario **nunca quede bloqueado**.
+  4. **Restauración Total en Caliente (`restaurarNegocioDesdeJSON()` y `procesarArchivoRestauracion()`):**
+     - Valida la integridad del archivo JSON, solicita confirmación explícita al usuario, inyecta los datos bajo el namespace correspondiente en `localStorage`, actualiza el registro global de negocios y ejecuta `cargarEstadoNegocio()` restableciendo el 100% de la información en memoria y en pantalla sin necesidad de recargar la página.
+  5. **Configuración para Vercel ([vercel.json](file:///c:/Proyectos/MyBusiness/vercel.json)):**
+     - Enrutamiento limpio: `/landing` -> `landing.html`, `/app` -> `index.html`, `/api/(.*)` -> `api/$1.js`, operando 100% gratis bajo el plan Hobby de Vercel ($0 USD).
 
 ---
 

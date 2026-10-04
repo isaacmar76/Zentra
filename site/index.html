@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zentra • El Sistema Operativo Ágil para Micronegocios en Colombia</title>
+  <meta name="description" content="Gestión financiera, proyectos por encargo, taller y mostrador POS sin enredos contables ni DIAN. 100% Offline-First y en tu celular.">
+  <link rel="icon" type="image/png" href="../img/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..700,0..1,0&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #F8F9FF;
+      --card-bg: #FFFFFF;
+      --surface-border: #E5EEFF;
+      --surface-subtle: #F0F4FC;
+      --surface-container-low: #EFF4FF;
+      --text: #0B1C30;
+      --text-muted: #596273;
+      --primary: #006C46;
+      --primary-container: #00D68F;
+      --primary-soft: rgba(0, 214, 143, 0.14);
+      --secondary: #006C46;
+      --accent: #00D68F;
+      --success: #006C46;
+      --alert: #BA1A1A;
+      --shadow-sm: 0 2px 8px rgba(11, 28, 48, 0.04);
+      --shadow-md: 0 8px 24px rgba(11, 28, 48, 0.06);
+      --shadow-lg: 0 16px 40px rgba(11, 28, 48, 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    h1, h2, h3, h4, .brand-font {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(0, 108, 70, 0.25);
+    }
+
+    .brand-name {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Botones */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, #00875A 100%);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(0, 108, 70, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 108, 70, 0.35);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: var(--text);
+      border: 1px solid var(--surface-border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-subtle);
+      border-color: #CBD5E1;
+    }
+
+    /* Hero Section */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 70px 20px 50px;
+      text-align: center;
+    }
+
+    .badge-colombia {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 108, 70, 0.08);
+      color: var(--primary);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+
+    .hero-title {
+      font-size: 46px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+      margin-bottom: 18px;
+      color: var(--text);
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--primary) 0%, #00B377 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 30px;
+      line-height: 1.6;
+    }
+
+    .hero-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badges {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 600;
+      flex-wrap: wrap;
+    }
+
+    .hero-badges span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Bento Grid */
+    .section-container {
+      max-width: 1100px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .section-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .bento-card {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+    }
+
+    .bento-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+      border-color: #CBD5E1;
+    }
+
+    .bento-card.span-2 {
+      grid-column: span 2;
+    }
+
+    .bento-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--surface-container-low);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .bento-card h3 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .bento-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* Respaldo Highlight Box */
+    .backup-box {
+      background: linear-gradient(135deg, #0B1C30 0%, #152A45 100%);
+      border-radius: 28px;
+      padding: 40px;
+      color: #FFFFFF;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 30px;
+      align-items: center;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .backup-box h2 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+
+    .backup-box p {
+      color: #94A3B8;
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    .backup-card-white {
+      background: #FFFFFF;
+      border-radius: 20px;
+      padding: 22px;
+      color: var(--text);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+      background: #FFFFFF;
+      border-top: 1px solid var(--surface-border);
+      padding: 40px 20px;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    /* Detección de Negocio Local Banner */
+    #activeBizBanner {
+      display: none;
+      background: #E8F5E9;
+      border-bottom: 1px solid #C8E6C9;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1B5E20;
+    }
+
+    /* Modal de Restauración */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 28, 48, 0.6);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #FFFFFF;
+      border-radius: 24px;
+      max-width: 480px;
+      width: 100%;
+      padding: 26px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+      .bento-card.span-2 {
+        grid-column: span 1;
+      }
+      .backup-box {
+        grid-template-columns: 1fr;
+        padding: 26px 20px;
+      }
+      .hero-title {
+        font-size: 30px;
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra de Detección de Negocio en este Dispositivo -->
+  <div id="activeBizBanner">
+    <span>🏪 Tienes el negocio <b id="activeBizName">Mi Negocio</b> configurado en este navegador.</span>
+    <a href="javascript:void(0)" onclick="abrirAppZentra()" style="color: var(--primary); margin-left: 10px; font-weight: 800; text-decoration: underline;">Abrir mi Negocio ➔</a>
+  </div>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <a href="#" class="brand-logo">
+      <div class="brand-icon">Z</div>
+      <div>
+        <div class="brand-name">Zentra</div>
+      </div>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#modos" class="nav-link">Taller vs POS</a>
+      <a href="#funciones" class="nav-link">Funciones</a>
+      <a href="#respaldo" class="nav-link">Copia de Seguridad</a>
+      <a href="#casos" class="nav-link">Casos de Éxito</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button onclick="abrirModalRestaurarLanding()" class="btn btn-secondary" title="Recuperar negocio desde archivo">
+        <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">settings_backup_restore</span>
+        <span>Restaurar Copia</span>
+      </button>
+      <a href="javascript:void(0)" onclick="abrirAppZentra()" class="btn btn-primary">
+        <span>🚀 Abrir Mi Negocio</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero">
+      <div class="badge-colombia">
+        <span>🇨🇴</span> Hecho para micronegocios, talleres y retail en Colombia
+      </div>
+      <h1 class="hero-title">
+        El Sistema Operativo Ágil para <span>los Negocios que Mueven a Colombia</span>
+      </h1>
+      <p class="hero-subtitle">
+        Elimina los cuadernos manuales y las hojas de cálculo enredadas. Controla tu dinero, gestiona pedidos de taller, envía cotizaciones con QR a WhatsApp y atiende en mostrador rápido. Sin burocracia ni DIAN obligatoria.
+      </p>
+
+      <div class="hero-buttons">
+        <a href="javascript:void(0)" onclick="abrirAppZentra()" class="btn btn-primary" style="padding: 13px 28px; font-size: 15px;">
+          <span>🚀 Entrar a Zentra Gratis</span>
+        </a>
+        <button onclick="abrirModalRestaurarLanding()" class="btn btn-secondary" style="padding: 13px 22px; font-size: 14px;">
+          <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">shield</span>
+          <span>Restaurar mi Negocio</span>
+        </button>
+      </div>
+
+      <div class="hero-badges">
+        <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">wifi_off</span> 100% Offline-First</span>
+        <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">lock</span> Privacidad Total</span>
+        <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">mail</span> Respaldo a tu Correo</span>
+        <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">phone_android</span> Celular y PC</span>
+      </div>
+    </section>
+
+    <!-- Bento Grid: Funcionalidades -->
+    <section class="section-container" id="funciones">
+      <div class="section-header">
+        <h2 class="section-title">Todo lo que necesitas en una sola pantalla</h2>
+        <p class="section-subtitle">Diseñado desde la mesa de trabajo de emprendedores reales para operar con agilidad.</p>
+      </div>
+
+      <div class="bento-grid">
+        <!-- Modo Taller & Servicios -->
+        <div class="bento-card span-2" id="modos">
+          <div>
+            <div class="bento-icon">✂️</div>
+            <h3>Modo Taller & Servicios por Encargo</h3>
+            <p>
+              Ideal para talleres de confección, diseño, reparaciones, eventos y manufactura. Controla pedidos por fases (Diseño, Producción, Empaque, Entregado), compras de insumos vinculadas al pedido, abonos del cliente y ganancia neta real.
+            </p>
+          </div>
+          <div style="margin-top: 18px; display:flex; gap:8px; flex-wrap:wrap;">
+            <span style="font-size:11px; background:var(--surface-container-low); padding:4px 10px; border-radius:10px; font-weight:700; color:var(--primary);">✓ Fases Operativas</span>
+            <span style="font-size:11px; background:var(--surface-container-low); padding:4px 10px; border-radius:10px; font-weight:700; color:var(--primary);">✓ Compras en Checklist</span>
+            <span style="font-size:11px; background:var(--surface-container-low); padding:4px 10px; border-radius:10px; font-weight:700; color:var(--primary);">✓ Saldo Pendiente</span>
+          </div>
+        </div>
+
+        <!-- Modo Mostrador POS -->
+        <div class="bento-card">
+          <div>
+            <div class="bento-icon">⚡</div>
+            <h3>Mostrador Rápido (POS)</h3>
+            <p>
+              Ventas en 1 toque. Catálogo táctil con fotos de tus productos, precios, búsqueda instantánea y cobro inmediato para tiendas, papelerías y abarrotes.
+            </p>
+          </div>
+          <div style="margin-top: 18px;">
+            <span style="font-size:11px; background:#E0F2FE; color:#0369A1; padding:4px 10px; border-radius:10px; font-weight:700;">✓ Venta en 1 toque</span>
+          </div>
+        </div>
+
+        <!-- Cotizaciones WhatsApp -->
+        <div class="bento-card">
+          <div>
+            <div class="bento-icon">💬</div>
+            <h3>Cotizaciones con QR a WhatsApp</h3>
+            <p>
+              Genera cotizaciones limpias con tu QR de Nequi o Bancolombia para que tu cliente escanee y pague de inmediato. Con seguimiento comercial y caducidad automática de 15 días.
+            </p>
+          </div>
+        </div>
+
+        <!-- Tareas Pendientes -->
+        <div class="bento-card">
+          <div>
+            <div class="bento-icon">📝</div>
+            <h3>Tareas Pendientes del Taller</h3>
+            <p>
+              Crea tareas rápidas del día con prioridad urgente 🔴 y checklist circular interactivo visible en la pantalla principal. Puedes activarlo o desactivarlo cuando quieras.
+            </p>
+          </div>
+        </div>
+
+        <!-- Fotos desde Galería -->
+        <div class="bento-card">
+          <div>
+            <div class="bento-icon">📸</div>
+            <h3>Fotos desde Cámara y Galería</h3>
+            <p>
+              Sube fotos a tus productos directamente desde el carrete de tu celular o captúralas en vivo con la cámara. Optimización automática para que la app vuele.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección de Respaldo y Envío al Correo -->
+    <section class="section-container" id="respaldo">
+      <div class="backup-box">
+        <div>
+          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(0,214,143,0.15); color:var(--primary-container); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:800; margin-bottom:12px;">
+            <span>🛡️</span> SEGURIDAD Y TRANQUILIDAD TOTAL
+          </div>
+          <h2>Tu Negocio Respaldado en tu Correo Personal</h2>
+          <p>
+            Tus datos viven en tu dispositivo de forma privada. Con un solo clic, Zentra genera una copia de seguridad completa y la envía directamente a tu bandeja de entrada de correo.
+            Si cambias de celular o se borra tu navegador, solo subes el archivo y recuperas todo en 2 segundos.
+          </p>
+          <div style="display:flex; gap:12px; flex-wrap:wrap;">
+            <a href="javascript:void(0)" onclick="abrirAppZentra()" class="btn btn-primary" style="background:#00D68F; color:#0B1C30; font-weight:800;">
+              <span>Abrir Mi Negocio ➔</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="backup-card-white">
+          <div style="font-size:12px; font-weight:800; color:var(--text); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+            <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px;">settings_backup_restore</span>
+            <span>Restaurar Negocio Aquí</span>
+          </div>
+          <p style="font-size:11px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">
+            ¿Recibiste el archivo de copia de seguridad en tu correo? Súbelo a continuación para recuperarlo de inmediato:
+          </p>
+
+          <input type="file" id="landingDirectRestoreInp" accept=".json,application/json" onchange="ejecutarRestauracionLanding(event)" style="display:none;">
+          <label for="landingDirectRestoreInp" class="btn btn-secondary" style="width:100%; border:2px dashed var(--primary); color:var(--primary); justify-content:center; padding:12px; font-weight:800;">
+            <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
+            <span>Seleccionar Archivo de Respaldo</span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Casos de Éxito -->
+    <section class="section-container" id="casos">
+      <div class="section-header">
+        <h2 class="section-title">Comerciantes que ya operan con Zentra</h2>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div class="bento-card">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <div style="width:42px; height:42px; border-radius:50%; background:#FCE7F3; color:#BE185D; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800;">T</div>
+            <div>
+              <div style="font-weight:800; font-size:14px;">Tatiana Marín</div>
+              <div style="font-size:11px; color:var(--text-muted);">TM Diseños Creativos • Papelería & Taller</div>
+            </div>
+          </div>
+          <p style="font-size:12.5px; font-style:italic;">
+            "Antes mezclaba las compras de cartulinas con la plata de la casa. Ahora con Zentra registro cada encargo, controlo el abono del cliente y sé exactamente cuánto me queda de ganancia limpia."
+          </p>
+        </div>
+
+        <div class="bento-card">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <div style="width:42px; height:42px; border-radius:50%; background:#E0F2FE; color:#0369A1; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800;">P</div>
+            <div>
+              <div style="font-weight:800; font-size:14px;">Don Pedro</div>
+              <div style="font-size:11px; color:var(--text-muted);">Tienda & Abarrotes • Mostrador POS</div>
+            </div>
+          </div>
+          <p style="font-size:12.5px; font-style:italic;">
+            "Tener las fotos de los productos en la pantalla me permite cobrar en un toque y al final de la tarde el cuadre de caja de hoy me muestra las ventas sin ponerme a sumar facturas viejas."
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div style="font-weight:800; color:var(--text); margin-bottom:6px;">Zentra • Software para Micronegocios</div>
+    <div>Diseñado en Colombia • Offline-First • Privacidad y Control Total</div>
+    <div style="margin-top:14px; font-size:12px;">
+      <a href="javascript:void(0)" onclick="abrirAppZentra()" style="color:var(--primary); font-weight:700; text-decoration:none; margin:0 8px;">🚀 Abrir App Zentra</a> •
+      <a href="javascript:void(0)" onclick="configurarUrlApp()" style="color:var(--text-muted); text-decoration:none; margin:0 8px;">⚙️ Configurar Enlace de la App</a>
+    </div>
+  </footer>
+
+  <!-- Modal de Restauración -->
+  <div class="modal-backdrop" id="modalRestaurarLanding" onclick="cerrarModalRestaurarLanding(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:6px;">
+          <span class="material-symbols-outlined" style="color:var(--primary);">settings_backup_restore</span>
+          <span>Restaurar Copia de Seguridad</span>
+        </h3>
+        <button onclick="cerrarModalRestaurarLanding()" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
+      </div>
+
+      <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
+        Selecciona el archivo de respaldo <b>.json</b> que descargaste previamente o recibiste en tu correo electrónico. Tus proyectos, catálogo y configuraciones se restaurarán de inmediato.
+      </p>
+
+      <input type="file" id="modalRestoreFileInp" accept=".json,application/json" onchange="ejecutarRestauracionLanding(event)" style="display:none;">
+      <label for="modalRestoreFileInp" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:13.5px; cursor:pointer;">
+        <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
+        <span>Seleccionar Archivo de Respaldo (.json)</span>
+      </label>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // ENLACE INTELIGENTE A LA APP ZENTRA (Proyecto 1)
+    // =========================================================================
+    function abrirAppZentra() {
+      // 1. Si estamos en local (localhost o file://), abrir la app local
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      // 2. Si el usuario ya guardó la URL de su App en Vercel
+      const customUrl = localStorage.getItem('zentra_app_target_url');
+      if (customUrl) {
+        window.location.href = customUrl;
+        return;
+      }
+
+      // 3. Fallback inteligente: si está en el mismo dominio o subcarpeta
+      // Si el proyecto de la app está en un subdominio o proyecto hermano:
+      const ingresarUrl = prompt(
+        "🚀 Ingresa el enlace de tu App Zentra en Vercel (Proyecto 1):\n\nEjemplo: https://tu-zentra.vercel.app\n\n(Se guardará automáticamente para que no tengas que escribirlo de nuevo)",
+        window.location.origin
+      );
+
+      if (ingresarUrl && ingresarUrl.trim() !== '') {
+        const cleanUrl = ingresarUrl.trim();
+        localStorage.setItem('zentra_app_target_url', cleanUrl);
+        window.location.href = cleanUrl;
+      }
+    }
+
+    function configurarUrlApp() {
+      const actual = localStorage.getItem('zentra_app_target_url') || '';
+      const nueva = prompt("Configura la URL de tu App Zentra en Vercel (Proyecto 1):", actual);
+      if (nueva !== null) {
+        if (nueva.trim() === '') {
+          localStorage.removeItem('zentra_app_target_url');
+          alert('Configuración restablecida por defecto.');
+        } else {
+          localStorage.setItem('zentra_app_target_url', nueva.trim());
+          alert('✅ Enlace de la App actualizado: ' + nueva.trim());
+        }
+      }
+    }
+
+    // Detección automática de negocio existente en este navegador
+    (function verificarNegocioExistente() {
+      try {
+        const activeBizId = localStorage.getItem('zentra_active_biz_id');
+        if (activeBizId) {
+          const profileRaw = localStorage.getItem(`zentra_biz_profile_${activeBizId}`);
+          if (profileRaw) {
+            const p = JSON.parse(profileRaw);
+            const banner = document.getElementById('activeBizBanner');
+            const lblName = document.getElementById('activeBizName');
+            if (banner && lblName && p.name) {
+              lblName.innerText = `"${p.name}"`;
+              banner.style.display = 'block';
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('Error verificando negocio local:', e);
+      }
+    })();
+
+    function abrirModalRestaurarLanding() {
+      document.getElementById('modalRestaurarLanding').style.display = 'flex';
+    }
+
+    function cerrarModalRestaurarLanding(e) {
+      document.getElementById('modalRestaurarLanding').style.display = 'none';
+    }
+
+    function ejecutarRestauracionLanding(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const backup = JSON.parse(e.target.result);
+          if (!backup || !backup.bizId || !backup.bizProfile) {
+            alert('❌ El archivo seleccionado no corresponde a una copia válida de Zentra.');
+            return;
+          }
+
+          const bizName = backup.bizProfile.name || 'Negocio';
+          const confirmar = confirm(`¿Deseas restaurar la copia de seguridad de "${bizName}"?\n\nSe cargarán ${backup.projectsData?.length || 0} proyectos, ${backup.catalogItems?.length || 0} productos y todas tus configuraciones.`);
+          if (!confirmar) return;
+
+          const bizId = backup.bizId;
+
+          // Guardar en localStorage
+          localStorage.setItem(`zentra_biz_profile_${bizId}`, JSON.stringify(backup.bizProfile));
+          localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(backup.projectsData || []));
+          localStorage.setItem(`zentra_expenses_${bizId}`, JSON.stringify(backup.generalExpenses || []));
+          localStorage.setItem(`zentra_incomes_${bizId}`, JSON.stringify(backup.generalIncomes || []));
+          localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(backup.catalogItems || []));
+          localStorage.setItem(`zentra_quotes_${bizId}`, JSON.stringify(backup.savedQuotes || []));
+          localStorage.setItem(`zentra_tasks_${bizId}`, JSON.stringify(backup.pendingTasks || []));
+          localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(backup.clients || []));
+          localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(backup.users || []));
+          if (backup.activeLayout) {
+            localStorage.setItem('zentra_active_layout', backup.activeLayout);
+          }
+          localStorage.setItem('zentra_active_biz_id', bizId);
+
+          // Actualizar registro de negocios
+          let reg = [];
+          try {
+            reg = JSON.parse(localStorage.getItem('zentra_businesses_registry') || '[]');
+          } catch (_) { reg = []; }
+
+          const idx = reg.findIndex(b => b.id === bizId);
+          const bizEntry = {
+            id: bizId,
+            name: backup.bizProfile.name,
+            owner: backup.bizProfile.owner,
+            phone: backup.bizProfile.phone,
+            type: backup.bizProfile.type || 'servicios',
+            createdAt: backup.bizProfile.createdAt || backup.exportDate
+          };
+          if (idx !== -1) reg[idx] = bizEntry; else reg.push(bizEntry);
+          localStorage.setItem('zentra_businesses_registry', JSON.stringify(reg));
+
+          alert(`🎉 ¡Negocio "${bizName}" restaurado exitosamente! Abriendo tu aplicación...`);
+          abrirAppZentra();
+        } catch (err) {
+          alert('❌ Error al procesar el archivo. Asegúrate de que sea un archivo JSON válido.');
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+  </script>
+</body>
+</html>

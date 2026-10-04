@@ -201,8 +201,8 @@ class CatalogItemModel {
 | **2026-10-04** | `1ae5d84` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
 | **2026-10-04** | `c81ec7e` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
 | **2026-10-04** | `f36dfc0` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
-| **2026-10-04** | `538316a` | UX / UI / Simplificación | Hito 23: Flujo Directo de Personalización, Tareas Pendientes en Inicio y Unificación a 1 Solo Botón de Mi Negocio en el Hero (eliminando duplicados de la barra inferior y badge de usuario) | ✅ Completado |
-| **2026-10-04** | `current` | Web / Respaldo / Vercel | Hito 24: Despliegue de Página Web Oficial de Zentra (landing.html), Motor de Copia de Seguridad con Envío al Correo del Dueño y Restauración en 1 Toque ($0 USD Vercel) | ✅ Completado |
+| **2026-10-04** | `b5943fc` | Web / Respaldo / Vercel | Hito 24: Despliegue de Página Web Oficial de Zentra (landing.html), Motor de Copia de Seguridad con Envío al Correo del Dueño y Restauración en 1 Toque ($0 USD Vercel) | ✅ Completado |
+| **2026-10-04** | `current` | Arquitectura / Multi-Deploy | Hito 25: Arquitectura Multi-Proyecto en Vercel (Opción 3 - Separación Total: Proyecto 1 para la App Operativa y Proyecto 2 para la Web Comercial en site/) | ✅ Completado |
 
 ---
 
@@ -589,6 +589,25 @@ class CatalogItemModel {
      - Valida la integridad del archivo JSON, solicita confirmación explícita al usuario, inyecta los datos bajo el namespace correspondiente en `localStorage`, actualiza el registro global de negocios y ejecuta `cargarEstadoNegocio()` restableciendo el 100% de la información en memoria y en pantalla sin necesidad de recargar la página.
   5. **Configuración para Vercel ([vercel.json](file:///c:/Proyectos/MyBusiness/vercel.json)):**
      - Enrutamiento limpio: `/landing` -> `landing.html`, `/app` -> `index.html`, `/api/(.*)` -> `api/$1.js`, operando 100% gratis bajo el plan Hobby de Vercel ($0 USD).
+
+#### Hito 25: Arquitectura Multi-Proyecto en Vercel (Opción 3 - Separación Total App vs Web Comercial)
+- **Requerimiento del Usuario:**
+  - El usuario expresó inquietud sobre si un nuevo despliegue en Vercel podría alterar o sobreescribir su proyecto y datos actuales de Zentra.
+  - Seleccionó formalmente la **Opción 3**: Implementar dos proyectos independientes en Vercel desde el mismo repositorio (`isaacmar76/Zentra`) en la rama `main`:
+    1. **Proyecto 1 (Actual - Zentra App):** Dedicado exclusivamente a la aplicación de gestión operativa, manteniendo intacto su dominio actual, su flujo directo a `index.html` y la seguridad íntegra de sus datos locales en `localStorage`.
+    2. **Proyecto 2 (Nuevo - Zentra Web / Comercial):** Dedicado al portal de marketing, presentación, captación de usuarios y módulo de respaldos con su propia URL y configuración limpia.
+- **Implementación Técnica:**
+  1. **Directorio Autónomo para el Sitio Web ([site/](file:///c:/Proyectos/MyBusiness/site/)):**
+     - Se creó la carpeta `site/` conteniendo `site/index.html` (portal comercial autónomo con diseño Fintech Clarity, Bento grid, testimonios y restaurador de respaldos).
+     - Se añadió `site/vercel.json` con enrutamiento limpio de archivos estáticos.
+     - Al configurar el Proyecto 2 en Vercel con **Root Directory = `site`**, la raíz `https://zentra-web.vercel.app/` sirve de forma nativa la Landing Page sin necesidad de prefijos `/landing`.
+  2. **Preservación Total del Proyecto Existente (Zentra App):**
+     - El archivo raíz [index.html](file:///c:/Proyectos/MyBusiness/index.html) y la configuración raíz [vercel.json](file:///c:/Proyectos/MyBusiness/vercel.json) se mantienen intactos.
+     - El Proyecto 1 continúa sirviendo directamente la App de gestión en `/`, sin interrupciones ni pantallas previas de marketing para los usuarios operativos.
+  3. **Conector Inteligente Web ➔ App:**
+     - En `site/index.html`, los botones "🚀 Abrir Mi Negocio" y "Entrar a Zentra" cuentan con detección de entorno local (`../index.html`), soporte dinámico para redirigir a la URL del Proyecto 1 en producción y botón de configuración rápida en el pie de página (`configurarUrlApp()`).
+  4. **Seguridad y Persistencia de Datos:**
+     - Se documenta y garantiza que los deploys de código en Vercel no tocan ni eliminan los datos de `localStorage` de los dispositivos clientes. Ambos proyectos operan de forma 100% gratuita ($0 USD) en el tier Hobby de Vercel.
 
 ---
 

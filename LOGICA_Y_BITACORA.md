@@ -198,7 +198,8 @@ class CatalogItemModel {
 | **2026-10-03** | `1090b4a` | Feature / POS / Facturación | Administración avanzada del propietario: Catálogo con costo y venta (márgenes), Carrito mostrador/retail, Pedidos multi-ítem a medida, y ciclo Cotización vs Factura | ✅ Completado |
 | **2026-10-03** | `e151d1a` | UX / Sales Flow | Flujo rápido de ventas: Botón Tomar Pedido, Carrito permanente superior derecho, Acciones directas Cotizar (copia + WhatsApp) y Cobrar (factura) | ✅ Completado |
 | **2026-10-03** | `321ec68` | Fix / Multi-Tenant Auth | Auto-recuperación de negocios, acceso directo 1-toque en login y búsqueda flexible por nombre de negocio | ✅ Completado |
-| **2026-10-04** | `current` | Feature / POS / CRM | Selector y Creación Express de Clientes en Carrito: vinculación con directorio para cotizaciones y facturas sin perder el flujo de venta | ✅ Completado |
+| **2026-10-04** | `321ec68` | Feature / POS / CRM | Selector y Creación Express de Clientes en Carrito: vinculación con directorio para cotizaciones y facturas sin perder el flujo de venta | ✅ Completado |
+| **2026-10-04** | `current` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
 
 ---
 
@@ -416,6 +417,30 @@ class CatalogItemModel {
   - **Integración con Cotizaciones y Facturas:**
     - `cotizarYCopiarWhatsApp()` y `procesarCobroRetail()` incorporan automáticamente el nombre, WhatsApp y documento/NIT del cliente vinculado en el texto preformateado y en el comprobante oficial (`invoiceReceiptModal`), preservando la validez de 15 días y cuentas bancarias.
     - Si no se selecciona cliente, se genera de forma inmediata con "Cliente Mostrador" / "Consumidor Final" conservando la máxima agilidad en el punto de venta.
+
+#### Hito 19: Edición de Catálogo con Fotos/Cámara, Medios de Pago con QR en Perfil y Formatos Simplificados de Cotización y Factura
+- **Requerimiento del Usuario:**
+  1. **Edición en Catálogo:** Al entrar al catálogo se debe poder editar cualquier producto o servicio existente (modificar nombre, precios, costos, existencias, categoría) y adjuntar una imagen o tomar una foto directamente desde la cámara del celular.
+  2. **Perfil del Negocio:** Configurar medios de pago reales (Nequi, Daviplata, Bancolombia u otros canales como Bre-B / Llave) y permitir subir la imagen de un código QR de cobro para facilitar el proceso de pago al cliente.
+  3. **Cero Datos Inventados:** En la cotización y factura se deben enviar **única y exclusivamente** los medios de pago configurados por el usuario. Eliminar números demo o textos ficticios de relleno (`"312 000 0000"`, `"Consultar"`, `"Cuenta registrada"`). Si no hay medios registrados, no se inventa nada.
+  4. **Formatos Sencillos y Despejados:** Simplificar drásticamente los formatos de cotización y factura tanto en WhatsApp como en el recibo visual (descartar caracteres ASCII sobrecargados, divisores pesados y textos redundantes; presentar la información de forma directa, limpia y ejecutiva).
+- **Implementación Técnica:**
+  - **Edición Completa en Catálogo (`abrirModalEditarProducto(id)`):**
+    - Se incorporó un botón de edición `✏️` en cada tarjeta de producto y servicio del catálogo.
+    - El modal `#newProductModal` opera en modo dual (Creación / Edición) mediante la variable `editingProductId`, cargando en tiempo real datos, costos, precios, stock y la foto previa.
+    - Integración de carga y captura fotográfica (`#productPhotoInp` con soporte `capture="environment"` para cámara móvil) con previsualización inmediata y botón de eliminación.
+    - Al guardar con `guardarNuevoProducto()`, se actualizan los datos en el inventario global (`catalogItems`), se sincronizan en caliente en el carrito de compras (`retailCart` y `cart`) si ya habían sido agregados, y se persisten en `localStorage`.
+  - **Medios de Pago y Código QR en Perfil del Negocio:**
+    - Nuevos campos en el modal `#bizModal`: Nequi, Daviplata, Bancolombia, Otro Medio / Llave Bre-B, y cargador de código QR (`#bizQrPhotoInp`, `#bizQrPreview`).
+    - Las nuevas cuentas creadas inician limpias en `limpiarEstadoEnMemoria()` y `registrarNuevoNegocio()`, sin autocompletar números demo con el teléfono del dueño.
+    - Persistencia integral en `bizProfile` con almacenamiento en Base64 de la imagen QR y sincronización en `localStorage`.
+  - **Filtrado Estricto de Cero Datos Inventados (`obtenerMediosDePagoActivos()`):**
+    - Se creó la función centralizada `obtenerMediosDePagoActivos()`, que evalúa los campos registrados y retorna únicamente métodos con datos reales introducidos por el usuario.
+    - Si el negocio no ha configurado ningún medio de pago ni QR, la sección de medios de pago se omite por completo tanto en el texto de WhatsApp como en el comprobante visual.
+  - **Rediseño Minimalista de Cotización y Factura:**
+    - **WhatsApp (`generarTextoCotizacionWhatsApp()` y `generarTextoFacturaWhatsApp()`):** Formato limpio, directo y elegante: título claro, consecutivo, fecha, cliente, desglose conciso de ítems, total en COP, medios de pago activos y teléfono de contacto.
+    - **Modal Visual (`invoiceReceiptModal`):** Despeje tipográfico, tabla simplificada de ítems, distintivo claro según estado (Cotización en amarillo vs Factura en verde), y bloque dinámico `#recPaymentContainer` que renderiza las cuentas activas y el código QR (`#recQrImg`) con un diseño estético y moderno.
+    - Sincronización completa en los disparadores `copiarWhatsAppCotizacion()`, `cotizarYCopiarWhatsApp()`, `enviarReciboWhatsApp()`, `copiarTextoRecibo()` y `procesarCobroRetail()`.
 
 ---
 

@@ -725,7 +725,9 @@ class CatalogItemModel {
   7. **Personalización y Paleta Cromática Global (Nude & Blush en toda la App):**
      - Al seleccionar la **Opción E: Diseño Clásico V1**, la paleta cálida Nude & Blush (`#F5EFE6`, `#E8C4C4`, `#D4A5A5`, `#5C4A3E`) y la tipografía `Poppins` se aplican reactivamente a **toda la aplicación**: fondo general, cabecera de la app, barra de navegación inferior, modales (clientes, catálogo, perfil, nueva orden, cotizaciones, recibos), formularios, botones de acción primarios (gradiente rosa viejo) y tarjetas.
      - Al alternar a cualquier otro modo (`layout_a`, `layout_b`, `layout_c`, `layout_d`), el sistema restablece de inmediato el tema Fintech Clarity verde esmeralda y la tipografía Plus Jakarta Sans.
-  8. **Paridad Total de Archivos:**
+  8. **Blindaje de Íconos Material Symbols (Solución a Ligaduras de Texto):**
+     - Se añadió protección explícita con `font-family: 'Material Symbols Outlined' !important` y selectores de exclusión `:not(.material-symbols-outlined)` para evitar que la tipografía `Poppins` sobreescriba los íconos de la cabecera superior (`shopping_cart`, `storefront`) y la barra de navegación inferior (`dashboard`, `inventory_2`, `request_quote`), garantizando que se muestren siempre como glifos gráficos y nunca como texto sin formato.
+  9. **Paridad Total de Archivos:**
      - Actualizado en [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [index.html](file:///c:/Proyectos/MyBusiness/index.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
 
 ---

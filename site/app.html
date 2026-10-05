@@ -1189,10 +1189,10 @@
        OPCIÓN E: PLANTILLA DE DISEÑO CLÁSICO V1 (NUDE & BLUSH)
        ======================================================== */
     #layoutViewE {
-      font-family: 'Poppins', sans-serif !important;
+      font-family: 'Poppins', sans-serif;
     }
 
-    #layoutViewE * {
+    #layoutViewE *:not(.material-symbols-outlined):not([class*="material-symbols"]) {
       font-family: 'Poppins', sans-serif;
     }
 
@@ -1452,8 +1452,29 @@
        PERSONALIZACIÓN Y PALETA GLOBAL DE TODA LA APP EN MODO V1
        ======================================================== */
     body.theme-clasico-v1,
-    body.theme-clasico-v1 * {
-      font-family: 'Poppins', sans-serif !important;
+    body.theme-clasico-v1 *:not(.material-symbols-outlined):not([class*="material-symbols"]) {
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Blindaje absoluto de íconos Material Symbols para que nunca se muestren como texto */
+    .material-symbols-outlined,
+    [class*="material-symbols"],
+    body.theme-clasico-v1 .material-symbols-outlined,
+    body.theme-clasico-v1 [class*="material-symbols"],
+    #layoutViewE .material-symbols-outlined,
+    #layoutViewE [class*="material-symbols"] {
+      font-family: 'Material Symbols Outlined' !important;
+      font-weight: normal !important;
+      font-style: normal !important;
+      line-height: 1 !important;
+      letter-spacing: normal !important;
+      text-transform: none !important;
+      display: inline-block !important;
+      white-space: nowrap !important;
+      word-wrap: normal !important;
+      direction: ltr !important;
+      -webkit-font-feature-settings: 'liga' !important;
+      -webkit-font-smoothing: antialiased !important;
     }
 
     /* Fondo general y marco de teléfono */

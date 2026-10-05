@@ -677,6 +677,26 @@ class CatalogItemModel {
      - Cambios sincronizados de forma idéntica en [index.html](file:///c:/Proyectos/MyBusiness/index.html), [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
      - Actualización informativa en las landing pages [landing.html](file:///c:/Proyectos/MyBusiness/landing.html) y [site/index.html](file:///c:/Proyectos/MyBusiness/site/index.html).
 
+#### Hito 29: Formato Vertical Móvil (1 Producto por Fila) y Enlace Directo de Pedido por WhatsApp
+- **Requerimiento del Usuario:**
+  - *"puedes crear el catalogo con imagenes que se pueda compartir por whatsapp pero en tamaño para mobil? o sea que se vea 1 producto debajo del otro"*
+  - Permitir a los clientes visualizar el catálogo en teléfonos celulares en formato de desplazamiento vertical (scroll continuo tipo lookbook), viendo un producto grande debajo del otro con fotos panorámicas y botón directo de compra.
+- **Implementación Técnica:**
+  1. **Selector de Formato en el Modal (`#catalogPdfModal`):**
+     - Botón `[ 📱 Móvil (1 por fila) ]` (predeterminado): Formato de una sola columna con tarjetas de ancho completo y fotos de alta resolución (220px de altura).
+     - Botón `[ 📄 Cuadrícula (Carta/PC) ]`: Formato multi-columna tradicional para impresión o monitores grandes.
+  2. **Diseño CSS para Celulares (`.catalog-pdf-mobile-layout`):**
+     - Distribución `grid-template-columns: 1fr` que aprovecha el 100% de la pantalla del smartphone sin necesidad de zoom.
+     - Foto panorámica superior con esquinas redondeadas y relación de aspecto destacada para apreciar acabados y detalles de cada producto.
+     - Tipografía aumentada (títulos de 14px, precios de 16px en negrita COP).
+  3. **Botón Interactivo "Pedir por WhatsApp" en Cada Producto (`.catalog-pdf-order-link`):**
+     - Cada tarjeta incluye un botón verde directo que, al ser tocado por el cliente en el documento digital, abre de inmediato el chat de WhatsApp con el negocio indicando:
+       *"¡Hola! Me interesa este producto de su catálogo: [Nombre del Producto] ($XX.XXX COP)"*.
+  4. **Impresión Optimizada para Móvil (`@media print`):**
+     - Adición de la clase `.pdf-layout-mobile` que adapta la hoja al guardar en PDF en formato vertical sin cortar tarjetas entre páginas.
+  5. **Paridad Total de Archivos:**
+     - Sincronizado en [index.html](file:///c:/Proyectos/MyBusiness/index.html), [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

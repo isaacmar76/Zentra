@@ -1,12 +1,7 @@
 {
-  "version": 2,
-  "name": "zentra",
   "cleanUrls": true,
-  "routes": [
-    { "src": "/api/(.*)", "dest": "/api/$1" },
-    { "src": "/landing", "dest": "/landing.html" },
-    { "src": "/app", "dest": "/index.html" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    { "source": "/landing", "destination": "/landing.html" },
+    { "source": "/app", "destination": "/index.html" }
   ]
 }

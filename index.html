@@ -112,17 +112,28 @@
       --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
     }
 
-    [data-theme="nude"] {
+    [data-theme="nude"],
+    body.theme-clasico-v1 {
       --bg: #F5EFE6;
-      --primary: #E8C4C4;
-      --secondary: #D4A5A5;
-      --text: #5C4A3E;
-      --success: #A3B18A;
-      --alert: #E07A5F;
       --card-bg: #FFFFFF;
       --surface-border: #E8C4C4;
       --surface-subtle: #FAF5EF;
-      --surface-container-low: #F5EFE6;
+      --surface-container-low: #F3EAE0;
+      --text: #5C4A3E;
+      --text-muted: #8D7768;
+      --primary: #B37070;
+      --primary-container: #D4A5A5;
+      --primary-soft: rgba(212, 165, 165, 0.22);
+      --secondary: #D4A5A5;
+      --secondary-hover: #C48B8B;
+      --secondary-soft: #F9EBEA;
+      --accent: #D4A5A5;
+      --success: #588157;
+      --alert: #E07A5F;
+      --warning: #D97706;
+      --shadow-sm: 0 2px 8px rgba(92, 74, 62, 0.05);
+      --shadow-md: 0 6px 18px rgba(92, 74, 62, 0.07);
+      --shadow-lg: 0 12px 30px rgba(92, 74, 62, 0.09);
     }
 
     [data-theme="esmeralda"] {
@@ -1435,6 +1446,162 @@
       color: #8D7768;
       display: flex;
       justify-content: space-between;
+    }
+
+    /* ========================================================
+       PERSONALIZACIÓN Y PALETA GLOBAL DE TODA LA APP EN MODO V1
+       ======================================================== */
+    body.theme-clasico-v1,
+    body.theme-clasico-v1 * {
+      font-family: 'Poppins', sans-serif !important;
+    }
+
+    /* Fondo general y marco de teléfono */
+    body.theme-clasico-v1,
+    body.theme-clasico-v1 .phone-container {
+      background-color: #F5EFE6 !important;
+    }
+
+    /* Fondo para PC Mode */
+    body.pc-mode.theme-clasico-v1 {
+      background-color: #ECE3D7 !important;
+    }
+    body.pc-mode.theme-clasico-v1 .phone-container {
+      border: 1.5px solid #E8C4C4 !important;
+    }
+
+    /* Header superior y títulos */
+    body.theme-clasico-v1 .app-header {
+      background: #FFFFFF !important;
+      border-bottom: 1.5px solid #E8C4C4 !important;
+    }
+    body.theme-clasico-v1 .app-title {
+      color: #5C4A3E !important;
+      font-weight: 700 !important;
+    }
+    body.theme-clasico-v1 .icon-btn {
+      color: #5C4A3E !important;
+    }
+    body.theme-clasico-v1 .icon-btn:hover {
+      background: rgba(232, 196, 196, 0.35) !important;
+    }
+
+    /* Barra de navegación inferior */
+    body.theme-clasico-v1 .bottom-bar {
+      background: #FFFFFF !important;
+      border-top: 1.5px solid #E8C4C4 !important;
+    }
+    body.theme-clasico-v1 .nav-btn {
+      color: #8D7768 !important;
+    }
+    body.theme-clasico-v1 .nav-btn.active {
+      color: #B37070 !important;
+      font-weight: 700 !important;
+    }
+    body.theme-clasico-v1 .nav-btn.active span:first-child {
+      filter: drop-shadow(0 2px 4px rgba(179, 112, 112, 0.35));
+    }
+
+    /* Botones primarios en toda la aplicación (modales, venta, guardar, etc.) */
+    body.theme-clasico-v1 .primary-btn,
+    body.theme-clasico-v1 .btn-primary,
+    body.theme-clasico-v1 button[style*="linear-gradient(135deg, #006C46"],
+    body.theme-clasico-v1 button[style*="linear-gradient(135deg, var(--primary)"],
+    body.theme-clasico-v1 button[style*="background:var(--primary)"],
+    body.theme-clasico-v1 button[style*="background: var(--primary)"] {
+      background: linear-gradient(135deg, #D4A5A5 0%, #B37070 100%) !important;
+      box-shadow: 0 4px 14px rgba(179, 112, 112, 0.35) !important;
+      color: #FFFFFF !important;
+      border: none !important;
+    }
+
+    /* Botones secundarios */
+    body.theme-clasico-v1 .sec-btn,
+    body.theme-clasico-v1 .btn-secondary {
+      background: #FFFFFF !important;
+      border: 1.5px solid #E8C4C4 !important;
+      color: #5C4A3E !important;
+    }
+    body.theme-clasico-v1 .sec-btn:active,
+    body.theme-clasico-v1 .btn-secondary:active {
+      background: #FAF5EF !important;
+      border-color: #D4A5A5 !important;
+    }
+
+    /* Inputs, selects y textareas en todos los modales */
+    body.theme-clasico-v1 input,
+    body.theme-clasico-v1 select,
+    body.theme-clasico-v1 textarea {
+      background-color: #FAF5EF !important;
+      border: 1.5px solid #E8C4C4 !important;
+      color: #5C4A3E !important;
+    }
+    body.theme-clasico-v1 input:focus,
+    body.theme-clasico-v1 select:focus,
+    body.theme-clasico-v1 textarea:focus {
+      border-color: #D4A5A5 !important;
+      box-shadow: 0 0 0 3px rgba(212, 165, 165, 0.25) !important;
+      outline: none !important;
+    }
+
+    /* Modales y hojas emergentes */
+    body.theme-clasico-v1 .theme-sheet,
+    body.theme-clasico-v1 #bizModal > div,
+    body.theme-clasico-v1 #projectModal > div,
+    body.theme-clasico-v1 #catalogModal > div,
+    body.theme-clasico-v1 #receiptModal > div,
+    body.theme-clasico-v1 #newOrderModal > div,
+    body.theme-clasico-v1 #quoteModal > div,
+    body.theme-clasico-v1 #clientModal > div,
+    body.theme-clasico-v1 #tasksModal > div,
+    body.theme-clasico-v1 #catalogPdfModal > div {
+      background: #FFFFFF !important;
+      border-top: 3.5px solid #E8C4C4 !important;
+      color: #5C4A3E !important;
+    }
+
+    /* Tarjetas y contenedores en todas las vistas */
+    body.theme-clasico-v1 .card-item,
+    body.theme-clasico-v1 .bento-card,
+    body.theme-clasico-v1 .pos-product,
+    body.theme-clasico-v1 .theme-option {
+      background: #FFFFFF !important;
+      border-color: #F0DCD3 !important;
+      color: #5C4A3E !important;
+    }
+
+    body.theme-clasico-v1 .theme-option.active {
+      border-color: #D4A5A5 !important;
+      background: #FAF5EF !important;
+    }
+
+    /* Badges y etiquetas */
+    body.theme-clasico-v1 .badge {
+      background: #F5EFE6 !important;
+      color: #5C4A3E !important;
+    }
+    body.theme-clasico-v1 .badge-urgent {
+      background: #FFF0EB !important;
+      color: #E07A5F !important;
+      border-color: #FED7AA !important;
+    }
+
+    /* Carrito flotante */
+    body.theme-clasico-v1 #retailFloatingCartBtn {
+      background: linear-gradient(135deg, #D4A5A5 0%, #B37070 100%) !important;
+      box-shadow: 0 6px 20px rgba(179, 112, 112, 0.45) !important;
+    }
+
+    /* Subsecciones (Clientes, Movimientos, Catálogo) */
+    body.theme-clasico-v1 #subSecClientes,
+    body.theme-clasico-v1 #subSecMovimientos,
+    body.theme-clasico-v1 #subSecCatalogo {
+      color: #5C4A3E !important;
+    }
+    body.theme-clasico-v1 #subSecClientes button[onclick="irInicio()"],
+    body.theme-clasico-v1 #subSecMovimientos button[onclick="irInicio()"],
+    body.theme-clasico-v1 #subSecCatalogo button[onclick="irInicio()"] {
+      color: #B37070 !important;
     }
   </style>
 </head>
@@ -3862,6 +4029,11 @@
       const saved = localStorage.getItem('zentra_view_mode');
       if (saved === 'pc' || (!saved && window.innerWidth >= 768)) {
         document.body.classList.add('pc-mode');
+      }
+      const savedLayout = localStorage.getItem('zentra_active_layout');
+      if (savedLayout === 'layout_e') {
+        document.documentElement.setAttribute('data-theme', 'nude');
+        document.body.classList.add('theme-clasico-v1');
       }
       setTimeout(actualizarBtnDeviceToggle, 60);
     })();
@@ -7947,6 +8119,19 @@ ${estadoStr}${contactText}
       try {
         localStorage.setItem('zentra_active_layout', currentHomeLayout);
       } catch (e) {}
+
+      // Sincronizar paleta y personalización global en toda la App
+      if (currentHomeLayout === 'layout_e') {
+        document.documentElement.setAttribute('data-theme', 'nude');
+        document.body.classList.add('theme-clasico-v1');
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) metaTheme.setAttribute('content', '#F5EFE6');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'zentra_clarity');
+        document.body.classList.remove('theme-clasico-v1');
+        const metaTheme = document.querySelector('meta[name="theme-color"]');
+        if (metaTheme) metaTheme.setAttribute('content', '#FFFFFF');
+      }
 
       // Actualizar opción activa en modal de personalización
       document.querySelectorAll('#themeModal .theme-option').forEach(el => el.classList.remove('active'));

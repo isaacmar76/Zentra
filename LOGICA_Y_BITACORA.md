@@ -201,8 +201,8 @@ class CatalogItemModel {
 | **2026-10-04** | `1ae5d84` | Feature / Catálogo / Facturación | Hito 19: Edición de catálogo con fotos/cámara, medios de pago con QR en perfil y formatos limpios de cotización y factura sin datos inventados | ✅ Completado |
 | **2026-10-04** | `c81ec7e` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
 | **2026-10-04** | `f36dfc0` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
-| **2026-10-04** | `b5943fc` | Web / Respaldo / Vercel | Hito 24: Despliegue de Página Web Oficial de Zentra (landing.html), Motor de Copia de Seguridad con Envío al Correo del Dueño y Restauración en 1 Toque ($0 USD Vercel) | ✅ Completado |
-| **2026-10-04** | `current` | Arquitectura / Multi-Deploy | Hito 25: Arquitectura Multi-Proyecto en Vercel (Opción 3 - Separación Total: Proyecto 1 para la App Operativa y Proyecto 2 para la Web Comercial en site/) | ✅ Completado |
+| **2026-10-04** | `f5f09c0` | Arquitectura / Multi-Deploy | Hito 25: Arquitectura Multi-Proyecto en Vercel (Opción 3 - Separación Total: Proyecto 1 para la App Operativa y Proyecto 2 para la Web Comercial en site/) | ✅ Completado |
+| **2026-10-05** | `current` | UI / Multi-Device / Auth | Hito 26: Experiencia Multi-Dispositivo (PC & Celular), Portal de Acceso para el Dueño de Negocio y Sincronización en 1 Toque | ✅ Completado |
 
 ---
 
@@ -608,6 +608,24 @@ class CatalogItemModel {
      - En `site/index.html`, los botones "🚀 Abrir Mi Negocio" y "Entrar a Zentra" cuentan con detección de entorno local (`../index.html`), soporte dinámico para redirigir a la URL del Proyecto 1 en producción y botón de configuración rápida en el pie de página (`configurarUrlApp()`).
   4. **Seguridad y Persistencia de Datos:**
      - Se documenta y garantiza que los deploys de código en Vercel no tocan ni eliminan los datos de `localStorage` de los dispositivos clientes. Ambos proyectos operan de forma 100% gratuita ($0 USD) en el tier Hobby de Vercel.
+
+#### Hito 26: Experiencia Multi-Dispositivo (PC & Celular), Portal de Acceso del Dueño y Sincronización en 1 Toque
+- **Requerimiento del Usuario:**
+  - El usuario solicitó precisar en la Landing Page dónde ingresa el dueño del negocio para revisar su tienda.
+  - Preguntó si la página se conecta con la base de datos para mostrar la versión de su negocio en el computador (PC) y expresó el deseo de utilizar Zentra de manera fluida tanto en el móvil como en el PC.
+- **Implementación Técnica:**
+  1. **Botón Protagonista de Acceso para el Dueño:**
+     - Se integró en la barra superior (Navbar) y en el Hero el botón destacado `[ 🔐 Ingresar a Mi Tienda ]`.
+  2. **Modal Inteligente de Acceso del Dueño (`modalAccesoOwner`):**
+     - **Si el PC ya tiene la tienda configurada:** Detecta el negocio en `localStorage`, muestra una tarjeta resumen con nombre, titular y modo activo, y ofrece el botón `[ 🚀 Entrar a Administrar Mi Tienda ➔ ]` en 1 clic.
+     - **Si es un PC nuevo (sin negocio aún):** Presenta de forma didáctica la opción `📲 ¿Ya usas Zentra en tu celular?` para arrastrar o seleccionar el archivo `.json` de respaldo recibido por correo o descargado del móvil, activando la tienda completa en el computador al instante, o la opción de registrar una tienda nueva desde cero.
+  3. **Nueva Sección Interactiva Celular vs PC (`#dispositivos`):**
+     - Muestra las fortalezas de cada plataforma:
+       - **En Celular:** Punto de venta táctil en mostrador, fotos inmediatas con la cámara, cotizaciones con QR por WhatsApp y trabajo 100% offline.
+       - **En PC / Escritorio:** Panel visual panorámico para pedidos de taller, edición masiva de catálogo, cuadre de caja y balance financiero en pantalla completa.
+     - Banner interactivo de sincronización paso a paso para comerciantes.
+  4. **Sincronización de Archivos:**
+     - Cambios aplicados con paridad total tanto en [landing.html](file:///c:/Proyectos/MyBusiness/landing.html) como en el portal autónomo de Vercel [site/index.html](file:///c:/Proyectos/MyBusiness/site/index.html).
 
 ---
 

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zentra • El Sistema Operativo Ágil para Micronegocios en Colombia</title>
-  <meta name="description" content="Gestión financiera, proyectos por encargo, taller y mostrador POS sin enredos contables ni DIAN. 100% Offline-First y en tu celular.">
+  <meta name="description" content="Gestión financiera, proyectos por encargo, taller y mostrador POS sin enredos contables ni DIAN. 100% Offline-First en tu celular y en tu PC.">
   <link rel="icon" type="image/png" href="img/icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,7 +54,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--surface-border);
       padding: 12px 24px;
@@ -147,6 +147,7 @@
       background: #FFFFFF;
       color: var(--text);
       border: 1.5px solid var(--surface-border);
+      box-shadow: var(--shadow-sm);
     }
 
     .btn-secondary:hover {
@@ -154,28 +155,11 @@
       border-color: #CBD5E1;
     }
 
-    .btn-ghost {
-      background: transparent;
-      color: var(--primary);
-    }
-
-    /* Barra de detección de negocio existente */
-    #activeBizBanner {
-      display: none;
-      background: linear-gradient(90deg, #ECFDF5 0%, #EFF6FF 100%);
-      border-bottom: 1px solid #A7F3D0;
-      padding: 10px 20px;
-      text-align: center;
-      font-size: 13px;
-      color: #065F46;
-      font-weight: 600;
-    }
-
     /* Hero Section */
     .hero {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 50px 20px 40px;
+      padding: 60px 20px 45px;
       text-align: center;
     }
 
@@ -183,24 +167,22 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
+      background: rgba(0, 108, 70, 0.08);
+      color: var(--primary);
       padding: 6px 14px;
-      background: var(--surface-container-low);
-      border: 1px solid var(--surface-border);
-      border-radius: 30px;
+      border-radius: 20px;
       font-size: 12px;
       font-weight: 700;
-      color: var(--primary);
       margin-bottom: 20px;
     }
 
     .hero-title {
-      font-size: 42px;
+      font-size: 44px;
       font-weight: 900;
       letter-spacing: -0.04em;
       line-height: 1.15;
+      margin-bottom: 18px;
       color: var(--text);
-      max-width: 820px;
-      margin: 0 auto 16px;
     }
 
     .hero-title span {
@@ -210,9 +192,9 @@
     }
 
     .hero-subtitle {
-      font-size: 16px;
+      font-size: 16.5px;
       color: var(--text-muted);
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto 30px;
       line-height: 1.6;
     }
@@ -220,20 +202,19 @@
     .hero-buttons {
       display: flex;
       justify-content: center;
-      align-items: center;
       gap: 14px;
+      margin-bottom: 36px;
       flex-wrap: wrap;
-      margin-bottom: 40px;
     }
 
     .hero-badges {
       display: flex;
       justify-content: center;
       gap: 24px;
-      flex-wrap: wrap;
-      font-size: 12px;
-      font-weight: 700;
       color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 600;
+      flex-wrap: wrap;
     }
 
     .hero-badges span {
@@ -265,7 +246,7 @@
     .section-subtitle {
       font-size: 14px;
       color: var(--text-muted);
-      max-width: 600px;
+      max-width: 620px;
       margin: 0 auto;
     }
 
@@ -320,34 +301,35 @@
     .bento-card p {
       font-size: 13px;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.55;
     }
 
-    /* Caja de Respaldo y Restauración Interactiva */
+    /* Respaldo Highlight Box */
     .backup-box {
-      background: linear-gradient(135deg, #0B1C30 0%, #132A4A 100%);
+      background: linear-gradient(135deg, #0B1C30 0%, #152A45 100%);
       border-radius: 28px;
-      padding: 36px 30px;
+      padding: 40px;
       color: #FFFFFF;
-      box-shadow: var(--shadow-lg);
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
+      grid-template-columns: 1.2fr 0.8fr;
       gap: 30px;
       align-items: center;
+      box-shadow: var(--shadow-lg);
     }
 
     .backup-box h2 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: 800;
-      margin-bottom: 10px;
-      color: #FFFFFF;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      line-height: 1.25;
     }
 
     .backup-box p {
-      font-size: 13.5px;
       color: #94A3B8;
+      font-size: 13.5px;
       line-height: 1.6;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .backup-card-white {
@@ -355,7 +337,7 @@
       border-radius: 20px;
       padding: 22px;
       color: var(--text);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     }
 
     /* Footer */
@@ -368,14 +350,23 @@
       color: var(--text-muted);
     }
 
-    /* Modal de Restauración */
+    /* Detección de Negocio Local Banner */
+    #activeBizBanner {
+      display: none;
+      background: #E8F5E9;
+      border-bottom: 1px solid #C8E6C9;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #1B5E20;
+    }
+
+    /* Modales */
     .modal-backdrop {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       background: rgba(11, 28, 48, 0.65);
       backdrop-filter: blur(6px);
       z-index: 1000;
@@ -396,7 +387,7 @@
     /* Responsive */
     @media (max-width: 860px) {
       .bento-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
       }
       .bento-card.span-2 {
         grid-column: span 1;
@@ -418,8 +409,8 @@
 
   <!-- Barra de Detección de Negocio en este Dispositivo -->
   <div id="activeBizBanner">
-    <span>🏪 Tienes el negocio <b id="activeBizName">Mi Negocio</b> configurado en este navegador.</span>
-    <a href="index.html" style="color: var(--primary); margin-left: 10px; font-weight: 800; text-decoration: underline;">Abrir mi Negocio ➔</a>
+    <span>🏪 Tienes la tienda <b id="activeBizName">Mi Negocio</b> configurada en este navegador.</span>
+    <a href="index.html" style="color: var(--primary); margin-left: 10px; font-weight: 800; text-decoration: underline;">Entrar a Administrar ➔</a>
   </div>
 
   <!-- Navbar -->
@@ -434,18 +425,20 @@
     <nav class="nav-links">
       <a href="#modos" class="nav-link">Taller vs POS</a>
       <a href="#funciones" class="nav-link">Funciones</a>
+      <a href="#dispositivos" class="nav-link">Celular & PC</a>
       <a href="#respaldo" class="nav-link">Copia de Seguridad</a>
       <a href="#casos" class="nav-link">Casos de Éxito</a>
     </nav>
 
     <div class="nav-actions">
-      <button onclick="abrirModalRestaurarLanding()" class="btn btn-secondary" title="Recuperar negocio desde archivo">
-        <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">settings_backup_restore</span>
-        <span>Restaurar Copia</span>
+      <button onclick="abrirModalAccesoOwner()" class="btn btn-secondary" title="Sincronizar Celular con PC">
+        <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">devices</span>
+        <span>Celular / PC</span>
       </button>
-      <a href="index.html" class="btn btn-primary">
-        <span>🚀 Abrir Mi Negocio</span>
-      </a>
+      <button onclick="abrirModalAccesoOwner()" class="btn btn-primary" style="font-weight:800;">
+        <span class="material-symbols-outlined" style="font-size:18px;">storefront</span>
+        <span>🔐 Ingresar a Mi Tienda</span>
+      </button>
     </div>
   </header>
 
@@ -459,24 +452,26 @@
         El Sistema Operativo Ágil para <span>los Negocios que Mueven a Colombia</span>
       </h1>
       <p class="hero-subtitle">
-        Elimina los cuadernos manuales y las hojas de cálculo enredadas. Controla tu dinero, gestiona pedidos de taller, envía cotizaciones con QR a WhatsApp y atiende en mostrador rápido. Sin burocracia ni DIAN obligatoria.
+        Elimina los cuadernos manuales y las hojas de cálculo enredadas. Controla tu dinero, gestiona pedidos de taller, envía cotizaciones con QR a WhatsApp y atiende en mostrador rápido. 
+        <b>Disponible en tu Celular 📱 y en tu Computador 💻</b> sin burocracia ni DIAN obligatoria.
       </p>
 
       <div class="hero-buttons">
-        <a href="index.html" class="btn btn-primary" style="padding: 13px 28px; font-size: 15px;">
-          <span>🚀 Entrar a Zentra Gratis</span>
-        </a>
-        <button onclick="abrirModalRestaurarLanding()" class="btn btn-secondary" style="padding: 13px 22px; font-size: 14px;">
-          <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">shield</span>
-          <span>Restaurar mi Negocio</span>
+        <button onclick="abrirModalAccesoOwner()" class="btn btn-primary" style="padding: 14px 30px; font-size: 15px; font-weight:800;">
+          <span class="material-symbols-outlined" style="font-size:20px;">storefront</span>
+          <span>🔐 Ingresar a Mi Tienda (PC / Móvil)</span>
+        </button>
+        <button onclick="abrirModalAccesoOwner()" class="btn btn-secondary" style="padding: 14px 22px; font-size: 14px;">
+          <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">sync</span>
+          <span>Sincronizar desde Celular</span>
         </button>
       </div>
 
       <div class="hero-badges">
+        <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">phone_android</span> Celular y PC</span>
         <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">wifi_off</span> 100% Offline-First</span>
         <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">lock</span> Privacidad Total</span>
         <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">mail</span> Respaldo a tu Correo</span>
-        <span><span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">phone_android</span> Celular y PC</span>
       </div>
     </section>
 
@@ -553,6 +548,98 @@
       </div>
     </section>
 
+    <!-- Nueva Sección: Celular & PC -->
+    <section class="section-container" id="dispositivos">
+      <div class="section-header">
+        <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(0,108,70,0.08); color:var(--primary); padding:6px 14px; border-radius:20px; font-size:12px; font-weight:700; margin-bottom:10px;">
+          <span>📱 💻</span> MULTI-DISPOSITIVO
+        </div>
+        <h2 class="section-title">Tu Negocio en tu Celular y en tu Computador</h2>
+        <p class="section-subtitle">Usa la rapidez táctil en tu teléfono y la comodidad panorámica en tu computador de escritorio.</p>
+      </div>
+
+      <div class="bento-grid" style="grid-template-columns: 1fr 1fr;">
+        <!-- Celular -->
+        <div class="bento-card" style="border-top: 4px solid var(--primary);">
+          <div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+              <div class="bento-icon" style="background:#E8F5E9; color:var(--primary); font-size:24px;">📱</div>
+              <span style="font-size:11px; font-weight:800; background:rgba(0,108,70,0.1); color:var(--primary); padding:4px 10px; border-radius:8px;">MOSTRADOR & MOVILIDAD</span>
+            </div>
+            <h3 style="font-size:19px;">En tu Celular o Tablet</h3>
+            <p style="margin-bottom:16px;">Diseñado para la velocidad del mostrador y el movimiento diario:</p>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:10px; font-size:13px; color:var(--text-muted);">
+              <li style="display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">check_circle</span>
+                <span><b>Ventas en 1 toque:</b> Cobro rápido con catálogo táctil.</span>
+              </li>
+              <li style="display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">check_circle</span>
+                <span><b>Fotos directas:</b> Sube imágenes desde la cámara de tu celular.</span>
+              </li>
+              <li style="display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">check_circle</span>
+                <span><b>Cotizaciones WhatsApp:</b> Con código QR listo para pagar.</span>
+              </li>
+              <li style="display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="color:var(--primary); font-size:18px;">check_circle</span>
+                <span><b>100% Offline:</b> Registra pedidos y ventas sin gastar datos.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Computador -->
+        <div class="bento-card" style="border-top: 4px solid #0284C7;">
+          <div>
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+              <div class="bento-icon" style="background:#E0F2FE; color:#0284C7; font-size:24px;">💻</div>
+              <span style="font-size:11px; font-weight:800; background:rgba(2,132,199,0.1); color:#0284C7; padding:4px 10px; border-radius:8px;">GESTIÓN & ESCRITORIO</span>
+            </div>
+            <h3 style="font-size:19px;">En tu Computador / PC</h3>
+            <p style="margin-bottom:16px;">Toma el control con la comodidad de tu pantalla grande:</p>
+            <ul style="list-style:none; display:flex; flex-direction:column; gap:10px; font-size:13px; color:var(--text-muted);">
+              <li style="display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="color:#0284C7; font-size:18px;">check_circle</span>
+                <span><b>Tablero visual amplio:</b> Revisa pedidos y fases de producción cómodamente.</span>
+              </li>
+              <li style="display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="color:#0284C7; font-size:18px;">check_circle</span>
+                <span><b>Catálogo detallado:</b> Edita precios, costos y stock masivamente.</span>
+              </li>
+              <li style="display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="color:#0284C7; font-size:18px;">check_circle</span>
+                <span><b>Cuadre de caja y balance:</b> Analiza ingresos, egresos y utilidad real.</span>
+              </li>
+              <li style="display:flex; align-items:center; gap:8px;">
+                <span class="material-symbols-outlined" style="color:#0284C7; font-size:18px;">check_circle</span>
+                <span><b>Impresión de comprobantes:</b> En hojas completas o tirillas físicas.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Banner Interactivo de Sincronización Celular ➔ PC -->
+      <div style="margin-top:24px; background:linear-gradient(135deg, #F0FDF4 0%, #E8F5E9 100%); border:1.5px dashed var(--primary); border-radius:20px; padding:24px; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:280px;">
+          <div style="font-size:16px; font-weight:800; color:var(--primary); margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+            <span class="material-symbols-outlined">sync</span>
+            <span>¿Tienes tu negocio en el celular y quieres abrirlo en este PC?</span>
+          </div>
+          <p style="font-size:13px; color:var(--text-muted); line-height:1.4;">
+            Envía tu copia de seguridad a tu correo desde el menú <b>Mi Negocio</b> de tu celular, o súbela aquí para abrir tu tienda idéntica en este computador al instante.
+          </p>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button onclick="abrirModalAccesoOwner()" class="btn btn-primary" style="padding:12px 20px;">
+            <span class="material-symbols-outlined">download</span>
+            <span>Cargar Negocio en este PC</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
     <!-- Sección de Respaldo y Envío al Correo -->
     <section class="section-container" id="respaldo">
       <div class="backup-box">
@@ -563,28 +650,28 @@
           <h2>Tu Negocio Respaldado en tu Correo Personal</h2>
           <p>
             Tus datos viven en tu dispositivo de forma privada. Con un solo clic, Zentra genera una copia de seguridad completa y la envía directamente a tu bandeja de entrada de correo.
-            Si cambias de celular o se borra tu navegador, solo subes el archivo y recuperas todo en 2 segundos.
+            Si cambias de celular o entras desde un nuevo PC, solo subes el archivo y recuperas todo en 2 segundos.
           </p>
           <div style="display:flex; gap:12px; flex-wrap:wrap;">
-            <a href="index.html" class="btn btn-primary" style="background:#00D68F; color:#0B1C30; font-weight:800;">
-              <span>Configurar en mi Negocio ➔</span>
-            </a>
+            <button onclick="abrirModalAccesoOwner()" class="btn btn-primary" style="background:#00D68F; color:#0B1C30; font-weight:800;">
+              <span>Ingresar a Mi Tienda ➔</span>
+            </button>
           </div>
         </div>
 
         <div class="backup-card-white">
-          <div style="font-size:12px; font-weight:800; color:var(--text); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+          <div style="font-size:13px; font-weight:800; color:var(--text); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
             <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px;">settings_backup_restore</span>
             <span>Restaurar Negocio Aquí</span>
           </div>
-          <p style="font-size:11px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">
-            ¿Recibiste el archivo de copia de seguridad en tu correo? Súbelo a continuación para entrar a tu negocio inmediatamente:
+          <p style="font-size:11.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">
+            ¿Recibiste el archivo de copia de seguridad en tu correo? Súbelo a continuación para entrar a tu tienda en este computador:
           </p>
 
           <input type="file" id="landingDirectRestoreInp" accept=".json,application/json" onchange="ejecutarRestauracionLanding(event)" style="display:none;">
           <label for="landingDirectRestoreInp" class="btn btn-secondary" style="width:100%; border:2px dashed var(--primary); color:var(--primary); justify-content:center; padding:12px; font-weight:800;">
             <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
-            <span>Seleccionar Archivo de Respaldo</span>
+            <span>Seleccionar Archivo de Respaldo (.json)</span>
           </label>
         </div>
       </div>
@@ -631,63 +718,140 @@
     <div style="font-weight:800; color:var(--text); margin-bottom:6px;">Zentra • Software para Micronegocios</div>
     <div>Diseñado en Colombia • Offline-First • Privacidad y Control Total</div>
     <div style="margin-top:14px;">
-      <a href="index.html" style="color:var(--primary); font-weight:700; text-decoration:none; margin:0 8px;">Abrir App</a> •
+      <a href="javascript:void(0)" onclick="abrirModalAccesoOwner()" style="color:var(--primary); font-weight:700; text-decoration:none; margin:0 8px;">🔐 Ingresar a Mi Tienda</a> •
+      <a href="index.html" style="color:var(--text-muted); text-decoration:none; margin:0 8px;">Abrir App</a> •
       <a href="preview.html" style="color:var(--text-muted); text-decoration:none; margin:0 8px;">Prototipo</a> •
       <a href="LOGICA_Y_BITACORA.md" style="color:var(--text-muted); text-decoration:none; margin:0 8px;">Bitácora Oficial</a>
     </div>
   </footer>
 
-  <!-- Modal de Restauración -->
-  <div class="modal-backdrop" id="modalRestaurarLanding" onclick="cerrarModalRestaurarLanding(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h3 style="font-size:16px; font-weight:800; display:flex; align-items:center; gap:6px;">
-          <span class="material-symbols-outlined" style="color:var(--primary);">settings_backup_restore</span>
-          <span>Restaurar Copia de Seguridad</span>
+  <!-- Modal de Acceso del Dueño de Negocio (PC & Móvil) -->
+  <div class="modal-backdrop" id="modalAccesoOwner" onclick="cerrarModalAccesoOwner(event)">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 500px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="font-size:17px; font-weight:800; display:flex; align-items:center; gap:8px; color:var(--text);">
+          <span class="material-symbols-outlined" style="color:var(--primary); font-size:22px;">storefront</span>
+          <span>Acceso a Mi Tienda Zentra</span>
         </h3>
-        <button onclick="cerrarModalRestaurarLanding()" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
+        <button onclick="cerrarModalAccesoOwner()" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted);">✕</button>
       </div>
 
-      <p style="font-size:12.5px; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
-        Selecciona el archivo de respaldo <b>.json</b> que descargaste previamente o recibiste en tu correo electrónico. Tus proyectos, catálogo y configuraciones se restaurarán de inmediato.
-      </p>
-
-      <input type="file" id="modalRestoreFileInp" accept=".json,application/json" onchange="ejecutarRestauracionLanding(event)" style="display:none;">
-      <label for="modalRestoreFileInp" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:13.5px; cursor:pointer;">
-        <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
-        <span>Seleccionar Archivo de Respaldo (.json)</span>
-      </label>
+      <div id="ownerModalContent">
+        <!-- Renderizado dinámico vía JS -->
+      </div>
     </div>
   </div>
 
   <script>
     // Detección automática de negocio existente en este navegador
-    (function verificarNegocioExistente() {
+    function obtenerNegocioActivoLocal() {
       try {
         const activeBizId = localStorage.getItem('zentra_active_biz_id');
         if (activeBizId) {
           const profileRaw = localStorage.getItem(`zentra_biz_profile_${activeBizId}`);
           if (profileRaw) {
-            const p = JSON.parse(profileRaw);
-            const banner = document.getElementById('activeBizBanner');
-            const lblName = document.getElementById('activeBizName');
-            if (banner && lblName && p.name) {
-              lblName.innerText = `"${p.name}"`;
-              banner.style.display = 'block';
-            }
+            return JSON.parse(profileRaw);
           }
         }
       } catch (e) {
         console.warn('Error verificando negocio local:', e);
       }
-    })();
-
-    function abrirModalRestaurarLanding() {
-      document.getElementById('modalRestaurarLanding').style.display = 'flex';
+      return null;
     }
 
-    function cerrarModalRestaurarLanding(e) {
-      document.getElementById('modalRestaurarLanding').style.display = 'none';
+    (function verificarNegocioExistente() {
+      const p = obtenerNegocioActivoLocal();
+      if (p && p.name) {
+        const banner = document.getElementById('activeBizBanner');
+        const lblName = document.getElementById('activeBizName');
+        if (banner && lblName) {
+          lblName.innerText = `"${p.name}"`;
+          banner.style.display = 'block';
+        }
+      }
+    })();
+
+    // Modal de Acceso del Dueño de Negocio
+    function abrirModalAccesoOwner() {
+      const container = document.getElementById('ownerModalContent');
+      if (!container) return;
+
+      const activeBiz = obtenerNegocioActivoLocal();
+
+      if (activeBiz && activeBiz.name) {
+        // Caso 1: Ya hay un negocio configurado en este navegador/PC
+        const esServ = activeBiz.type === 'servicios';
+        container.innerHTML = `
+          <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:18px; padding:18px; margin-bottom:18px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:48px; height:48px; border-radius:14px; background:linear-gradient(135deg, var(--primary) 0%, var(--primary-container) 100%); display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;">🏪</div>
+              <div>
+                <div style="font-size:16px; font-weight:800; color:var(--text);">${activeBiz.name}</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">
+                  Dueño(a): <b>${activeBiz.owner || 'Titular'}</b> • Modo: <b>${esServ ? 'Taller & Servicios' : 'Mostrador POS'}</b>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <a href="index.html" class="btn btn-primary" style="padding:14px; font-size:15px; justify-content:center; width:100%; font-weight:800;">
+              <span>🚀 Entrar a Administrar Mi Tienda ➔</span>
+            </a>
+            <div style="text-align:center; margin-top:10px;">
+              <span style="font-size:12px; color:var(--text-muted);">¿Quieres cambiar de tienda o cargar otra copia?</span><br>
+              <button onclick="renderFormularioCargarCopia()" style="background:none; border:none; color:var(--primary); font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:underline; margin-top:4px;">
+                📥 Cargar otra copia de seguridad (.json)
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        // Caso 2: Es un computador o navegador nuevo (sin negocio aún)
+        renderFormularioCargarCopia();
+      }
+
+      document.getElementById('modalAccesoOwner').style.display = 'flex';
+    }
+
+    function renderFormularioCargarCopia() {
+      const container = document.getElementById('ownerModalContent');
+      if (!container) return;
+
+      container.innerHTML = `
+        <p style="font-size:13px; color:var(--text-muted); line-height:1.5; margin-bottom:16px;">
+          ¿Cómo deseas ingresar a tu negocio en este computador?
+        </p>
+
+        <!-- Opción 1: Cargar desde Celular -->
+        <div style="background:#F0FDF4; border:1.5px dashed var(--primary); border-radius:18px; padding:18px; margin-bottom:16px;">
+          <div style="font-size:13.5px; font-weight:800; color:var(--primary); margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:20px;">phone_android</span>
+            <span>1. ¿Ya usas Zentra en tu celular?</span>
+          </div>
+          <p style="font-size:12px; color:var(--text-muted); line-height:1.45; margin-bottom:12px;">
+            Sube el archivo <b>.json</b> de respaldo que descargaste o te llegó al correo. Tu tienda con todos sus productos, fotos y pedidos se abrirá en este PC de inmediato:
+          </p>
+
+          <input type="file" id="modalOwnerBackupInp" accept=".json,application/json" onchange="ejecutarRestauracionLanding(event)" style="display:none;">
+          <label for="modalOwnerBackupInp" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px; font-size:13px; cursor:pointer; font-weight:800;">
+            <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
+            <span>Seleccionar Respaldo del Celular (.json)</span>
+          </label>
+        </div>
+
+        <!-- Opción 2: Entrar a la App o Crear Nuevo -->
+        <div style="text-align:center; padding-top:4px;">
+          <div style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">¿Es tu primera vez o quieres crear una tienda nueva?</div>
+          <a href="index.html" class="btn btn-secondary" style="width:100%; justify-content:center; padding:11px; font-size:13px; font-weight:700;">
+            <span>✨ Abrir Zentra y Registrar mi Tienda</span>
+          </a>
+        </div>
+      `;
+    }
+
+    function cerrarModalAccesoOwner(e) {
+      document.getElementById('modalAccesoOwner').style.display = 'none';
     }
 
     function ejecutarRestauracionLanding(event) {
@@ -704,12 +868,12 @@
           }
 
           const bizName = backup.bizProfile.name || 'Negocio';
-          const confirmar = confirm(`¿Deseas restaurar la copia de seguridad de "${bizName}"?\n\nSe cargarán ${backup.projectsData?.length || 0} proyectos, ${backup.catalogItems?.length || 0} productos y todas tus configuraciones.`);
+          const confirmar = confirm(`¿Deseas activar la tienda "${bizName}" en este computador?\n\nSe cargarán ${backup.projectsData?.length || 0} proyectos, ${backup.catalogItems?.length || 0} productos y todas tus configuraciones.`);
           if (!confirmar) return;
 
           const bizId = backup.bizId;
 
-          // Guardar en localStorage
+          // Guardar en localStorage de este computador
           localStorage.setItem(`zentra_biz_profile_${bizId}`, JSON.stringify(backup.bizProfile));
           localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(backup.projectsData || []));
           localStorage.setItem(`zentra_expenses_${bizId}`, JSON.stringify(backup.generalExpenses || []));
@@ -742,7 +906,7 @@
           if (idx !== -1) reg[idx] = bizEntry; else reg.push(bizEntry);
           localStorage.setItem('zentra_businesses_registry', JSON.stringify(reg));
 
-          alert(`🎉 ¡Negocio "${bizName}" restaurado exitosamente! Redirigiendo a tu aplicación...`);
+          alert(`🎉 ¡Tienda "${bizName}" sincronizada exitosamente en este computador! Redirigiendo a tu aplicación...`);
           window.location.href = 'index.html';
         } catch (err) {
           alert('❌ Error al procesar el archivo. Asegúrate de que sea un archivo JSON válido.');

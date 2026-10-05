@@ -742,44 +742,20 @@
 
   <script>
     // =========================================================================
-    // ENLACE INTELIGENTE A LA APP ZENTRA
+    // ENLACE DIRECTO E INTELIGENTE A LA APP ZENTRA
     // =========================================================================
     function abrirAppZentra() {
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
-        window.location.href = '../index.html';
+      // Limpiar cualquier URL errónea de bucle previa
+      try { localStorage.removeItem('zentra_app_target_url'); } catch (_) {}
+
+      // Si está en entorno local o archivo directo
+      if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        window.location.href = 'app.html';
         return;
       }
 
-      const customUrl = localStorage.getItem('zentra_app_target_url');
-      if (customUrl) {
-        window.location.href = customUrl;
-        return;
-      }
-
-      const ingresarUrl = prompt(
-        "🚀 Ingresa el enlace de tu App Zentra en Vercel (Proyecto 1):\n\nEjemplo: https://tu-zentra.vercel.app\n\n(Se guardará automáticamente para que no tengas que escribirlo de nuevo)",
-        window.location.origin
-      );
-
-      if (ingresarUrl && ingresarUrl.trim() !== '') {
-        const cleanUrl = ingresarUrl.trim();
-        localStorage.setItem('zentra_app_target_url', cleanUrl);
-        window.location.href = cleanUrl;
-      }
-    }
-
-    function configurarUrlApp() {
-      const actual = localStorage.getItem('zentra_app_target_url') || '';
-      const nueva = prompt("Configura la URL de tu App Zentra en Vercel (Proyecto 1):", actual);
-      if (nueva !== null) {
-        if (nueva.trim() === '') {
-          localStorage.removeItem('zentra_app_target_url');
-          alert('Configuración restablecida por defecto.');
-        } else {
-          localStorage.setItem('zentra_app_target_url', nueva.trim());
-          alert('✅ Enlace de la App actualizado: ' + nueva.trim());
-        }
-      }
+      // En Vercel: abre la aplicación en el mismo dominio donde están los datos locales
+      window.location.href = '/app';
     }
 
     // Detección automática de negocio existente en este navegador

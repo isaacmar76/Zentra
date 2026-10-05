@@ -202,7 +202,8 @@ class CatalogItemModel {
 | **2026-10-04** | `c81ec7e` | Feature / UI / Personalización | Hito 20: Personalización Dinámica de Pantalla de Inicio: Selector de 4 Layouts en vivo (Cockpit Operativo, POS Mostrador, Tablero Kanban y Híbrido Modular) con eliminación de paletas de colores previas | ✅ Completado |
 | **2026-10-04** | `f36dfc0` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
 | **2026-10-04** | `f5f09c0` | Arquitectura / Multi-Deploy | Hito 25: Arquitectura Multi-Proyecto en Vercel (Opción 3 - Separación Total: Proyecto 1 para la App Operativa y Proyecto 2 para la Web Comercial en site/) | ✅ Completado |
-| **2026-10-05** | `current` | UI / Multi-Device / Auth | Hito 26: Experiencia Multi-Dispositivo (PC & Celular), Portal de Acceso para el Dueño de Negocio y Sincronización en 1 Toque | ✅ Completado |
+| **2026-10-05** | `c6444e7` | UI / Multi-Device / Auth | Hito 26: Experiencia Multi-Dispositivo (PC & Celular), Portal de Acceso para el Dueño de Negocio y Sincronización en 1 Toque | ✅ Completado |
+| **2026-10-05** | `current` | Fix / Desktop Mode / UX | Hito 27: Solución a bucle de redirección en Landing Page, Inclusión de App nativa en /site y Modo Escritorio (PC) Panorámico | ✅ Completado |
 
 ---
 
@@ -626,6 +627,25 @@ class CatalogItemModel {
      - Banner interactivo de sincronización paso a paso para comerciantes.
   4. **Sincronización de Archivos:**
      - Cambios aplicados con paridad total tanto en [landing.html](file:///c:/Proyectos/MyBusiness/landing.html) como en el portal autónomo de Vercel [site/index.html](file:///c:/Proyectos/MyBusiness/site/index.html).
+
+#### Hito 27: Solución al Bucle de Redirección de la Landing Page, Inclusión de App en /site y Modo Escritorio (PC) Panorámico
+- **Requerimiento del Usuario:**
+  - El usuario reportó que tras sincronizar su copia en el PC desde la Landing Page, al pulsar "Entrar a mi tienda" no se mostraban las opciones para operar en el PC y el sistema lo dejaba nuevamente en el home de la landing.
+  - Reiteró la necesidad de usar Zentra de forma clara y cómoda en ambos dispositivos (móvil y PC).
+- **Causa Raíz Diagnosticada:**
+  1. En el Proyecto 2 (`site/`), solo existía `site/index.html` (la Landing Page) y `site/vercel.json`, careciendo de la aplicación en sí. Cualquier redirección relativa terminaba recargando la misma página de marketing.
+  2. La función `abrirAppZentra()` solicitaba una URL externa mediante un prompt con fallback a `origin`, guardando la propia URL de la landing en `localStorage` y provocando un bucle recursivo sobre sí misma.
+  3. En la versión de escritorio, la app carecía de una vista panorámica amplia adecuada para monitores de PC, mostrándose restringida al marco móvil angosto de 390px.
+- **Implementación Técnica:**
+  1. **Inclusión de la App Nativa en `site/` ([site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/vercel.json](file:///c:/Proyectos/MyBusiness/site/vercel.json)):**
+     - Se integró la app completa en `site/app.html` y se habilitó la ruta `/app` en Vercel.
+     - Ahora, al sincronizar la copia en el sitio web de Vercel, el usuario es redirigido directamente a `/app` en el **mismo dominio**, accediendo al 100% de sus datos restaurados en `localStorage` sin pérdida ni aislamiento.
+  2. **Eliminación Total de Bucles y Prompts:**
+     - `abrirAppZentra()` limpia preventivamente cualquier clave `zentra_app_target_url` corrupta y redirige de forma unívoca a `/app` (en Vercel `site`), `/` (en Vercel raíz) o `app.html` / `index.html` (en local).
+  3. **Modo Escritorio (PC) Panorámico:**
+     - Nuevo layout CSS `.pc-mode` para pantallas de escritorio: contenedor de 960px de ancho centrado, sin notch de celular, superficie perlada amplia y cómoda para gestión operativa, POS con múltiples columnas y control de taller.
+     - Botón selector en la cabecera `[ 🖥️ Vista PC / 📱 Móvil ]` para alternar entre la vista amplia de oficina y la vista compacta de mostrador con persistencia en `localStorage.getItem('zentra_view_mode')`.
+     - Paridad idéntica sincronizada en [index.html](file:///c:/Proyectos/MyBusiness/index.html), [preview.html](file:///c:/Proyectos/MyBusiness/preview.html) y [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html).
 
 ---
 

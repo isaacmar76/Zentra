@@ -771,6 +771,18 @@
       }
     })();
 
+    // =========================================================================
+    // ENLACE DIRECTO E INTELIGENTE A LA APP ZENTRA
+    // =========================================================================
+    function abrirAppZentra() {
+      try { localStorage.removeItem('zentra_app_target_url'); } catch (_) {}
+      if (window.location.protocol === 'file:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        window.location.href = 'index.html';
+        return;
+      }
+      window.location.href = '/';
+    }
+
     // Modal de Acceso del Dueño de Negocio
     function abrirModalAccesoOwner() {
       const container = document.getElementById('ownerModalContent');
@@ -795,9 +807,9 @@
           </div>
 
           <div style="display:flex; flex-direction:column; gap:10px;">
-            <a href="index.html" class="btn btn-primary" style="padding:14px; font-size:15px; justify-content:center; width:100%; font-weight:800;">
+            <button onclick="abrirAppZentra()" class="btn btn-primary" style="padding:14px; font-size:15px; justify-content:center; width:100%; font-weight:800;">
               <span>🚀 Entrar a Administrar Mi Tienda ➔</span>
-            </a>
+            </button>
             <div style="text-align:center; margin-top:10px;">
               <span style="font-size:12px; color:var(--text-muted);">¿Quieres cambiar de tienda o cargar otra copia?</span><br>
               <button onclick="renderFormularioCargarCopia()" style="background:none; border:none; color:var(--primary); font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:underline; margin-top:4px;">
@@ -907,7 +919,7 @@
           localStorage.setItem('zentra_businesses_registry', JSON.stringify(reg));
 
           alert(`🎉 ¡Tienda "${bizName}" sincronizada exitosamente en este computador! Redirigiendo a tu aplicación...`);
-          window.location.href = 'index.html';
+          abrirAppZentra();
         } catch (err) {
           alert('❌ Error al procesar el archivo. Asegúrate de que sea un archivo JSON válido.');
         }

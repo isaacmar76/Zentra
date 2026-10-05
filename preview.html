@@ -234,6 +234,46 @@
       }
     }
 
+    /* Modo Escritorio / PC para pantalla ancha */
+    body.pc-mode {
+      background-color: #F0F4FC;
+      padding: 16px;
+      align-items: center;
+    }
+
+    body.pc-mode .phone-container {
+      width: 100%;
+      max-width: 960px;
+      height: 94vh;
+      max-height: 920px;
+      border: 1px solid var(--surface-border);
+      border-radius: 28px;
+      box-shadow: 0 16px 40px rgba(11, 28, 48, 0.12);
+    }
+
+    body.pc-mode .notch {
+      display: none;
+    }
+
+    body.pc-mode .app-header {
+      padding: 16px 24px 12px !important;
+    }
+
+    body.pc-mode .app-content {
+      padding: 16px 24px 80px !important;
+    }
+
+    body.pc-mode .bottom-bar {
+      max-width: 960px;
+      border-radius: 0 0 28px 28px;
+    }
+
+    @media (min-width: 600px) {
+      .btn-device-toggle {
+        display: inline-flex !important;
+      }
+    }
+
     /* Header de la App */
     .app-header {
       padding: 34px 18px 12px;
@@ -1007,6 +1047,11 @@
         </div>
       </div>
       <div class="header-actions">
+        <!-- Botón Toggle Vista PC / Celular (visible en PC / Tablet) -->
+        <button class="icon-btn btn-device-toggle" id="btnToggleDeviceMode" onclick="toggleDeviceViewMode()" title="Cambiar entre Vista PC y Vista Celular" style="background:var(--surface-container-low); border:1px solid var(--surface-border); color:var(--text); padding:0 10px; height:38px; border-radius:12px; display:none; align-items:center; gap:5px; cursor:pointer; font-size:11px; font-weight:700;">
+          <span class="material-symbols-outlined" id="iconDeviceToggle" style="font-size:18px; color:var(--primary);">laptop_chromebook</span>
+          <span id="txtDeviceToggle">Vista PC</span>
+        </button>
         <!-- Ícono del Carrito de Compras SIEMPRE VISIBLE arriba a la derecha -->
         <button class="icon-btn" id="btnHeaderCart" onclick="abrirCarritoRetail()" title="Ver Carrito de Pedido" style="position:relative; background:var(--primary-soft); color:var(--primary); border:1px solid rgba(0,108,70,0.25); width:38px; height:38px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
           <span class="material-symbols-outlined" style="font-size:21px;">shopping_cart</span>
@@ -3166,6 +3211,32 @@
     function reiniciarNegocio() {
       cerrarSesionNegocio(true);
     }
+
+    // ==========================================
+    // MODO PANTALLA: ESCRITORIO (PC) VS CELULAR
+    // ==========================================
+    function toggleDeviceViewMode() {
+      const isPc = document.body.classList.toggle('pc-mode');
+      localStorage.setItem('zentra_view_mode', isPc ? 'pc' : 'mobile');
+      actualizarBtnDeviceToggle();
+      showToast(isPc ? '🖥️ Vista PC activada' : '📱 Vista Celular activada');
+    }
+
+    function actualizarBtnDeviceToggle() {
+      const isPc = document.body.classList.contains('pc-mode');
+      const icon = document.getElementById('iconDeviceToggle');
+      const txt = document.getElementById('txtDeviceToggle');
+      if (icon) icon.innerText = isPc ? 'smartphone' : 'laptop_chromebook';
+      if (txt) txt.innerText = isPc ? 'Móvil' : 'Vista PC';
+    }
+
+    (function initDeviceMode() {
+      const saved = localStorage.getItem('zentra_view_mode');
+      if (saved === 'pc' || (!saved && window.innerWidth >= 768)) {
+        document.body.classList.add('pc-mode');
+      }
+      setTimeout(actualizarBtnDeviceToggle, 60);
+    })();
 
     function cargarEstadoLocal() {
       try {

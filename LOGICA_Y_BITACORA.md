@@ -203,7 +203,10 @@ class CatalogItemModel {
 | **2026-10-04** | `f36dfc0` | Feature / POS / CRM | Hito 21: Botones de Otros Ingresos y Módulo Completo de Seguimiento Comercial de Cotizaciones y Carritos Guardados (Caducidad 15 días, Retoma de Ventas y Extensión de Vigencia) | ✅ Completado |
 | **2026-10-04** | `f5f09c0` | Arquitectura / Multi-Deploy | Hito 25: Arquitectura Multi-Proyecto en Vercel (Opción 3 - Separación Total: Proyecto 1 para la App Operativa y Proyecto 2 para la Web Comercial en site/) | ✅ Completado |
 | **2026-10-05** | `c6444e7` | UI / Multi-Device / Auth | Hito 26: Experiencia Multi-Dispositivo (PC & Celular), Portal de Acceso para el Dueño de Negocio y Sincronización en 1 Toque | ✅ Completado |
-| **2026-10-05** | `current` | Fix / Desktop Mode / UX | Hito 27: Solución a bucle de redirección en Landing Page, Inclusión de App nativa en /site y Modo Escritorio (PC) Panorámico | ✅ Completado |
+| **2026-10-05** | `860e897` | Fix / Desktop Mode / UX | Hito 27: Solución a bucle de redirección en Landing Page, Inclusión de App nativa en /site y Modo Escritorio (PC) Panorámico | ✅ Completado |
+| **2026-10-05** | `2a48370` | Feature / Catálogo / PDF | Hito 28: Exportación de Catálogo a PDF e imagen para clientes vía WhatsApp | ✅ Completado |
+| **2026-10-05** | `f21730e` | UI / Catálogo Móvil | Hito 29: Formato vertical móvil (1 producto por fila) y enlace directo de pedido por WhatsApp | ✅ Completado |
+| **2026-10-05** | `current` | UI / Plantilla Seleccionable | Hito 30: Opción E: Diseño Clásico V1 (Nude & Blush, tipografía Poppins, matriz 2x2 de métricas y botones grandes originales) | ✅ Completado |
 
 ---
 
@@ -696,6 +699,31 @@ class CatalogItemModel {
      - Adición de la clase `.pdf-layout-mobile` que adapta la hoja al guardar en PDF en formato vertical sin cortar tarjetas entre páginas.
   5. **Paridad Total de Archivos:**
      - Sincronizado en [index.html](file:///c:/Proyectos/MyBusiness/index.html), [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
+
+#### Hito 30: Plantilla Seleccionable de Pantalla de Inicio - Opción E: Diseño Clásico V1 (Original)
+- **Requerimiento del Usuario:**
+  - *"hay manera de recuperar el primer diseño de la app? la distribucion de los botones en la pantalla de inicio el tamaño de los botones y fuentes etc?... si, vamos a crearlo como una plantilla aparte para seleccionar"*
+  - Recuperar la estética exacta del primer lanzamiento (commit `ac2499b`): tipografía Google Fonts `Poppins`, paleta cálida `Nude & Blush` (`#F5EFE6`, `#E8C4C4`, `#D4A5A5`, `#5C4A3E`), matriz de 4 tarjetas de balance 2×2, y botones grandes de acción directa (`+ NUEVO PROYECTO / PEDIDO`, `⚠️ PEDIDOS PRONTO A VENCER`).
+- **Implementación Técnica:**
+  1. **Tipografía Poppins:** Se cargó la familia completa `Poppins` (pesos 300 a 700) en el `<head>` mediante Google Fonts.
+  2. **Contenedor Aislado `#layoutViewE` (`clasico-v1-container`):**
+     - Aplica tipografía `Poppins` exclusivamente a la pantalla de inicio clásica sin alterar la tipografía `Plus Jakarta Sans` de los otros layouts.
+     - Aplica los estilos cromáticos originales: fondo crema suave, tarjetas blancas con bordes empolvados `#F0DCD3`, indicadores verdes (`#588157`), alertas terracota (`#E07A5F`) y textos chocolate cálido (`#5C4A3E`).
+  3. **Matriz de Métricas 2×2:**
+     - Ingresos Mes (`#txtIngresosE`), Gastos Insumos (`#txtGastosE`), Ganancia Real (`#txtGananciaE`, enmascarada para colaboradores) y Proyectos Activos (`#txtActivosE`).
+  4. **Distribución de Botones Originales:**
+     - Botón principal de ancho completo rosado `#D4A5A5` (`+ NUEVO PROYECTO / PEDIDO`).
+     - Acciones rápidas secundarias: `⚡ Tomar Pedido POS` y `📦 Ver Catálogo`.
+     - Botón de alerta urgente bordeado: `⚠️ PEDIDOS PRONTO A VENCER (X)`.
+     - Mini-botones de cuadre directo: `➕ Registrar Ingreso` y `➖ Registrar Gasto`.
+     - Soporte para el widget de Tareas Pendientes (`tasksWidgetContainer_e`).
+  5. **Tarjetas de Proyectos en Curso V1 (`#projectsListE`):**
+     - Formato clásico con título en negrita, badge de días restantes o urgencia, cliente, ganancia calculada y fase de producción.
+  6. **Selector Dinámico y Persistencia:**
+     - Agregado en el modal de personalización (`#themeModal`) como **Opción E: Diseño Clásico V1 (ORIGINAL)**.
+     - Soporte en `applyHomeLayout('layout_e')`, persistencia en `localStorage.getItem('zentra_active_layout')` y sincronización con perfil del negocio.
+  7. **Paridad Total de Archivos:**
+     - Actualizado en [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [index.html](file:///c:/Proyectos/MyBusiness/index.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
 
 ---
 

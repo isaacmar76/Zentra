@@ -773,15 +773,108 @@
       color: #1E293B;
     }
 
+    /* ======================================================== */
+    /* ESTILOS DEL MÓDULO DE CATÁLOGO PDF PARA CLIENTES         */
+    /* ======================================================== */
+    .catalog-pdf-sheet {
+      background: #FFFFFF;
+      color: #0B1C30;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid #E2E8F0;
+      font-family: 'Inter', -apple-system, sans-serif;
+    }
+
+    .catalog-pdf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .catalog-pdf-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .catalog-pdf-img-wrap {
+      width: 100%;
+      height: 140px;
+      background: #F8FAFC;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom: 1px solid #F1F5F9;
+    }
+
+    .catalog-pdf-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .catalog-pdf-content {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      justify-content: space-between;
+    }
+
     /* Reglas de Impresión (@media print) */
     @media print {
       body * {
         visibility: hidden !important;
       }
-      #invoiceReceiptModal, #invoiceReceiptModal * {
+      .no-print {
+        display: none !important;
+      }
+
+      /* Caso 1: Catálogo de Productos a PDF */
+      body.printing-catalog #catalogPdfPrintContainer,
+      body.printing-catalog #catalogPdfPrintContainer * {
         visibility: visible !important;
       }
-      #invoiceReceiptModal {
+      body.printing-catalog #catalogPdfPrintContainer {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        display: block !important;
+        background: #FFFFFF !important;
+        color: #0B1C30 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+      }
+      body.printing-catalog .catalog-pdf-sheet {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+      }
+      body.printing-catalog .catalog-pdf-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 12px !important;
+      }
+      body.printing-catalog .catalog-pdf-img-wrap {
+        height: 125px !important;
+      }
+
+      /* Caso 2: Factura / Recibo */
+      body:not(.printing-catalog) #invoiceReceiptModal, 
+      body:not(.printing-catalog) #invoiceReceiptModal * {
+        visibility: visible !important;
+      }
+      body:not(.printing-catalog) #invoiceReceiptModal {
         position: fixed !important;
         left: 0 !important;
         top: 0 !important;
@@ -792,14 +885,16 @@
         padding: 0 !important;
         margin: 0 !important;
       }
-      .no-print {
-        display: none !important;
-      }
-      .receipt-paper {
+      body:not(.printing-catalog) .receipt-paper {
         box-shadow: none !important;
         border: 1px solid #DDD !important;
         max-width: 100% !important;
         border-radius: 0 !important;
+      }
+
+      @page {
+        size: letter portrait;
+        margin: 10mm 10mm;
       }
     }
 
@@ -1141,7 +1236,12 @@
         <div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <div style="font-size:12px; font-weight:800; color:var(--text);">📋 Últimas Ventas & Encargos</div>
-            <button onclick="abrirModalCatalogoInventario()" style="background:none; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer;">Ver Catálogo</button>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button onclick="abrirModalExportarCatalogoPDF()" style="background:none; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:2px;">
+                <span>📄</span> Catálogo PDF
+              </button>
+              <button onclick="abrirModalCatalogoInventario()" style="background:none; border:none; color:var(--text-muted); font-size:11px; font-weight:700; cursor:pointer;">Ver Catálogo</button>
+            </div>
           </div>
           <div id="cockpitRecentOrders" style="display:flex; flex-direction:column; gap:8px;">
             <!-- Últimos 3 pedidos -->
@@ -1364,7 +1464,12 @@
           <button onclick="irInicio()" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px;">
             <span>‹ Volver al Inicio</span>
           </button>
-          <button onclick="abrirModalNuevoProducto()" style="background:var(--secondary); color:#fff; border:none; padding:7px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer;">+ Nuevo Ítem</button>
+          <div style="display:flex; gap:6px;">
+            <button onclick="abrirModalExportarCatalogoPDF()" style="background:var(--primary-soft); color:var(--primary); border:1.5px solid var(--primary); padding:7px 11px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+              <span>📄</span> Exportar PDF
+            </button>
+            <button onclick="abrirModalNuevoProducto()" style="background:var(--secondary); color:#fff; border:none; padding:7px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer;">+ Nuevo Ítem</button>
+          </div>
         </div>
         <div id="catalogIntegratedList">
           <!-- Renderizado dinámico de productos del catálogo -->
@@ -2192,6 +2297,12 @@
           <button type="button" class="status-chip" id="chipCatServicios" onclick="filtrarCatalogoPorTipo('servicio')">✂️ Servicios / Proyectos</button>
         </div>
 
+        <!-- Botón Destacado: Exportar Catálogo para Clientes (PDF & WhatsApp) -->
+        <button type="button" onclick="abrirModalExportarCatalogoPDF()" style="width:100%; margin-bottom:12px; background:linear-gradient(135deg, #006C46 0%, #00D68F 100%); color:#FFFFFF; border:none; padding:10px 14px; border-radius:14px; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 10px rgba(0,108,70,0.22); transition:transform 0.15s ease;">
+          <span style="font-size:16px;">📄</span>
+          <span>Exportar Catálogo para Clientes (PDF & WhatsApp)</span>
+        </button>
+
         <!-- Acciones rápidas: Nuevo al Catálogo vs Ítem a Medida para el Pedido -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
           <button onclick="abrirModalNuevoProducto()" style="background:var(--card-bg); border:1.5px dashed var(--secondary); color:var(--secondary); padding:9px 8px; border-radius:12px; font-weight:700; font-size:11.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
@@ -2718,6 +2829,90 @@
       </div>
     </div>
 
+    <!-- Modal: Exportar y Compartir Catálogo a Clientes (PDF & WhatsApp) -->
+    <div id="catalogPdfModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:500; align-items:flex-end; justify-content:center; backdrop-filter:blur(4px);">
+      <div style="background:var(--card-bg); width:100%; max-width:850px; border-radius:28px 28px 0 0; padding:20px; max-height:92vh; display:flex; flex-direction:column; color:var(--text); box-shadow:0 -10px 40px rgba(0,0,0,0.3); margin:0 auto; box-sizing:border-box;">
+        
+        <!-- Header del Modal -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; border-bottom:1px solid var(--surface-border); padding-bottom:12px;">
+          <div>
+            <div style="font-size:18px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:8px;">
+              <span>📄</span> Exportar Catálogo para Clientes
+            </div>
+            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">
+              Descarga un PDF listo para imprimir o enviar, o comparte un resumen por WhatsApp
+            </div>
+          </div>
+          <button onclick="cerrarModalExportarCatalogoPDF()" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); padding:4px;">✕</button>
+        </div>
+
+        <!-- Barra de Configuración y Filtros -->
+        <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:16px; padding:12px; margin-bottom:12px;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
+            <!-- Filtro por Tipo o Categoría -->
+            <div>
+              <label style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:4px;">Filtrar Ítems</label>
+              <select id="catalogPdfFilterSelect" onchange="actualizarFiltroCatalogoPDF(this.value)" style="width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:12px; font-weight:600;">
+                <option value="todos">🌟 Todos los productos y servicios</option>
+                <option value="producto">📦 Solo Productos Físicos</option>
+                <option value="servicio">✂️ Solo Servicios y Encargos</option>
+              </select>
+            </div>
+            <!-- Buscador Rápido -->
+            <div>
+              <label style="font-size:10.5px; font-weight:700; color:var(--text-muted); text-transform:uppercase; display:block; margin-bottom:4px;">Buscar por Nombre</label>
+              <input type="text" id="catalogPdfSearchInp" oninput="actualizarBusquedaCatalogoPDF(this.value)" placeholder="🔍 Ej: Topper, Taza, Libreta..." style="width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:12px; box-sizing:border-box;">
+            </div>
+          </div>
+
+          <!-- Opciones de Personalización (Toggles) -->
+          <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; padding-top:6px; border-top:1px dashed var(--surface-border); font-size:11.5px;">
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:600;">
+              <input type="checkbox" id="chkPdfShowPrices" checked onchange="toggleOpcionCatalogoPDF('prices', this.checked)" style="accent-color:var(--primary); width:15px; height:15px;">
+              <span>Mostrar Precios COP</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:600;">
+              <input type="checkbox" id="chkPdfShowStock" checked onchange="toggleOpcionCatalogoPDF('stock', this.checked)" style="accent-color:var(--primary); width:15px; height:15px;">
+              <span>Mostrar Disponibilidad</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; font-weight:600;">
+              <input type="checkbox" id="chkPdfIncludePayment" checked onchange="toggleOpcionCatalogoPDF('payment', this.checked)" style="accent-color:var(--primary); width:15px; height:15px;">
+              <span>Incluir Medios de Pago & QR</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Botones de Acción Primarios -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+          <button onclick="imprimirCatalogoPDF()" style="background:linear-gradient(135deg, #006C46 0%, #00D68F 100%); color:#FFFFFF; border:none; padding:11px 14px; border-radius:14px; font-weight:800; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(0,108,70,0.25);">
+            <span style="font-size:16px;">🖨️</span> Descargar / Imprimir PDF
+          </button>
+          <button onclick="compartirCatalogoWhatsApp()" style="background:#25D366; color:#FFFFFF; border:none; padding:11px 14px; border-radius:14px; font-weight:800; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(37,211,102,0.25);">
+            <span style="font-size:16px;">💬</span> Compartir por WhatsApp
+          </button>
+        </div>
+
+        <!-- Barra de Estado de Vista Previa -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:11px; color:var(--text-muted);">
+          <span>Vista Previa del Catálogo (<b id="lblPdfItemCount" style="color:var(--primary);">0 ítems</b>)</span>
+          <button onclick="copiarTextoCatalogoWhatsApp()" style="background:none; border:none; color:var(--primary); font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:3px;">
+            <span>📋</span> Copiar listado en texto
+          </button>
+        </div>
+
+        <!-- Contenedor con Scroll de Vista Previa -->
+        <div style="overflow-y:auto; flex:1; border:1px solid var(--surface-border); border-radius:16px; background:#F8FAFC; padding:12px;" id="catalogPdfPreviewScrollWrap">
+          <div id="catalogPdfPreviewContainer">
+            <!-- Renderizado dinámico de la hoja de catálogo -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Contenedor dedicado para Impresión Limpia a PDF (@media print) -->
+    <div id="catalogPdfPrintContainer" style="display:none;"></div>
+
     <!-- Toast -->
     <div class="toast" id="toastMsg">Venta registrada</div>
   </div>
@@ -2758,6 +2953,13 @@
     let activeWorkingQuoteId = null;
     let quotesFilterTab = 'activas';
     let quotesSearchQuery = '';
+
+    // Estado del Módulo de Exportación de Catálogo a PDF & WhatsApp
+    let catalogPdfFilterType = 'todos';
+    let catalogPdfShowPrices = true;
+    let catalogPdfShowStock = true;
+    let catalogPdfIncludePayment = true;
+    let catalogPdfSearch = '';
 
     // Estado de Tareas Pendientes (Seguimiento Operativo y de Taller)
     let pendingTasks = [];
@@ -6097,6 +6299,376 @@ ${estadoStr}${contactText}
       renderCatalogItems();
       recalcularTodo();
       showToast(`✓ Venta de 1 ${item.name} registrada (+$${item.price.toLocaleString('es-CO')} COP en ingresos)`);
+    }
+
+    // =========================================================================
+    // MÓDULO: EXPORTAR Y COMPARTIR CATÁLOGO A CLIENTES (PDF & WHATSAPP)
+    // =========================================================================
+    function abrirModalExportarCatalogoPDF() {
+      catalogPdfFilterType = 'todos';
+      catalogPdfSearch = '';
+      const sInp = document.getElementById('catalogPdfSearchInp');
+      if (sInp) sInp.value = '';
+
+      const chkPrices = document.getElementById('chkPdfShowPrices');
+      if (chkPrices) catalogPdfShowPrices = chkPrices.checked;
+
+      const chkStock = document.getElementById('chkPdfShowStock');
+      if (chkStock) catalogPdfShowStock = chkStock.checked;
+
+      const chkPayment = document.getElementById('chkPdfIncludePayment');
+      if (chkPayment) catalogPdfIncludePayment = chkPayment.checked;
+
+      poblarCategoriasFiltroCatalogoPDF();
+      renderPrevisualizacionCatalogoPDF();
+
+      const modal = document.getElementById('catalogPdfModal');
+      if (modal) modal.style.display = 'flex';
+    }
+
+    function cerrarModalExportarCatalogoPDF() {
+      const modal = document.getElementById('catalogPdfModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function poblarCategoriasFiltroCatalogoPDF() {
+      const select = document.getElementById('catalogPdfFilterSelect');
+      if (!select) return;
+
+      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
+      const relevantItems = catalogItems.filter(i => !i.mode || i.mode === mode);
+      
+      const cats = Array.from(new Set(relevantItems.map(i => i.cat || 'General').filter(Boolean))).sort();
+
+      let html = `
+        <option value="todos">🌟 Todos los productos y servicios</option>
+        <option value="producto">📦 Solo Productos Físicos</option>
+        <option value="servicio">✂️ Solo Servicios y Encargos</option>
+      `;
+
+      if (cats.length > 0) {
+        html += `<optgroup label="Filtrar por Categoría:">`;
+        cats.forEach(c => {
+          html += `<option value="${c}">🏷️ ${c}</option>`;
+        });
+        html += `</optgroup>`;
+      }
+
+      select.innerHTML = html;
+      select.value = catalogPdfFilterType;
+    }
+
+    function actualizarFiltroCatalogoPDF(val) {
+      catalogPdfFilterType = val;
+      renderPrevisualizacionCatalogoPDF();
+    }
+
+    function actualizarBusquedaCatalogoPDF(val) {
+      catalogPdfSearch = val;
+      renderPrevisualizacionCatalogoPDF();
+    }
+
+    function toggleOpcionCatalogoPDF(opcion, val) {
+      if (opcion === 'prices') catalogPdfShowPrices = val;
+      if (opcion === 'stock') catalogPdfShowStock = val;
+      if (opcion === 'payment') catalogPdfIncludePayment = val;
+      renderPrevisualizacionCatalogoPDF();
+    }
+
+    function obtenerItemsFiltradosCatalogoPDF() {
+      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
+      let items = catalogItems.filter(i => !i.mode || i.mode === mode);
+
+      if (catalogPdfFilterType === 'producto') {
+        items = items.filter(i => (!i.itemType || i.itemType === 'producto'));
+      } else if (catalogPdfFilterType === 'servicio') {
+        items = items.filter(i => i.itemType === 'servicio');
+      } else if (catalogPdfFilterType !== 'todos') {
+        items = items.filter(i => (i.cat || 'General') === catalogPdfFilterType);
+      }
+
+      if (catalogPdfSearch && catalogPdfSearch.trim()) {
+        const q = catalogPdfSearch.toLowerCase().trim();
+        items = items.filter(i => (i.name && i.name.toLowerCase().includes(q)) || (i.cat && i.cat.toLowerCase().includes(q)));
+      }
+
+      return items;
+    }
+
+    function renderPrevisualizacionCatalogoPDF() {
+      const previewContainer = document.getElementById('catalogPdfPreviewContainer');
+      const printContainer = document.getElementById('catalogPdfPrintContainer');
+      const countEl = document.getElementById('lblPdfItemCount');
+      if (!previewContainer) return;
+
+      const items = obtenerItemsFiltradosCatalogoPDF();
+      if (countEl) countEl.innerText = `${items.length} ítems`;
+
+      const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'Mi Negocio';
+      const bizOwner = (bizProfile && bizProfile.owner) ? bizProfile.owner : '';
+      const bizPhone = (bizProfile && bizProfile.phone) ? bizProfile.phone : '';
+      const bizTypeStr = (bizProfile && bizProfile.type === 'retail') ? 'Tienda / Comercio' : 'Taller Creativo / Proyectos';
+      const bizSub = bizOwner ? `Por: ${bizOwner} • ${bizTypeStr}` : bizTypeStr;
+
+      const logoHtml = (bizProfile && bizProfile.logo)
+        ? `<img src="${bizProfile.logo}" style="width:48px; height:48px; border-radius:12px; object-fit:cover; border:1px solid #E2E8F0;">`
+        : `<div style="width:48px; height:48px; border-radius:12px; background:linear-gradient(135deg, #006C46 0%, #00D68F 100%); color:#FFFFFF; display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900;">${bizName.charAt(0).toUpperCase()}</div>`;
+
+      const fechaActual = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      if (items.length === 0) {
+        const emptyHtml = `
+          <div style="text-align:center; padding:36px 18px; color:#64748B;">
+            <div style="font-size:42px; margin-bottom:8px;">🏷️</div>
+            <div style="font-size:15px; font-weight:800; color:#0B1C30; margin-bottom:4px;">No hay productos con este filtro</div>
+            <div style="font-size:12px; max-width:320px; margin:0 auto; line-height:1.4;">Prueba seleccionando otra categoría o borra el texto de búsqueda.</div>
+          </div>
+        `;
+        previewContainer.innerHTML = emptyHtml;
+        if (printContainer) printContainer.innerHTML = emptyHtml;
+        return;
+      }
+
+      let cardsHtml = '';
+      items.forEach(item => {
+        const isServ = item.itemType === 'servicio';
+        const thumbHtml = item.image
+          ? `<img src="${item.image}" alt="${item.name.replace(/"/g, '&quot;')}" style="width:100%; height:100%; object-fit:cover;">`
+          : `<div style="font-size:38px; color:#CBD5E1;">${isServ ? '✂️' : '🎁'}</div>`;
+
+        const stockHtml = catalogPdfShowStock
+          ? `<span style="font-size:9.5px; font-weight:700; color:${isServ ? '#4F46E5' : (item.stock > 0 ? '#15803D' : '#DC2626')}; background:${isServ ? '#EEF2FF' : (item.stock > 0 ? '#DCFCE7' : '#FEE2E2')}; padding:2px 7px; border-radius:6px; white-space:nowrap;">
+              ${isServ ? '✂️ Por encargo' : (item.stock > 0 ? `✓ ${item.stock} disponibles` : '⚠️ Agotado')}
+            </span>`
+          : '';
+
+        const priceHtml = catalogPdfShowPrices
+          ? `<div style="margin-top:auto; padding-top:6px; border-top:1px dashed #E2E8F0; display:flex; justify-content:space-between; align-items:baseline;">
+              <span style="font-size:10px; color:#64748B; font-weight:600;">Precio:</span>
+              <span style="font-size:14px; font-weight:900; color:#006C46;">$${(item.price || 0).toLocaleString('es-CO')} <span style="font-size:9.5px; font-weight:700;">COP</span></span>
+            </div>`
+          : '';
+
+        cardsHtml += `
+          <div class="catalog-pdf-card">
+            <div class="catalog-pdf-img-wrap">
+              ${thumbHtml}
+            </div>
+            <div class="catalog-pdf-content">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; margin-bottom:5px;">
+                <span style="font-size:9.5px; font-weight:800; text-transform:uppercase; padding:2px 6px; border-radius:4px; background:${isServ ? '#EEF2FF; color:#4F46E5;' : '#F0FDF4; color:#15803D;'}">
+                  ${item.cat || (isServ ? 'Servicio' : 'General')}
+                </span>
+                ${stockHtml}
+              </div>
+              <div style="font-size:13px; font-weight:800; color:#0F172A; line-height:1.3; margin-bottom:6px;">
+                ${item.name}
+              </div>
+              ${priceHtml}
+            </div>
+          </div>
+        `;
+      });
+
+      let paymentSectionHtml = '';
+      if (catalogPdfIncludePayment) {
+        const metodos = obtenerMediosDePagoActivos();
+        if (metodos.length > 0 || (bizProfile && bizProfile.qrImage)) {
+          let mHtml = metodos.map(m => `
+            <div style="display:flex; align-items:center; gap:6px; font-size:11.5px; background:#FFFFFF; border:1px solid #CBD5E1; border-radius:8px; padding:6px 10px;">
+              <span>${m.icon}</span>
+              <span style="color:#64748B; font-weight:600;">${m.tipo}:</span>
+              <b style="color:#0F172A;">${m.dato}</b>
+            </div>
+          `).join('');
+
+          let qrHtml = (bizProfile && bizProfile.qrImage)
+            ? `<div style="display:flex; align-items:center; gap:8px; background:#FFFFFF; border:1px solid #CBD5E1; border-radius:8px; padding:6px 10px;">
+                <img src="${bizProfile.qrImage}" style="width:48px; height:48px; object-fit:contain; border-radius:6px;">
+                <div style="font-size:9.5px; color:#64748B; line-height:1.2;"><b>Código QR</b><br>Escanea para<br>transferir</div>
+              </div>`
+            : '';
+
+          paymentSectionHtml = `
+            <div style="margin-top:16px; background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:12px 14px; break-inside:avoid; page-break-inside:avoid;">
+              <div style="font-size:11.5px; font-weight:800; color:#0B1C30; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+                <span>💳</span> Cuentas y Medios de Pago Autorizados
+              </div>
+              <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+                ${mHtml}
+                ${qrHtml}
+              </div>
+            </div>
+          `;
+        }
+      }
+
+      const sheetHtml = `
+        <div class="catalog-pdf-sheet">
+          <!-- Encabezado de la Tienda -->
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2.5px solid #006C46; padding-bottom:12px; margin-bottom:12px; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              ${logoHtml}
+              <div>
+                <h1 style="font-size:20px; font-weight:900; color:#0B1C30; margin:0; line-height:1.2;">${bizName}</h1>
+                <div style="font-size:11.5px; color:#596273; margin-top:2px; font-weight:600;">${bizSub}</div>
+                ${bizPhone ? `<div style="font-size:11.5px; color:#006C46; margin-top:3px; font-weight:700;">📱 Pedidos al WhatsApp: <b>${bizPhone}</b></div>` : ''}
+              </div>
+            </div>
+            <div style="text-align:right; flex-shrink:0;">
+              <span style="display:inline-block; background:#E6F8F1; color:#006C46; font-size:10px; font-weight:800; padding:3px 8px; border-radius:6px; border:1px solid #A7F3D0;">CATÁLOGO OFICIAL</span>
+              <div style="font-size:10.5px; color:#64748B; margin-top:4px;">Edición: ${fechaActual}</div>
+              <div style="font-size:10.5px; font-weight:700; color:#0B1C30; margin-top:1px;">${items.length} productos listados</div>
+            </div>
+          </div>
+
+          <!-- Banner de Instrucciones al Cliente -->
+          <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:9px 12px; margin-bottom:14px; font-size:11px; color:#166534; display:flex; align-items:center; gap:8px;">
+            <span style="font-size:16px;">💡</span>
+            <span><b>¿Cómo hacer tu pedido?</b> Escríbenos al WhatsApp con el nombre de los productos que deseas o envíanos una captura de pantalla para apartarlos o elaborarlos a tu medida.</span>
+          </div>
+
+          <!-- Cuadrícula de Productos -->
+          <div class="catalog-pdf-grid">
+            ${cardsHtml}
+          </div>
+
+          <!-- Medios de Pago -->
+          ${paymentSectionHtml}
+
+          <!-- Pie de Página -->
+          <div style="margin-top:16px; padding-top:10px; border-top:1px solid #E2E8F0; text-align:center; font-size:10px; color:#94A3B8;">
+            ${bizName} • Catálogo digital para clientes • Creado con Zentra (Software Ágil para Micronegocios)
+          </div>
+        </div>
+      `;
+
+      previewContainer.innerHTML = sheetHtml;
+      if (printContainer) printContainer.innerHTML = sheetHtml;
+    }
+
+    function imprimirCatalogoPDF() {
+      const items = obtenerItemsFiltradosCatalogoPDF();
+      if (items.length === 0) {
+        showToast('⚠️ No hay productos seleccionados para exportar');
+        return;
+      }
+
+      renderPrevisualizacionCatalogoPDF();
+      document.body.classList.add('printing-catalog');
+
+      const removePrintClass = () => {
+        document.body.classList.remove('printing-catalog');
+        window.removeEventListener('afterprint', removePrintClass);
+      };
+
+      window.addEventListener('afterprint', removePrintClass);
+
+      showToast('✓ Abriendo diálogo de impresión. Elige "Guardar como PDF".');
+      setTimeout(() => {
+        window.print();
+        setTimeout(removePrintClass, 2000);
+      }, 150);
+    }
+
+    function generarTextoCatalogoWhatsApp() {
+      const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'Nuestra Tienda';
+      const items = obtenerItemsFiltradosCatalogoPDF();
+
+      let text = `✨ *CATÁLOGO OFICIAL • ${bizName.toUpperCase()}* ✨\n`;
+      text += `¡Hola! Aquí tienes nuestro catálogo de productos y servicios actualizado para que escojas tus favoritos:\n\n`;
+
+      if (items.length === 0) {
+        text += `_No hay productos registrados en este momento._\n\n`;
+      } else {
+        items.forEach(item => {
+          const isServ = item.itemType === 'servicio';
+          const icon = isServ ? '✂️' : '📦';
+          text += `${icon} *${item.name}*\n`;
+          if (catalogPdfShowPrices) {
+            text += `   💵 Precio: *$${(item.price || 0).toLocaleString('es-CO')} COP*\n`;
+          }
+          if (catalogPdfShowStock) {
+            const stockStr = isServ ? 'Elaborado por encargo' : (item.stock > 0 ? `${item.stock} disponibles` : 'Agotado');
+            text += `   ℹ️ Disponibilidad: ${stockStr}\n`;
+          }
+          if (item.cat) {
+            text += `   🏷️ Categoría: ${item.cat}\n`;
+          }
+          text += `\n`;
+        });
+      }
+
+      if (catalogPdfIncludePayment) {
+        const metodos = obtenerMediosDePagoActivos();
+        if (metodos.length > 0) {
+          text += `💳 *MEDIOS DE PAGO:*\n`;
+          metodos.forEach(m => {
+            text += `• ${m.icon} ${m.tipo}: *${m.dato}*\n`;
+          });
+          text += `\n`;
+        }
+      }
+
+      text += `📲 *¿CÓMO HACER TU PEDIDO?*\n`;
+      text += `Respóndenos a este mensaje con los productos que deseas y te confirmamos disponibilidad y entrega. ¡Con mucho gusto te atenderemos! 😊`;
+
+      return text;
+    }
+
+    function compartirCatalogoWhatsApp() {
+      const texto = generarTextoCatalogoWhatsApp();
+      const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'Mi Negocio';
+
+      if (navigator.share) {
+        navigator.share({
+          title: `Catálogo de Productos - ${bizName}`,
+          text: texto
+        }).then(() => {
+          showToast('✓ Catálogo compartido con éxito');
+        }).catch(err => {
+          if (err.name !== 'AbortError') {
+            abrirWhatsAppWebConTexto(texto);
+          }
+        });
+      } else {
+        abrirWhatsAppWebConTexto(texto);
+      }
+    }
+
+    function abrirWhatsAppWebConTexto(texto) {
+      const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+      window.open(url, '_blank');
+      showToast('✓ Abriendo WhatsApp para compartir tu catálogo');
+    }
+
+    function copiarTextoCatalogoWhatsApp() {
+      const texto = generarTextoCatalogoWhatsApp();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(texto).then(() => {
+          showToast('✓ Catálogo copiado al portapapeles. ¡Pégalo donde quieras!');
+        }).catch(() => {
+          fallbackCopiarTextoCatalogo(texto);
+        });
+      } else {
+        fallbackCopiarTextoCatalogo(texto);
+      }
+    }
+
+    function fallbackCopiarTextoCatalogo(texto) {
+      const t = document.createElement('textarea');
+      t.value = texto;
+      t.style.position = 'fixed';
+      t.style.left = '-9999px';
+      document.body.appendChild(t);
+      t.select();
+      try {
+        document.execCommand('copy');
+        showToast('✓ Catálogo copiado al portapapeles');
+      } catch (_) {
+        showToast('⚠️ No se pudo copiar automáticamente');
+      }
+      document.body.removeChild(t);
     }
 
     function abrirModalNuevoProducto() {

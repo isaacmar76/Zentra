@@ -647,6 +647,36 @@ class CatalogItemModel {
      - Botón selector en la cabecera `[ 🖥️ Vista PC / 📱 Móvil ]` para alternar entre la vista amplia de oficina y la vista compacta de mostrador con persistencia en `localStorage.getItem('zentra_view_mode')`.
      - Paridad idéntica sincronizada en [index.html](file:///c:/Proyectos/MyBusiness/index.html), [preview.html](file:///c:/Proyectos/MyBusiness/preview.html) y [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html).
 
+#### Hito 28: Módulo de Exportación y Compartir Catálogo a Clientes en PDF y WhatsApp
+- **Requerimiento del Usuario:**
+  - *"crea una opcion con la que pueda exportar mi catalogo a pdf para compartir con los clientes y asi puedan ver mis productos y escoger"*
+  - Permitir a los microempresarios generar un catálogo visualmente profesional con fotos, nombres y precios de venta al público para que sus clientes escojan y ordenen con facilidad.
+- **Implementación Técnica:**
+  1. **Accesibilidad Directa en la App:**
+     - Botón destacado `[ 📄 Exportar Catálogo para Clientes (PDF & WhatsApp) ]` en el modal de catálogo (`#catalogModal`).
+     - Botón `[ 📄 Exportar PDF ]` en la vista integrada del catálogo (`#subSecCatalogo`).
+     - Botón rápido `[ 📄 Catálogo PDF ]` en el Cockpit de Inicio junto al resumen de ventas.
+  2. **Modal Interactivo de Configuración y Vista Previa (`#catalogPdfModal`):**
+     - **Filtro Inteligente:** Filtra entre "Todos los ítems", "📦 Solo Productos Físicos", "✂️ Solo Servicios y Encargos", o por categorías específicas existentes.
+     - **Buscador en Tiempo Real:** Búsqueda rápida por nombre de ítem o categoría.
+     - **Toggles Personalizables:**
+       - `Mostrar Precios COP`: Permite generar catálogos con o sin precios de venta.
+       - `Mostrar Disponibilidad`: Muestra existencias en stock ("✓ 8 disponibles") o fabricación por encargo ("✂️ Por encargo").
+       - `Incluir Medios de Pago & QR`: Agrega las cuentas bancarias configuradas (Nequi, Daviplata, Bancolombia) y el código QR de cobro.
+     - **Privacidad Comercial:** Los costos unitarios internos (`item.cost`) y márgenes de ganancia NUNCA se exponen ni se imprimen; únicamente los precios de venta al público.
+     - **Previsualización Dinámica:** Hoja tipo catálogo de revista con tipografía Inter, encabezado con logo, nombre comercial, contacto de WhatsApp y cuadrícula con fotos.
+  3. **Impresión Limpia y Guardado en PDF (`@media print`):**
+     - Contenedor aislado `#catalogPdfPrintContainer` y clase de control `body.printing-catalog`.
+     - Reglas de salto de página inteligente (`break-inside: avoid; page-break-inside: avoid;`) para que las tarjetas nunca se corten entre hojas.
+     - Compatible con la función nativa *"Guardar como PDF"* de navegadores en PC (Chrome, Edge, Safari) y en dispositivos móviles Android / iOS.
+     - Total compatibilidad con el sistema previo de recibos de pago.
+  4. **Compartir en WhatsApp en 1 Clic (`compartirCatalogoWhatsApp()`):**
+     - Genera un mensaje formateado con emojis estructurado por productos, precios, disponibilidad y datos de pago para transferencia.
+     - Soporta `navigator.share` (Web Share API) en celulares y fallback directo a `https://wa.me/?text=...` o copiado al portapapeles (`copiarTextoCatalogoWhatsApp()`).
+  5. **Paridad Total de Archivos:**
+     - Cambios sincronizados de forma idéntica en [index.html](file:///c:/Proyectos/MyBusiness/index.html), [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
+     - Actualización informativa en las landing pages [landing.html](file:///c:/Proyectos/MyBusiness/landing.html) y [site/index.html](file:///c:/Proyectos/MyBusiness/site/index.html).
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

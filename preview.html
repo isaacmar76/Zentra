@@ -8027,13 +8027,14 @@ ${estadoStr}${contactText}
       const inpField = document.getElementById('bizBackupEmailInp');
       if (inpField) inpField.value = email;
 
-      showToast('⏳ Preparando y enviando copia de seguridad...');
+      showToast('⏳ Preparando copia de seguridad...');
 
       const safeName = (bizProfile.name || 'Zentra');
       const dateStr = new Date().toLocaleString('es-CO');
+      const cleanFileName = `Zentra_Backup_${safeName.replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ]/g, '_')}_${new Date().toISOString().slice(0, 10)}.json`;
       const jsonContent = JSON.stringify(backup, null, 2);
 
-      let envioExitoso = false;
+      // 1. Intento de envío automático por servidor (si RESEND_API_KEY está configurada en Vercel)
       try {
         const res = await fetch('/api/send-backup', {
           method: 'POST',
@@ -8050,20 +8051,43 @@ ${estadoStr}${contactText}
 
         const data = await res.json().catch(() => ({}));
         if (res.ok && data.success) {
-          envioExitoso = true;
-          showToast(`✉️ ¡Copia de seguridad enviada con éxito a ${email}!`);
+          showToast(`✉️ ¡Copia enviada directamente por correo a ${email}!`);
+          alert(`✅ ¡Copia de seguridad enviada con éxito a ${email}!\n\nRevisa tu bandeja de entrada o la carpeta de Spam.`);
           return;
         }
       } catch (err) {
         console.warn('API serverless de correo no disponible directamente:', err);
       }
 
-      // Fallback universal: Descargar copia de respaldo y preparar correo con mailto
+      // 2. Compartir archivo nativo con adjunto real (Móviles Android / iOS con Web Share API)
+      const backupBlob = new Blob([jsonContent], { type: 'application/json' });
+      try {
+        const backupFile = new File([backupBlob], cleanFileName, { type: 'application/json' });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [backupFile] })) {
+          await navigator.share({
+            title: `🛡️ Respaldo Zentra - ${safeName}`,
+            text: `Copia de seguridad de "${safeName}" (${dateStr}). Guarda este archivo .json adjunto para restaurar tu negocio en cualquier PC o celular.`,
+            files: [backupFile]
+          });
+          showToast('✓ Archivo compartido con éxito');
+          return;
+        }
+      } catch (shareErr) {
+        console.warn('Share API cancelado o no disponible:', shareErr);
+      }
+
+      // 3. Descarga directa en el dispositivo (Descargas / Downloads)
       descargarCopiaSeguridad();
-      const subject = encodeURIComponent(`🛡️ Copia de Seguridad Zentra - ${safeName} (${dateStr})`);
-      const body = encodeURIComponent(`Hola ${bizProfile.owner || ''},\n\nSe ha generado el respaldo completo de tu negocio "${safeName}" el ${dateStr}.\n\nResumen de datos guardados:\n- Proyectos / Encargos: ${backup.summary.totalProyectos}\n- Productos en catálogo: ${backup.summary.totalCatalogo}\n- Cotizaciones activas: ${backup.summary.totalCotizaciones}\n- Tareas pendientes: ${backup.summary.totalTareas}\n- Directorio de clientes: ${backup.summary.totalClientes}\n\nGuarda este archivo. En caso de cambiar de teléfono o necesitar restaurar tu negocio, entra a Zentra y pulsa "Restaurar Negocio desde Copia".\n\nZentra • Gestión Ágil para Micronegocios`);
-      window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
-      showToast(`📋 Se descargó el archivo y se preparó el correo para ${email}.`);
+
+      // Alerta clara y pedagógica al comerciante
+      alert(
+        `📥 Archivo de Respaldo Descargado con Éxito\n\n` +
+        `El archivo se ha guardado en las descargas de tu dispositivo como:\n` +
+        `📄 ${cleanFileName}\n\n` +
+        `💡 Para abrir tu negocio en el computador:\n` +
+        `1. Pásate este archivo al PC (por WhatsApp, Telegram o correo).\n` +
+        `2. En el PC abre la página de Zentra y haz clic en "🔐 Ingresar a Mi Tienda" ➔ "Sincronizar desde Celular".`
+      );
     }
 
     function restaurarNegocioDesdeJSON(backup) {

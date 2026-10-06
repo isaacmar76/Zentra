@@ -1767,11 +1767,8 @@
       <section id="layoutViewB" class="home-layout-section" style="display:none;">
         <!-- Barra de métricas POS -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px;">
-          <div onclick="verDesgloseGlobal()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; cursor:pointer;" title="Ver desglose de caja y ventas">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-              <div style="font-size:9.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Ventas de Hoy</div>
-              <span style="font-size:10px; color:var(--primary); font-weight:700;">Ver ➔</span>
-            </div>
+          <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px;">
+            <div style="font-size:9.5px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Ventas de Hoy</div>
             <div style="font-size:15px; font-weight:800; color:var(--primary); margin-top:2px;" id="posVentasHoyVal">$0</div>
           </div>
           <div onclick="abrirModalCotizaciones()" style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:14px; padding:10px 12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer;">
@@ -2972,8 +2969,8 @@
     </div>
 
     <!-- Modal: Catálogo e Inventario -->
-    <div id="catalogModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:500; align-items:flex-end; justify-content:center;">
-      <div style="background:var(--card-bg); width:100%; max-width:480px; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text); box-sizing:border-box;">
+    <div id="catalogModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:300; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
           <div>
             <div style="font-size:17px; font-weight:800; color:var(--text);">📦 Catálogo & Pedidos</div>
@@ -3299,8 +3296,8 @@
     </div>
 
     <!-- Modal: Carrito de Compras / Mostrador (Retail POS) -->
-    <div id="retailCartModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:510; align-items:flex-end; justify-content:center;">
-      <div style="background:var(--card-bg); width:100%; max-width:480px; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text); box-sizing:border-box;">
+    <div id="retailCartModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:360; align-items:flex-end; justify-content:center;">
+      <div style="background:var(--card-bg); width:100%; border-radius:28px 28px 0 0; padding:22px 18px; max-height:88%; overflow-y:auto; color:var(--text);">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
           <div>
             <div style="font-size:17px; font-weight:800; color:var(--text);">🛒 Carrito de Mostrador / Pedido</div>
@@ -3823,9 +3820,6 @@
     let catalogTypeFilter = 'todos';
     let selectedProjectIdx = 0;
     let catalogFilter = 'servicios';
-    let catalogPickerTarget = 'cart';
-    let tempProductPhoto = null;
-    let tempOrderItems = [];
     let currentFormAction = null;
 
     // Estado de Cotizaciones y Carritos Guardados (Seguimiento Comercial)
@@ -4170,7 +4164,7 @@
     // ==========================================
     function abrirSelectorRapidoNegocios() {
       const modal = document.getElementById('selectorRapidoTiendasModal');
-      const bModal = document.getElementById('bizModal');
+      const bModal = document.getElementById('businessProfileModal');
       if (bModal) bModal.style.display = 'none';
       renderListaRapidaTiendas();
       if (modal) modal.style.display = 'flex';
@@ -5644,7 +5638,7 @@
 
       // 5. Refrescar lista de negocios
       renderSavedBusinessesList();
-      const modal = document.getElementById('bizModal');
+      const modal = document.getElementById('businessProfileModal');
       if (modal && modal.style.display === 'flex') {
         cerrarBusinessProfileModal();
       }
@@ -6112,28 +6106,25 @@
     }
 
     function switchServiciosTab(tab) {
-      const tabPed = document.getElementById('segTabPedidos');
-      if (tabPed) tabPed.classList.toggle('active', tab === 'pedidos');
-      const tabCli = document.getElementById('segTabClientes');
-      if (tabCli) tabCli.classList.toggle('active', tab === 'clientes');
-      const tabMov = document.getElementById('segTabMovimientos');
-      if (tabMov) tabMov.classList.toggle('active', tab === 'movimientos');
-      const tabCat = document.getElementById('segTabCatalogo');
-      if (tabCat) tabCat.classList.toggle('active', tab === 'catalogo');
+      document.getElementById('segTabPedidos').classList.toggle('active', tab === 'pedidos');
+      if (document.getElementById('segTabClientes')) document.getElementById('segTabClientes').classList.toggle('active', tab === 'clientes');
+      document.getElementById('segTabMovimientos').classList.toggle('active', tab === 'movimientos');
+      document.getElementById('segTabCatalogo').classList.toggle('active', tab === 'catalogo');
 
-      const secPed = document.getElementById('subSecPedidos');
-      if (secPed) secPed.style.display = tab === 'pedidos' ? 'block' : 'none';
-      const secCli = document.getElementById('subSecClientes');
-      if (secCli) secCli.style.display = tab === 'clientes' ? 'block' : 'none';
-      const secMov = document.getElementById('subSecMovimientos');
-      if (secMov) secMov.style.display = tab === 'movimientos' ? 'block' : 'none';
-      const secCat = document.getElementById('subSecCatalogo');
-      if (secCat) secCat.style.display = tab === 'catalogo' ? 'block' : 'none';
+      document.getElementById('subSecPedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
+      if (document.getElementById('subSecClientes')) document.getElementById('subSecClientes').style.display = tab === 'clientes' ? 'block' : 'none';
+      document.getElementById('subSecMovimientos').style.display = tab === 'movimientos' ? 'block' : 'none';
+      document.getElementById('subSecCatalogo').style.display = tab === 'catalogo' ? 'block' : 'none';
 
       if (tab === 'pedidos') renderProjectsList();
       if (tab === 'clientes') renderClientesList();
       if (tab === 'movimientos') renderGeneralMovimientos();
       if (tab === 'catalogo') renderCatalogIntegrated();
+    }
+
+    function irInicio() {
+      aplicarModalidadNegocio();
+      switchServiciosTab('pedidos');
     }
 
     function renderGeneralMovimientos() {
@@ -6220,21 +6211,18 @@
     }
 
     function aplicarModalidadNegocio() {
-      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
-      const vServ = document.getElementById('viewServicios');
-      if (vServ) vServ.style.display = mode === 'servicios' ? 'block' : 'none';
-      const vRet = document.getElementById('viewRetail');
-      if (vRet) vRet.style.display = mode === 'retail' ? 'block' : 'none';
-      const hTitle = document.getElementById('headerTitle');
-      if (hTitle) hTitle.innerText = `${(bizProfile && bizProfile.name) || 'Zentra'} • ${mode === 'servicios' ? 'Servicios' : 'Retail'}`;
-      const lblType = document.getElementById('lblBizType');
-      if (lblType) {
-        lblType.innerText = mode === 'servicios' ? '🎨 Servicios / Por Encargo' : '🛒 Retail / Mostrador';
+      const mode = bizProfile.type || 'servicios';
+      document.getElementById('viewServicios').style.display = mode === 'servicios' ? 'block' : 'none';
+      document.getElementById('viewRetail').style.display = mode === 'retail' ? 'block' : 'none';
+      document.getElementById('headerTitle').innerText = `${bizProfile.name || 'Zentra'} • ${mode === 'servicios' ? 'Servicios' : 'Retail'}`;
+      if (document.getElementById('lblBizType')) {
+        document.getElementById('lblBizType').innerText = mode === 'servicios' ? '🎨 Servicios / Por Encargo' : '🛒 Retail / Mostrador';
       }
       if (mode === 'retail') {
         renderPos();
+      } else {
+        recalcularTodo();
       }
-      recalcularTodo();
     }
 
     function calcularComprasProyecto(p) {
@@ -7677,10 +7665,10 @@ ${estadoStr}${contactText}
           : `<span style="font-size:11px; font-weight:700; color:${isLow ? 'var(--alert)' : '#15803D'};">${isLow ? '⚠️ ' : ''}${item.stock} disp</span>`;
 
         const actionBtn = (catalogPickerTarget === 'active_project')
-          ? `<button onclick="seleccionarProductoParaProyectoPorId('${item.id}')" style="background:var(--secondary); color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">+ Proyecto</button>`
+          ? `<button onclick="seleccionarProductoParaProyecto(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="background:var(--secondary); color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">+ Proyecto</button>`
           : (catalogPickerTarget === 'new_order')
           ? `<button onclick="agregarItemDesdePicker('${item.id}')" style="background:var(--secondary); color:#fff; border:none; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; white-space:nowrap;">+ Encargo</button>`
-          : `<button onclick="agregarAlCarritoRetailPorId('${item.id}')" style="background:var(--primary); color:#fff; border:none; padding:6px 12px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.2);"><span>🛒</span> + Agregar</button>`;
+          : `<button onclick="agregarAlCarritoRetail(${JSON.stringify(item).replace(/"/g, '&quot;')})" style="background:var(--primary); color:#fff; border:none; padding:6px 12px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.2);"><span>🛒</span> + Agregar</button>`;
 
         card.innerHTML = `
           <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
@@ -7715,38 +7703,6 @@ ${estadoStr}${contactText}
         `;
         container.appendChild(card);
       });
-    }
-
-    function agregarAlCarritoRetailPorId(id) {
-      const p = catalogItems.find(x => x.id === id);
-      if (p) agregarAlCarritoRetail(p);
-    }
-
-    function seleccionarProductoParaProyecto(item) {
-      if (!item) return;
-      if (selectedProjectIdx < 0 || !projectsData[selectedProjectIdx]) {
-        showToast('No hay un proyecto activo seleccionado.');
-        cerrarModalCatalogoInventario();
-        return;
-      }
-      const p = projectsData[selectedProjectIdx];
-      if (!p.tasks) p.tasks = [];
-      p.tasks.push({
-        id: 'task_' + Date.now(),
-        text: `${item.name} (${item.cat || 'Insumo'})`,
-        isPurchase: true,
-        cost: item.cost || item.price || 0,
-        isDone: true
-      });
-      persistirEstadoLocal();
-      recalcularTodo();
-      cerrarModalCatalogoInventario();
-      showToast(`✓ Insumo "${item.name}" asignado al proyecto.`);
-    }
-
-    function seleccionarProductoParaProyectoPorId(id) {
-      const p = catalogItems.find(x => x.id === id);
-      if (p) seleccionarProductoParaProyecto(p);
     }
 
     function eliminarProductoCatalogo(id) {
@@ -9203,11 +9159,7 @@ ${estadoStr}${contactText}
     // OPCIÓN B: TERMINAL MOSTRADOR RÁPIDO (POS)
     // ------------------------------------------
     function renderLayoutPos() {
-      const totalVentasPOS = generalIncomes
-        .filter(i => (i.desc && (i.desc.includes('Venta POS') || i.desc.includes('Venta catálogo') || i.desc.includes('Factura'))))
-        .reduce((sum, i) => sum + (i.amount || 0), 0);
-      const totalAbonosProyectos = projectsData.reduce((s, p) => s + (p.cobrado || 0), 0);
-      const totalVentas = (bizProfile && bizProfile.type === 'retail') ? totalVentasPOS : (totalVentasPOS + totalAbonosProyectos);
+      const totalVentas = projectsData.reduce((s, p) => s + (p.cobrado || 0), 0);
       const elVentas = document.getElementById('posVentasHoyVal');
       if (elVentas) elVentas.innerText = `$${totalVentas.toLocaleString('es-CO')}`;
 
@@ -9261,7 +9213,7 @@ ${estadoStr}${contactText}
       items.forEach(p => {
         const card = document.createElement('div');
         card.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:16px; padding:10px; display:flex; flex-direction:column; justify-content:space-between; height:120px; box-shadow:0 2px 6px rgba(0,0,0,0.02); cursor:pointer;';
-        card.onclick = () => agregarAlCarritoRetail(p);
+        card.onclick = () => agregarProductoAlCarritoRetail(p.id);
 
         const thumb = p.image
           ? `<img src="${p.image}" style="width:28px; height:28px; border-radius:8px; object-fit:cover;">`
@@ -9277,7 +9229,7 @@ ${estadoStr}${contactText}
               <div style="font-size:13.5px; font-weight:800; color:var(--primary);">$${p.price.toLocaleString('es-CO')}</div>
               <div style="font-size:9.5px; color:var(--text-muted);">${p.itemType === 'servicio' ? 'Servicio' : `${p.stock} disp.`}</div>
             </div>
-            <button type="button" onclick="event.stopPropagation(); agregarAlCarritoRetailPorId('${p.id}')" style="background:var(--primary-soft); color:var(--primary); border:none; width:28px; height:28px; border-radius:8px; font-size:16px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center;">+</button>
+            <button style="background:var(--primary-soft); color:var(--primary); border:none; width:28px; height:28px; border-radius:8px; font-size:16px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center;">+</button>
           </div>
         `;
         grid.appendChild(card);
@@ -11116,7 +11068,7 @@ ${estadoStr}${contactText}
       await sincronizarConNubeFirebase(currentGoogleUser.uid);
       setTimeout(() => {
         cerrarModalSincronizacionNube();
-        const bizProfModal = document.getElementById('bizModal');
+        const bizProfModal = document.getElementById('businessProfileModal');
         if (bizProfModal) bizProfModal.style.display = 'none';
         irInicio();
       }, 700);

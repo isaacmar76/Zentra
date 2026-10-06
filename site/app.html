@@ -3630,6 +3630,10 @@
             <button type="button" onclick="cerrarSesionGoogle()" style="background:transparent; border:none; color:var(--alert); font-size:11.5px; font-weight:700; cursor:pointer; padding:6px; margin-top:4px;">
               Desconectar Cuenta de Google
             </button>
+            <button type="button" onclick="ejecutarDiagnosticoFirebase()" style="background:none; border:none; color:var(--text-muted); font-size:10.5px; font-weight:700; cursor:pointer; padding:4px; display:inline-flex; align-items:center; justify-content:center; gap:4px; margin-top:4px;">
+              <span class="material-symbols-outlined" style="font-size:14px;">build</span>
+              <span>🔍 Diagnóstico de Conexión</span>
+            </button>
           </div>
         </div>
 
@@ -3657,6 +3661,13 @@
             <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">qr_code_scanner</span>
             <span>Vincular por Código QR (Estilo WhatsApp)</span>
           </button>
+
+          <div style="text-align:center; margin-top:10px;">
+            <button type="button" onclick="ejecutarDiagnosticoFirebase()" style="background:none; border:none; color:var(--text-muted); font-size:10.5px; font-weight:700; cursor:pointer; padding:4px; display:inline-flex; align-items:center; gap:4px;">
+              <span class="material-symbols-outlined" style="font-size:14px;">build</span>
+              <span>🔍 Diagnóstico de Conexión</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -9855,6 +9866,22 @@ ${estadoStr}${contactText}
             });
           } catch (_) {}
 
+          // Manejar retorno de redirección móvil (Google Redirect en Android / iOS)
+          fbAuth.getRedirectResult().then(result => {
+            if (result && result.user) {
+              showToast(`✓ ¡Bienvenido(a), ${result.user.displayName || result.user.email}!`);
+              handleGoogleAuthState(result.user);
+            }
+          }).catch(err => {
+            console.error('Error getRedirectResult:', err);
+            window.lastAuthError = err;
+            if (err.code === 'auth/unauthorized-domain') {
+              alert('⚠️ Dominio no autorizado en Firebase.\n\nPor favor agrega "' + window.location.hostname + '" en Firebase Console > Authentication > Settings > Authorized domains.');
+            } else if (err.code) {
+              alert('⚠️ Error de inicio de sesión con Google: ' + err.message);
+            }
+          });
+
           // Escuchar cambios de autenticación con Google
           fbAuth.onAuthStateChanged(user => {
             handleGoogleAuthState(user);
@@ -9945,8 +9972,16 @@ ${estadoStr}${contactText}
         actualizarBadgeNubeUI('connected');
       } catch (err) {
         console.error('Error sincronizando con Firebase:', err);
+        window.lastFirebaseError = err;
         actualizarBadgeNubeUI('error');
-        showToast('⚠️ Modo Local activo (sin conexión a nube)');
+
+        if (err.code === 'permission-denied') {
+          alert('⚠️ Error de Reglas en Firebase (Permiso Denegado):\n\nTu base de datos Firestore tiene bloqueado el acceso.\n\n👉 Solución en 1 minuto:\nVe a console.firebase.google.com > Proyecto Zentra > Firestore Database > pestaña "Reglas" y cambia la regla a:\n\nallow read, write: if request.auth != null;');
+        } else if (err.code === 'not-found' || (err.message && err.message.includes('does not exist'))) {
+          alert('⚠️ Base de datos Firestore no encontrada:\n\nDebes ir a console.firebase.google.com > Firestore Database y hacer clic en "Crear base de datos".');
+        } else {
+          showToast('⚠️ Modo Local activo (sin conexión a nube)');
+        }
       }
     }
 
@@ -9996,7 +10031,8 @@ ${estadoStr}${contactText}
           updatedAt: new Date().toISOString()
         };
 
-        await fbDb.collection('tiendas').doc(uid).set(payload, { merge: true });
+        const cleanPayload = JSON.parse(JSON.stringify(payload));
+        await fbDb.collection('tiendas').doc(uid).set(cleanPayload, { merge: true });
         lastCloudSyncTimestamp = Date.now();
         localStorage.setItem('zentra_last_cloud_sync', lastCloudSyncTimestamp.toString());
         localStorage.setItem('zentra_last_local_update', lastCloudSyncTimestamp.toString());
@@ -10006,7 +10042,14 @@ ${estadoStr}${contactText}
         }
       } catch (err) {
         console.error('Error al subir a Firestore:', err);
+        window.lastFirebaseError = err;
         actualizarBadgeNubeUI('error');
+
+        if (err.code === 'permission-denied') {
+          alert('⚠️ Error de Reglas en Firebase (Permiso Denegado):\n\nTu base de datos Firestore tiene bloqueada la escritura.\n\n👉 Ve a console.firebase.google.com > Firestore Database > pestaña "Reglas" y coloca:\nallow read, write: if request.auth != null;');
+        } else if (err.code) {
+          alert('⚠️ Error al guardar en Firebase (' + err.code + '): ' + err.message);
+        }
       } finally {
         setTimeout(() => { isSavingToCloud = false; }, 800);
       }
@@ -10143,17 +10186,25 @@ ${estadoStr}${contactText}
         showToast(`✓ ¡Bienvenido(a), ${user.displayName || user.email}!`);
       } catch (error) {
         console.error('Error Google Sign-In:', error);
+        window.lastAuthError = error;
         if (error.code === 'auth/popup-closed-by-user') {
           showToast('Inicio de sesión cancelado.');
         } else if (error.code === 'auth/unauthorized-domain') {
           alert('⚠️ Dominio no autorizado en Firebase.\n\nPor favor agrega "' + window.location.hostname + '" en Firebase Console > Authentication > Settings > Authorized domains.');
         } else if (error.code === 'auth/operation-not-allowed') {
           alert('⚠️ El proveedor de Google no está habilitado en Firebase.\n\nPor favor ve a Firebase Console > Authentication > Sign-in method y habilita Google.');
+        } else if (error.code === 'auth/popup-blocked') {
+          showToast('⏳ Abriendo Google por redirección móvil...');
+          try {
+            await fbAuth.signInWithRedirect(provider);
+          } catch (rErr) {
+            alert('Error al redirigir: ' + rErr.message);
+          }
         } else {
           try {
             await fbAuth.signInWithRedirect(provider);
           } catch (redirectErr) {
-            showToast(`❌ Error al conectar con Google: ${error.message}`);
+            alert(`❌ Error al conectar con Google (${error.code || 'error'}): ${error.message}`);
           }
         }
       }
@@ -10199,6 +10250,41 @@ ${estadoStr}${contactText}
       }
       showToast('⏳ Sincronizando con Google Cloud...');
       sincronizarConNubeFirebase(currentGoogleUser.uid);
+    }
+
+    async function ejecutarDiagnosticoFirebase() {
+      let reporte = `📋 DIAGNÓSTICO DE CONEXIÓN FIREBASE\n`;
+      reporte += `• Dominio actual: ${window.location.hostname}\n`;
+      reporte += `• Firebase SDK: ${typeof firebase !== 'undefined' ? '✓ Cargado' : '❌ No cargado'}\n`;
+      reporte += `• Auth: ${fbAuth ? '✓ Activo' : '❌ No activo'}\n`;
+      reporte += `• Firestore: ${fbDb ? '✓ Activo' : '❌ No activo'}\n`;
+
+      if (currentGoogleUser) {
+        reporte += `• Usuario Google: ${currentGoogleUser.email}\n`;
+        reporte += `• UID: ${currentGoogleUser.uid.substring(0, 10)}...\n`;
+
+        showToast('⏳ Probando base de datos Firestore...');
+        try {
+          const docRef = fbDb.collection('tiendas').doc(currentGoogleUser.uid);
+          const snap = await docRef.get();
+          reporte += `• Lectura Firestore: ✓ ÉXITO (${snap.exists ? 'Documento existe' : 'Aún sin documento en nube'})\n`;
+          reporte += `\n🎉 ¡Tu conexión con Google Firebase está 100% OPERATIVA!`;
+        } catch (dbErr) {
+          reporte += `• Lectura Firestore: ❌ ERROR (${dbErr.code || dbErr.message})\n`;
+          if (dbErr.code === 'permission-denied') {
+            reporte += `\n⚠️ CAUSA: Las Reglas de Seguridad de Firestore están bloqueando el acceso.\n\n👉 Ve a console.firebase.google.com > Firestore Database > pestaña "Reglas" y cambia a:\nallow read, write: if request.auth != null;`;
+          } else if (dbErr.code === 'not-found' || (dbErr.message && dbErr.message.includes('does not exist'))) {
+            reporte += `\n⚠️ CAUSA: La base de datos no está creada en Firestore.\n\n👉 Ve a console.firebase.google.com > Firestore Database y pulsa "Crear base de datos".`;
+          }
+        }
+      } else {
+        reporte += `• Usuario Google: ❌ No has iniciado sesión.\n👉 Pulsa "Continuar con Google" para conectar.`;
+      }
+
+      if (window.lastFirebaseError) {
+        reporte += `\n\n[Último error registrado: ${window.lastFirebaseError.code || window.lastFirebaseError.message}]`;
+      }
+      alert(reporte);
     }
 
     function actualizarBadgeNubeUI(estado) {

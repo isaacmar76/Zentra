@@ -3524,8 +3524,9 @@
             <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:5px;">
               📲 Escanea para transferir:
             </div>
-            <div style="display:inline-block; background:#FFFFFF; padding:6px; border-radius:14px; border:1.5px solid #006C46; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-              <img id="recQrImgBottom" src="" alt="Código QR de Pago" style="width:130px; height:130px; object-fit:contain; display:block; border-radius:8px;">
+            <div style="display:inline-block; background:#FFFFFF; padding:6px; border-radius:14px; border:1.5px solid #006C46; box-shadow:0 2px 8px rgba(0,0,0,0.06); text-align:center;">
+              <canvas id="recQrCanvasBottom" width="260" height="260" style="width:130px; height:130px; display:block; border-radius:8px; background:#FFFFFF;"></canvas>
+              <img id="recQrImgBottom" src="" alt="Código QR de Pago" style="display:none; width:130px; height:130px; border-radius:8px;">
             </div>
             <div style="font-size:9.5px; color:#64748B; margin-top:4px;">
               Nequi • Bre-Be • Bancolombia • Billeteras Digitales
@@ -6956,14 +6957,49 @@
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
-        tempBizQrPhoto = e.target.result;
-        const prev = document.getElementById('bizQrPreview');
-        const btnRemove = document.getElementById('btnRemoveBizQr');
-        if (prev) {
-          prev.innerHTML = `<img src="${tempBizQrPhoto}" style="width:100%; height:100%; object-fit:contain; background:#fff;">`;
-        }
-        if (btnRemove) btnRemove.style.display = 'inline-block';
-        showToast('✓ Imagen del código QR cargada');
+        const rawData = e.target.result;
+        const img = new Image();
+        img.onload = function() {
+          const maxDim = 600; // Nitidez ultra-alta para lectura de QR sin saturar memoria
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const c = document.createElement('canvas');
+          c.width = w;
+          c.height = h;
+          const ctx = c.getContext('2d');
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, w, h);
+          ctx.drawImage(img, 0, 0, w, h);
+          tempBizQrPhoto = c.toDataURL('image/jpeg', 0.9);
+
+          const prev = document.getElementById('bizQrPreview');
+          const btnRemove = document.getElementById('btnRemoveBizQr');
+          if (prev) {
+            prev.innerHTML = `<img src="${tempBizQrPhoto}" style="width:100%; height:100%; object-fit:contain; background:#fff;">`;
+          }
+          if (btnRemove) btnRemove.style.display = 'inline-block';
+          showToast('✓ Código QR optimizado y listo');
+        };
+        img.onerror = function() {
+          tempBizQrPhoto = rawData;
+          const prev = document.getElementById('bizQrPreview');
+          const btnRemove = document.getElementById('btnRemoveBizQr');
+          if (prev) {
+            prev.innerHTML = `<img src="${tempBizQrPhoto}" style="width:100%; height:100%; object-fit:contain; background:#fff;">`;
+          }
+          if (btnRemove) btnRemove.style.display = 'inline-block';
+          showToast('✓ Imagen del código QR cargada');
+        };
+        img.src = rawData;
       };
       reader.readAsDataURL(file);
     }
@@ -7645,15 +7681,63 @@ ${estadoStr}${contactText}
         }
       }
 
+    function dibujarQrEnTicket(qrSource) {
+      return new Promise((resolve) => {
+        const qrCanvas = document.getElementById('recQrCanvasBottom');
+        const qrImgBottom = document.getElementById('recQrImgBottom');
+        const qrBottom = document.getElementById('recQrBottomContainer');
+        if (!qrCanvas || !qrSource) {
+          if (qrBottom) qrBottom.style.display = 'none';
+          return resolve(false);
+        }
+
+        if (qrImgBottom) qrImgBottom.src = qrSource;
+
+        const ctx = qrCanvas.getContext('2d');
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+
+        img.onload = () => {
+          ctx.fillStyle = '#FFFFFF';
+          ctx.fillRect(0, 0, qrCanvas.width, qrCanvas.height);
+
+          const cw = qrCanvas.width;
+          const ch = qrCanvas.height;
+          const iw = img.naturalWidth || img.width;
+          const ih = img.naturalHeight || img.height;
+          if (iw > 0 && ih > 0) {
+            const scale = Math.min(cw / iw, ch / ih);
+            const dw = iw * scale;
+            const dh = ih * scale;
+            const dx = (cw - dw) / 2;
+            const dy = (ch - dh) / 2;
+
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, dx, dy, dw, dh);
+          }
+          if (qrBottom) qrBottom.style.display = 'block';
+          resolve(true);
+        };
+
+        img.onerror = () => {
+          console.warn('No se pudo cargar la imagen del QR para el comprobante');
+          if (qrBottom) qrBottom.style.display = 'none';
+          resolve(false);
+        };
+
+        img.src = qrSource;
+      });
+    }
+
       // Medios de pago y QR al final
       const payContainer = document.getElementById('recPaymentContainer');
       const payTitle = document.getElementById('lblRecPaymentTitle');
       const payList = document.getElementById('recPaymentMethodsList');
       const qrBottom = document.getElementById('recQrBottomContainer');
-      const qrImgBottom = document.getElementById('recQrImgBottom');
 
       const metodos = obtenerMediosDePagoActivos();
-      const hasQr = !!(bizProfile && bizProfile.qrImage);
+      const hasQr = !!(bizProfile && bizProfile.qrImage && typeof bizProfile.qrImage === 'string' && bizProfile.qrImage.trim().length > 15 && bizProfile.qrImage !== 'null' && bizProfile.qrImage !== 'undefined');
 
       if (isQuote) {
         // EN COTIZACIÓN:
@@ -7673,9 +7757,8 @@ ${estadoStr}${contactText}
         }
 
         // QR Centrado siempre al final después de productos y total
-        if (hasQr && qrBottom && qrImgBottom) {
-          qrBottom.style.display = 'block';
-          qrImgBottom.src = bizProfile.qrImage;
+        if (hasQr && qrBottom) {
+          dibujarQrEnTicket(bizProfile.qrImage.trim());
         } else if (qrBottom) {
           qrBottom.style.display = 'none';
         }
@@ -7721,10 +7804,32 @@ ${estadoStr}${contactText}
 
       showToast('⏳ Generando imagen en alta definición...');
 
+      // 1. Si hay QR registrado, asegurar que esté 100% dibujado en el canvas antes de capturar
+      const qrCanvas = document.getElementById('recQrCanvasBottom');
+      const hasQr = !!(bizProfile && bizProfile.qrImage && typeof bizProfile.qrImage === 'string' && bizProfile.qrImage.trim().length > 15 && bizProfile.qrImage !== 'null' && bizProfile.qrImage !== 'undefined');
+      if (hasQr) {
+        await dibujarQrEnTicket(bizProfile.qrImage.trim());
+      }
+
+      // 2. Asegurar que cualquier imagen pendiente haya completado decodificación
+      const imgs = Array.from(card.querySelectorAll('img'));
+      await Promise.all(imgs.map(img => {
+        if (!img.src) return Promise.resolve();
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        if (img.decode) return img.decode().catch(() => {});
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+          setTimeout(resolve, 300);
+        });
+      }));
+
+      await new Promise(r => setTimeout(r, 60));
+
       const canvas = await html2canvas(card, {
         scale: 2, // 2x para máxima nitidez en pantallas de celular y PDF
         useCORS: true,
-        allowTaint: true,
+        allowTaint: false,
         backgroundColor: '#FFFFFF',
         logging: false,
         onclone: (clonedDoc) => {
@@ -7732,6 +7837,16 @@ ${estadoStr}${contactText}
           if (clonedCard) {
             clonedCard.style.boxShadow = 'none';
             clonedCard.style.margin = '0';
+          }
+          // Copiar píxeles del canvas original al canvas clonado en el iframe
+          if (qrCanvas) {
+            const cloneCanvas = clonedDoc.getElementById('recQrCanvasBottom');
+            if (cloneCanvas) {
+              cloneCanvas.width = qrCanvas.width;
+              cloneCanvas.height = qrCanvas.height;
+              const cloneCtx = cloneCanvas.getContext('2d');
+              cloneCtx.drawImage(qrCanvas, 0, 0);
+            }
           }
         }
       });

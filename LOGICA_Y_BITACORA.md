@@ -210,8 +210,8 @@ class CatalogItemModel {
 | **2026-10-05** | `510a7b9` | Fix / Modo Clásico V1 | Hito 32: Visualización Completa de Proyectos en Modo Clásico V1 (Filtro 'Producción' y normalización de estados) | ✅ Completado |
 | **2026-10-05** | `67da1e8` | Multi-Tenant / Firestore Sync | Hito 33: Aislamiento Total Multi-Tienda en Firestore, Smart-Merge Anti-Pérdida y Eliminación de Restricciones en Catálogo | ✅ Completado |
 | **2026-10-05** | `982ce6d` | Multi-Tenant / Cloud | Hito 34: Gestión y Eliminación de Tiendas Duplicadas o No Deseadas (Local & Firebase Cloud) | ✅ Completado |
-| **2026-10-05** | `current` | UI / Catálogo / Cloud Sync | Hito 35: Tareas a Modal en Barra Inferior con Notificación Badge en Modo Clásico, Campo Descripción Breve en Catálogo y Auto-Cierre de Sincronización en la Nube | ✅ Completado |
-
+| **2026-10-05** | `b901865` | UI / Catálogo / Cloud Sync | Hito 35: Tareas a Modal en Barra Inferior con Notificación Badge en Modo Clásico, Campo Descripción Breve en Catálogo y Auto-Cierre de Sincronización en la Nube | ✅ Completado |
+| **2026-10-05** | `current` | Resiliencia / Anti-Pérdida / Multi-Tienda | Hito 36: Blindaje de Arranque Anti-Pérdida, Auto-Recuperación de Proyectos/Catálogo, Selector Rápido Multi-Tienda (1-Tap Switch) y Banner Inteligente en Modo Clásico | ✅ Completado |
 
 ---
 
@@ -847,6 +847,39 @@ class CatalogItemModel {
      - `irInicio()` restaura además el estado `.active` en el botón `#btnNavHome` de la barra inferior.
   4. **Paridad Total de Archivos:**
      - Sincronización exacta al 100% de SHA-256 en los 4 archivos del repositorio: `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
+
+#### Hito 36: Blindaje de Arranque Anti-Pérdida, Auto-Recuperación de Proyectos/Catálogo, Selector Rápido Multi-Tienda (1-Tap Switch) y Banner Inteligente en Modo Clásico
+- **Requerimiento del Usuario / Alerta de Emergencia:**
+  - *"ahora tatiana volvio a abrir la app y no aparece ninguno de sus datos! que hiciste????"*
+  - Tatiana reabrió la app y reportó que no se visualizaban sus proyectos ni sus datos contables.
+- **Diagnóstico y Causa Raíz:**
+  1. **Bifurcación destructiva en `cargarEstadoLocal()`:** Si la clave `zentra_active_biz_id` era nula o apuntaba a un ID no coincidente en el registro local, el código ejecutaba `limpiarEstadoEnMemoria()`, vaciando `projectsData = []` y mostrando `$0` en pantalla antes de abrir el modal de login.
+  2. **Tienda Activa Desfasada / Cruce con Retail:** Al sincronizar o probar la tienda "Better Life" (modelo retail sin proyectos de taller), la tienda activa quedó configurada como Better Life. Al entrar en Modo Clásico, la pantalla mostraba 0 proyectos y $0 porque los proyectos de Tatiana pertenecen a "TM Diseños Creativos" (`biz_tm_disenos`), dando la falsa impresión de pérdida de datos.
+  3. **Ausencia de Auto-Recuperación para Proyectos:** Existía `autoRecuperarCatalogoSiVacio()`, pero no existía `autoRecuperarProyectosSiVacio()`. Si los proyectos se cargaban vacíos, no se consultaba el respaldo local `zentra_projects_backup_${bizId}` ni la clave legada `zentra_projects`.
+  4. **Falta de Selector Rápido Accesible en Modo Clásico:** El título `#clasicoBizName` no era interactivo ni permitía a Tatiana cambiar de tienda en 1 clic al abrir la app.
+- **Implementación Técnica:**
+  1. **Auto-Healer No Destructivo en `cargarEstadoLocal()`:**
+     - Se eliminó el vaciado indiscriminado de memoria (`limpiarEstadoEnMemoria()`).
+     - Si el layout activo es Modo Clásico (`layout_e`) y la tienda activa actual es retail o tiene 0 proyectos, el motor prioriza automáticamente la tienda de Tatiana (`biz_tm_disenos`) que contiene los proyectos y finanzas.
+     - Si `activeBizId` es nulo o inválido, busca en `registry` priorizando TM Diseños, luego tiendas con proyectos guardados, luego tiendas con catálogo, y carga el negocio sin mostrar pantallas en blanco ni requerir PIN.
+  2. **Motor de Auto-Recuperación de Proyectos (`autoRecuperarProyectosSiVacio()`):**
+     - Si `projectsData` está vacío, busca secuencialmente en: (1) `zentra_projects_backup_${bizId}`, (2) clave legada `zentra_projects`, (3) claves huérfanas `zentra_projects_*`, y (4) plantilla demostrativa `DEFAULT_PROJECTS_TM`.
+     - Guarda automáticamente copias de respaldo continuas en `zentra_projects_backup_${bizId}` en cada guardado.
+  3. **Auto-Recuperación de Catálogo y Clientes:**
+     - En `autoRecuperarCatalogoSiVacio()`, se garantiza fallback a `DEFAULT_CATALOG_TM_SERVICIOS` para TM Diseños Creativos.
+     - Si la lista de clientes está vacía para TM Diseños, se cargan los clientes predeterminados (`DEFAULT_CLIENTS_TM`).
+  4. **Selector Rápido de Tiendas (1-Tap Switch - `#selectorRapidoTiendasModal`):**
+     - Nuevo modal flotante interactivo que lista todas las tiendas del dispositivo con ícono (✂️ o 🛒), nombre, titular, conteo exacto de proyectos y productos, insignia de "Activa ✓" y botón directo "Abrir ➔".
+     - Al tocar una tienda, se ejecuta `ingresarDirectoANegocio(bizId)` cargando el 100% de los datos al instante sin pedir PIN ni contraseñas.
+     - Accesible desde el encabezado general (`#headerTitle`) y desde el nombre de tienda en Modo Clásico (`#clasicoBizName`).
+  5. **Banner Inteligente en Modo Clásico (`#bannerSwitchStoreTip`):**
+     - Si el usuario se encuentra visualizando otra tienda (ej. "Better Life") mientras TM Diseños Creativos tiene proyectos registrados, se despliega automáticamente una alerta ámbar destacada:
+       *📍 Estás viendo "Better Life". ¿Deseas abrir tus proyectos de TM Diseños Creativos? [Ir a TM ➔]*
+     - Un solo toque traslada a Tatiana inmediatamente a su tienda con todos sus proyectos y finanzas.
+  6. **Blindaje en Sincronización en la Nube (`sincronizarConNubeFirebase()`):**
+     - Impide la creación accidental de tiendas nuevas en blanco si existen datos huérfanos locales.
+  7. **Paridad Total de Archivos:**
+     - 100% de coincidencia SHA-256 en los 4 archivos de producción: `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
 
 ---
 

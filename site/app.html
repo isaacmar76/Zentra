@@ -8822,9 +8822,10 @@ ${estadoStr}${contactText}
       const elGastos = document.getElementById('txtGastosE');
       if (elGastos) elGastos.innerText = `$${totalGastos.toLocaleString('es-CO')}`;
 
+      const isCollaborator = currentUser && currentUser.role === 'COLLABORATOR';
       const elGanancia = document.getElementById('txtGananciaE');
       if (elGanancia) {
-        if (currentUserRole === 'COLLABORATOR') {
+        if (isCollaborator) {
           elGanancia.innerText = '••••••';
         } else {
           elGanancia.innerText = `$${gananciaReal.toLocaleString('es-CO')}`;
@@ -8863,6 +8864,13 @@ ${estadoStr}${contactText}
             const ganancia = (p.cobrado || 0) - compras;
             const daysLeft = p.daysLeft !== undefined ? p.daysLeft : 3;
             const isUrgent = !isDelivered && daysLeft <= 3;
+            const st = p.status || 'En Proceso';
+
+            let statusIcon = '🎨';
+            if (st === 'Producción') statusIcon = '✂️';
+            else if (st === 'Empaque') statusIcon = '📦';
+            else if (st === 'Entregado') statusIcon = '✅';
+            else if (st === 'Cotización') statusIcon = '📋';
 
             const card = document.createElement('div');
             card.className = 'card-item-v1';
@@ -8871,16 +8879,16 @@ ${estadoStr}${contactText}
               <div class="item-header-v1">
                 <span class="item-title-v1">${p.name}</span>
                 <span class="badge-v1 ${isUrgent ? 'badge-urgent-v1' : (isDelivered ? 'badge-v1' : 'badge-status-v1')}">
-                  ${isDelivered ? 'Entregado ✓' : (isUrgent ? `Vence en ${daysLeft} días` : (p.status || 'En Proceso'))}
+                  ${isDelivered ? 'Entregado ✓' : (isUrgent ? `Vence en ${daysLeft} días` : st)}
                 </span>
               </div>
               <div class="item-detail-v1">
                 <span>Cliente: <b>${p.client || 'Cliente General'}</b></span>
-                <span style="font-weight: 700; color: #5C4A3E;">Ganancia: ${currentUserRole === 'COLLABORATOR' ? '••••••' : '$' + ganancia.toLocaleString('es-CO')}</span>
+                <span style="font-weight: 700; color: #5C4A3E;">Ganancia: ${isCollaborator ? '••••••' : '$' + ganancia.toLocaleString('es-CO')}</span>
               </div>
               <div class="item-detail-v1" style="margin-top: 6px; align-items:center;">
                 <span style="font-size:10.5px; opacity:0.85;">${p.services || 'Encargo personalizado'}</span>
-                <span class="badge-v1 badge-status-v1" style="font-size:9.5px;">${p.status || 'En Diseño'}</span>
+                <span class="badge-v1 badge-status-v1" style="font-size:9.5px;">${statusIcon} ${st}</span>
               </div>
             `;
             listCont.appendChild(card);

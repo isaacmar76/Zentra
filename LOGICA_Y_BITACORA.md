@@ -762,6 +762,23 @@ class CatalogItemModel {
   8. **Paridad Total de Archivos:**
      - Replicado en [index.html](file:///c:/Proyectos/MyBusiness/index.html), [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
 
+#### Hito 32: Corrección de Renderizado en Modo Clásico V1 (Layout E) y Visibilidad de Proyectos en Producción
+- **Reporte del Usuario:**
+  - *"queiro que revises el modo Clasico, tatiana ha creado 2 proyectos que estan en estado produccion y aun asi no se ven en el listado de Proyectos de la vista principal"*
+- **Causa Raíz Identificada:**
+  - En la función `renderLayoutClasicoV1()`, se evaluaba directamente la variable no declarada `currentUserRole === 'COLLABORATOR'`.
+  - En la arquitectura global de Zentra, el rol del usuario se aloja en el objeto `currentUser` (`currentUser.role`).
+  - Al no existir `currentUserRole` en el ámbito léxico, invocar `renderLayoutClasicoV1()` (o `recalcularTodo()` tras crear/actualizar un proyecto) disparaba de inmediato una excepción fatal `ReferenceError: currentUserRole is not defined`.
+  - Esta excepción abortaba la ejecución de la función antes de alcanzar el bloque que renderiza los proyectos (`document.getElementById('projectsListE')`), provocando que la lista de "Proyectos en Curso" quedara en blanco y no mostrara los proyectos creados (incluidos los que estaban en estado 'Producción').
+- **Solución Técnica Aplicada:**
+  1. **Corrección de Ámbito en `renderLayoutClasicoV1`:**
+     - Se sustituyó la referencia huérfana por la comprobación segura: `const isCollaborator = currentUser && currentUser.role === 'COLLABORATOR';`.
+     - Se utilizó `isCollaborator` tanto para ocultar la ganancia global (`#txtGananciaE`) como para enmascarar la ganancia por proyecto en cada tarjeta.
+  2. **Renderizado Enriquecido de Estados y Badges en Diseño Clásico:**
+     - Se dotó a las tarjetas de proyecto de Modo Clásico (`card-item-v1`) de íconos temáticos para cada fase operativa: `✂️ Producción`, `🎨 Diseño`, `📦 Empaque`, `✅ Entregado`, `📋 Cotización`.
+  3. **Paridad Total y Despliegue:**
+     - Sincronización exacta al 100% de SHA-256 en los 4 archivos clave: `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

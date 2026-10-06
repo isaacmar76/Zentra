@@ -16,6 +16,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..700,0..1,0&display=swap" rel="stylesheet">
+  <!-- Firebase SDK (Compat v10.12.0) y jsQR para Sincronización en la Nube y Vinculación QR -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <style>
     :root, [data-theme="zentra_clarity"] {
       /* Tema Fintech Clarity (Zentra Core - nuevo_diseño.md) */
@@ -1654,6 +1659,11 @@
           <span class="material-symbols-outlined" style="font-size:21px;">shopping_cart</span>
           <span id="headerCartBadge" style="position:absolute; top:-4px; right:-4px; background:#E53E3E; color:#FFFFFF; font-size:10px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.25); display:none;">0</span>
         </button>
+        <!-- Ícono de Sincronización en la Nube (Google Cloud) -->
+        <button class="icon-btn" id="btnCloudSyncStatus" onclick="abrirModalSincronizacionNube()" title="Estado de Sincronización en la Nube con Google" style="position:relative; background:var(--surface-container-low); border:1px solid var(--surface-border); color:var(--text); width:38px; height:38px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+          <span class="material-symbols-outlined" id="iconCloudSync" style="font-size:20px; color:var(--text-muted);">cloud_off</span>
+          <span id="dotCloudSync" style="position:absolute; top:5px; right:5px; width:7px; height:7px; border-radius:50%; background:#F59E0B; display:inline-block;"></span>
+        </button>
         <!-- Ícono de Mi Negocio / Configuración -->
         <button class="icon-btn" id="btnBusinessProfile" title="Datos del negocio y configuración" onclick="openBusinessProfileModal()" style="background:var(--surface-container-low); border:1px solid var(--surface-border); color:var(--text); width:38px; height:38px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
           <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">storefront</span>
@@ -2450,6 +2460,38 @@
           </div>
         </div>
 
+        <!-- Sección Sincronización en la Nube con Google (Firebase) -->
+        <div style="margin-top:16px; margin-bottom:12px; padding:14px; background:var(--surface-container-low); border:1px solid var(--surface-border); border-radius:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:20px; color:var(--primary);">cloud_sync</span>
+              <span style="font-size:13px; font-weight:800; color:var(--text);">Sincronización en la Nube (Google)</span>
+            </div>
+            <span id="bizCloudStatusBadge" style="font-size:9.5px; background:#FEF3C7; color:#B45309; padding:2px 8px; border-radius:8px; font-weight:800;">MODO LOCAL</span>
+          </div>
+          <div style="font-size:11px; color:var(--text-muted); line-height:1.35; margin-bottom:10px;">
+            Mantén tu tienda conectada en tiempo real entre tu celular y tu computador sin cables ni transferencias manuales.
+          </div>
+          <div id="bizCloudUserRow" style="display:none; align-items:center; gap:8px; margin-bottom:10px; padding:8px 10px; background:var(--card-bg); border-radius:12px; border:1px solid var(--surface-border);">
+            <div id="bizCloudAvatar" style="width:28px; height:28px; border-radius:50%; background:var(--primary); color:#FFF; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800;">G</div>
+            <div style="flex:1; overflow:hidden;">
+              <div id="bizCloudUserName" style="font-size:11.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Usuario</div>
+              <div id="bizCloudUserEmail" style="font-size:10px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">correo@gmail.com</div>
+            </div>
+            <button type="button" onclick="cerrarSesionGoogle()" style="background:none; border:none; color:var(--alert); font-size:10.5px; font-weight:700; cursor:pointer;">Desconectar</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button type="button" id="btnBizConnectGoogle" onclick="iniciarSesionConGoogle()" style="background:var(--primary); color:#FFFFFF; border:none; padding:8px 10px; border-radius:12px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:16px;">account_circle</span>
+              <span>Conectar Google</span>
+            </button>
+            <button type="button" onclick="sincronizarManualmenteConFirebase()" style="background:var(--card-bg); border:1.5px solid var(--primary); color:var(--primary); padding:8px 10px; border-radius:12px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:16px;">sync</span>
+              <span>Sincronizar Ya</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Sección Copia de Seguridad y Respaldo del Negocio -->
         <div style="margin-top:16px; margin-bottom:16px; padding:14px; background:var(--surface-container-low); border:1px solid var(--surface-border); border-radius:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
@@ -2538,6 +2580,29 @@
           <img src="img/zentra-logo.png" alt="Zentra Logo" style="width:76px; height:76px; object-fit:contain; margin-bottom:8px; border-radius:18px; background:#FFFFFF; padding:4px; box-shadow:0 4px 14px rgba(11,28,48,0.08); border:1px solid #E2E8F0; display:inline-block;">
           <div class="auth-title" style="font-size:19px; font-weight:800; color:#0B1C30; font-family:'Plus Jakarta Sans'; letter-spacing:-0.02em;">Portal Zentra</div>
           <div class="auth-sub" style="font-size:11.5px; color:#64748B; margin-top:2px;">Finanzas sin caos • Control ágil de tu negocio</div>
+        </div>
+
+        <!-- Acceso Rápido Nube: Google Sign-In & QR WhatsApp -->
+        <div style="margin-bottom:14px;">
+          <button type="button" onclick="iniciarSesionConGoogle()" class="google-btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; border-radius:14px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A; font-family:'Plus Jakarta Sans', sans-serif; font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.04); transition:all 0.18s ease;">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.58-5.17 3.58-9.15z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Continuar con Google</span>
+          </button>
+          <button type="button" onclick="abrirModalVincularQR()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:8px 12px; border-radius:12px; border:1px solid #E2E8F0; background:#F8FAFC; color:#475569; font-size:11px; font-weight:700; cursor:pointer; margin-top:6px;">
+            <span class="material-symbols-outlined" style="font-size:16px; color:var(--primary);">qr_code_scanner</span>
+            <span>Vincular por QR (Estilo WhatsApp)</span>
+          </button>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+          <div style="flex:1; height:1px; background:#E2E8F0;"></div>
+          <span style="font-size:10px; color:#94A3B8; font-weight:700; text-transform:uppercase;">O acceso manual local</span>
+          <div style="flex:1; height:1px; background:#E2E8F0;"></div>
         </div>
 
         <!-- Selector de Pestañas: Iniciar Sesión vs Crear Negocio -->
@@ -3526,6 +3591,125 @@
     <!-- Contenedor dedicado para Impresión Limpia a PDF (@media print) -->
     <div id="catalogPdfPrintContainer" style="display:none;"></div>
 
+    <!-- Modal: Sincronización en la Nube con Google Cloud -->
+    <div id="cloudSyncModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); backdrop-filter:blur(3px); z-index:900; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:var(--card-bg); width:100%; max-width:380px; border-radius:24px; padding:22px; color:var(--text); box-shadow:0 15px 40px rgba(0,0,0,0.25); max-height:90%; overflow-y:auto; border:1px solid var(--surface-border);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="material-symbols-outlined" style="font-size:24px; color:var(--primary);">cloud_sync</span>
+            <div style="font-size:16px; font-weight:800;">Sincronización en la Nube</div>
+          </div>
+          <button onclick="cerrarModalSincronizacionNube()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted); padding:4px;">✕</button>
+        </div>
+
+        <!-- Estado Conectado -->
+        <div id="modalCloudConnectedBox" style="display:none;">
+          <div style="background:var(--surface-container-low); border:1px solid var(--surface-border); border-radius:16px; padding:14px; margin-bottom:14px; text-align:center;">
+            <div id="modalCloudUserAvatar" style="width:48px; height:48px; border-radius:50%; background:var(--primary); color:#FFF; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; margin:0 auto 8px;">G</div>
+            <div id="modalCloudUserName" style="font-size:14px; font-weight:800; color:var(--text);">Usuario Google</div>
+            <div id="modalCloudUserEmail" style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">correo@gmail.com</div>
+            <div style="display:inline-flex; align-items:center; gap:5px; background:#DCFCE7; color:#166534; padding:3px 10px; border-radius:12px; font-size:10px; font-weight:800; margin-top:10px; border:1px solid #86EFAC;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#16A34A; display:inline-block;"></span>
+              <span>Sincronizado en Tiempo Real</span>
+            </div>
+          </div>
+
+          <div style="font-size:11.5px; color:var(--text-muted); line-height:1.4; margin-bottom:14px; text-align:center;">
+            Todos los cambios que hagas en tu celular o computador se sincronizan en vivo sin cables ni transferencias manuales.
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button type="button" onclick="sincronizarManualmenteConFirebase()" class="primary-btn" style="margin:0; padding:11px; font-weight:800; font-size:12.5px; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:18px;">sync</span>
+              <span>Forzar Sincronización Ahora</span>
+            </button>
+            <button type="button" onclick="abrirModalVincularQR()" style="background:var(--surface-subtle); border:1.5px solid var(--surface-border); color:var(--text); padding:10px; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">qr_code_scanner</span>
+              <span>Vincular por Código QR (WhatsApp)</span>
+            </button>
+            <button type="button" onclick="cerrarSesionGoogle()" style="background:transparent; border:none; color:var(--alert); font-size:11.5px; font-weight:700; cursor:pointer; padding:6px; margin-top:4px;">
+              Desconectar Cuenta de Google
+            </button>
+          </div>
+        </div>
+
+        <!-- Estado Desconectado -->
+        <div id="modalCloudDisconnectedBox">
+          <div style="text-align:center; padding:16px 10px; background:var(--surface-container-low); border:1px solid var(--surface-border); border-radius:16px; margin-bottom:14px;">
+            <div style="font-size:36px; margin-bottom:6px;">☁️</div>
+            <div style="font-size:13.5px; font-weight:800; color:var(--text); margin-bottom:4px;">Conecta tu Cuenta de Google</div>
+            <div style="font-size:11px; color:var(--text-muted); line-height:1.4;">
+              Respalda tu tienda en la nube de forma permanente y gratuita. Abre Zentra en tu computador o en cualquier celular manteniendo todo sincronizado al instante.
+            </div>
+          </div>
+
+          <button type="button" onclick="iniciarSesionConGoogle()" class="google-btn" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:12px 16px; border-radius:14px; border:1.5px solid #CBD5E1; background:#FFFFFF; color:#0F172A; font-family:'Plus Jakarta Sans', sans-serif; font-size:13px; font-weight:700; cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,0.06); margin-bottom:10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.66v3.05h3.88c2.27-2.09 3.58-5.17 3.58-9.15z"/>
+              <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.34 24 12 24z"/>
+              <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+              <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+            </svg>
+            <span>Continuar con Google</span>
+          </button>
+
+          <button type="button" onclick="abrirModalVincularQR()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 14px; border-radius:14px; border:1px solid var(--surface-border); background:var(--surface-subtle); color:var(--text); font-size:12px; font-weight:700; cursor:pointer;">
+            <span class="material-symbols-outlined" style="font-size:18px; color:var(--primary);">qr_code_scanner</span>
+            <span>Vincular por Código QR (Estilo WhatsApp)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Escanear QR con Cámara (Móvil escanea PC) -->
+    <div id="qrScanModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px); z-index:950; align-items:center; justify-content:center; padding:16px; flex-direction:column;">
+      <div style="background:#0F172A; width:100%; max-width:360px; border-radius:24px; padding:18px; color:#FFF; box-shadow:0 15px 40px rgba(0,0,0,0.5); text-align:center;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-size:14px; font-weight:800; display:flex; align-items:center; gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:20px; color:#00D68F;">qr_code_scanner</span>
+            <span>Escanear QR de Pantalla PC</span>
+          </div>
+          <button onclick="cerrarEscanerQR()" style="background:none; border:none; font-size:20px; color:#94A3B8; cursor:pointer; padding:4px;">✕</button>
+        </div>
+        <div style="font-size:11px; color:#94A3B8; margin-bottom:12px;">
+          Apunta con tu cámara al código QR que aparece en la pantalla del computador:
+        </div>
+        <div style="position:relative; width:100%; height:260px; border-radius:16px; overflow:hidden; background:#000; border:2px solid #00D68F;">
+          <video id="qrScanVideo" style="width:100%; height:100%; object-fit:cover;"></video>
+          <div style="position:absolute; top:15%; left:15%; width:70%; height:70%; border:2px dashed rgba(0,214,143,0.7); border-radius:12px; pointer-events:none;"></div>
+        </div>
+        <button type="button" onclick="cerrarEscanerQR()" style="margin-top:14px; width:100%; padding:10px; border-radius:12px; border:1px solid #334155; background:#1E293B; color:#CBD5E1; font-weight:700; font-size:12px; cursor:pointer;">
+          Cancelar Escaneo
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal: Mostrar QR en Pantalla (PC muestra QR) -->
+    <div id="qrDisplayModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); backdrop-filter:blur(3px); z-index:950; align-items:center; justify-content:center; padding:16px;">
+      <div style="background:var(--card-bg); width:100%; max-width:360px; border-radius:24px; padding:22px; color:var(--text); box-shadow:0 15px 40px rgba(0,0,0,0.25); text-align:center; border:1px solid var(--surface-border);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <div style="font-size:15px; font-weight:800; display:flex; align-items:center; gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:22px; color:var(--primary);">laptop_chromebook</span>
+            <span>Vincular con Computador</span>
+          </div>
+          <button onclick="cerrarModalQRPC()" style="background:none; border:none; font-size:20px; color:var(--text-muted); cursor:pointer; padding:4px;">✕</button>
+        </div>
+        <div style="font-size:11.5px; color:var(--text-muted); line-height:1.4; margin-bottom:16px;">
+          1. Abre Zentra en tu celular donde ya tienes tu cuenta iniciada.<br>
+          2. Toca <b>"Vincular por QR"</b> y enfoca este código con tu cámara:
+        </div>
+        <div style="padding:12px; background:#FFFFFF; border-radius:18px; display:inline-block; box-shadow:0 4px 16px rgba(0,0,0,0.06); border:1.5px solid var(--surface-border);">
+          <img id="imgDisplayQR" src="" alt="Código QR de Vinculación" style="width:200px; height:200px; display:block; border-radius:8px;">
+        </div>
+        <div id="lblQrDisplayStatus" style="font-size:11px; font-weight:700; color:var(--primary); margin-top:12px;">
+          Esperando escaneo desde tu celular...
+        </div>
+        <button type="button" onclick="cerrarModalQRPC()" style="margin-top:14px; width:100%; padding:9px; border-radius:12px; border:1px solid var(--surface-border); background:var(--surface-subtle); color:var(--text); font-weight:700; font-size:11.5px; cursor:pointer;">
+          Cerrar
+        </button>
+      </div>
+    </div>
+
     <!-- Toast -->
     <div class="toast" id="toastMsg">Venta registrada</div>
   </div>
@@ -3802,6 +3986,11 @@
           reg[idx].phone = bizProfile.phone;
           reg[idx].type = bizProfile.type;
           guardarRegistroNegocios(reg);
+        }
+
+        // Programar sincronización transparente con la nube si hay cuenta activa
+        if (typeof programarSincronizacionNube === 'function') {
+          programarSincronizacionNube();
         }
       } catch (e) {
         console.warn('Storage save error', e);
@@ -9530,18 +9719,20 @@ ${estadoStr}${contactText}
       );
     }
 
-    function restaurarNegocioDesdeJSON(backup) {
+    function restaurarNegocioDesdeJSON(backup, isSilent = false) {
       try {
         if (!backup || !backup.bizId || !backup.bizProfile) {
-          showToast('❌ El archivo no corresponde a una copia válida de Zentra');
+          if (!isSilent) showToast('❌ El archivo no corresponde a una copia válida de Zentra');
           return false;
         }
 
         const bizName = backup.bizProfile.name || 'Negocio';
         const fecha = backup.exportDate ? new Date(backup.exportDate).toLocaleString('es-CO') : 'Desconocida';
 
-        const confirmar = confirm(`¿Deseas restaurar la copia de seguridad de "${bizName}" del ${fecha}?\n\nEsto restaurará ${backup.projectsData?.length || 0} proyectos, ${backup.catalogItems?.length || 0} productos y todas tus configuraciones.`);
-        if (!confirmar) return false;
+        if (!isSilent) {
+          const confirmar = confirm(`¿Deseas restaurar la copia de seguridad de "${bizName}" del ${fecha}?\n\nEsto restaurará ${backup.projectsData?.length || 0} proyectos, ${backup.catalogItems?.length || 0} productos y todas tus configuraciones.`);
+          if (!confirmar) return false;
+        }
 
         const bizId = backup.bizId;
 
@@ -9559,6 +9750,10 @@ ${estadoStr}${contactText}
           localStorage.setItem('zentra_active_layout', backup.activeLayout);
         }
         localStorage.setItem('zentra_active_biz_id', bizId);
+        if (backup.exportTimestamp) {
+          localStorage.setItem('zentra_last_local_update', backup.exportTimestamp.toString());
+          localStorage.setItem('zentra_last_cloud_sync', backup.exportTimestamp.toString());
+        }
 
         // 2. Actualizar registro central de negocios
         const reg = obtenerRegistroNegocios();
@@ -9583,10 +9778,11 @@ ${estadoStr}${contactText}
         if (backup.activeLayout) {
           applyHomeLayout(backup.activeLayout, false);
         }
-        cerrarBusinessProfileModal();
-        irInicio();
-
-        showToast(`🎉 ¡Negocio "${bizName}" restaurado exitosamente!`);
+        if (!isSilent) {
+          cerrarBusinessProfileModal();
+          irInicio();
+          showToast(`🎉 ¡Negocio "${bizName}" restaurado exitosamente!`);
+        }
         return true;
       } catch (err) {
         console.error('Error al restaurar respaldo:', err);
@@ -9611,8 +9807,658 @@ ${estadoStr}${contactText}
       reader.readAsText(file);
     }
 
+    // =======================================================
+    // MOTOR DE INTEGRACIÓN GOOGLE FIREBASE Y SINCRONIZACIÓN EN TIEMPO REAL
+    // =======================================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAscjzcp4-d5UNoTUxYkaSqUrjmXxabkKs",
+      authDomain: "zentra-d2b9e.firebaseapp.com",
+      projectId: "zentra-d2b9e",
+      storageBucket: "zentra-d2b9e.firebasestorage.app",
+      messagingSenderId: "839899175783",
+      appId: "1:839899175783:web:4044684ba833a61ddd2dc2"
+    };
+
+    let fbApp = null;
+    let fbAuth = null;
+    let fbDb = null;
+    let currentGoogleUser = null;
+    let firebaseUnsubscribeSnapshot = null;
+    let isSavingToCloud = false;
+    let isApplyingCloudData = false;
+    let cloudSyncDebounceTimer = null;
+    let lastCloudSyncTimestamp = 0;
+
+    // Variables para escaneo y emparejamiento por QR (Estilo WhatsApp)
+    let qrVideoElement = null;
+    let qrCanvasElement = null;
+    let qrCanvasContext = null;
+    let qrScanningStream = null;
+    let qrScanAnimFrame = null;
+    let qrSessionListenerUnsub = null;
+
+    function initFirebase() {
+      try {
+        if (typeof firebase !== 'undefined') {
+          if (!firebase.apps.length) {
+            fbApp = firebase.initializeApp(firebaseConfig);
+          } else {
+            fbApp = firebase.app();
+          }
+          fbAuth = firebase.auth();
+          fbDb = firebase.firestore();
+
+          // Intentar habilitar persistencia offline en Firestore
+          try {
+            fbDb.enablePersistence({ synchronizeTabs: true }).catch(err => {
+              console.log('Firebase Persistence info:', err.code);
+            });
+          } catch (_) {}
+
+          // Escuchar cambios de autenticación con Google
+          fbAuth.onAuthStateChanged(user => {
+            handleGoogleAuthState(user);
+          });
+        }
+      } catch (err) {
+        console.warn('Firebase init error:', err);
+      }
+    }
+
+    function obtenerTimestampUltimoCambioLocal() {
+      const ts = localStorage.getItem('zentra_last_local_update');
+      return ts ? parseInt(ts, 10) : 0;
+    }
+
+    async function handleGoogleAuthState(user) {
+      if (user) {
+        currentGoogleUser = {
+          uid: user.uid,
+          email: user.email || '',
+          name: user.displayName || user.email || 'Usuario',
+          photo: user.photoURL || null
+        };
+        try {
+          localStorage.setItem('zentra_google_user', JSON.stringify(currentGoogleUser));
+        } catch (_) {}
+
+        actualizarBadgeNubeUI('connected');
+        actualizarInfoPerfilGoogleUI();
+
+        // Cerrar modal de bienvenida si estaba abierto
+        const authModal = document.getElementById('authScreenModal');
+        if (authModal && authModal.style.display === 'flex') {
+          authModal.style.display = 'none';
+        }
+
+        // Sincronizar datos con Firestore
+        await sincronizarConNubeFirebase(user.uid);
+      } else {
+        currentGoogleUser = null;
+        try {
+          localStorage.removeItem('zentra_google_user');
+        } catch (_) {}
+        if (firebaseUnsubscribeSnapshot) {
+          firebaseUnsubscribeSnapshot();
+          firebaseUnsubscribeSnapshot = null;
+        }
+        actualizarBadgeNubeUI('disconnected');
+        actualizarInfoPerfilGoogleUI();
+      }
+    }
+
+    async function sincronizarConNubeFirebase(uid) {
+      if (!fbDb || !uid) return;
+      actualizarBadgeNubeUI('syncing');
+
+      try {
+        const docRef = fbDb.collection('tiendas').doc(uid);
+        const docSnap = await docRef.get();
+
+        if (docSnap.exists) {
+          const cloudData = docSnap.data();
+          const localTs = obtenerTimestampUltimoCambioLocal();
+          const cloudTs = cloudData.exportTimestamp || 0;
+
+          // Si no hay negocio local activo o la nube es más reciente
+          if (!bizProfile || !bizProfile.id || cloudTs >= localTs) {
+            aplicarDatosNube(cloudData);
+            showToast('☁️ Tienda sincronizada desde la nube');
+          } else {
+            // El local es más reciente (por ejemplo, cambios recientes offline)
+            await subirEstadoANubeFirebase(uid, false);
+          }
+        } else {
+          // Documento no existe aún en Firestore
+          if (bizProfile && bizProfile.id) {
+            await subirEstadoANubeFirebase(uid, false);
+            showToast('☁️ Tu negocio se ha respaldado en Google Cloud');
+          } else {
+            // Usuario nuevo sin negocio local: crear negocio inicial
+            crearNegocioInicialParaUsuarioGoogle(currentGoogleUser);
+            await subirEstadoANubeFirebase(uid, false);
+          }
+        }
+
+        // Iniciar escucha reactiva en tiempo real (Realtime Snapshot)
+        suscribirCambiosEnTiempoReal(uid);
+        actualizarBadgeNubeUI('connected');
+      } catch (err) {
+        console.error('Error sincronizando con Firebase:', err);
+        actualizarBadgeNubeUI('error');
+        showToast('⚠️ Modo Local activo (sin conexión a nube)');
+      }
+    }
+
+    function suscribirCambiosEnTiempoReal(uid) {
+      if (!fbDb || !uid) return;
+      if (firebaseUnsubscribeSnapshot) {
+        firebaseUnsubscribeSnapshot();
+        firebaseUnsubscribeSnapshot = null;
+      }
+
+      firebaseUnsubscribeSnapshot = fbDb.collection('tiendas').doc(uid).onSnapshot(docSnap => {
+        if (!docSnap.exists) return;
+        if (isSavingToCloud) return; // Evitar eco de nuestra propia escritura
+        const cloudData = docSnap.data();
+        const localTs = obtenerTimestampUltimoCambioLocal();
+        const cloudTs = cloudData.exportTimestamp || 0;
+
+        // Si la nube trae actualización de otro dispositivo (PC o Celular)
+        if (cloudTs > (localTs + 1500)) {
+          console.log('Firebase: Actualización remota recibida');
+          actualizarBadgeNubeUI('syncing');
+          aplicarDatosNube(cloudData);
+          setTimeout(() => {
+            actualizarBadgeNubeUI('connected');
+            showToast('🔄 Cambios sincronizados en vivo');
+          }, 350);
+        }
+      }, err => {
+        console.warn('Error en listener de Firestore:', err);
+      });
+    }
+
+    async function subirEstadoANubeFirebase(uid, mostrarNotificacion = false) {
+      if (!fbDb || !uid || isApplyingCloudData) return;
+      const backup = generarBackupNegocio();
+      if (!backup) return;
+
+      isSavingToCloud = true;
+      actualizarBadgeNubeUI('syncing');
+      try {
+        const payload = {
+          ...backup,
+          uid: uid,
+          ownerEmail: (currentGoogleUser && currentGoogleUser.email) || bizProfile.email || '',
+          ownerGoogleName: (currentGoogleUser && currentGoogleUser.name) || bizProfile.owner || '',
+          exportTimestamp: Date.now(),
+          updatedAt: new Date().toISOString()
+        };
+
+        await fbDb.collection('tiendas').doc(uid).set(payload, { merge: true });
+        lastCloudSyncTimestamp = Date.now();
+        localStorage.setItem('zentra_last_cloud_sync', lastCloudSyncTimestamp.toString());
+        localStorage.setItem('zentra_last_local_update', lastCloudSyncTimestamp.toString());
+        actualizarBadgeNubeUI('connected');
+        if (mostrarNotificacion) {
+          showToast('✓ Sincronizado en la nube');
+        }
+      } catch (err) {
+        console.error('Error al subir a Firestore:', err);
+        actualizarBadgeNubeUI('error');
+      } finally {
+        setTimeout(() => { isSavingToCloud = false; }, 800);
+      }
+    }
+
+    function programarSincronizacionNube() {
+      localStorage.setItem('zentra_last_local_update', Date.now().toString());
+
+      if (!currentGoogleUser || !currentGoogleUser.uid || !fbDb) return;
+      clearTimeout(cloudSyncDebounceTimer);
+      cloudSyncDebounceTimer = setTimeout(() => {
+        subirEstadoANubeFirebase(currentGoogleUser.uid, false);
+      }, 1600);
+    }
+
+    function aplicarDatosNube(cloudData) {
+      if (!cloudData || !cloudData.bizId || !cloudData.bizProfile) return false;
+      isApplyingCloudData = true;
+      try {
+        const bizId = cloudData.bizId;
+
+        localStorage.setItem(`zentra_biz_profile_${bizId}`, JSON.stringify(cloudData.bizProfile));
+        localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(cloudData.projectsData || []));
+        localStorage.setItem(`zentra_expenses_${bizId}`, JSON.stringify(cloudData.generalExpenses || []));
+        localStorage.setItem(`zentra_incomes_${bizId}`, JSON.stringify(cloudData.generalIncomes || []));
+        localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(cloudData.catalogItems || []));
+        localStorage.setItem(`zentra_quotes_${bizId}`, JSON.stringify(cloudData.savedQuotes || []));
+        localStorage.setItem(`zentra_tasks_${bizId}`, JSON.stringify(cloudData.pendingTasks || []));
+        localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(cloudData.clients || []));
+        localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(cloudData.users || []));
+        if (cloudData.activeLayout) {
+          localStorage.setItem('zentra_active_layout', cloudData.activeLayout);
+        }
+        localStorage.setItem('zentra_active_biz_id', bizId);
+        if (cloudData.exportTimestamp) {
+          localStorage.setItem('zentra_last_local_update', cloudData.exportTimestamp.toString());
+          localStorage.setItem('zentra_last_cloud_sync', cloudData.exportTimestamp.toString());
+        }
+
+        const reg = obtenerRegistroNegocios();
+        const idx = reg.findIndex(b => b.id === bizId);
+        const bizEntry = {
+          id: bizId,
+          name: cloudData.bizProfile.name,
+          owner: cloudData.bizProfile.owner,
+          phone: cloudData.bizProfile.phone,
+          type: cloudData.bizProfile.type || 'servicios',
+          createdAt: cloudData.bizProfile.createdAt || cloudData.exportDate || new Date().toISOString()
+        };
+        if (idx !== -1) {
+          reg[idx] = bizEntry;
+        } else {
+          reg.push(bizEntry);
+        }
+        guardarRegistroNegocios(reg);
+
+        cargarEstadoNegocio(bizId);
+        if (cloudData.activeLayout) {
+          applyHomeLayout(cloudData.activeLayout, false);
+        }
+        return true;
+      } catch (err) {
+        console.error('Error aplicando datos de nube:', err);
+        return false;
+      } finally {
+        setTimeout(() => { isApplyingCloudData = false; }, 800);
+      }
+    }
+
+    function crearNegocioInicialParaUsuarioGoogle(googleUser) {
+      const ownerName = (googleUser && googleUser.name) ? googleUser.name : 'Propietario(a)';
+      const firstName = ownerName.split(' ')[0] || 'Dueño';
+      const cleanBizName = `Negocio de ${firstName}`;
+      const newBizId = 'biz_' + Date.now();
+
+      bizProfile = {
+        id: newBizId,
+        name: cleanBizName,
+        owner: ownerName,
+        email: (googleUser && googleUser.email) || '',
+        phone: '',
+        nequi: '',
+        daviplata: '',
+        bancolombia: '',
+        otherPayment: '',
+        qrImage: null,
+        type: 'servicios',
+        showPendingTasks: true,
+        configured: true
+      };
+      projectsData = [];
+      generalExpenses = [];
+      generalIncomes = [];
+      catalogItems = [...DEFAULT_CATALOG_TM_SERVICIOS];
+      savedQuotes = [];
+      pendingTasks = [
+        { id: 'task_demo_1', text: 'Configurar información de mi negocio', priority: 'alta', completed: false, createdAt: new Date().toISOString(), completedAt: null }
+      ];
+      clients = [...DEFAULT_CLIENTS_TM];
+      users = [{
+        id: 'usr_owner_' + Date.now(),
+        bizId: newBizId,
+        name: ownerName,
+        username: ownerName.toLowerCase().replace(/\s+/g, ''),
+        email: (googleUser && googleUser.email) || '',
+        phone: '',
+        pin: '1234',
+        role: 'OWNER',
+        active: true
+      }];
+      currentUser = users[0];
+
+      persistirEstadoLocal();
+      cargarEstadoNegocio(newBizId);
+      irInicio();
+    }
+
+    async function iniciarSesionConGoogle() {
+      if (!fbAuth) {
+        showToast('⏳ Conectando con Google Firebase...');
+        initFirebase();
+        if (!fbAuth) {
+          alert('No se pudo conectar con el servicio de Firebase. Por favor verifica tu conexión a internet.');
+          return;
+        }
+      }
+      showToast('⏳ Abriendo acceso con Google...');
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+
+      try {
+        const result = await fbAuth.signInWithPopup(provider);
+        const user = result.user;
+        showToast(`✓ ¡Bienvenido(a), ${user.displayName || user.email}!`);
+      } catch (error) {
+        console.error('Error Google Sign-In:', error);
+        if (error.code === 'auth/popup-closed-by-user') {
+          showToast('Inicio de sesión cancelado.');
+        } else if (error.code === 'auth/unauthorized-domain') {
+          alert('⚠️ Dominio no autorizado en Firebase.\n\nPor favor agrega "' + window.location.hostname + '" en Firebase Console > Authentication > Settings > Authorized domains.');
+        } else if (error.code === 'auth/operation-not-allowed') {
+          alert('⚠️ El proveedor de Google no está habilitado en Firebase.\n\nPor favor ve a Firebase Console > Authentication > Sign-in method y habilita Google.');
+        } else {
+          try {
+            await fbAuth.signInWithRedirect(provider);
+          } catch (redirectErr) {
+            showToast(`❌ Error al conectar con Google: ${error.message}`);
+          }
+        }
+      }
+    }
+
+    async function cerrarSesionGoogle() {
+      const confirmar = confirm('¿Deseas desconectar tu cuenta de Google de este dispositivo?\n\nTus datos seguirán respaldados en la nube y guardados en este equipo.');
+      if (!confirmar) return;
+      try {
+        if (firebaseUnsubscribeSnapshot) {
+          firebaseUnsubscribeSnapshot();
+          firebaseUnsubscribeSnapshot = null;
+        }
+        if (fbAuth) {
+          await fbAuth.signOut();
+        }
+        currentGoogleUser = null;
+        localStorage.removeItem('zentra_google_user');
+        actualizarBadgeNubeUI('disconnected');
+        actualizarInfoPerfilGoogleUI();
+        cerrarModalSincronizacionNube();
+        showToast('Cuenta de Google desconectada.');
+      } catch (err) {
+        console.error('Error al cerrar sesión de Google:', err);
+      }
+    }
+
+    function abrirModalSincronizacionNube() {
+      actualizarInfoPerfilGoogleUI();
+      const m = document.getElementById('cloudSyncModal');
+      if (m) m.style.display = 'flex';
+    }
+
+    function cerrarModalSincronizacionNube() {
+      const m = document.getElementById('cloudSyncModal');
+      if (m) m.style.display = 'none';
+    }
+
+    function sincronizarManualmenteConFirebase() {
+      if (!currentGoogleUser) {
+        abrirModalSincronizacionNube();
+        return;
+      }
+      showToast('⏳ Sincronizando con Google Cloud...');
+      sincronizarConNubeFirebase(currentGoogleUser.uid);
+    }
+
+    function actualizarBadgeNubeUI(estado) {
+      const btn = document.getElementById('btnCloudSyncStatus');
+      const icon = document.getElementById('iconCloudSync');
+      const dot = document.getElementById('dotCloudSync');
+      const bizBadge = document.getElementById('bizCloudStatusBadge');
+      if (!btn || !icon || !dot) return;
+
+      if (estado === 'connected') {
+        icon.innerText = 'cloud_done';
+        icon.style.color = 'var(--primary)';
+        dot.style.background = '#10B981';
+        dot.style.display = 'inline-block';
+        btn.title = `Sincronizado con Google: ${currentGoogleUser ? currentGoogleUser.email : 'Conectado'}`;
+        if (bizBadge) {
+          bizBadge.innerText = '🟢 NUBE ACTIVA';
+          bizBadge.style.background = '#DCFCE7';
+          bizBadge.style.color = '#166534';
+        }
+      } else if (estado === 'syncing') {
+        icon.innerText = 'sync';
+        icon.style.color = 'var(--primary)';
+        dot.style.background = '#3B82F6';
+        dot.style.display = 'inline-block';
+        btn.title = 'Sincronizando con la nube...';
+        if (bizBadge) {
+          bizBadge.innerText = '⏳ SINCRONIZANDO...';
+          bizBadge.style.background = '#EFF6FF';
+          bizBadge.style.color = '#1D4ED8';
+        }
+      } else if (estado === 'error') {
+        icon.innerText = 'cloud_off';
+        icon.style.color = '#EF4444';
+        dot.style.background = '#EF4444';
+        dot.style.display = 'inline-block';
+        btn.title = 'Error de conexión a la nube';
+        if (bizBadge) {
+          bizBadge.innerText = '🔴 ERROR NUBE';
+          bizBadge.style.background = '#FEE2E2';
+          bizBadge.style.color = '#991B1B';
+        }
+      } else {
+        icon.innerText = 'cloud_off';
+        icon.style.color = 'var(--text-muted)';
+        dot.style.background = '#F59E0B';
+        dot.style.display = 'inline-block';
+        btn.title = 'Modo Local (Sin cuenta de Google)';
+        if (bizBadge) {
+          bizBadge.innerText = '🟠 MODO LOCAL';
+          bizBadge.style.background = '#FEF3C7';
+          bizBadge.style.color = '#B45309';
+        }
+      }
+    }
+
+    function actualizarInfoPerfilGoogleUI() {
+      const userRow = document.getElementById('bizCloudUserRow');
+      const avatarEl = document.getElementById('bizCloudAvatar');
+      const nameEl = document.getElementById('bizCloudUserName');
+      const emailEl = document.getElementById('bizCloudUserEmail');
+      const btnConnect = document.getElementById('btnBizConnectGoogle');
+
+      const mAvatar = document.getElementById('modalCloudUserAvatar');
+      const mName = document.getElementById('modalCloudUserName');
+      const mEmail = document.getElementById('modalCloudUserEmail');
+      const mConnectedBox = document.getElementById('modalCloudConnectedBox');
+      const mDisconnectedBox = document.getElementById('modalCloudDisconnectedBox');
+
+      if (currentGoogleUser) {
+        if (userRow) userRow.style.display = 'flex';
+        if (btnConnect) btnConnect.style.display = 'none';
+        if (avatarEl) {
+          if (currentGoogleUser.photo) {
+            avatarEl.innerHTML = `<img src="${currentGoogleUser.photo}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+          } else {
+            avatarEl.innerText = (currentGoogleUser.name || 'G').charAt(0).toUpperCase();
+          }
+        }
+        if (nameEl) nameEl.innerText = currentGoogleUser.name || 'Usuario Google';
+        if (emailEl) emailEl.innerText = currentGoogleUser.email || '';
+
+        if (mConnectedBox) mConnectedBox.style.display = 'block';
+        if (mDisconnectedBox) mDisconnectedBox.style.display = 'none';
+        if (mAvatar) {
+          if (currentGoogleUser.photo) {
+            mAvatar.innerHTML = `<img src="${currentGoogleUser.photo}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+          } else {
+            mAvatar.innerText = (currentGoogleUser.name || 'G').charAt(0).toUpperCase();
+          }
+        }
+        if (mName) mName.innerText = currentGoogleUser.name || 'Usuario Google';
+        if (mEmail) mEmail.innerText = currentGoogleUser.email || '';
+      } else {
+        if (userRow) userRow.style.display = 'none';
+        if (btnConnect) btnConnect.style.display = 'flex';
+        if (mConnectedBox) mConnectedBox.style.display = 'none';
+        if (mDisconnectedBox) mDisconnectedBox.style.display = 'block';
+      }
+    }
+
+    // =======================================================
+    // MOTOR DE VINCULACIÓN POR CÓDIGO QR (ESTILO WHATSAPP WEB)
+    // =======================================================
+    function abrirModalVincularQR() {
+      cerrarModalSincronizacionNube();
+      if (currentGoogleUser && currentGoogleUser.uid) {
+        // En dispositivo ya autenticado: preguntar si quiere abrir la cámara para vincular un PC
+        const abrirCamara = confirm('¿Deseas abrir la cámara de tu celular para escanear el código QR en la pantalla de tu computador?\n\n• Pulsa Aceptar para abrir la cámara (si estás en el celular).\n• Pulsa Cancelar si estás en el computador para mostrar el código QR en pantalla.');
+        if (abrirCamara) {
+          iniciarEscanerQR();
+        } else {
+          generarYMostrarQRPC();
+        }
+      } else {
+        // En dispositivo sin sesión: generar y mostrar QR en pantalla
+        generarYMostrarQRPC();
+      }
+    }
+
+    async function generarYMostrarQRPC() {
+      const modal = document.getElementById('qrDisplayModal');
+      if (modal) modal.style.display = 'flex';
+      const qrImg = document.getElementById('imgDisplayQR');
+      const qrStatus = document.getElementById('lblQrDisplayStatus');
+      if (qrStatus) qrStatus.innerText = 'Esperando escaneo desde tu celular...';
+
+      const token = 'zentra_qr_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+
+      try {
+        if (!fbDb) initFirebase();
+        if (fbDb) {
+          await fbDb.collection('qr_sessions').doc(token).set({
+            status: 'pending',
+            createdAt: Date.now()
+          });
+
+          // Cargar imagen de QR
+          const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(token)}&bgcolor=FFFFFF&color=0B1C30`;
+          if (qrImg) qrImg.src = qrUrl;
+
+          // Escuchar cuando el móvil autorice el código
+          if (qrSessionListenerUnsub) qrSessionListenerUnsub();
+          qrSessionListenerUnsub = fbDb.collection('qr_sessions').doc(token).onSnapshot(async docSnap => {
+            if (!docSnap.exists) return;
+            const data = docSnap.data();
+            if (data.status === 'authorized' && data.uid) {
+              if (qrStatus) qrStatus.innerText = '¡Autorizado! Sincronizando tu tienda...';
+              showToast('🎉 ¡Dispositivo vinculado con éxito!');
+              if (qrSessionListenerUnsub) {
+                qrSessionListenerUnsub();
+                qrSessionListenerUnsub = null;
+              }
+              cerrarModalQRPC();
+              await sincronizarConNubeFirebase(data.uid);
+            }
+          });
+        }
+      } catch (err) {
+        console.error('Error generando QR:', err);
+        if (qrStatus) qrStatus.innerText = 'Error al generar código QR.';
+      }
+    }
+
+    function cerrarModalQRPC() {
+      if (qrSessionListenerUnsub) {
+        qrSessionListenerUnsub();
+        qrSessionListenerUnsub = null;
+      }
+      const modal = document.getElementById('qrDisplayModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    async function iniciarEscanerQR() {
+      const modal = document.getElementById('qrScanModal');
+      if (modal) modal.style.display = 'flex';
+      const video = document.getElementById('qrScanVideo');
+      qrVideoElement = video;
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+        qrScanningStream = stream;
+        video.srcObject = stream;
+        video.setAttribute('playsinline', 'true');
+        await video.play();
+        requestAnimationFrame(escanearFrameQR);
+      } catch (err) {
+        console.error('Error accediendo a cámara para QR:', err);
+        alert('No se pudo acceder a la cámara. Por favor autoriza los permisos de cámara en tu navegador.');
+        cerrarEscanerQR();
+      }
+    }
+
+    function escanearFrameQR() {
+      if (!qrVideoElement || qrVideoElement.readyState !== qrVideoElement.HAVE_ENOUGH_DATA) {
+        qrScanAnimFrame = requestAnimationFrame(escanearFrameQR);
+        return;
+      }
+      if (!qrCanvasElement) {
+        qrCanvasElement = document.createElement('canvas');
+        qrCanvasContext = qrCanvasElement.getContext('2d');
+      }
+      qrCanvasElement.width = qrVideoElement.videoWidth;
+      qrCanvasElement.height = qrVideoElement.videoHeight;
+      qrCanvasContext.drawImage(qrVideoElement, 0, 0, qrCanvasElement.width, qrCanvasElement.height);
+      const imageData = qrCanvasContext.getImageData(0, 0, qrCanvasElement.width, qrCanvasElement.height);
+
+      if (typeof jsQR !== 'undefined') {
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert'
+        });
+        if (code && code.data && code.data.startsWith('zentra_qr_')) {
+          procesarCodigoQREscaneado(code.data);
+          return;
+        }
+      }
+      qrScanAnimFrame = requestAnimationFrame(escanearFrameQR);
+    }
+
+    async function procesarCodigoQREscaneado(token) {
+      cerrarEscanerQR();
+      if (!currentGoogleUser || !currentGoogleUser.uid) {
+        alert('Debes iniciar sesión con Google primero en este celular antes de vincular un computador.');
+        return;
+      }
+      showToast('⏳ Vinculando computador...');
+      try {
+        if (!fbDb) initFirebase();
+        await fbDb.collection('qr_sessions').doc(token).set({
+          status: 'authorized',
+          uid: currentGoogleUser.uid,
+          userEmail: currentGoogleUser.email,
+          userName: currentGoogleUser.name,
+          authorizedAt: Date.now()
+        }, { merge: true });
+        showToast('🎉 ¡Computador vinculado con éxito!');
+      } catch (err) {
+        console.error('Error autorizando sesión QR:', err);
+        showToast('❌ Error al autorizar el computador.');
+      }
+    }
+
+    function cerrarEscanerQR() {
+      if (qrScanAnimFrame) {
+        cancelAnimationFrame(qrScanAnimFrame);
+        qrScanAnimFrame = null;
+      }
+      if (qrScanningStream) {
+        qrScanningStream.getTracks().forEach(t => t.stop());
+        qrScanningStream = null;
+      }
+      const modal = document.getElementById('qrScanModal');
+      if (modal) modal.style.display = 'none';
+    }
+
     // Inicialización y arranque con verificación multi-inquilino
     cargarEstadoLocal();
+    initFirebase();
   </script>
 </body>
 </html>

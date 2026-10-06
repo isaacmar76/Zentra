@@ -205,8 +205,9 @@ class CatalogItemModel {
 | **2026-10-05** | `c6444e7` | UI / Multi-Device / Auth | Hito 26: Experiencia Multi-Dispositivo (PC & Celular), Portal de Acceso para el Dueño de Negocio y Sincronización en 1 Toque | ✅ Completado |
 | **2026-10-05** | `860e897` | Fix / Desktop Mode / UX | Hito 27: Solución a bucle de redirección en Landing Page, Inclusión de App nativa en /site y Modo Escritorio (PC) Panorámico | ✅ Completado |
 | **2026-10-05** | `2a48370` | Feature / Catálogo / PDF | Hito 28: Exportación de Catálogo a PDF e imagen para clientes vía WhatsApp | ✅ Completado |
-| **2026-10-05** | `f21730e` | UI / Catálogo Móvil | Hito 29: Formato vertical móvil (1 producto por fila) y enlace directo de pedido por WhatsApp | ✅ Completado |
-| **2026-10-05** | `current` | UI / Plantilla Seleccionable | Hito 30: Opción E: Diseño Clásico V1 (Nude & Blush, tipografía Poppins, matriz 2x2 de métricas y botones grandes originales) | ✅ Completado |
+| **2026-10-05** | `0c3c60d` | UI / Plantilla Seleccionable | Hito 30: Opción E: Diseño Clásico V1 (Nude & Blush, tipografía Poppins, matriz 2x2 de métricas y botones grandes originales) | ✅ Completado |
+| **2026-10-05** | `current` | Cloud Sync / Firebase / Auth | Hito 31: Sincronización en Tiempo Real con Google Firebase y Vinculación QR (Estilo WhatsApp Web) entre Celular y PC | ✅ Completado |
+
 
 ---
 
@@ -729,6 +730,37 @@ class CatalogItemModel {
      - Se añadió protección explícita con `font-family: 'Material Symbols Outlined' !important` y selectores de exclusión `:not(.material-symbols-outlined)` para evitar que la tipografía `Poppins` sobreescriba los íconos de la cabecera superior (`shopping_cart`, `storefront`) y la barra de navegación inferior (`dashboard`, `inventory_2`, `request_quote`), garantizando que se muestren siempre como glifos gráficos y nunca como texto sin formato.
   9. **Paridad Total de Archivos:**
      - Actualizado en [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [index.html](file:///c:/Proyectos/MyBusiness/index.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
+
+#### Hito 31: Sincronización en Tiempo Real con Google Firebase & Vinculación QR (Estilo WhatsApp Web)
+- **Requerimiento del Usuario:**
+  - *"ya tengo creado el proyecto en Firebase, creo que lo hicimos al principio, yo no lo recordaba"* (Proyecto `zentra-d2b9e`).
+  - *"de que manera podemos hacer que el usuario haga login con cuenta de google y no sea necesario que haga mas nada, es decir que la app cree todo lo demas en firebase etc?... Tambien me gustaria que consideremos una manera de hacer lo que WhatsApp que a traves de un QR se pueda abrir la App en un PC. Esto ultimo consideralo como una opcion aparte. Lo importante es mantener la sincronizacion a traves de google."*
+- **Implementación Técnica:**
+  1. **Integración del SDK de Firebase (Compat v10.12.0) y jsQR:**
+     - Inclusión en `<head>` de Firebase App, Auth y Cloud Firestore compat, junto con la librería `jsQR` para escaneo de cámara.
+     - Configuración del proyecto `zentra-d2b9e`.
+  2. **Persistencia Offline Nativa (IndexedDB):**
+     - Se habilitó `enablePersistence({ synchronizeTabs: true })` en Firestore, garantizando que si se pierde la conexión a internet, las operaciones se pongan en cola localmente y se sincronicen en cuanto vuelva la señal.
+  3. **Autenticación con 1 Toque con Google (`signInWithPopup` / `signInWithRedirect`):**
+     - Botón destacado oficial de Google (`Continuar con Google`) con isotipo SVG en:
+       - Portal de Acceso inicial (`#authScreenModal`).
+       - Modal de Perfil del Negocio (`#businessProfileModal`).
+       - Modal dedicado de Sincronización en la Nube (`#cloudSyncModal`).
+  4. **Aislamiento Multi-Inquilino en la Nube (`/tiendas/{user.uid}`):**
+     - Cada tienda se almacena de forma particionada y segura bajo el UID de Google del propietario.
+     - Si el usuario ya tenía datos en su celular y se conecta por primera vez, Zentra sube automáticamente su negocio existente a la nube.
+     - Si el usuario se conecta desde una computadora u otro dispositivo nuevo con su cuenta de Google, Zentra descarga automáticamente la tienda completa (`restaurarNegocioDesdeJSON(cloudData, true)`).
+  5. **Escucha Reactiva en Tiempo Real (`onSnapshot`):**
+     - Cualquier venta, pedido, cambio de precio o tarea registrado en un dispositivo se propaga a los demás equipos en vivo en menos de un segundo.
+     - Debounce inteligente (1.6s) en `programarSincronizacionNube()` dentro de `persistirEstadoLocal()` para optimizar el consumo de la cuota gratuita Spark de Firebase.
+  6. **Vinculación por Código QR (Estilo WhatsApp Web):**
+     - El computador muestra un código QR dinámico con un token temporal de sesión (`qr_sessions/{token}`).
+     - Desde el celular autenticado con Google, el usuario puede abrir el escáner de cámara (`#qrScanModal`) para apuntar al monitor.
+     - En menos de 1 segundo, el celular autoriza el token en Firestore y el computador se desbloquea con la tienda completa cargada sin necesidad de teclear credenciales.
+  7. **Indicadores de Estado Visuales en UI:**
+     - Ícono en la barra superior con badge de estado: `🟢 Nube Activa (cloud_done)`, `🔵 Sincronizando (sync)`, `🟠 Modo Local (cloud_off)`.
+  8. **Paridad Total de Archivos:**
+     - Replicado en [index.html](file:///c:/Proyectos/MyBusiness/index.html), [preview.html](file:///c:/Proyectos/MyBusiness/preview.html), [site/app.html](file:///c:/Proyectos/MyBusiness/site/app.html) y [site/app/index.html](file:///c:/Proyectos/MyBusiness/site/app/index.html).
 
 ---
 

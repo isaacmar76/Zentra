@@ -11,6 +11,7 @@ class CatalogItemModel {
   final String businessType; // 'servicios', 'retail', 'ambos'
   final String itemType; // 'producto', 'servicio'
   final String? imageUrl; // Foto tomada con cámara o subida desde galería
+  final String? description; // Pequeña descripción opcional del producto/servicio
 
   CatalogItemModel({
     required this.id,
@@ -22,6 +23,7 @@ class CatalogItemModel {
     this.businessType = 'ambos',
     this.itemType = 'producto',
     this.imageUrl,
+    this.description,
   });
 
   bool get isService => itemType == 'servicio';
@@ -40,6 +42,7 @@ class CatalogItemModel {
       'businessType': businessType,
       'itemType': itemType,
       'imageUrl': imageUrl,
+      'description': description,
     };
   }
 
@@ -54,6 +57,7 @@ class CatalogItemModel {
       businessType: map['businessType'] ?? 'ambos',
       itemType: map['itemType'] ?? 'producto',
       imageUrl: map['imageUrl'],
+      description: map['description'],
     );
   }
 
@@ -67,6 +71,7 @@ class CatalogItemModel {
     String? businessType,
     String? itemType,
     String? imageUrl,
+    String? description,
   }) {
     return CatalogItemModel(
       id: id ?? this.id,
@@ -78,6 +83,7 @@ class CatalogItemModel {
       businessType: businessType ?? this.businessType,
       itemType: itemType ?? this.itemType,
       imageUrl: imageUrl ?? this.imageUrl,
+      description: description ?? this.description,
     );
   }
 }

@@ -2015,9 +2015,14 @@
           <button onclick="irInicio()" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px;">
             <span>‹ Volver al Inicio</span>
           </button>
-          <button onclick="abrirModalCliente()" style="background:var(--primary); color:#fff; border:none; padding:7px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
-            <span>+</span> Nuevo Cliente
-          </button>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button type="button" onclick="importarClienteDirectoDesdeAgenda()" title="Buscar o importar desde los contactos del celular" style="background:#EEF2FF; color:#4338CA; border:1px solid #C7D2FE; padding:7px 11px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(79,70,229,0.12);">
+              <span>📱</span> Contactos
+            </button>
+            <button onclick="abrirModalCliente()" style="background:var(--primary); color:#fff; border:none; padding:7px 12px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px;">
+              <span>+</span> Nuevo Cliente
+            </button>
+          </div>
         </div>
         <div style="margin-bottom:10px;">
           <input type="text" id="inpBuscarCliente" oninput="filtrarClientesUI()" placeholder="🔍 Buscar cliente, teléfono o documento..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--surface-border); background:#FFFFFF; font-size:12px; color:var(--text); box-sizing:border-box;">
@@ -2824,9 +2829,14 @@
         <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:16px; padding:12px; margin-bottom:12px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
             <label style="font-size:11px; font-weight:700; color:var(--text); margin:0;">1. Cliente *</label>
-            <button type="button" onclick="toggleCrearClienteRapido()" id="btnToggleQuickClient" style="background:transparent; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer;">
-              + Crear Nuevo Cliente
-            </button>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button type="button" onclick="seleccionarContactoParaPedido()" title="Buscar o escoger de contactos del celular" style="background:#EEF2FF; color:#4338CA; border:1px solid #C7D2FE; padding:3px 8px; border-radius:8px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:3px;">
+                <span>📱</span> Contactos
+              </button>
+              <button type="button" onclick="toggleCrearClienteRapido()" id="btnToggleQuickClient" style="background:transparent; border:none; color:var(--primary); font-size:11px; font-weight:700; cursor:pointer;">
+                + Crear Nuevo
+              </button>
+            </div>
           </div>
 
           <!-- Selector dropdown de clientes existentes -->
@@ -2838,7 +2848,12 @@
 
           <!-- Formulario rápido para crear cliente al vuelo -->
           <div id="boxQuickCreateClient" style="display:none; margin-top:8px; padding-top:8px; border-top:1px dashed #CBD5E1;">
-            <div style="font-size:10.5px; font-weight:700; color:var(--primary); margin-bottom:6px;">✨ Datos del nuevo cliente:</div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <div style="font-size:10.5px; font-weight:700; color:var(--primary);">✨ Datos del nuevo cliente:</div>
+              <button type="button" onclick="llenarClienteRapidoDesdeContactos()" style="background:#EEF2FF; color:#4338CA; border:1px solid #C7D2FE; padding:3px 8px; border-radius:8px; font-size:10px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:3px;">
+                <span>📱</span> Cargar de Contactos
+              </button>
+            </div>
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px;">
               <input type="text" id="quickCliNameInp" placeholder="Nombre completo *" style="padding:8px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--bg); color:var(--text);">
               <input type="text" id="quickCliPhoneInp" placeholder="WhatsApp / Celular *" style="padding:8px; border-radius:10px; border:1px solid var(--surface-border); font-size:12px; background:var(--bg); color:var(--text);">
@@ -3257,7 +3272,12 @@
     <div id="clientModal" style="display:none; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); z-index:420; align-items:center; justify-content:center; padding:18px;">
       <div style="background:var(--card-bg); width:100%; max-width:350px; border-radius:24px; padding:22px 18px; color:var(--text); box-shadow:0 12px 36px rgba(0,0,0,0.25); max-height:90%; overflow-y:auto;">
         <div style="font-size:16px; font-weight:800; margin-bottom:2px;" id="cliModalTitle">+ Nuevo Cliente</div>
-        <div style="font-size:11px; color:var(--text-muted); margin-bottom:14px;">Registra los datos para pedidos, cotizaciones y facturas</div>
+        <div style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Registra los datos para pedidos, cotizaciones y facturas</div>
+
+        <button type="button" onclick="llenarClienteDesdeContactosTelefono()" style="width:100%; margin-bottom:12px; background:linear-gradient(135deg, #EEF2FF 0%, #E0E7FF 100%); border:1.5px solid #C7D2FE; color:#3730A3; padding:9px 12px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 5px rgba(79,70,229,0.12);">
+          <span style="font-size:16px;">📱</span>
+          <span>Cargar Datos desde Contactos del Celular</span>
+        </button>
 
         <div style="margin-bottom:10px;">
           <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Nombre Completo *</label>
@@ -3328,7 +3348,10 @@
                 <!-- Opciones inyectadas dinámicamente -->
               </select>
             </div>
-            <button type="button" onclick="abrirCrearClienteDesdeCarrito()" title="Registrar nuevo cliente en directorio" style="background:var(--primary-soft); color:var(--primary); border:1.5px solid var(--primary); padding:8px 12px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.15);">
+            <button type="button" onclick="vincularClienteDesdeContactosTelefono()" title="Buscar o escoger de tus contactos del celular" style="background:#EEF2FF; color:#4338CA; border:1.5px solid #C7D2FE; padding:8px 10px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(79,70,229,0.12);">
+              <span>📱</span> Contactos
+            </button>
+            <button type="button" onclick="abrirCrearClienteDesdeCarrito()" title="Registrar nuevo cliente en directorio" style="background:var(--primary-soft); color:var(--primary); border:1.5px solid var(--primary); padding:8px 10px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; white-space:nowrap; display:flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.15);">
               <span>➕</span> Nuevo
             </button>
           </div>
@@ -3341,9 +3364,12 @@
           <input type="hidden" id="selectedCartClientId" value="">
 
           <!-- Aviso sutil de estado del cliente -->
-          <div id="cartClientNotice" style="font-size:10px; color:var(--text-muted); margin-top:5px; display:flex; justify-content:space-between; align-items:center;">
+          <div id="cartClientNotice" style="font-size:10px; color:var(--text-muted); margin-top:5px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:4px;">
             <span>Si no escoges ninguno, se enviará como cliente genérico ("Cliente Mostrador").</span>
-            <button type="button" id="btnDesvincularCliente" onclick="desvincularClienteDeCarrito()" style="display:none; background:transparent; border:none; color:var(--alert); font-size:10px; font-weight:700; cursor:pointer; padding:2px;">✕ Desvincular</button>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <button type="button" id="btnGuardarCliCarrito" onclick="guardarClienteRapidoDesdeCarrito()" style="display:none; background:#ECFDF5; border:1px solid #A7F3D0; color:#065F46; font-size:10px; font-weight:700; border-radius:6px; cursor:pointer; padding:2px 6px;">💾 Guardar en Directorio</button>
+              <button type="button" id="btnDesvincularCliente" onclick="desvincularClienteDeCarrito()" style="display:none; background:transparent; border:none; color:var(--alert); font-size:10px; font-weight:700; cursor:pointer; padding:2px;">✕ Desvincular</button>
+            </div>
           </div>
         </div>
 
@@ -5106,7 +5132,8 @@
                 <span style="font-size:9px; font-weight:700; padding:1px 5px; border-radius:5px; background:${isServ ? '#EEF2FF; color:#4F46E5;' : '#ECFDF5; color:#065F46;'}">${isServ ? '✂️ SERVICIO' : '📦 PRODUCTO'}</span>
               </div>
               <div style="font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${it.name}</div>
-              <div style="font-size:10.5px; color:var(--text-muted);">${it.cat || 'General'} • ${isServ ? 'Bajo encargo' : 'Stock: ' + it.stock}</div>
+              ${it.description ? `<div style="font-size:10px; color:#64748B; margin-top:1px; line-height:1.2; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${escaparHTML(it.description)}</div>` : ''}
+              <div style="font-size:10.5px; color:var(--text-muted); margin-top:1px;">${it.cat || 'General'} • ${isServ ? 'Bajo encargo' : 'Stock: ' + it.stock}</div>
               <div style="font-size:12px; font-weight:800; color:var(--secondary); margin-top:1px;">$${it.price.toLocaleString('es-CO')} COP</div>
             </div>
           </div>
@@ -5927,14 +5954,37 @@
       }
 
       if (filtered.length === 0) {
-        container.innerHTML = `
-          <div style="text-align:center; padding:32px 18px; background:#FFFFFF; border-radius:20px; border:1px dashed #ECEEF2; margin:12px 0;">
-            <div style="font-size:36px; margin-bottom:10px;">👥</div>
-            <div style="font-weight:700; font-size:15px; margin-bottom:6px; color:var(--text);">No hay clientes registrados</div>
-            <div style="font-size:12px; color:var(--text-muted); margin-bottom:18px; line-height:1.4;">Registra a tus clientes habituales para tomar pedidos y generar cotizaciones y facturas en 1 toque.</div>
-            <button class="primary-btn" onclick="abrirModalCliente()" style="max-width:240px; margin:0 auto;">+ NUEVO CLIENTE</button>
-          </div>
-        `;
+        if (query) {
+          container.innerHTML = `
+            <div style="text-align:center; padding:28px 16px; background:#FFFFFF; border-radius:20px; border:1.5px dashed var(--surface-border); margin:12px 0;">
+              <div style="font-size:32px; margin-bottom:8px;">🔍</div>
+              <div style="font-weight:800; font-size:14px; margin-bottom:4px; color:var(--text);">No se encontró a "${escaparHTML(query)}"</div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:14px; line-height:1.4;">¿No está en tu directorio? Búscalo en los contactos de tu celular para crearlo al instante o ingrésalo manualmente.</div>
+              <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+                <button type="button" onclick="importarClienteDirectoDesdeAgenda()" style="background:#EEF2FF; color:#4338CA; border:1.5px solid #C7D2FE; padding:8px 14px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                  <span>📱</span> Buscar en Contactos
+                </button>
+                <button type="button" class="primary-btn" onclick="abrirModalClienteConNombre('${escaparHTML(query).replace(/'/g, "\\'")}')">
+                  + Crear Manual
+                </button>
+              </div>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <div style="text-align:center; padding:32px 18px; background:#FFFFFF; border-radius:20px; border:1px dashed #ECEEF2; margin:12px 0;">
+              <div style="font-size:36px; margin-bottom:10px;">👥</div>
+              <div style="font-weight:700; font-size:15px; margin-bottom:6px; color:var(--text);">No hay clientes registrados</div>
+              <div style="font-size:12px; color:var(--text-muted); margin-bottom:18px; line-height:1.4;">Registra a tus clientes habituales para tomar pedidos y generar cotizaciones y facturas en 1 toque.</div>
+              <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+                <button type="button" onclick="importarClienteDirectoDesdeAgenda()" style="background:#EEF2FF; color:#4338CA; border:1.5px solid #C7D2FE; padding:8px 14px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                  <span>📱</span> Importar de Contactos
+                </button>
+                <button class="primary-btn" onclick="abrirModalCliente()" style="max-width:200px;">+ NUEVO CLIENTE</button>
+              </div>
+            </div>
+          `;
+        }
         return;
       }
 
@@ -6100,6 +6150,191 @@
         persistirEstadoLocal();
         renderClientesList();
         showToast(`Cliente "${c.name}" eliminado.`);
+      }
+    }
+
+    // ==========================================
+    // INTEGRACIÓN CON CONTACTOS DEL CELULAR (PWA / MOBILE)
+    // ==========================================
+    async function seleccionarContactoDelCelular() {
+      const isSupported = ('contacts' in navigator && 'ContactsManager' in window && 'select' in navigator.contacts);
+
+      if (!isSupported) {
+        showToast('📱 El acceso directo a contactos requiere Google Chrome en Android bajo conexión segura. Puedes ingresar los datos manualmente.');
+        return null;
+      }
+
+      try {
+        const props = ['name', 'tel'];
+        const res = await navigator.contacts.select(props, { multiple: false });
+        if (!res || res.length === 0) return null;
+
+        const contact = res[0];
+        const rawName = (contact.name && contact.name.length > 0) ? contact.name[0].trim() : '';
+        let rawTel = (contact.tel && contact.tel.length > 0) ? contact.tel[0].trim() : '';
+        const cleanTel = rawTel.replace(/[^0-9+]/g, '');
+
+        if (!rawName && !cleanTel) {
+          showToast('⚠️ El contacto seleccionado no contiene nombre ni teléfono.');
+          return null;
+        }
+
+        return {
+          name: rawName || 'Cliente Contacto',
+          phone: cleanTel || rawTel,
+          email: (contact.email && contact.email.length > 0) ? contact.email[0].trim() : ''
+        };
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.warn('Error al seleccionar contacto:', err);
+          showToast('⚠️ No se pudo acceder a los contactos o se canceló el permiso.');
+        }
+        return null;
+      }
+    }
+
+    function buscarOCrearClienteDesdeContacto(contact) {
+      if (!contact || (!contact.name && !contact.phone)) return null;
+
+      const cleanPhone = (contact.phone || '').replace(/[^0-9]/g, '');
+
+      // Buscar si ya existe por teléfono (últimos 7 dígitos) o nombre
+      let found = clients.find(c => {
+        const cPhone = (c.phone || '').replace(/[^0-9]/g, '');
+        if (cleanPhone && cPhone && (cPhone === cleanPhone || (cleanPhone.length >= 7 && cPhone.endsWith(cleanPhone.slice(-7))))) {
+          return true;
+        }
+        if (contact.name && c.name && c.name.trim().toLowerCase() === contact.name.trim().toLowerCase()) {
+          return true;
+        }
+        return false;
+      });
+
+      if (found) {
+        return { client: found, isNew: false };
+      }
+
+      // Si no existe, crear automáticamente en el directorio
+      const newClient = {
+        id: 'cli_' + Date.now(),
+        name: contact.name,
+        phone: contact.phone,
+        document: '',
+        email: contact.email || '',
+        address: '',
+        notes: 'Importado desde contactos del celular',
+        createdAt: new Date().toISOString()
+      };
+
+      clients.unshift(newClient);
+      persistirEstadoLocal();
+      renderClientesList();
+      if (document.getElementById('lblClientesCount')) {
+        document.getElementById('lblClientesCount').innerText = clients.length;
+      }
+
+      return { client: newClient, isNew: true };
+    }
+
+    async function vincularClienteDesdeContactosTelefono() {
+      const contact = await seleccionarContactoDelCelular();
+      if (!contact) return;
+
+      const result = buscarOCrearClienteDesdeContacto(contact);
+      if (!result || !result.client) return;
+
+      actualizarSelectorClientesCarrito(result.client.id);
+      alSeleccionarClienteEnCarrito(result.client.id);
+
+      if (result.isNew) {
+        showToast(`✓ Cliente "${result.client.name}" creado desde contactos y vinculado a la venta 📱`);
+      } else {
+        showToast(`✓ Cliente "${result.client.name}" seleccionado desde tus contactos`);
+      }
+    }
+
+    async function seleccionarContactoParaPedido() {
+      const contact = await seleccionarContactoDelCelular();
+      if (!contact) return;
+
+      const result = buscarOCrearClienteDesdeContacto(contact);
+      if (!result || !result.client) return;
+
+      actualizarDropdownClientes(result.client.id);
+      seleccionarClienteParaPedido(result.client);
+
+      if (result.isNew) {
+        showToast(`✓ Cliente "${result.client.name}" creado desde contactos y asignado al pedido 📱`);
+      } else {
+        showToast(`✓ Cliente "${result.client.name}" seleccionado para el pedido`);
+      }
+    }
+
+    async function llenarClienteDesdeContactosTelefono() {
+      const contact = await seleccionarContactoDelCelular();
+      if (!contact) return;
+
+      if (contact.name && document.getElementById('cliNameInp')) {
+        document.getElementById('cliNameInp').value = contact.name;
+      }
+      if (contact.phone && document.getElementById('cliPhoneInp')) {
+        document.getElementById('cliPhoneInp').value = contact.phone;
+      }
+      if (contact.email && document.getElementById('cliEmailInp')) {
+        document.getElementById('cliEmailInp').value = contact.email;
+      }
+
+      showToast(`✓ Datos de "${contact.name}" cargados desde tus contactos.`);
+    }
+
+    async function importarClienteDirectoDesdeAgenda() {
+      const contact = await seleccionarContactoDelCelular();
+      if (!contact) return;
+
+      const result = buscarOCrearClienteDesdeContacto(contact);
+      if (!result || !result.client) return;
+
+      if (result.isNew) {
+        showToast(`✓ Cliente "${result.client.name}" agregado a tu directorio desde tus contactos! 📱`);
+      } else {
+        showToast(`ℹ️ "${result.client.name}" ya estaba registrado en tu directorio.`);
+      }
+      renderClientesList();
+    }
+
+    function guardarClienteRapidoDesdeCarrito() {
+      const nameVal = (document.getElementById('retailCliNameInp')?.value || '').trim();
+      const phoneVal = (document.getElementById('retailCliPhoneInp')?.value || '').trim();
+      if (!nameVal) {
+        showToast('Ingresa el nombre del cliente');
+        return;
+      }
+      const result = buscarOCrearClienteDesdeContacto({ name: nameVal, phone: phoneVal });
+      if (result && result.client) {
+        actualizarSelectorClientesCarrito(result.client.id);
+        alSeleccionarClienteEnCarrito(result.client.id);
+        showToast(`✓ Cliente "${result.client.name}" guardado en el directorio`);
+      }
+    }
+
+    async function llenarClienteRapidoDesdeContactos() {
+      const contact = await seleccionarContactoDelCelular();
+      if (!contact) return;
+
+      if (contact.name && document.getElementById('quickCliNameInp')) {
+        document.getElementById('quickCliNameInp').value = contact.name;
+      }
+      if (contact.phone && document.getElementById('quickCliPhoneInp')) {
+        document.getElementById('quickCliPhoneInp').value = contact.phone;
+      }
+
+      showToast(`✓ Contacto "${contact.name}" cargado en el formulario`);
+    }
+
+    function abrirModalClienteConNombre(name = '') {
+      abrirModalCliente();
+      if (name && document.getElementById('cliNameInp')) {
+        document.getElementById('cliNameInp').value = name;
       }
     }
 
@@ -6746,7 +6981,7 @@
     function actualizarDropdownClientes(selectedId = null) {
       const sel = document.getElementById('orderClientSelect');
       if (!sel) return;
-      sel.innerHTML = '<option value="">-- Selecciona un cliente registrado --</option>';
+      sel.innerHTML = '<option value="">-- Selecciona un cliente registrado --</option><option value="__CONTACTS__">📱 Buscar en contactos del celular...</option>';
       clients.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
@@ -6761,6 +6996,12 @@
     }
 
     function alCambiarClienteSelect(val) {
+      if (val === '__CONTACTS__') {
+        const sel = document.getElementById('orderClientSelect');
+        if (sel) sel.value = selectedOrderClientId || '';
+        seleccionarContactoParaPedido();
+        return;
+      }
       if (val === '__NEW__') {
         mostrarCrearClienteAlVuelo(true);
         return;
@@ -7061,7 +7302,8 @@
         const qty = it.quantity || 1;
         const unit = it.unitPrice || it.price || 0;
         const sub = it.subtotal || (qty * unit);
-        return `• ${qty}x ${it.name} = $${sub.toLocaleString('es-CO')} COP`;
+        const descText = it.description ? `\n   _${it.description}_` : '';
+        return `• ${qty}x ${it.name}${descText} = $${sub.toLocaleString('es-CO')} COP`;
       }).join('\n');
     }
 
@@ -7166,9 +7408,12 @@ ${estadoStr}${contactText}
           const unit = it.unitPrice || it.price || 0;
           const sub = it.subtotal || (it.quantity * unit);
           tr.innerHTML = `
-            <td style="font-weight:700; color:#0B1C30; padding:5px 6px;">${it.quantity}x</td>
-            <td style="color:#1E293B; font-weight:600; padding:5px 6px;">${it.name}</td>
-            <td style="text-align:right; font-weight:700; color:#0B1C30; padding:5px 6px;">$${sub.toLocaleString('es-CO')}</td>
+            <td style="font-weight:700; color:#0B1C30; padding:5px 6px; vertical-align:top;">${it.quantity}x</td>
+            <td style="color:#1E293B; font-weight:600; padding:5px 6px;">
+              <div>${escaparHTML(it.name)}</div>
+              ${it.description ? `<div style="font-size:10px; color:#64748B; font-weight:400; line-height:1.2; margin-top:2px;">${escaparHTML(it.description)}</div>` : ''}
+            </td>
+            <td style="text-align:right; font-weight:700; color:#0B1C30; padding:5px 6px; vertical-align:top;">$${sub.toLocaleString('es-CO')}</td>
           `;
           tbody.appendChild(tr);
         });
@@ -7725,6 +7970,7 @@ ${estadoStr}${contactText}
           p.items.push({
             catalogId: item.id,
             name: item.name,
+            description: item.description || '',
             unitPrice: item.price,
             quantity: 1,
             subtotal: item.price,
@@ -8136,6 +8382,9 @@ ${estadoStr}${contactText}
           if (item.cat) {
             text += `   🏷️ Categoría: ${item.cat}\n`;
           }
+          if (item.description) {
+            text += `   📝 Detalle: _${item.description}_\n`;
+          }
           text += `\n`;
         });
       }
@@ -8485,6 +8734,7 @@ ${estadoStr}${contactText}
         retailCart.push({
           id: p.id,
           name: p.name,
+          description: p.description || '',
           price: p.price,
           cost: p.cost || 0,
           cat: p.cat || 'General',
@@ -8569,7 +8819,7 @@ ${estadoStr}${contactText}
       if (!sel) return;
 
       const currentVal = forceSelectId || selectedCartClientId || sel.value;
-      sel.innerHTML = '<option value="">👤 Escoger cliente del directorio...</option>';
+      sel.innerHTML = '<option value="">👤 Escoger cliente del directorio...</option><option value="__CONTACTS__">📱 Buscar en contactos del celular...</option>';
 
       if (clients && clients.length > 0) {
         clients.forEach(c => {
@@ -8596,6 +8846,13 @@ ${estadoStr}${contactText}
       const nameInp = document.getElementById('retailCliNameInp');
       const phoneInp = document.getElementById('retailCliPhoneInp');
       const hiddenInp = document.getElementById('selectedCartClientId');
+
+      if (clientId === '__CONTACTS__') {
+        const sel = document.getElementById('cartClientSelect');
+        if (sel) sel.value = selectedCartClientId || '';
+        vincularClienteDesdeContactosTelefono();
+        return;
+      }
 
       if (!clientId) {
         selectedCartClientId = null;
@@ -8689,6 +8946,11 @@ ${estadoStr}${contactText}
           noticeSpan.innerText = 'Si no escoges ninguno, se enviará como cliente genérico ("Cliente Mostrador").';
         }
       }
+
+      const btnGuardar = document.getElementById('btnGuardarCliCarrito');
+      if (btnGuardar) {
+        btnGuardar.style.display = (!selectedCartClientId && nameVal && nameVal.toLowerCase() !== 'cliente mostrador' && nameVal.length >= 2) ? 'inline-block' : 'none';
+      }
     }
 
     function renderRetailCartModal() {
@@ -8726,7 +8988,8 @@ ${estadoStr}${contactText}
           <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
             ${thumbHtml}
             <div style="min-width:0; flex:1;">
-              <div style="font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</div>
+              <div style="font-size:12.5px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escaparHTML(item.name)}</div>
+              ${item.description ? `<div style="font-size:10px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escaparHTML(item.description)}</div>` : ''}
               <div style="font-size:11px; color:var(--text-muted);">$${item.price.toLocaleString('es-CO')} c/u</div>
             </div>
           </div>
@@ -9260,7 +9523,7 @@ ${estadoStr}${contactText}
 
       items.forEach(p => {
         const card = document.createElement('div');
-        card.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:16px; padding:10px; display:flex; flex-direction:column; justify-content:space-between; height:120px; box-shadow:0 2px 6px rgba(0,0,0,0.02); cursor:pointer;';
+        card.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:16px; padding:10px; display:flex; flex-direction:column; justify-content:space-between; min-height:124px; box-shadow:0 2px 6px rgba(0,0,0,0.02); cursor:pointer; gap:4px;';
         card.onclick = () => agregarAlCarritoRetail(p);
 
         const thumb = p.image
@@ -9268,9 +9531,12 @@ ${estadoStr}${contactText}
           : `<span style="font-size:18px;">${p.itemType === 'servicio' ? '✂️' : '🎁'}</span>`;
 
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-            <div style="font-size:12px; font-weight:700; color:var(--text); line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.name}</div>
-            <div style="flex-shrink:0; margin-left:4px;">${thumb}</div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div style="font-size:12px; font-weight:700; color:var(--text); line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escaparHTML(p.name)}</div>
+              <div style="flex-shrink:0; margin-left:4px;">${thumb}</div>
+            </div>
+            ${p.description ? `<div style="font-size:9.5px; color:var(--text-muted); line-height:1.2; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; margin-top:2px;">${escaparHTML(p.description)}</div>` : ''}
           </div>
           <div style="display:flex; justify-content:space-between; align-items:flex-end;">
             <div>

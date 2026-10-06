@@ -2565,6 +2565,10 @@
           ✨ CERRAR Y CREAR OTRO NEGOCIO
         </button>
 
+        <button type="button" onclick="eliminarNegocioActual()" style="width:100%; margin-top:8px; background:rgba(239, 68, 68, 0.08); border:1px solid #FCA5A5; color:#DC2626; padding:9px; border-radius:12px; font-weight:700; font-size:11.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:5px;">
+          <span>🗑️</span> Eliminar Esta Tienda
+        </button>
+
         <div style="text-align:center; margin-top:14px; padding-top:10px; border-top:1px solid var(--surface-border);">
           <a href="landing.html" target="_blank" style="color:var(--primary); font-size:11.5px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:4px;">
             <span class="material-symbols-outlined" style="font-size:15px;">open_in_new</span>
@@ -5119,34 +5123,52 @@
 
       registry.forEach(biz => {
         const isRetail = biz.type === 'retail';
+        let numProds = 0;
+        let numProj = 0;
+        try {
+          const cat = localStorage.getItem(`zentra_catalog_${biz.id}`);
+          if (cat) numProds = JSON.parse(cat).length;
+          const prj = localStorage.getItem(`zentra_projects_${biz.id}`);
+          if (prj) numProj = JSON.parse(prj).length;
+        } catch (_) {}
+
+        const isCurrentActive = bizProfile && bizProfile.id === biz.id;
+
         const card = document.createElement('div');
-        card.style.cssText = 'background:#FFFFFF; border:1.5px solid #CBD5E1; border-radius:16px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer; transition:all 0.2s ease; box-shadow:0 2px 6px rgba(11,28,48,0.04);';
+        card.style.cssText = `background:#FFFFFF; border:1.5px solid ${isCurrentActive ? 'var(--primary)' : '#CBD5E1'}; border-radius:16px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer; transition:all 0.2s ease; box-shadow:0 2px 6px rgba(11,28,48,0.04);`;
         
         card.onmouseover = () => { card.style.borderColor = '#006C46'; card.style.background = '#F0FDF4'; };
-        card.onmouseout = () => { card.style.borderColor = '#CBD5E1'; card.style.background = '#FFFFFF'; };
+        card.onmouseout = () => { card.style.borderColor = isCurrentActive ? 'var(--primary)' : '#CBD5E1'; card.style.background = '#FFFFFF'; };
 
         card.innerHTML = `
-          <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+          <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;" onclick="ingresarDirectoANegocio('${biz.id}')">
             <div style="width:42px; height:42px; border-radius:12px; background:${isRetail ? '#ECFDF5' : '#EEF2FF'}; color:${isRetail ? '#065F46' : '#4338CA'}; font-size:22px; display:flex; align-items:center; justify-content:center; flex-shrink:0; border:1px solid ${isRetail ? '#A7F3D0' : '#C7D2FE'};">
               ${isRetail ? '🛒' : '✂️'}
             </div>
             <div style="min-width:0; flex:1;">
-              <div style="font-weight:800; font-size:14px; color:#0B1C30; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                ${biz.name}
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-weight:800; font-size:14px; color:#0B1C30; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                  ${biz.name}
+                </span>
+                ${isCurrentActive ? '<span style="font-size:9.5px; background:#DCFCE7; color:#15803D; padding:1px 6px; border-radius:6px; font-weight:800;">Activa</span>' : ''}
               </div>
               <div style="font-size:11px; color:#64748B; margin-top:2px;">
                 <span>${isRetail ? 'Retail / Mostrador' : 'Servicios / Por Encargo'}</span> • <span>${biz.owner || 'Dueño'}</span>
               </div>
+              <div style="font-size:10.5px; color:#006C46; font-weight:700; margin-top:2px;">
+                📦 ${numProds} productos • 📋 ${numProj} proyectos
+              </div>
             </div>
           </div>
-          <button style="background:var(--primary); color:#FFFFFF; border:none; padding:9px 14px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; gap:5px; flex-shrink:0; box-shadow:0 2px 8px rgba(0,108,70,0.25);">
-            <span>Entrar</span> <span>➔</span>
-          </button>
+          <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+            <button onclick="event.stopPropagation(); ingresarDirectoANegocio('${biz.id}')" style="background:var(--primary); color:#FFFFFF; border:none; padding:8px 12px; border-radius:10px; font-weight:800; font-size:11.5px; cursor:pointer; display:flex; align-items:center; gap:4px; box-shadow:0 2px 6px rgba(0,108,70,0.2);">
+              <span>Entrar</span> <span>➔</span>
+            </button>
+            <button onclick="event.stopPropagation(); eliminarNegocioDeDispositivo('${biz.id}', event)" title="Eliminar tienda duplicada o no deseada" style="background:#FEE2E2; border:1px solid #FCA5A5; color:#DC2626; width:34px; height:34px; border-radius:10px; font-size:15px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.2s;">
+              🗑️
+            </button>
+          </div>
         `;
-
-        card.onclick = () => {
-          ingresarDirectoANegocio(biz.id);
-        };
 
         container.appendChild(card);
       });
@@ -5171,6 +5193,102 @@
       cargarEstadoNegocio(bizId, ownerUser.id);
       document.getElementById('authScreenModal').style.display = 'none';
       showToast(`¡Bienvenida(o) a "${biz.name}"!`);
+    }
+
+    async function eliminarNegocioDeDispositivo(bizId, event = null) {
+      if (event) event.stopPropagation();
+      if (!bizId) return;
+
+      const reg = obtenerRegistroNegocios();
+      const targetBiz = reg.find(b => b.id === bizId);
+      const bizName = (targetBiz && targetBiz.name) || (bizProfile && bizProfile.id === bizId ? bizProfile.name : 'esta tienda');
+
+      let numProds = 0;
+      let numProj = 0;
+      try {
+        const cat = localStorage.getItem(`zentra_catalog_${bizId}`);
+        if (cat) numProds = JSON.parse(cat).length;
+        const prj = localStorage.getItem(`zentra_projects_${bizId}`);
+        if (prj) numProj = JSON.parse(prj).length;
+      } catch (_) {}
+
+      const confirmMsg = `¿Deseas eliminar permanentemente la tienda "${bizName}"?\n\n` +
+        `• Contenido registrado: ${numProds} productos y ${numProj} proyectos.\n` +
+        `• Esta acción liberará la tienda del dispositivo y de la sincronización en la nube.\n\n` +
+        `Presiona Aceptar para proceder con la eliminación.`;
+
+      if (!confirm(confirmMsg)) return;
+
+      // 1. Limpiar todas las claves de localStorage de este negocio
+      localStorage.removeItem(`zentra_biz_profile_${bizId}`);
+      localStorage.removeItem(`zentra_catalog_${bizId}`);
+      localStorage.removeItem(`zentra_catalog_backup_${bizId}`);
+      localStorage.removeItem(`zentra_projects_${bizId}`);
+      localStorage.removeItem(`zentra_expenses_${bizId}`);
+      localStorage.removeItem(`zentra_incomes_${bizId}`);
+      localStorage.removeItem(`zentra_clients_${bizId}`);
+      localStorage.removeItem(`zentra_users_${bizId}`);
+      localStorage.removeItem(`zentra_quotes_${bizId}`);
+      localStorage.removeItem(`zentra_tasks_${bizId}`);
+      localStorage.removeItem(`zentra_current_user_${bizId}`);
+
+      // 2. Actualizar registro local de negocios
+      const updatedReg = reg.filter(b => b.id !== bizId);
+      guardarRegistroNegocios(updatedReg);
+
+      // 3. Si Firebase está conectado con Google, eliminar de la nube también
+      if (typeof currentGoogleUser !== 'undefined' && currentGoogleUser && currentGoogleUser.uid && typeof fbDb !== 'undefined' && fbDb) {
+        try {
+          const uid = currentGoogleUser.uid;
+          // Eliminar documento específico de la tienda en Firestore
+          await fbDb.collection('tiendas').doc(`${uid}_${bizId}`).delete();
+
+          // Actualizar registro en Firestore
+          await fbDb.collection('tiendas').doc(`${uid}_registry`).set({
+            uid: uid,
+            ownerEmail: currentGoogleUser.email || '',
+            updatedAt: new Date().toISOString(),
+            businesses: updatedReg.map(b => ({
+              id: b.id,
+              name: b.name,
+              owner: b.owner,
+              phone: b.phone,
+              type: b.type,
+              createdAt: b.createdAt || new Date().toISOString()
+            }))
+          }, { merge: true });
+
+          console.log(`Zentra: Tienda ${bizId} eliminada de Firebase.`);
+        } catch (cloudErr) {
+          console.warn('Error eliminando tienda de Firebase:', cloudErr);
+        }
+      }
+
+      showToast(`✓ Tienda "${bizName}" eliminada correctamente`);
+
+      // 4. Si la tienda eliminada era la que estaba abierta en pantalla
+      if (bizProfile && bizProfile.id === bizId) {
+        localStorage.removeItem('zentra_active_biz_id');
+        limpiarEstadoEnMemoria();
+        if (updatedReg.length > 0) {
+          cargarEstadoNegocio(updatedReg[0].id);
+          showToast(`Cargada la tienda "${updatedReg[0].name}"`);
+        } else {
+          abrirAuthPortal('register');
+        }
+      }
+
+      // 5. Refrescar lista de negocios
+      renderSavedBusinessesList();
+      const modal = document.getElementById('businessProfileModal');
+      if (modal && modal.style.display === 'flex') {
+        cerrarBusinessProfileModal();
+      }
+    }
+
+    function eliminarNegocioActual() {
+      if (!bizProfile || !bizProfile.id) return;
+      eliminarNegocioDeDispositivo(bizProfile.id);
     }
 
     function toggleVerPinLogin() {

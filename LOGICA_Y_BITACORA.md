@@ -803,6 +803,27 @@ class CatalogItemModel {
   5. **Paridad Total de Archivos:**
      - Sincronización exacta al 100% en `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
 
+#### Hito 34: Gestión y Eliminación de Tiendas Duplicadas o No Deseadas (Local & Firebase Cloud)
+- **Reporte del Usuario:**
+  - *"en el celular veo 2 tiendas con el mismo nombre better life, coloca una opcion para eliminar la tienda que no corresponde"*
+- **Implementación Técnica:**
+  1. **Diferenciación Visual en el Selector de Tiendas:**
+     - En la lista de tiendas guardadas (`#boxSavedBusinesses`), cada tarjeta ahora detalla métricas clave:
+       - Cantidad real de productos e insumos (`📦 X productos`)
+       - Cantidad de proyectos/pedidos (`📋 Y proyectos`)
+       - Distintivo visual verde `Activa` para la tienda actualmente en uso.
+     - Esto permite al usuario identificar inmediatamente cuál es la tienda real con catálogo cargado y cuál es la copia vacía o duplicada.
+  2. **Botón de Eliminación Rápida (`🗑️`):**
+     - Botón rojo directo de papelera en cada tarjeta del selector de tiendas (`renderSavedBusinessesList`).
+     - Botón adicional "🗑️ Eliminar Esta Tienda" en el modal de Datos de Mi Negocio (`#businessProfileModal`).
+  3. **Motor de Eliminación Limpia y Sincronizada (`eliminarNegocioDeDispositivo`):**
+     - Ventana modal de confirmación informando nombre de la tienda, número de productos y proyectos que contiene.
+     - Limpieza total de claves en `localStorage` (`zentra_biz_profile_*`, `zentra_catalog_*`, `zentra_projects_*`, etc.).
+     - Si la cuenta de Google está conectada, elimina el documento de la tienda en Firebase Firestore (`tiendas/{uid}_{bizId}`) y actualiza el registro general `tiendas/{uid}_registry` para que el duplicado no vuelva a descargarse en otros dispositivos.
+     - Si la tienda eliminada era la activa, conmuta automáticamente a la siguiente tienda disponible del usuario o abre la pantalla de registro.
+  4. **Paridad Total de Archivos:**
+     - Sincronización exacta al 100% en `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

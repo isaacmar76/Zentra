@@ -206,7 +206,11 @@ class CatalogItemModel {
 | **2026-10-05** | `860e897` | Fix / Desktop Mode / UX | Hito 27: Solución a bucle de redirección en Landing Page, Inclusión de App nativa en /site y Modo Escritorio (PC) Panorámico | ✅ Completado |
 | **2026-10-05** | `2a48370` | Feature / Catálogo / PDF | Hito 28: Exportación de Catálogo a PDF e imagen para clientes vía WhatsApp | ✅ Completado |
 | **2026-10-05** | `0c3c60d` | UI / Plantilla Seleccionable | Hito 30: Opción E: Diseño Clásico V1 (Nude & Blush, tipografía Poppins, matriz 2x2 de métricas y botones grandes originales) | ✅ Completado |
-| **2026-10-05** | `current` | Cloud Sync / Firebase / Auth | Hito 31: Sincronización en Tiempo Real con Google Firebase y Vinculación QR (Estilo WhatsApp Web) entre Celular y PC | ✅ Completado |
+| **2026-10-05** | `91e3e7f` | Cloud Sync / Firebase / Auth | Hito 31: Sincronización en Tiempo Real con Google Firebase y Vinculación QR (Estilo WhatsApp Web) entre Celular y PC | ✅ Completado |
+| **2026-10-05** | `510a7b9` | Fix / Modo Clásico V1 | Hito 32: Visualización Completa de Proyectos en Modo Clásico V1 (Filtro 'Producción' y normalización de estados) | ✅ Completado |
+| **2026-10-05** | `67da1e8` | Multi-Tenant / Firestore Sync | Hito 33: Aislamiento Total Multi-Tienda en Firestore, Smart-Merge Anti-Pérdida y Eliminación de Restricciones en Catálogo | ✅ Completado |
+| **2026-10-05** | `982ce6d` | Multi-Tenant / Cloud | Hito 34: Gestión y Eliminación de Tiendas Duplicadas o No Deseadas (Local & Firebase Cloud) | ✅ Completado |
+| **2026-10-05** | `current` | UI / Catálogo / Cloud Sync | Hito 35: Tareas a Modal en Barra Inferior con Notificación Badge en Modo Clásico, Campo Descripción Breve en Catálogo y Auto-Cierre de Sincronización en la Nube | ✅ Completado |
 
 
 ---
@@ -823,6 +827,26 @@ class CatalogItemModel {
      - Si la tienda eliminada era la activa, conmuta automáticamente a la siguiente tienda disponible del usuario o abre la pantalla de registro.
   4. **Paridad Total de Archivos:**
      - Sincronización exacta al 100% en `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
+
+#### Hito 35: Tareas a Modal en Barra Inferior en Modo Clásico, Campo Descripción en Catálogo y Auto-Cierre de Sincronización en la Nube
+- **Requerimiento del Usuario:**
+  - *"nuevos cambios: en el modo Clasico, las tareas ya no se deben ver en la pantalla principal, que sea con un boton en la barra de abajo y que se abra la opcion, si hay tareas pendientes que se vea una notificacion en el boton como la que sale cuando hay proyectos o cotizaciones pendientes. En el catalogo agrega un campo para colocar una pequeña descripcion del producto. En la opcion de sincronizar cuando se termine de realizar la tarea cerrar el cuadro y volver a la pagina principal"*
+- **Implementación Técnica:**
+  1. **Modo Clásico V1 (`layout_e`) - Tareas en Barra Inferior y Modal:**
+     - El contenedor `#tasksWidgetContainer_e` se configuró con `display:none;` permanente en la pantalla principal de Modo Clásico para descongestionar el feed principal y centrar la vista en proyectos y finanzas.
+     - En `<nav class="bottom-bar">` se incorporó el nuevo botón interactivo `#btnNavTasks` ("Tareas") con ícono `checklist`.
+     - Sistema de insignias en tiempo real: Se implementó `#navTasksBadge` posicionado de manera responsiva en la esquina superior derecha del ícono de tareas (`top:2px; right:calc(50% - 20px)`), con fondo `#DC2626` y conteo de pendientes (`pendingTasks.filter(t => !t.completed).length`), comportándose de forma análoga a la insignia de cotizaciones y pedidos pendientes.
+     - Nuevo modal `#tasksModal` estilo bottom-sheet con contenedor `#tasksModalContainer`, que se abre al tocar el botón de la barra inferior (`abrirModalTareas()`) y permite crear tareas, marcar como completadas, alternar prioridad urgente, eliminar y limpiar.
+  2. **Catálogo - Campo de Descripción Breve del Producto/Servicio:**
+     - En el formulario de alta y edición de ítems (`#newProductModal`), se integró el campo `<textarea id="prodDescInp">` ("Descripción Breve (Opcional)") bajo el nombre del ítem.
+     - Persistencia completa en `catalogItems` (`item.description`), guardado automático en `localStorage`, integración con Smart Merge y Firebase Firestore, y respaldo en backups locales y en la nube.
+     - Renderizado visual estilizado en `renderCatalogItems()`, `renderCatalogIntegrated()` y en el generador de catálogo PDF (`renderPrevisualizacionCatalogoPDF()`).
+  3. **Sincronización en la Nube - Auto-Cierre y Retorno al Inicio:**
+     - En `sincronizarManualmenteConFirebase()`, al finalizar con éxito la sincronización con Google Cloud, se invoca automáticamente `cerrarModalSincronizacionNube()`, se oculta cualquier modal residual y se llama a `irInicio()`.
+     - Se integró el mismo comportamiento tras completar la vinculación por código QR y al completar el inicio de sesión con Google.
+     - `irInicio()` restaura además el estado `.active` en el botón `#btnNavHome` de la barra inferior.
+  4. **Paridad Total de Archivos:**
+     - Sincronización exacta al 100% de SHA-256 en los 4 archivos del repositorio: `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
 
 ---
 

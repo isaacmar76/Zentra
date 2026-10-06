@@ -1992,8 +1992,8 @@
           </button>
         </div>
 
-        <!-- Widget de Tareas Pendientes en Clásico V1 -->
-        <div id="tasksWidgetContainer_e" style="margin-bottom:14px;"></div>
+        <!-- Widget de Tareas Pendientes en Clásico V1 (Oculto en pantalla principal; accesible desde la barra inferior) -->
+        <div id="tasksWidgetContainer_e" style="display:none; margin-bottom:14px;"></div>
 
         <!-- Lista de Proyectos en Curso con diseño V1 -->
         <div class="section-title-v1">
@@ -2096,10 +2096,15 @@
         <span class="material-symbols-outlined" style="font-size:20px;">inventory_2</span>
         <span>Catálogo</span>
       </button>
+      <button class="nav-btn" id="btnNavTasks" onclick="abrirModalTareas()" style="position:relative;">
+        <span class="material-symbols-outlined" style="font-size:20px;">checklist</span>
+        <span>Tareas</span>
+        <span id="navTasksBadge" style="position:absolute; top:2px; right:calc(50% - 20px); background:#DC2626; color:#FFFFFF; font-size:9.5px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.2); display:none;">0</span>
+      </button>
       <button class="nav-btn" id="btnNavQuotes" onclick="abrirModalCotizaciones()" style="position:relative;">
         <span class="material-symbols-outlined" style="font-size:20px;">request_quote</span>
         <span>Cotizaciones</span>
-        <span id="navQuotesBadge" style="position:absolute; top:3px; right:16px; background:#0284C7; color:#FFFFFF; font-size:9.5px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.2); display:none;">0</span>
+        <span id="navQuotesBadge" style="position:absolute; top:2px; right:calc(50% - 20px); background:#0284C7; color:#FFFFFF; font-size:9.5px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 4px rgba(0,0,0,0.2); display:none;">0</span>
       </button>
     </nav>
 
@@ -3059,6 +3064,11 @@
           <input type="text" id="prodNameInp" placeholder="Ej: Cake Topper Shaker, Agendas, Tarjetas x50" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Descripción Breve (Opcional)</label>
+          <textarea id="prodDescInp" rows="2" placeholder="Ej: Medidas, material, colores o detalles para el cliente..." style="width:100%; padding:8px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:12px; font-family:inherit; resize:vertical; box-sizing:border-box;"></textarea>
+        </div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;">
           <div>
             <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;" id="lblProdPriceTitle">Precio Venta ($ COP) *</label>
@@ -3447,6 +3457,27 @@
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- Modal de Gestión y Seguimiento de Tareas Pendientes -->
+    <div id="tasksModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:370; align-items:flex-end; justify-content:center;" onclick="if(event.target===this) cerrarModalTareas()">
+      <div style="background:var(--card-bg); width:100%; max-width:480px; border-radius:28px 28px 0 0; padding:20px 16px; max-height:88%; overflow-y:auto; color:var(--text); box-sizing:border-box; box-shadow:0 -10px 30px rgba(0,0,0,0.25);" onclick="event.stopPropagation()">
+        <!-- Header del Modal -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+          <div>
+            <div style="font-size:16px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:6px;">
+              <span>📝</span> Tareas y Pendientes
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Gestión de pendientes del día, reparaciones y recordatorios</div>
+          </div>
+          <button onclick="cerrarModalTareas()" style="background:none; border:none; font-size:20px; font-weight:700; cursor:pointer; color:var(--text-muted); padding:2px 6px;">✕</button>
+        </div>
+
+        <!-- Contenedor dinámico del widget de tareas -->
+        <div id="tasksModalContainer">
+          <!-- Renderizado dinámicamente -->
+        </div>
       </div>
     </div>
 
@@ -5827,7 +5858,8 @@
 
         card.innerHTML = `
           <div>
-            <div style="font-weight:700; font-size:13px; color:var(--text);">${item.name}</div>
+            <div style="font-weight:700; font-size:13px; color:var(--text);">${escaparHTML(item.name)}</div>
+            ${item.description ? `<div style="font-size:11px; color:#64748B; margin-top:2px;">${escaparHTML(item.description)}</div>` : ''}
             <div style="font-size:11px; color:#777;">Cat: ${item.cat} • Costo: $${item.cost.toLocaleString('es-CO')}</div>
             <div style="font-size:13px; font-weight:700; color:var(--secondary); margin-top:2px;">
               $${item.price.toLocaleString('es-CO')} 
@@ -7319,7 +7351,8 @@ ${estadoStr}${contactText}
                 <span style="font-size:9.5px; font-weight:800; padding:1px 6px; border-radius:5px; background:${isServ ? '#EEF2FF; color:#4F46E5;' : '#ECFDF5; color:#065F46;'}">${isServ ? '✂️ SERVICIO' : '📦 PRODUCTO'}</span>
                 <span style="font-size:10px; color:var(--text-muted);">${item.cat || 'General'}</span>
               </div>
-              <div style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</div>
+              <div style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${escaparHTML(item.name)}</div>
+              ${item.description ? `<div style="font-size:11px; color:#64748B; margin-top:2px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${escaparHTML(item.description)}</div>` : ''}
               <div style="font-size:11px; color:#64748B; margin-top:1px;">
                 Costo: <b>$${(item.cost || 0).toLocaleString('es-CO')}</b> • Venta: <b style="color:var(--text);">$${(item.price || 0).toLocaleString('es-CO')}</b>
               </div>
@@ -7593,9 +7626,10 @@ ${estadoStr}${contactText}
                 </span>
                 ${stockHtml}
               </div>
-              <div style="font-size:14px; font-weight:800; color:#0F172A; line-height:1.3; margin-bottom:6px;">
-                ${item.name}
+              <div style="font-size:14px; font-weight:800; color:#0F172A; line-height:1.3; margin-bottom:4px;">
+                ${escaparHTML(item.name)}
               </div>
+              ${item.description ? `<div style="font-size:10.5px; color:#64748B; line-height:1.3; margin-bottom:6px;">${escaparHTML(item.description)}</div>` : ''}
               ${priceHtml}
               ${orderLinkHtml}
             </div>
@@ -7818,6 +7852,8 @@ ${estadoStr}${contactText}
       if (subEl) subEl.innerText = 'Define costos, precios de venta y control de existencias';
 
       document.getElementById('prodNameInp').value = '';
+      const descInp = document.getElementById('prodDescInp');
+      if (descInp) descInp.value = '';
       document.getElementById('prodPriceInp').value = '';
       document.getElementById('prodCostInp').value = '';
       document.getElementById('prodStockInp').value = '10';
@@ -7843,6 +7879,8 @@ ${estadoStr}${contactText}
       if (subEl) subEl.innerText = 'Modifica datos, precios, costo o cambia la foto';
 
       document.getElementById('prodNameInp').value = item.name || '';
+      const descInp = document.getElementById('prodDescInp');
+      if (descInp) descInp.value = item.description || '';
       document.getElementById('prodPriceInp').value = item.price || '';
       document.getElementById('prodCostInp').value = item.cost || '';
       document.getElementById('prodStockInp').value = item.stock !== undefined ? item.stock : 10;
@@ -7881,6 +7919,7 @@ ${estadoStr}${contactText}
 
     function guardarNuevoProducto() {
       const name = document.getElementById('prodNameInp').value.trim();
+      const description = (document.getElementById('prodDescInp')?.value || '').trim();
       const price = parseFloat(document.getElementById('prodPriceInp').value) || 0;
       const cost = parseFloat(document.getElementById('prodCostInp').value) || 0;
       const itemType = document.getElementById('prodTypeInp').value || 'producto';
@@ -7904,6 +7943,7 @@ ${estadoStr}${contactText}
         const item = catalogItems.find(i => i.id === editingProductId);
         if (item) {
           item.name = name;
+          item.description = description;
           item.price = price;
           item.cost = cost;
           item.stock = stock;
@@ -7917,6 +7957,7 @@ ${estadoStr}${contactText}
           retailCart.forEach(ci => {
             if (ci.id === editingProductId) {
               ci.name = name;
+              ci.description = description;
               ci.price = price;
               ci.cost = cost;
               ci.image = tempProductPhoto || null;
@@ -7932,6 +7973,7 @@ ${estadoStr}${contactText}
         catalogItems.unshift({
           id: 'c_' + Date.now(),
           name: name,
+          description: description,
           price: price,
           cost: cost,
           stock: stock,
@@ -9176,6 +9218,9 @@ ${estadoStr}${contactText}
       const targetEl = document.getElementById(activeTargetId);
       if (targetEl) targetEl.style.display = 'block';
       renderCurrentHomeLayout();
+      document.querySelectorAll('.bottom-bar .nav-btn').forEach(btn => btn.classList.remove('active'));
+      const btnHome = document.getElementById('btnNavHome');
+      if (btnHome) btnHome.classList.add('active');
     }
 
     function mostrarSubseccionClientes() {
@@ -9383,13 +9428,13 @@ ${estadoStr}${contactText}
         }).join('');
       }
 
+      const isModal = suffix === 'modal';
       return `
-        <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:18px; padding:13px 14px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+        <div style="background:var(--card-bg); ${isModal ? 'border:none; padding:0; box-shadow:none;' : 'border:1px solid var(--surface-border); border-radius:18px; padding:13px 14px; box-shadow:0 2px 8px rgba(0,0,0,0.03);'}">
           <!-- Cabecera del widget -->
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <div style="display:flex; align-items:center; gap:6px;">
-              <span style="font-size:16px;">📝</span>
-              <span style="font-size:12.5px; font-weight:800; color:var(--text);">Tareas Pendientes</span>
+              ${isModal ? '' : '<span style="font-size:16px;">📝</span> <span style="font-size:12.5px; font-weight:800; color:var(--text);">Tareas Pendientes</span>'}
               ${countBadge}
             </div>
             ${btnLimpiar}
@@ -9423,6 +9468,23 @@ ${estadoStr}${contactText}
       `;
     }
 
+    function abrirModalTareas() {
+      actualizarWidgetsTareasPendientes();
+      const modal = document.getElementById('tasksModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => {
+          const inp = document.getElementById('inpNewTaskText_modal');
+          if (inp) inp.focus();
+        }, 120);
+      }
+    }
+
+    function cerrarModalTareas() {
+      const modal = document.getElementById('tasksModal');
+      if (modal) modal.style.display = 'none';
+    }
+
     function actualizarWidgetsTareasPendientes() {
       const showTasks = bizProfile.showPendingTasks !== false;
       sincronizarToggleTareasPendientesUI();
@@ -9438,7 +9500,8 @@ ${estadoStr}${contactText}
       containers.forEach(item => {
         const el = document.getElementById(item.id);
         if (!el) return;
-        if (!showTasks) {
+        // En modo clásico V1 las tareas ya no se muestran en la pantalla principal
+        if (!showTasks || item.id === 'tasksWidgetContainer_e') {
           el.style.display = 'none';
           el.innerHTML = '';
         } else {
@@ -9446,6 +9509,24 @@ ${estadoStr}${contactText}
           el.innerHTML = renderPendingTasksWidgetMarkup(item.suffix);
         }
       });
+
+      // Actualizar contenedor del modal de tareas
+      const modalCont = document.getElementById('tasksModalContainer');
+      if (modalCont) {
+        modalCont.innerHTML = renderPendingTasksWidgetMarkup('modal');
+      }
+
+      // Notificación badge en el botón de navegación inferior (como proyectos o cotizaciones pendientes)
+      const pendientes = pendingTasks.filter(t => !t.completed);
+      const bNavTasks = document.getElementById('navTasksBadge');
+      if (bNavTasks) {
+        if (pendientes.length > 0) {
+          bNavTasks.innerText = pendientes.length;
+          bNavTasks.style.display = 'inline-block';
+        } else {
+          bNavTasks.style.display = 'none';
+        }
+      }
     }
 
     // =======================================================
@@ -10191,6 +10272,15 @@ ${estadoStr}${contactText}
 
         // Sincronizar datos con Firestore
         await sincronizarConNubeFirebase(user.uid);
+
+        // Si el modal de sincronización estaba abierto, cerrarlo y volver a inicio
+        const cloudModal = document.getElementById('cloudSyncModal');
+        if (cloudModal && cloudModal.style.display === 'flex') {
+          setTimeout(() => {
+            cerrarModalSincronizacionNube();
+            irInicio();
+          }, 650);
+        }
       } else {
         currentGoogleUser = null;
         try {
@@ -10623,13 +10713,19 @@ ${estadoStr}${contactText}
       if (m) m.style.display = 'none';
     }
 
-    function sincronizarManualmenteConFirebase() {
+    async function sincronizarManualmenteConFirebase() {
       if (!currentGoogleUser) {
         abrirModalSincronizacionNube();
         return;
       }
       showToast('⏳ Sincronizando con Google Cloud...');
-      sincronizarConNubeFirebase(currentGoogleUser.uid);
+      await sincronizarConNubeFirebase(currentGoogleUser.uid);
+      setTimeout(() => {
+        cerrarModalSincronizacionNube();
+        const bizProfModal = document.getElementById('businessProfileModal');
+        if (bizProfModal) bizProfModal.style.display = 'none';
+        irInicio();
+      }, 700);
     }
 
     async function ejecutarDiagnosticoFirebase() {
@@ -10820,6 +10916,8 @@ ${estadoStr}${contactText}
               }
               cerrarModalQRPC();
               await sincronizarConNubeFirebase(data.uid);
+              cerrarModalSincronizacionNube();
+              irInicio();
             }
           });
         }
@@ -10903,6 +11001,8 @@ ${estadoStr}${contactText}
           authorizedAt: Date.now()
         }, { merge: true });
         showToast('🎉 ¡Computador vinculado con éxito!');
+        cerrarModalSincronizacionNube();
+        irInicio();
       } catch (err) {
         console.error('Error autorizando sesión QR:', err);
         showToast('❌ Error al autorizar el computador.');

@@ -1666,6 +1666,11 @@
           <span class="material-symbols-outlined" id="iconDeviceToggle" style="font-size:18px; color:var(--primary);">laptop_chromebook</span>
           <span id="txtDeviceToggle">Vista PC</span>
         </button>
+        <!-- Ícono de Pedidos Web Recibidos de la Tienda Online -->
+        <button class="icon-btn" id="btnOnlineOrders" onclick="abrirModalPedidosWeb()" title="Pedidos Recibidos en Tienda Online" style="position:relative; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; width:38px; height:38px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
+          <span class="material-symbols-outlined" style="font-size:21px;">storefront</span>
+          <span id="badgeOnlineOrders" style="position:absolute; top:-4px; right:-4px; background:#EF4444; color:#FFFFFF; font-size:10px; font-weight:800; border-radius:10px; padding:1px 5px; min-width:14px; text-align:center; box-shadow:0 2px 5px rgba(0,0,0,0.25); display:none;">0</span>
+        </button>
         <!-- Ícono del Carrito de Compras SIEMPRE VISIBLE arriba a la derecha -->
         <button class="icon-btn" id="btnHeaderCart" onclick="abrirCarritoRetail()" title="Ver Carrito de Pedido" style="position:relative; background:var(--primary-soft); color:var(--primary); border:1px solid rgba(0,108,70,0.25); width:38px; height:38px; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer;">
           <span class="material-symbols-outlined" style="font-size:21px;">shopping_cart</span>
@@ -1710,6 +1715,18 @@
             </button>
             <button class="sec-btn" onclick="abrirModalNuevoPedido()" style="margin:0; font-weight:700; font-size:11.5px; display:flex; align-items:center; justify-content:center; gap:4px; border:1.5px solid var(--surface-border); background:var(--surface-subtle); color:var(--text); border-radius:14px;">
               <span>✂️</span> + A Medida
+            </button>
+          </div>
+          <!-- Fila Rápida: Pedidos Web y Compartir Tienda -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px;">
+            <button type="button" onclick="abrirModalPedidosWeb()" style="padding:9px 10px; border-radius:12px; border:1px solid #BFDBFE; background:#EFF6FF; color:#1D4ED8; font-size:11.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span>🛍️</span>
+              <span>Pedidos Web</span>
+              <span id="cockpitOrdersBadge" style="background:#EF4444; color:#fff; font-size:9.5px; padding:1px 6px; border-radius:10px; display:none;">0</span>
+            </button>
+            <button type="button" onclick="compartirTiendaVirtual()" style="padding:9px 10px; border-radius:12px; border:1px solid #A7F3D0; background:#ECFDF5; color:#047857; font-size:11.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span>📲</span>
+              <span>Compartir Tienda</span>
             </button>
           </div>
         </div>
@@ -2077,6 +2094,9 @@
             <span>‹ Volver al Inicio</span>
           </button>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" onclick="compartirTiendaVirtual()" style="background:#ECFDF5; border:1.5px solid #006C46; color:#006C46; padding:7px 11px; border-radius:10px; font-size:11.5px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 4px rgba(0,108,70,0.15);">
+              <span>📲</span> Compartir Tienda Web
+            </button>
             <button onclick="abrirModalImportarSheets()" style="background:#F0FDF4; border:1.5px solid #22C55E; color:#15803D; padding:7px 11px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(34,197,94,0.12);">
               <span>📊</span> Importar Sheets
             </button>
@@ -2456,6 +2476,12 @@
         </div>
 
         <button onclick="guardarDatosNegocio()" class="primary-btn">GUARDAR CAMBIOS</button>
+
+        <div style="margin-top:10px;">
+          <button type="button" onclick="compartirTiendaVirtual()" style="width:100%; background:linear-gradient(135deg, #006C46 0%, #059669 100%); color:#FFFFFF; border:none; padding:11px; border-radius:14px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(0,108,70,0.22);">
+            <span>📲</span> Compartir Mi Tienda y Catálogo Virtual
+          </button>
+        </div>
 
         <!-- Personalización de Pantalla de Inicio -->
         <div style="margin-top:16px; margin-bottom:16px; padding:14px; background:var(--surface-container-low); border:1px solid var(--surface-border); border-radius:16px;">
@@ -3573,6 +3599,46 @@
       </div>
     </div>
 
+    <!-- Modal de Gestión de Pedidos de la Tienda Online -->
+    <div id="ordersWebModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:380; align-items:flex-end; justify-content:center;" onclick="if(event.target===this) cerrarModalPedidosWeb()">
+      <div style="background:var(--card-bg); width:100%; max-width:500px; border-radius:28px 28px 0 0; padding:20px 16px; max-height:90%; overflow-y:auto; color:var(--text); box-sizing:border-box; box-shadow:0 -10px 30px rgba(0,0,0,0.25);" onclick="event.stopPropagation()">
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+          <div>
+            <div style="font-size:16.5px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:6px;">
+              <span>🛍️</span> Pedidos Tienda Online
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Pedidos recibidos en tiempo real desde tu catálogo web</div>
+          </div>
+          <button onclick="cerrarModalPedidosWeb()" style="background:none; border:none; font-size:20px; font-weight:700; cursor:pointer; color:var(--text-muted); padding:2px 6px;">✕</button>
+        </div>
+
+        <!-- Botón Compartir Tienda -->
+        <div style="margin-bottom:12px; display:flex; gap:8px;">
+          <button type="button" onclick="compartirTiendaVirtual()" style="flex:1; background:linear-gradient(135deg, #006C46 0%, #059669 100%); color:#FFFFFF; border:none; padding:10px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(0,108,70,0.25);">
+            <span>📲</span> Compartir Catálogo a Clientes
+          </button>
+          <button type="button" onclick="sincronizarPedidosWebManual()" style="background:var(--surface-container-low); border:1px solid var(--surface-border); color:var(--text); padding:0 12px; border-radius:12px; font-size:12px; font-weight:700; cursor:pointer;" title="Refrescar pedidos">
+            <span>🔄</span>
+          </button>
+        </div>
+
+        <!-- Pestañas de Filtro de Estados -->
+        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:6px; margin-bottom:12px; scrollbar-width:none;" id="ordersWebStatusTabs">
+          <button class="orders-tab-btn active" onclick="filtrarTabPedidosWeb('todos', this)" style="padding:6px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--primary); color:#FFFFFF; font-size:11px; font-weight:700; white-space:nowrap; cursor:pointer;">Todos (<span id="cntOrdersAll">0</span>)</button>
+          <button class="orders-tab-btn" onclick="filtrarTabPedidosWeb('pendiente_pago', this)" style="padding:6px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:11px; font-weight:700; white-space:nowrap; cursor:pointer;">⏳ Pendiente Pago (<span id="cntOrdersPending">0</span>)</button>
+          <button class="orders-tab-btn" onclick="filtrarTabPedidosWeb('en_preparacion', this)" style="padding:6px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:11px; font-weight:700; white-space:nowrap; cursor:pointer;">🟡 En Preparación (<span id="cntOrdersPrep">0</span>)</button>
+          <button class="orders-tab-btn" onclick="filtrarTabPedidosWeb('empacado', this)" style="padding:6px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:11px; font-weight:700; white-space:nowrap; cursor:pointer;">📦 Empacados (<span id="cntOrdersPack">0</span>)</button>
+          <button class="orders-tab-btn" onclick="filtrarTabPedidosWeb('enviado', this)" style="padding:6px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:11px; font-weight:700; white-space:nowrap; cursor:pointer;">🚚 Enviados (<span id="cntOrdersSent">0</span>)</button>
+        </div>
+
+        <!-- Lista de Pedidos -->
+        <div id="ordersWebListContainer" style="display:flex; flex-direction:column; gap:10px;">
+          <!-- Inyectado dinámicamente -->
+        </div>
+      </div>
+    </div>
+
     <!-- Modal de Gestión y Seguimiento de Tareas Pendientes -->
     <div id="tasksModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.55); backdrop-filter:blur(3px); z-index:370; align-items:flex-end; justify-content:center;" onclick="if(event.target===this) cerrarModalTareas()">
       <div style="background:var(--card-bg); width:100%; max-width:480px; border-radius:28px 28px 0 0; padding:20px 16px; max-height:88%; overflow-y:auto; color:var(--text); box-sizing:border-box; box-shadow:0 -10px 30px rgba(0,0,0,0.25);" onclick="event.stopPropagation()">
@@ -4354,6 +4420,7 @@
         localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(clients));
         localStorage.setItem(`zentra_quotes_${bizId}`, JSON.stringify(savedQuotes));
         localStorage.setItem(`zentra_tasks_${bizId}`, JSON.stringify(pendingTasks));
+        localStorage.setItem(`zentra_orders_${bizId}`, JSON.stringify(onlineOrders || []));
         if (currentUser) localStorage.setItem(`zentra_current_user_${bizId}`, JSON.stringify(currentUser));
         localStorage.setItem('zentra_active_biz_id', bizId);
 
@@ -4847,6 +4914,8 @@
         renderCatalogItems();
         renderPos();
         actualizarWidgetsTareasPendientes();
+        cargarPedidosWebLocal(bizId);
+        escucharPedidosWebFirestore();
 
         // Conectar escucha en la nube específica para este negocio
         if (typeof currentGoogleUser !== 'undefined' && currentGoogleUser && currentGoogleUser.uid && typeof suscribirCambiosEnTiempoReal === 'function') {
@@ -7211,8 +7280,465 @@
 
       document.getElementById('headerTitle').innerText = `${bizProfile.name} • Servicios`;
       persistirEstadoLocal();
+      publicarCatalogoTiendaEnNube(true);
       cerrarBusinessProfileModal();
       showToast(`¡Datos actualizados para "${bizProfile.name}"!`);
+    }
+
+    // =========================================================================
+    // MÓDULO DE TIENDA VIRTUAL PÚBLICA Y GESTIÓN DE PEDIDOS EN LÍNEA
+    // =========================================================================
+    let onlineOrders = [];
+    let onlineOrdersUnsubscribe = null;
+    let activeOrdersWebTab = 'todos';
+
+    function cargarPedidosWebLocal(bizId) {
+      if (!bizId) return;
+      try {
+        const raw = localStorage.getItem(`zentra_orders_${bizId}`);
+        onlineOrders = raw ? JSON.parse(raw) : [];
+      } catch (_) {
+        onlineOrders = [];
+      }
+      actualizarBadgesPedidosWeb();
+    }
+
+    function guardarPedidosWebLocal() {
+      if (!bizProfile || !bizProfile.id) return;
+      try {
+        localStorage.setItem(`zentra_orders_${bizProfile.id}`, JSON.stringify(onlineOrders));
+      } catch (_) {}
+      actualizarBadgesPedidosWeb();
+    }
+
+    function escucharPedidosWebFirestore() {
+      if (!fbDb || !bizProfile || !bizProfile.id) return;
+      if (onlineOrdersUnsubscribe) {
+        onlineOrdersUnsubscribe();
+        onlineOrdersUnsubscribe = null;
+      }
+
+      try {
+        const ordersRef = fbDb.collection('tiendas_publicas').doc(bizProfile.id).collection('pedidos');
+        onlineOrdersUnsubscribe = ordersRef.onSnapshot(snap => {
+          const list = [];
+          snap.forEach(doc => {
+            list.push(doc.data());
+          });
+          list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+          onlineOrders = list;
+          guardarPedidosWebLocal();
+          actualizarBadgesPedidosWeb();
+          if (document.getElementById('ordersWebModal') && document.getElementById('ordersWebModal').style.display === 'flex') {
+            renderizarListaPedidosWeb();
+          }
+        }, err => {
+          console.warn('Listener de pedidos web Firestore:', err);
+        });
+      } catch (err) {
+        console.warn('Error al iniciar escucha de pedidos web:', err);
+      }
+    }
+
+    function actualizarBadgesPedidosWeb() {
+      const pendingCount = onlineOrders.filter(o => o.status === 'pendiente_pago').length;
+      const totalCount = onlineOrders.length;
+
+      const headerBadge = document.getElementById('badgeOnlineOrders');
+      if (headerBadge) {
+        if (pendingCount > 0) {
+          headerBadge.innerText = pendingCount;
+          headerBadge.style.display = 'block';
+        } else {
+          headerBadge.style.display = 'none';
+        }
+      }
+
+      const cockpitBadge = document.getElementById('cockpitOrdersBadge');
+      if (cockpitBadge) {
+        if (pendingCount > 0) {
+          cockpitBadge.innerText = pendingCount;
+          cockpitBadge.style.display = 'inline-block';
+        } else {
+          cockpitBadge.style.display = 'none';
+        }
+      }
+
+      const elAll = document.getElementById('cntOrdersAll');
+      if (elAll) elAll.innerText = totalCount;
+      const elPending = document.getElementById('cntOrdersPending');
+      if (elPending) elPending.innerText = pendingCount;
+      const elPrep = document.getElementById('cntOrdersPrep');
+      if (elPrep) elPrep.innerText = onlineOrders.filter(o => o.status === 'en_preparacion').length;
+      const elPack = document.getElementById('cntOrdersPack');
+      if (elPack) elPack.innerText = onlineOrders.filter(o => o.status === 'empacado').length;
+      const elSent = document.getElementById('cntOrdersSent');
+      if (elSent) elSent.innerText = onlineOrders.filter(o => o.status === 'enviado').length;
+    }
+
+    function abrirModalPedidosWeb() {
+      actualizarBadgesPedidosWeb();
+      renderizarListaPedidosWeb();
+      document.getElementById('ordersWebModal').style.display = 'flex';
+    }
+
+    function cerrarModalPedidosWeb() {
+      document.getElementById('ordersWebModal').style.display = 'none';
+    }
+
+    function filtrarTabPedidosWeb(tab, btn) {
+      activeOrdersWebTab = tab;
+      document.querySelectorAll('.orders-tab-btn').forEach(b => {
+        b.style.background = 'var(--card-bg)';
+        b.style.color = 'var(--text)';
+      });
+      if (btn) {
+        btn.style.background = 'var(--primary)';
+        btn.style.color = '#FFFFFF';
+      }
+      renderizarListaPedidosWeb();
+    }
+
+    function renderizarListaPedidosWeb() {
+      const container = document.getElementById('ordersWebListContainer');
+      if (!container) return;
+
+      let list = onlineOrders;
+      if (activeOrdersWebTab !== 'todos') {
+        list = list.filter(o => o.status === activeOrdersWebTab);
+      }
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:30px 16px; color:var(--text-muted);">
+            <div style="font-size:36px; margin-bottom:8px;">🛍️</div>
+            <div style="font-size:13px; font-weight:700;">No hay pedidos en esta categoría</div>
+            <div style="font-size:11px; margin-top:4px;">Comparte el enlace de tu tienda con tus clientes para empezar a recibir pedidos aquí.</div>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = list.map(o => {
+        const isPending = o.status === 'pendiente_pago';
+        const isPrep = o.status === 'en_preparacion';
+        const isPacked = o.status === 'empacado';
+        const isSent = o.status === 'enviado';
+        const isDelivered = o.status === 'entregado';
+
+        let statusBadge = '';
+        if (isPending) statusBadge = `<span style="background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">⏳ Esperando Pago</span>`;
+        else if (isPrep) statusBadge = `<span style="background:#DBEAFE; color:#1E40AF; border:1px solid #93C5FD; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">🟡 En Preparación</span>`;
+        else if (isPacked) statusBadge = `<span style="background:#F3E8FF; color:#6B21A8; border:1px solid #D8B4FE; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">📦 Empacado</span>`;
+        else if (isSent) statusBadge = `<span style="background:#E0E7FF; color:#3730A3; border:1px solid #C7D2FE; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">🚚 En Camino</span>`;
+        else if (isDelivered) statusBadge = `<span style="background:#DCFCE7; color:#166534; border:1px solid #86EFAC; font-size:10.5px; font-weight:800; padding:2px 8px; border-radius:10px;">🟢 Entregado</span>`;
+
+        const itemsHtml = (o.items || []).map(it => `
+          <div style="display:flex; justify-content:space-between; font-size:11.5px; color:#334155;">
+            <span><b>${it.cant}x</b> ${it.name}</span>
+            <span style="font-weight:700;">$${(it.subtotal || (it.cant * it.price) || 0).toLocaleString('es-CO')}</span>
+          </div>
+        `).join('');
+
+        const cleanPhone = (o.client && o.client.phone ? o.client.phone.replace(/\D/g, '') : '');
+        const waLink = cleanPhone ? `https://wa.me/${cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone}` : '#';
+
+        let actionsHtml = '';
+        if (isPending) {
+          actionsHtml = `
+            <button type="button" onclick="confirmarPagoPedidoWeb('${o.orderId}')" style="width:100%; background:linear-gradient(135deg, #16A34A 0%, #22C55E 100%); color:#FFFFFF; border:none; padding:10px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(22,163,74,0.25);">
+              <span>✓ Confirmar Pago Recibido ($${(o.total || 0).toLocaleString('es-CO')})</span>
+            </button>
+          `;
+        } else if (isPrep) {
+          actionsHtml = `
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <button type="button" onclick="cambiarEstadoPedidoWeb('${o.orderId}', 'empacado')" style="background:#F3E8FF; border:1px solid #D8B4FE; color:#6B21A8; padding:8px; border-radius:10px; font-size:11px; font-weight:800; cursor:pointer;">
+                📦 Marcar Empacado
+              </button>
+              <button type="button" onclick="reabrirReciboPedidoWeb('${o.orderId}')" style="background:#F8FAFC; border:1px solid #CBD5E1; color:#334155; padding:8px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+                📄 Ver Recibo
+              </button>
+            </div>
+          `;
+        } else if (isPacked) {
+          actionsHtml = `
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <button type="button" onclick="cambiarEstadoPedidoWeb('${o.orderId}', 'enviado')" style="background:#E0E7FF; border:1px solid #C7D2FE; color:#3730A3; padding:8px; border-radius:10px; font-size:11px; font-weight:800; cursor:pointer;">
+                🚚 Marcar Enviado
+              </button>
+              <button type="button" onclick="reabrirReciboPedidoWeb('${o.orderId}')" style="background:#F8FAFC; border:1px solid #CBD5E1; color:#334155; padding:8px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+                📄 Ver Recibo
+              </button>
+            </div>
+          `;
+        } else if (isSent) {
+          actionsHtml = `
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+              <button type="button" onclick="cambiarEstadoPedidoWeb('${o.orderId}', 'entregado')" style="background:#DCFCE7; border:1px solid #86EFAC; color:#166534; padding:8px; border-radius:10px; font-size:11px; font-weight:800; cursor:pointer;">
+                🟢 Marcar Entregado
+              </button>
+              <button type="button" onclick="reabrirReciboPedidoWeb('${o.orderId}')" style="background:#F8FAFC; border:1px solid #CBD5E1; color:#334155; padding:8px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+                📄 Ver Recibo
+              </button>
+            </div>
+          `;
+        } else {
+          actionsHtml = `
+            <button type="button" onclick="reabrirReciboPedidoWeb('${o.orderId}')" style="width:100%; background:#F8FAFC; border:1px solid #CBD5E1; color:#334155; padding:8px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer;">
+              📄 Ver Recibo / Factura Oficial
+            </button>
+          `;
+        }
+
+        return `
+          <div style="background:#FFFFFF; border:1.5px solid ${isPending ? '#FCD34D' : '#E2E8F0'}; border-radius:16px; padding:12px; box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <span style="font-size:13px; font-weight:800; color:var(--primary);">#${o.orderId}</span>
+              ${statusBadge}
+            </div>
+
+            <!-- Cliente y Contacto -->
+            <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:8px 10px; margin-bottom:8px; font-size:11.5px;">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <b style="color:#0F172A;">👤 ${o.client ? o.client.name : 'Cliente'}</b>
+                <a href="${waLink}" target="_blank" style="color:#16A34A; font-weight:700; text-decoration:none; display:flex; align-items:center; gap:2px;">
+                  <span>💬 WhatsApp</span>
+                </a>
+              </div>
+              <div style="color:#64748B; margin-top:2px;">📍 ${o.client ? o.client.address : 'Sin dirección'}</div>
+              ${o.client && o.client.notes ? `<div style="color:#B45309; font-size:10.5px; margin-top:2px;">📝 Nota: ${o.client.notes}</div>` : ''}
+            </div>
+
+            <!-- Productos -->
+            <div style="margin-bottom:8px; display:flex; flex-direction:column; gap:3px;">
+              ${itemsHtml}
+            </div>
+
+            <!-- Total y Medio de Pago -->
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-top:1px dashed #CBD5E1; margin-bottom:10px;">
+              <span style="font-size:11px; color:#64748B;">Medio: <b>${o.paymentMethod || 'Transferencia'}</b></span>
+              <span style="font-size:15px; font-weight:800; color:#006C46;">$${(o.total || 0).toLocaleString('es-CO')} COP</span>
+            </div>
+
+            <!-- Acciones -->
+            ${actionsHtml}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function confirmarPagoPedidoWeb(orderId) {
+      const order = onlineOrders.find(o => o.orderId === orderId);
+      if (!order) return;
+
+      order.status = 'en_preparacion';
+      order.incomeRegistered = true;
+      order.confirmedAt = new Date().toISOString();
+
+      const nuevoIngreso = {
+        id: 'inc_' + Date.now(),
+        amount: order.total || 0,
+        concept: `Venta Tienda Web #${order.orderId} - ${(order.client && order.client.name) || 'Cliente'}`,
+        date: new Date().toLocaleDateString('es-CO'),
+        timestamp: Date.now(),
+        category: 'Ventas Web',
+        paymentMethod: order.paymentMethod || 'Transferencia'
+      };
+      generalIncomes.unshift(nuevoIngreso);
+
+      guardarPedidosWebLocal();
+      persistirEstadoLocal();
+
+      if (fbDb && bizProfile && bizProfile.id) {
+        try {
+          await fbDb.collection('tiendas_publicas')
+                    .doc(bizProfile.id)
+                    .collection('pedidos')
+                    .doc(order.orderId)
+                    .set(order, { merge: true });
+        } catch (err) {
+          console.warn('Error actualizando pedido en Firestore:', err);
+        }
+      }
+
+      if (currentGoogleUser && currentGoogleUser.uid) {
+        subirEstadoANubeFirebase(currentGoogleUser.uid, false);
+      }
+
+      actualizarBadgesPedidosWeb();
+      renderizarListaPedidosWeb();
+
+      const receiptData = {
+        mode: 'factura',
+        consecutivo: order.orderId,
+        clientName: (order.client && order.client.name) || 'Cliente',
+        clientDoc: '',
+        clientPhone: (order.client && order.client.phone) || '',
+        date: new Date().toLocaleDateString('es-CO'),
+        items: (order.items || []).map(it => ({
+          cant: it.cant,
+          name: it.name,
+          subtotal: it.subtotal || (it.cant * it.price)
+        })),
+        total: order.total,
+        cobrado: order.total,
+        saldo: 0
+      };
+      abrirFacturaReciboConDatos(receiptData);
+
+      const cliPhone = (order.client && order.client.phone) || '';
+      const cleanPhone = cliPhone.replace(/\D/g, '');
+      const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+      const msg = `¡Hola *${(order.client && order.client.name) || ''}*! 👋\n\nConfirmamos con éxito el pago de tu pedido *#${order.orderId}* por valor de *$${(order.total || 0).toLocaleString('es-CO')} COP*.\n\nTu pedido ya se encuentra *en preparación* con mucho cuidado. Te adjuntamos tu recibo oficial. Te avisaremos tan pronto salga en camino. ¡Muchas gracias por tu compra!`;
+      const waUrl = fullPhone ? `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank');
+      showToast('🎉 ¡Pago confirmado! Ingreso registrado y recibo listo');
+    }
+
+    async function cambiarEstadoPedidoWeb(orderId, nuevoEstado) {
+      const order = onlineOrders.find(o => o.orderId === orderId);
+      if (!order) return;
+
+      order.status = nuevoEstado;
+      order.updatedAt = new Date().toISOString();
+
+      guardarPedidosWebLocal();
+      actualizarBadgesPedidosWeb();
+      renderizarListaPedidosWeb();
+
+      if (fbDb && bizProfile && bizProfile.id) {
+        try {
+          await fbDb.collection('tiendas_publicas')
+                    .doc(bizProfile.id)
+                    .collection('pedidos')
+                    .doc(order.orderId)
+                    .set(order, { merge: true });
+        } catch (err) {
+          console.warn('Error actualizando estado en Firestore:', err);
+        }
+      }
+
+      const cliPhone = (order.client && order.client.phone) || '';
+      const cleanPhone = cliPhone.replace(/\D/g, '');
+      const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+
+      let msg = '';
+      if (nuevoEstado === 'empacado') {
+        msg = `¡Hola *${(order.client && order.client.name) || ''}*! 📦\n\nTu pedido *#${order.orderId}* ya se encuentra *empacado y listo para despacho*. Te notificaremos cuando el repartidor vaya en camino. ¡Gracias!`;
+      } else if (nuevoEstado === 'enviado') {
+        msg = `¡Hola *${(order.client && order.client.name) || ''}*! 🚚\n\nTu pedido *#${order.orderId}* va *en camino* hacia tu dirección: *${(order.client && order.client.address) || ''}*. ¡Pronto estará en tus manos!`;
+      } else if (nuevoEstado === 'entregado') {
+        msg = `¡Hola *${(order.client && order.client.name) || ''}*! 🟢\n\nTu pedido *#${order.orderId}* ha sido *entregado con éxito*. Esperamos que lo disfrutes. ¡Muchas gracias por elegirnos!`;
+      }
+
+      if (msg && fullPhone) {
+        const waUrl = `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`;
+        window.open(waUrl, '_blank');
+      }
+      showToast(`✓ Pedido #${order.orderId} marcado como "${nuevoEstado}"`);
+    }
+
+    function reabrirReciboPedidoWeb(orderId) {
+      const order = onlineOrders.find(o => o.orderId === orderId);
+      if (!order) return;
+      const receiptData = {
+        mode: 'factura',
+        consecutivo: order.orderId,
+        clientName: (order.client && order.client.name) || 'Cliente',
+        clientDoc: '',
+        clientPhone: (order.client && order.client.phone) || '',
+        date: order.createdAt ? new Date(order.createdAt).toLocaleDateString('es-CO') : new Date().toLocaleDateString('es-CO'),
+        items: (order.items || []).map(it => ({
+          cant: it.cant,
+          name: it.name,
+          subtotal: it.subtotal || (it.cant * it.price)
+        })),
+        total: order.total,
+        cobrado: order.total,
+        saldo: 0
+      };
+      abrirFacturaReciboConDatos(receiptData);
+    }
+
+    async function sincronizarPedidosWebManual() {
+      showToast('🔄 Refrescando pedidos web...');
+      escucharPedidosWebFirestore();
+      await publicarCatalogoTiendaEnNube(true);
+      showToast('✓ Pedidos actualizados');
+    }
+
+    async function publicarCatalogoTiendaEnNube(silencioso = false) {
+      if (!fbDb || !bizProfile || !bizProfile.id) return false;
+      try {
+        const publicData = {
+          bizId: bizProfile.id,
+          name: bizProfile.name || 'Mi Tienda',
+          owner: bizProfile.owner || '',
+          phone: bizProfile.phone || '',
+          nequi: bizProfile.nequi || '',
+          daviplata: bizProfile.daviplata || '',
+          bancolombia: bizProfile.bancolombia || '',
+          brebe: bizProfile.otherPayment || '',
+          qrImage: bizProfile.qrImage || null,
+          catalog: (catalogItems || []).map(it => ({
+            id: it.id,
+            name: it.name,
+            price: it.price || 0,
+            category: it.category || 'General',
+            desc: it.desc || '',
+            photo: it.photo || null
+          })),
+          updatedAt: new Date().toISOString()
+        };
+
+        await fbDb.collection('tiendas_publicas').doc(bizProfile.id).set(publicData, { merge: true });
+        if (!silencioso) {
+          showToast('☁️ Catálogo y tienda web sincronizados en vivo');
+        }
+        return true;
+      } catch (err) {
+        console.warn('Error al publicar catálogo público:', err);
+        return false;
+      }
+    }
+
+    async function compartirTiendaVirtual() {
+      if (!bizProfile || !bizProfile.id) {
+        showToast('Primero configura los datos de tu negocio.');
+        return;
+      }
+
+      showToast('⏳ Sincronizando catálogo en línea...');
+      await publicarCatalogoTiendaEnNube(true);
+
+      const origin = window.location.origin;
+      const storeUrl = `${origin}/tienda.html?biz=${bizProfile.id}`;
+      const bizName = bizProfile.name || 'nuestra tienda';
+
+      const shareText = `¡Hola! 👋 Te invitamos a conocer el catálogo virtual de *${bizName}*. Puedes ver todos nuestros productos y hacer tu pedido directamente aquí:\n\n👉 ${storeUrl}\n\n¡Esperamos tu pedido!`;
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(storeUrl).catch(() => {});
+      }
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ title: bizName, text: shareText, url: storeUrl })) {
+        try {
+          await navigator.share({
+            title: `Tienda Virtual - ${bizName}`,
+            text: shareText,
+            url: storeUrl
+          });
+          showToast('✓ Enlace de tienda compartido');
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+        }
+      }
+
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+      window.open(waUrl, '_blank');
+      showToast('📋 Enlace copiado al portapapeles y WhatsApp abierto');
     }
 
     // ==========================================

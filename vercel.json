@@ -2,6 +2,9 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/landing", "destination": "/landing.html" },
-    { "source": "/app", "destination": "/index.html" }
+    { "source": "/app", "destination": "/index.html" },
+    { "source": "/tienda", "destination": "/tienda.html" },
+    { "source": "/catalogo", "destination": "/tienda.html" },
+    { "source": "/t/:biz", "destination": "/tienda.html" }
   ]
 }

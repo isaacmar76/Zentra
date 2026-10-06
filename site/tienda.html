@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tienda Virtual y Catálogo de Pedidos</title>
+  <meta name="description" content="Haz tu pedido en línea de forma rápida, segura y directa por WhatsApp.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..700,0..1,0&display=swap" rel="stylesheet">
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <style>
+    :root {
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --primary: #006C46;
+      --primary-hover: #005637;
+      --primary-soft: #ECFDF5;
+      --primary-border: #A7F3D0;
+      --accent: #10B981;
+      --danger: #EF4444;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding-bottom: 90px;
+    }
+
+    /* HEADER TIENDA */
+    .store-header {
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--border);
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .store-header-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .store-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #006C46 0%, #059669 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,108,70,0.25);
+      overflow: hidden;
+    }
+
+    .store-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .store-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .store-name-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .store-name {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .verified-badge {
+      color: #0284C7;
+      font-size: 18px;
+    }
+
+    .store-sub {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .store-badge-open {
+      background: #DCFCE7;
+      color: #15803D;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-size: 10px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .store-badge-open::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #16A34A;
+      display: inline-block;
+    }
+
+    .store-payment-pills {
+      max-width: 900px;
+      margin: 10px auto 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .store-payment-pills::-webkit-scrollbar { display: none; }
+
+    .payment-pill {
+      background: #F1F5F9;
+      color: #334155;
+      font-size: 10.5px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 8px;
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #E2E8F0;
+    }
+
+    /* BARRA DE BÚSQUEDA Y CATEGORÍAS */
+    .controls-container {
+      max-width: 900px;
+      margin: 14px auto 0;
+      padding: 0 16px;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 14px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s ease;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--primary);
+    }
+
+    .search-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 13.5px;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .category-pills {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+    .category-pills::-webkit-scrollbar { display: none; }
+
+    .cat-btn {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .cat-btn.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+      box-shadow: 0 3px 8px rgba(0,108,70,0.25);
+    }
+
+    /* LISTA / GRILLA DE PRODUCTOS */
+    .catalog-wrapper {
+      max-width: 900px;
+      margin: 16px auto;
+      padding: 0 16px;
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .catalog-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.1s ease, box-shadow 0.15s ease;
+    }
+
+    .product-card:active {
+      transform: scale(0.99);
+    }
+
+    .product-img-box {
+      width: 84px;
+      height: 84px;
+      border-radius: 12px;
+      background: #F1F5F9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid #E2E8F0;
+    }
+
+    .product-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-details {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 84px;
+    }
+
+    .product-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.25;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .product-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-top: 2px;
+    }
+
+    .product-bottom-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: auto;
+    }
+
+    .product-price {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .btn-add-cart {
+      background: var(--primary-soft);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-add-cart:active {
+      background: var(--primary);
+      color: #FFFFFF;
+    }
+
+    .qty-stepper {
+      display: inline-flex;
+      align-items: center;
+      background: var(--primary);
+      border-radius: 10px;
+      color: #FFFFFF;
+      overflow: hidden;
+    }
+
+    .qty-stepper button {
+      background: transparent;
+      border: none;
+      color: #FFFFFF;
+      width: 28px;
+      height: 28px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .qty-stepper span {
+      padding: 0 6px;
+      font-size: 12.5px;
+      font-weight: 800;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    /* BARRA FLOTANTE DE CARRITO */
+    .floating-cart-bar {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      max-width: 500px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, #006C46 0%, #059669 100%);
+      color: #FFFFFF;
+      padding: 12px 18px;
+      border-radius: 18px;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 10px 25px rgba(0,108,70,0.4);
+      z-index: 100;
+      cursor: pointer;
+      animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .floating-cart-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .floating-cart-count {
+      background: rgba(255,255,255,0.22);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .floating-cart-total {
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .floating-cart-cta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 800;
+      background: #FFFFFF;
+      color: #006C46;
+      padding: 8px 14px;
+      border-radius: 12px;
+    }
+
+    /* MODAL / DRAWER DEL CARRITO */
+    .cart-drawer-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .cart-drawer-box {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      border-radius: 24px 24px 0 0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: drawerUp 0.25s ease-out;
+    }
+
+    @keyframes drawerUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .drawer-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .drawer-title {
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .drawer-close {
+      background: #F1F5F9;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 18px;
+    }
+
+    .drawer-content {
+      padding: 16px 20px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .cart-item-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .cart-item-name {
+      font-size: 13px;
+      font-weight: 700;
+      flex: 1;
+    }
+
+    .cart-item-price {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--primary);
+      text-align: right;
+    }
+
+    /* FORMULARIO DE CHECKOUT */
+    .checkout-form {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: #334155;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      font-size: 13px;
+      outline: none;
+      color: var(--text);
+      background: #F8FAFC;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--primary);
+      background: #FFFFFF;
+    }
+
+    .drawer-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      background: #F8FAFC;
+    }
+
+    .drawer-total-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .drawer-total-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .drawer-total-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+
+    .btn-submit-order {
+      width: 100%;
+      background: linear-gradient(135deg, #16A34A 0%, #22C55E 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(22,163,74,0.3);
+    }
+
+    /* PANTALLA DE ÉXITO TRAS HACER PEDIDO */
+    .success-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .success-box {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 24px;
+      padding: 24px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .success-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: #ECFDF5;
+      color: #059669;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+
+    .payment-notice-card {
+      background: #FFFBEB;
+      border: 1.5px solid #FCD34D;
+      border-radius: 14px;
+      padding: 12px;
+      margin: 16px 0;
+      text-align: left;
+      font-size: 11.5px;
+      color: #78350F;
+    }
+
+    .qr-payment-preview {
+      margin: 12px 0;
+      text-align: center;
+    }
+
+    .qr-payment-preview img, .qr-payment-preview canvas {
+      max-width: 160px;
+      border-radius: 12px;
+      border: 1.5px solid #006C46;
+      padding: 4px;
+      background: #FFFFFF;
+    }
+
+    /* VACÍO / LOADING */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ENCABEZADO DE LA TIENDA -->
+  <header class="store-header">
+    <div class="store-header-top">
+      <div class="store-avatar" id="storeAvatar">🏪</div>
+      <div class="store-info">
+        <div class="store-name-row">
+          <h1 class="store-name" id="storeName">Cargando tienda...</h1>
+          <span class="material-symbols-outlined verified-badge" title="Tienda verificada">verified</span>
+        </div>
+        <div class="store-sub">
+          <span class="store-badge-open">Abierto para pedidos</span>
+          <span id="storePhoneText">📞 Contacto disponible</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Píldoras de Medios de Pago -->
+    <div class="store-payment-pills" id="storePaymentPills">
+      <!-- Dinámico -->
+    </div>
+  </header>
+
+  <!-- BUSCADOR Y CATEGORÍAS -->
+  <div class="controls-container">
+    <div class="search-box">
+      <span class="material-symbols-outlined" style="color:var(--text-muted); font-size:20px;">search</span>
+      <input type="text" id="searchInput" placeholder="Buscar en el catálogo..." oninput="filtrarProductos()">
+    </div>
+
+    <div class="category-pills" id="categoryPills">
+      <button class="cat-btn active" onclick="filtrarCategoria('todos', this)">Todos</button>
+    </div>
+  </div>
+
+  <!-- CATÁLOGO -->
+  <main class="catalog-wrapper">
+    <div class="catalog-grid" id="catalogGrid">
+      <!-- Inyectado dinámicamente -->
+    </div>
+    <div id="emptyCatalog" class="empty-state" style="display:none;">
+      <span class="material-symbols-outlined" style="font-size:48px; opacity:0.5;">inventory_2</span>
+      <p style="margin-top:8px; font-weight:600;">No encontramos productos con ese nombre.</p>
+    </div>
+  </main>
+
+  <!-- BARRA FLOTANTE DE CARRITO -->
+  <div class="floating-cart-bar" id="floatingCartBar" onclick="abrirDrawerCarrito()">
+    <div class="floating-cart-info">
+      <div class="floating-cart-count" id="cartBadgeCount">0 items</div>
+      <div class="floating-cart-total" id="cartBadgeTotal">$0 COP</div>
+    </div>
+    <div class="floating-cart-cta">
+      <span>Ver Pedido</span>
+      <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+    </div>
+  </div>
+
+  <!-- DRAWER / MODAL DEL CARRITO Y CHECKOUT -->
+  <div class="cart-drawer-overlay" id="cartDrawer" onclick="if(event.target===this) cerrarDrawerCarrito()">
+    <div class="cart-drawer-box">
+      <div class="drawer-header">
+        <div class="drawer-title">
+          <span>🛒 Tu Pedido</span>
+          <span style="font-size:12px; color:var(--text-muted); font-weight:600;" id="drawerItemCount">(0 productos)</span>
+        </div>
+        <button class="drawer-close" onclick="cerrarDrawerCarrito()">✕</button>
+      </div>
+
+      <div class="drawer-content">
+        <!-- Lista de productos en carrito -->
+        <div id="cartItemsList">
+          <!-- Inyectado dinámicamente -->
+        </div>
+
+        <!-- Formulario de Datos de Entrega -->
+        <form class="checkout-form" id="checkoutForm" onsubmit="event.preventDefault(); confirmarPedido();">
+          <div style="font-size:12px; font-weight:800; color:var(--text); margin-top:8px; border-top:1px solid var(--border); padding-top:12px;">
+            📍 Datos para Entrega y Contacto
+          </div>
+
+          <div class="form-group">
+            <label for="custName">Tu Nombre Completo *</label>
+            <input type="text" id="custName" placeholder="Ej: Carlos Pérez" required>
+          </div>
+
+          <div class="form-group">
+            <label for="custPhone">Tu WhatsApp / Celular *</label>
+            <input type="tel" id="custPhone" placeholder="Ej: 3215311523" required>
+          </div>
+
+          <div class="form-group">
+            <label for="custAddress">Dirección de Entrega / Barrio *</label>
+            <input type="text" id="custAddress" placeholder="Ej: Carrera 15 # 45-20, Apto 302" required>
+          </div>
+
+          <div class="form-group">
+            <label for="custPaymentMethod">Medio de Pago a Utilizar *</label>
+            <select id="custPaymentMethod" required>
+              <option value="Nequi">🟣 Nequi</option>
+              <option value="Bre-Be">🟢 Bre-Be</option>
+              <option value="Bancolombia">🔵 Bancolombia / Transferencia</option>
+              <option value="Daviplata">🟡 Daviplata</option>
+              <option value="Efectivo">💵 Efectivo al recibir</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="custNotes">Notas o indicaciones (Opcional)</label>
+            <textarea id="custNotes" rows="2" placeholder="Ej: Timbrar en portería, sin cebolla, etc."></textarea>
+          </div>
+        </form>
+      </div>
+
+      <div class="drawer-footer">
+        <div class="drawer-total-row">
+          <span class="drawer-total-label">TOTAL A PAGAR:</span>
+          <span class="drawer-total-val" id="drawerTotalVal">$0 COP</span>
+        </div>
+        <button type="button" class="btn-submit-order" onclick="confirmarPedido()">
+          <span>Hacer Pedido</span>
+          <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DE ÉXITO Y TRANSFERENCIA -->
+  <div class="success-modal" id="successModal">
+    <div class="success-box">
+      <div class="success-icon">✓</div>
+      <h2 style="font-size:18px; font-weight:800; color:var(--text);">¡Pedido Recibido con Éxito!</h2>
+      <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">
+        Número de Pedido: <b style="color:var(--primary); font-size:14px;" id="successOrderNum">#PED-1001</b>
+      </p>
+
+      <div class="payment-notice-card">
+        <b>⏳ Tu pedido está en espera de confirmación de pago.</b><br>
+        Transfiere el valor de <b id="successTotalText">$0 COP</b> al medio seleccionado y envía el comprobante para que la tienda comience la preparación.
+      </div>
+
+      <!-- Datos de Pago de la Tienda -->
+      <div id="successPaymentDetails" style="text-align:left; background:#F8FAFC; border:1px solid var(--border); border-radius:14px; padding:12px; font-size:12px; margin-bottom:14px;">
+        <!-- Inyectado dinámicamente -->
+      </div>
+
+      <!-- Imagen / Canvas QR de la Tienda si existe -->
+      <div id="successQrBox" class="qr-payment-preview" style="display:none;">
+        <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:4px;">📲 Escanea este código para transferir:</div>
+        <img id="successQrImg" src="" alt="QR Tienda">
+      </div>
+
+      <button type="button" class="btn-submit-order" onclick="notificarPorWhatsApp()">
+        <span>📲 Enviar Comprobante por WhatsApp</span>
+      </button>
+
+      <button type="button" onclick="cerrarModalExito()" style="margin-top:10px; background:transparent; border:none; color:var(--text-muted); font-size:12px; font-weight:700; cursor:pointer;">
+        Volver a la tienda
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Configuración Firebase (Zentra)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAscjzcp4-d5UNoTUxYkaSqUrjmXxabkKs",
+      authDomain: "zentra-d2b9e.firebaseapp.com",
+      projectId: "zentra-d2b9e",
+      storageBucket: "zentra-d2b9e.firebasestorage.app",
+      messagingSenderId: "839899175783",
+      appId: "1:839899175783:web:4044684ba833a61ddd2dc2"
+    };
+
+    let fbApp = null;
+    let fbDb = null;
+
+    try {
+      if (typeof firebase !== 'undefined') {
+        fbApp = firebase.initializeApp(firebaseConfig, 'publicStoreApp');
+        fbDb = fbApp.firestore();
+      }
+    } catch (e) {
+      console.warn('Firebase init error:', e);
+    }
+
+    // Estado de la Tienda
+    let storeData = {
+      bizId: '',
+      name: 'Tienda Oficial',
+      phone: '',
+      nequi: '',
+      daviplata: '',
+      bancolombia: '',
+      brebe: '',
+      qrImage: null,
+      catalog: []
+    };
+
+    let cart = []; // [{ id, name, price, cant, photo }]
+    let activeCategory = 'todos';
+    let currentCreatedOrder = null;
+
+    // Obtener parámetro de tienda desde la URL
+    function getStoreIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      let biz = params.get('biz') || params.get('t') || params.get('tienda');
+      if (biz) return biz.trim();
+
+      // Soporte para rutas amigables tipo /t/nombre_tienda
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      if (pathParts.length >= 2 && pathParts[0] === 't') {
+        return pathParts[1];
+      }
+      return null;
+    }
+
+    // Inicialización al cargar la página
+    window.addEventListener('DOMContentLoaded', async () => {
+      const bizId = getStoreIdFromUrl();
+      await cargarDatosTienda(bizId);
+      renderizarHeaderTienda();
+      renderizarCategorias();
+      renderizarProductos();
+    });
+
+    async function cargarDatosTienda(bizId) {
+      // 1. Intentar cargar desde Firestore (Colección de tiendas públicas)
+      if (bizId && fbDb) {
+        try {
+          const docRef = fbDb.collection('tiendas_publicas').doc(bizId);
+          const snap = await docRef.get();
+          if (snap.exists) {
+            const data = snap.data();
+            storeData = {
+              bizId: bizId,
+              name: data.name || 'Tienda Oficial',
+              phone: data.phone || '',
+              nequi: data.nequi || '',
+              daviplata: data.daviplata || '',
+              bancolombia: data.bancolombia || '',
+              brebe: data.brebe || data.otherPayment || '',
+              qrImage: data.qrImage || null,
+              catalog: Array.isArray(data.catalog) ? data.catalog : []
+            };
+            return;
+          }
+        } catch (err) {
+          console.warn('Error leyendo tienda en Firestore:', err);
+        }
+      }
+
+      // 2. Si es local o estamos en el mismo navegador (fallback rápido para pruebas locales)
+      if (bizId) {
+        try {
+          const pStr = localStorage.getItem(`zentra_biz_profile_${bizId}`);
+          const cStr = localStorage.getItem(`zentra_catalog_${bizId}`);
+          if (pStr) {
+            const p = JSON.parse(pStr);
+            const c = cStr ? JSON.parse(cStr) : [];
+            storeData = {
+              bizId: bizId,
+              name: p.name || 'Tienda Oficial',
+              phone: p.phone || '',
+              nequi: p.nequi || '',
+              daviplata: p.daviplata || '',
+              bancolombia: p.bancolombia || '',
+              brebe: p.otherPayment || '',
+              qrImage: p.qrImage || null,
+              catalog: c.map(it => ({
+                id: it.id,
+                name: it.name,
+                price: it.price || 0,
+                category: it.category || 'General',
+                desc: it.desc || '',
+                photo: it.photo || null
+              }))
+            };
+            return;
+          }
+        } catch (_) {}
+      }
+
+      // 3. Fallback demostrativo (Better Life / Tienda Demo)
+      storeData = {
+        bizId: bizId || 'demo_store',
+        name: 'BETTER LIFE • Tienda Oficial',
+        phone: '3215311523',
+        nequi: '3215311523',
+        brebe: '@3215311523',
+        bancolombia: 'Ahorros 456-789012-34',
+        qrImage: null,
+        catalog: [
+          { id: 'p1', name: 'Club Colombia Dorada SixPack', price: 44000, category: 'Cervezas', desc: 'Pack x6 unidades latas 330ml frías', photo: null },
+          { id: 'p2', name: 'Tequila Don Julio Blanco (700 ml)', price: 249900, category: 'Licores', desc: '100% Agave azul, botella sellada', photo: null },
+          { id: 'p3', name: 'Whisky Buchanan\'s 12 Años', price: 165000, category: 'Licores', desc: 'Botella original 750ml con sello fiscal', photo: null },
+          { id: 'p4', name: 'Agua Manantial con Gas 500ml', price: 4500, category: 'Bebidas', desc: 'Refrescante agua mineral de manantial', photo: null }
+        ]
+      };
+    }
+
+    function renderizarHeaderTienda() {
+      document.getElementById('storeName').innerText = storeData.name;
+      document.title = `${storeData.name} • Catálogo y Pedidos en Línea`;
+      if (storeData.phone) {
+        document.getElementById('storePhoneText').innerText = `📞 WhatsApp: ${storeData.phone}`;
+      }
+
+      const avatarBox = document.getElementById('storeAvatar');
+      const initials = storeData.name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+      avatarBox.innerText = initials || '🏪';
+
+      // Píldoras de Medios de Pago
+      const pillsContainer = document.getElementById('storePaymentPills');
+      pillsContainer.innerHTML = '';
+      if (storeData.nequi) {
+        pillsContainer.innerHTML += `<div class="payment-pill">🟣 Nequi: ${storeData.nequi}</div>`;
+      }
+      if (storeData.brebe) {
+        pillsContainer.innerHTML += `<div class="payment-pill">🟢 Bre-Be: ${storeData.brebe}</div>`;
+      }
+      if (storeData.bancolombia) {
+        pillsContainer.innerHTML += `<div class="payment-pill">🔵 Bancolombia</div>`;
+      }
+      if (storeData.qrImage) {
+        pillsContainer.innerHTML += `<div class="payment-pill">📲 QR Disponible</div>`;
+      }
+    }
+
+    function renderizarCategorias() {
+      const container = document.getElementById('categoryPills');
+      const cats = ['todos', ...new Set(storeData.catalog.map(p => p.category || 'General'))];
+      container.innerHTML = cats.map(c => `
+        <button class="cat-btn ${c === activeCategory ? 'active' : ''}" onclick="filtrarCategoria('${c}', this)">
+          ${c === 'todos' ? 'Todos los productos' : c}
+        </button>
+      `).join('');
+    }
+
+    function filtrarCategoria(cat, btn) {
+      activeCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderizarProductos();
+    }
+
+    function filtrarProductos() {
+      renderizarProductos();
+    }
+
+    function renderizarProductos() {
+      const grid = document.getElementById('catalogGrid');
+      const empty = document.getElementById('emptyCatalog');
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      let items = storeData.catalog.filter(p => {
+        const matchesCat = activeCategory === 'todos' || (p.category || 'General') === activeCategory;
+        const matchesQuery = !query || p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query));
+        return matchesCat && matchesQuery;
+      });
+
+      if (items.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+
+      empty.style.display = 'none';
+      grid.innerHTML = items.map(p => {
+        const inCart = cart.find(c => c.id === p.id);
+        const qty = inCart ? inCart.cant : 0;
+        const imgHtml = p.photo 
+          ? `<img src="${p.photo}" alt="${p.name}">` 
+          : `<span>🛍️</span>`;
+
+        const btnHtml = qty > 0
+          ? `<div class="qty-stepper">
+              <button type="button" onclick="modificarCantidad('${p.id}', -1)">-</button>
+              <span>${qty}</span>
+              <button type="button" onclick="modificarCantidad('${p.id}', 1)">+</button>
+             </div>`
+          : `<button type="button" class="btn-add-cart" onclick="agregarAlCarrito('${p.id}')">
+              <span>+ Agregar</span>
+             </button>`;
+
+        return `
+          <div class="product-card">
+            <div class="product-img-box">${imgHtml}</div>
+            <div class="product-details">
+              <div>
+                <div class="product-title">${p.name}</div>
+                <div class="product-desc">${p.desc || p.category || ''}</div>
+              </div>
+              <div class="product-bottom-row">
+                <div class="product-price">$${(p.price || 0).toLocaleString('es-CO')} COP</div>
+                ${btnHtml}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function agregarAlCarrito(prodId) {
+      const prod = storeData.catalog.find(p => p.id === prodId);
+      if (!prod) return;
+      cart.push({
+        id: prod.id,
+        name: prod.name,
+        price: prod.price || 0,
+        cant: 1,
+        photo: prod.photo || null
+      });
+      actualizarBarraCarrito();
+      renderizarProductos();
+    }
+
+    function modificarCantidad(prodId, delta) {
+      const item = cart.find(c => c.id === prodId);
+      if (!item) return;
+      item.cant += delta;
+      if (item.cant <= 0) {
+        cart = cart.filter(c => c.id !== prodId);
+      }
+      actualizarBarraCarrito();
+      renderizarProductos();
+      renderizarItemsDrawer();
+    }
+
+    function actualizarBarraCarrito() {
+      const bar = document.getElementById('floatingCartBar');
+      const totalCount = cart.reduce((acc, it) => acc + it.cant, 0);
+      const totalPrice = cart.reduce((acc, it) => acc + (it.cant * it.price), 0);
+
+      if (totalCount > 0) {
+        bar.style.display = 'flex';
+        document.getElementById('cartBadgeCount').innerText = `${totalCount} ${totalCount === 1 ? 'producto' : 'productos'}`;
+        document.getElementById('cartBadgeTotal').innerText = `$${totalPrice.toLocaleString('es-CO')} COP`;
+      } else {
+        bar.style.display = 'none';
+        cerrarDrawerCarrito();
+      }
+    }
+
+    function abrirDrawerCarrito() {
+      if (cart.length === 0) return;
+      renderizarItemsDrawer();
+      document.getElementById('cartDrawer').style.display = 'flex';
+    }
+
+    function cerrarDrawerCarrito() {
+      document.getElementById('cartDrawer').style.display = 'none';
+    }
+
+    function renderizarItemsDrawer() {
+      const list = document.getElementById('cartItemsList');
+      const totalCount = cart.reduce((acc, it) => acc + it.cant, 0);
+      const totalPrice = cart.reduce((acc, it) => acc + (it.cant * it.price), 0);
+
+      document.getElementById('drawerItemCount').innerText = `(${totalCount} ${totalCount === 1 ? 'producto' : 'productos'})`;
+      document.getElementById('drawerTotalVal').innerText = `$${totalPrice.toLocaleString('es-CO')} COP`;
+
+      if (cart.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-size:12px; padding:20px;">Tu carrito está vacío.</p>';
+        return;
+      }
+
+      list.innerHTML = cart.map(it => `
+        <div class="cart-item-row">
+          <div class="cart-item-name">${it.name}</div>
+          <div class="qty-stepper" style="transform:scale(0.88);">
+            <button type="button" onclick="modificarCantidad('${it.id}', -1)">-</button>
+            <span>${it.cant}</span>
+            <button type="button" onclick="modificarCantidad('${it.id}', 1)">+</button>
+          </div>
+          <div class="cart-item-price">$${(it.cant * it.price).toLocaleString('es-CO')}</div>
+        </div>
+      `).join('');
+    }
+
+    // CONFIRMAR PEDIDO Y ENVIAR A FIRESTORE
+    async function confirmarPedido() {
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const address = document.getElementById('custAddress').value.trim();
+      const paymentMethod = document.getElementById('custPaymentMethod').value;
+      const notes = document.getElementById('custNotes').value.trim();
+
+      if (!name || !phone || !address) {
+        alert('Por favor completa tu Nombre, Teléfono y Dirección de entrega.');
+        return;
+      }
+
+      if (cart.length === 0) {
+        alert('Agrega al menos un producto al carrito para ordenar.');
+        return;
+      }
+
+      const total = cart.reduce((acc, it) => acc + (it.cant * it.price), 0);
+      const consecutivoNum = Math.floor(1000 + Math.random() * 9000);
+      const orderId = `PED-${consecutivoNum}`;
+
+      const orderPayload = {
+        orderId: orderId,
+        bizId: storeData.bizId,
+        storeName: storeData.name,
+        client: {
+          name: name,
+          phone: phone,
+          address: address,
+          notes: notes
+        },
+        items: cart.map(it => ({
+          id: it.id,
+          name: it.name,
+          cant: it.cant,
+          price: it.price,
+          subtotal: it.cant * it.price
+        })),
+        total: total,
+        paymentMethod: paymentMethod,
+        status: 'pendiente_pago', // 'pendiente_pago' | 'en_preparacion' | 'empacado' | 'enviado' | 'entregado'
+        incomeRegistered: false,
+        createdAt: new Date().toISOString()
+      };
+
+      currentCreatedOrder = orderPayload;
+
+      // 1. Guardar en Firestore para que la app del comerciante lo reciba en vivo
+      if (fbDb && storeData.bizId) {
+        try {
+          await fbDb.collection('tiendas_publicas')
+                    .doc(storeData.bizId)
+                    .collection('pedidos')
+                    .doc(orderId)
+                    .set(orderPayload);
+        } catch (err) {
+          console.warn('Error guardando pedido en Firestore:', err);
+        }
+      }
+
+      // 2. Guardar también en localStorage para consulta local en el navegador
+      try {
+        const localOrdersKey = `zentra_orders_${storeData.bizId}`;
+        const existing = JSON.parse(localStorage.getItem(localOrdersKey) || '[]');
+        existing.unshift(orderPayload);
+        localStorage.setItem(localOrdersKey, JSON.stringify(existing));
+      } catch (_) {}
+
+      // 3. Mostrar Pantalla de Éxito y Cuentas para Transferir
+      cerrarDrawerCarrito();
+      mostrarModalExito(orderPayload);
+
+      // Limpiar carrito
+      cart = [];
+      actualizarBarraCarrito();
+      renderizarProductos();
+    }
+
+    function mostrarModalExito(order) {
+      document.getElementById('successOrderNum').innerText = `#${order.orderId}`;
+      document.getElementById('successTotalText').innerText = `$${order.total.toLocaleString('es-CO')} COP`;
+
+      // Armar resumen de cuentas bancarias de la tienda
+      const pBox = document.getElementById('successPaymentDetails');
+      let lines = [`<b style="color:#0F172A;">Medios Autorizados para Pagar:</b>`];
+      if (storeData.nequi) lines.push(`• 🟣 <b>Nequi:</b> ${storeData.nequi}`);
+      if (storeData.brebe) lines.push(`• 🟢 <b>Bre-Be:</b> ${storeData.brebe}`);
+      if (storeData.daviplata) lines.push(`• 🟡 <b>Daviplata:</b> ${storeData.daviplata}`);
+      if (storeData.bancolombia) lines.push(`• 🔵 <b>Bancolombia:</b> ${storeData.bancolombia}`);
+      pBox.innerHTML = lines.join('<br>');
+
+      // Mostrar QR si la tienda lo tiene configurado
+      const qrBox = document.getElementById('successQrBox');
+      const qrImg = document.getElementById('successQrImg');
+      if (storeData.qrImage && qrImg) {
+        qrImg.src = storeData.qrImage;
+        qrBox.style.display = 'block';
+      } else {
+        qrBox.style.display = 'none';
+      }
+
+      document.getElementById('successModal').style.display = 'flex';
+    }
+
+    function cerrarModalExito() {
+      document.getElementById('successModal').style.display = 'none';
+    }
+
+    function notificarPorWhatsApp() {
+      if (!currentCreatedOrder) return;
+      const o = currentCreatedOrder;
+      const targetPhone = storeData.phone || '';
+      const cleanPhone = targetPhone.replace(/\D/g, '');
+      const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+
+      const itemsText = o.items.map(it => `• ${it.cant}x ${it.name} ($${it.subtotal.toLocaleString('es-CO')})`).join('\n');
+      const msg = `¡Hola *${storeData.name}*! 👋\n\nAcabo de realizar mi pedido en tu tienda web:\n*Pedido:* #${o.orderId}\n*Cliente:* ${o.client.name}\n*Dirección:* ${o.client.address}\n\n*Productos:*\n${itemsText}\n\n💰 *Total a Pagar:* $${o.total.toLocaleString('es-CO')} COP\n💳 *Medio de Pago:* ${o.paymentMethod}\n\nAdjunto te envío el comprobante de la transferencia para que por favor confirmes el pago. ¡Muchas gracias!`;
+
+      const waUrl = fullPhone 
+        ? `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`
+        : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+      window.open(waUrl, '_blank');
+    }
+  </script>
+</body>
+</html>

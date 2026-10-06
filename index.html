@@ -2581,6 +2581,8 @@
           </a>
         </div>
       </div>
+    </div>
+
     <!-- Modal Selector Rápido de Tiendas / Negocios (1-Tap Switch) -->
     <div id="selectorRapidoTiendasModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(11,28,48,0.72); backdrop-filter:blur(5px); z-index:9999; align-items:center; justify-content:center; padding:16px;">
       <div style="background:#FFFFFF; width:100%; max-width:420px; border-radius:26px; padding:22px 18px; color:#0F172A; box-shadow:0 20px 45px rgba(0,0,0,0.35); max-height:90vh; display:flex; flex-direction:column; border:1px solid #E2E8F0;">
@@ -3821,6 +3823,7 @@
     let selectedProjectIdx = 0;
     let catalogFilter = 'servicios';
     let currentFormAction = null;
+    let catalogPickerTarget = 'cart';
 
     // Estado de Cotizaciones y Carritos Guardados (Seguimiento Comercial)
     let savedQuotes = [];
@@ -7705,6 +7708,44 @@ ${estadoStr}${contactText}
       });
     }
 
+    function seleccionarProductoParaProyecto(item) {
+      if (!item) return;
+      if (!projectsData || projectsData.length === 0) {
+        showToast('Crea un encargo o pedido primero');
+        return;
+      }
+      const p = projectsData[selectedProjectIdx] || projectsData[0];
+      if (p) {
+        if (!p.items) p.items = [];
+        const existing = p.items.find(x => x.catalogId === item.id);
+        if (existing) {
+          existing.quantity = (existing.quantity || 1) + 1;
+          existing.subtotal = existing.quantity * (existing.unitPrice || item.price);
+        } else {
+          p.items.push({
+            catalogId: item.id,
+            name: item.name,
+            unitPrice: item.price,
+            quantity: 1,
+            subtotal: item.price,
+            itemType: item.itemType || 'producto'
+          });
+        }
+        p.total = (p.total || 0) + item.price;
+        persistirEstadoLocal();
+        recalcularTodo();
+        renderProjectItems();
+        showToast(`✓ Agregado al proyecto: ${item.name}`);
+        cerrarPickerCatalogo();
+        cerrarModalCatalogoInventario();
+      }
+    }
+
+    function seleccionarProductoParaProyectoPorId(id) {
+      const item = catalogItems.find(it => it.id === id);
+      if (item) seleccionarProductoParaProyecto(item);
+    }
+
     function eliminarProductoCatalogo(id) {
       const idx = catalogItems.findIndex(i => i.id === id);
       if (idx === -1) return;
@@ -8416,6 +8457,13 @@ ${estadoStr}${contactText}
       });
 
       renderRetailCartBadge();
+    }
+
+    function agregarProductoAlCarritoRetail(pId) {
+      const p = (typeof pId === 'object' && pId !== null) ? pId : catalogItems.find(item => item.id === pId);
+      if (p) {
+        agregarAlCarritoRetail(p);
+      }
     }
 
     function agregarAlCarritoRetail(p) {
@@ -9213,7 +9261,7 @@ ${estadoStr}${contactText}
       items.forEach(p => {
         const card = document.createElement('div');
         card.style.cssText = 'background:var(--card-bg); border:1px solid var(--surface-border); border-radius:16px; padding:10px; display:flex; flex-direction:column; justify-content:space-between; height:120px; box-shadow:0 2px 6px rgba(0,0,0,0.02); cursor:pointer;';
-        card.onclick = () => agregarProductoAlCarritoRetail(p.id);
+        card.onclick = () => agregarAlCarritoRetail(p);
 
         const thumb = p.image
           ? `<img src="${p.image}" style="width:28px; height:28px; border-radius:8px; object-fit:cover;">`

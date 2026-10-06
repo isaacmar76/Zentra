@@ -23,6 +23,9 @@
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
   <!-- SheetJS para importar hojas de cálculo Excel / Google Sheets (.xlsx, .xls, .csv) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- html2canvas y jsPDF para exportar cotizaciones y recibos como Imagen HD y PDF visual idéntico -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root, [data-theme="zentra_clarity"] {
       /* Tema Fintech Clarity (Zentra Core - nuevo_diseño.md) */
@@ -955,6 +958,13 @@
         margin: 0 !important;
       }
       body:not(.printing-catalog) .receipt-paper {
+        box-shadow: none !important;
+        border: none !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        background: transparent !important;
+      }
+      body:not(.printing-catalog) #receiptTicketCard {
         box-shadow: none !important;
         border: 1px solid #DDD !important;
         max-width: 100% !important;
@@ -2419,8 +2429,8 @@
           </div>
 
           <div style="margin-bottom:10px;">
-            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">🟢 Otro Medio / Llave / Bre-B</label>
-            <input type="text" id="bizOtherPaymentInp" placeholder="Ej: Bre-B / Dale / Transfiya 312..." style="width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:12px; box-sizing:border-box;">
+            <label style="font-size:11px; font-weight:600; display:block; margin-bottom:3px;">🟢 Bre-Be / Llave Digital</label>
+            <input type="text" id="bizOtherPaymentInp" placeholder="Ej: Bre-Be / Celular / Llave 312..." style="width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); background:var(--card-bg); color:var(--text); font-size:12px; box-sizing:border-box;">
           </div>
 
           <!-- Código QR de Pago -->
@@ -3447,91 +3457,117 @@
 
     <!-- Modal: Factura / Recibo de Pago / Presupuesto para Enviar al Cliente -->
     <div id="invoiceReceiptModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); backdrop-filter:blur(4px); z-index:500; align-items:center; justify-content:center; padding:14px; overflow-y:auto;">
-      <div class="receipt-paper" style="width:100%; max-width:370px; max-height:92%; overflow-y:auto; border-radius:22px; padding:18px; box-shadow:0 12px 32px rgba(0,0,0,0.25);">
+      <div class="receipt-paper" style="width:100%; max-width:390px; max-height:92vh; overflow-y:auto; border-radius:24px; padding:16px; box-sizing:border-box; background:transparent;">
         
-        <!-- Botón cerrar flotante (oculto en impresión) -->
-        <div class="no-print" style="display:flex; justify-content:flex-end; margin-bottom:2px;">
-          <button onclick="cerrarFacturaRecibo()" style="background:#F1F5F9; border:none; border-radius:50%; width:28px; height:28px; font-size:14px; cursor:pointer; color:#64748B;">✕</button>
+        <!-- Botón cerrar flotante (oculto en imagen y en impresión) -->
+        <div class="no-print" style="display:flex; justify-content:flex-end; margin-bottom:8px;">
+          <button onclick="cerrarFacturaRecibo()" style="background:#FFFFFF; border:1px solid #E2E8F0; border-radius:50%; width:32px; height:32px; font-size:15px; cursor:pointer; color:#64748B; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.15);">✕</button>
         </div>
 
-        <!-- Encabezado simple -->
-        <div style="text-align:center; margin-bottom:12px;">
-          <div style="font-size:17px; font-weight:800; color:#0B1C30; text-transform:uppercase;" id="recBizName">ZENTRA</div>
-          <div style="font-size:11px; color:#64748B; margin-top:1px;" id="recBizContact"></div>
-          <div style="display:inline-block; margin-top:6px; padding:3px 10px; border-radius:8px; font-size:11px; font-weight:800;" id="recDocTypeBadge">COTIZACIÓN</div>
-        </div>
-
-        <!-- Consecutivo, Fecha y Cliente -->
-        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:9px 12px; margin-bottom:10px; font-size:11.5px;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span style="color:#64748B;"><b id="recOrderNumLabel">N°:</b> <span id="recOrderNum" style="color:#0B1C30; font-weight:700;">#COT-100</span></span>
-            <span style="color:#64748B;"><b id="recOrderDate">04/10/2026</b></span>
+        <!-- TARJETA PURA DEL RECIBO / COTIZACIÓN (SOLO ESTA SE CAPTURA COMO IMAGEN O PDF) -->
+        <div id="receiptTicketCard" style="background:#FFFFFF; border-radius:22px; padding:20px 18px; box-shadow:0 10px 30px rgba(0,0,0,0.18); border:1px solid #E2E8F0; color:#0B1C30; box-sizing:border-box; width:100%;">
+          
+          <!-- Encabezado simple -->
+          <div style="text-align:center; margin-bottom:12px;">
+            <div style="font-size:18px; font-weight:800; color:#0B1C30; text-transform:uppercase; letter-spacing:0.02em;" id="recBizName">ZENTRA</div>
+            <div style="font-size:11px; color:#64748B; margin-top:2px;" id="recBizContact"></div>
+            <div style="display:inline-block; margin-top:6px; padding:3px 10px; border-radius:8px; font-size:11px; font-weight:800;" id="recDocTypeBadge">COTIZACIÓN</div>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div><span style="color:#64748B;">Cliente:</span> <b style="color:#0B1C30;" id="recClientName">Cliente Mostrador</b></div>
-            <div id="recClientDocBadge" style="font-size:10.5px; color:#64748B; font-weight:600;"></div>
+
+          <!-- Consecutivo, Fecha y Cliente -->
+          <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:9px 12px; margin-bottom:12px; font-size:11.5px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span style="color:#64748B;"><b id="recOrderNumLabel">N°:</b> <span id="recOrderNum" style="color:#0B1C30; font-weight:700;">#COT-100</span></span>
+              <span style="color:#64748B;"><b id="recOrderDate">04/10/2026</b></span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div><span style="color:#64748B;">Cliente:</span> <b style="color:#0B1C30;" id="recClientName">Cliente Mostrador</b></div>
+              <div id="recClientDocBadge" style="font-size:10.5px; color:#64748B; font-weight:600;"></div>
+            </div>
           </div>
-          <div id="recValidityNotice" style="display:none; font-size:10px; color:#92400E; margin-top:4px; font-weight:600;">
-            ⏳ Validez de la oferta: 15 días calendario
+
+          <!-- Tabla Limpia de Artículos -->
+          <table class="receipt-table" style="width:100%; margin-bottom:12px; font-size:11.5px; border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid #E2E8F0;">
+                <th style="width:34px; text-align:left; padding:5px 6px; font-weight:700; color:#64748B;">CANT.</th>
+                <th style="text-align:left; padding:5px 6px; font-weight:700; color:#64748B;">DESCRIPCIÓN</th>
+                <th style="text-align:right; padding:5px 6px; font-weight:700; color:#64748B;">SUBTOTAL</th>
+              </tr>
+            </thead>
+            <tbody id="recTableBody">
+              <!-- Filas dinámicas -->
+            </tbody>
+          </table>
+
+          <!-- Total Prominente -->
+          <div style="background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:14px; padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; font-weight:800; color:#475569;" id="lblRecTotalTitle">TOTAL COTIZADO:</span>
+            <span style="font-size:18px; font-weight:800; color:#006C46;" id="recTotalVal">$0 COP</span>
           </div>
-        </div>
 
-        <!-- Tabla Limpia de Artículos -->
-        <table class="receipt-table" style="width:100%; margin-bottom:10px; font-size:11.5px;">
-          <thead>
-            <tr>
-              <th style="width:34px; text-align:left; padding:4px 6px;">Cant.</th>
-              <th style="text-align:left; padding:4px 6px;">Descripción</th>
-              <th style="text-align:right; padding:4px 6px;">Subtotal</th>
-            </tr>
-          </thead>
-          <tbody id="recTableBody">
-            <!-- Filas dinámicas -->
-          </tbody>
-        </table>
+          <!-- Sello de Estado (Solo si es Factura con estado) -->
+          <div id="recPaymentStatusStamp" style="display:none; text-align:center; padding:6px; border-radius:8px; font-size:10.5px; font-weight:800; margin-bottom:10px;">
+            <!-- Dinámico -->
+          </div>
 
-        <!-- Total Prominente -->
-        <div style="background:#F8FAFC; border:1.5px solid #CBD5E1; border-radius:12px; padding:10px 14px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-          <span style="font-size:12px; font-weight:700; color:#475569;" id="lblRecTotalTitle">TOTAL:</span>
-          <span style="font-size:17px; font-weight:800; color:var(--primary);" id="recTotalVal">$0 COP</span>
-        </div>
-
-        <!-- Sello de Estado (Solo si es Factura con estado) -->
-        <div id="recPaymentStatusStamp" style="display:none; text-align:center; padding:6px; border-radius:8px; font-size:10.5px; font-weight:800; margin-bottom:10px;">
-          <!-- Dinámico -->
-        </div>
-
-        <!-- Medios de Pago y QR (Condicional: SOLO los configurados, sin inventar datos) -->
-        <div id="recPaymentContainer" style="display:none; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px; margin-bottom:12px;">
-          <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:5px;" id="lblRecPaymentTitle">💳 Medios para Pagar Cotización:</div>
-          <div style="display:flex; gap:10px; align-items:center; justify-content:space-between;">
-            <div id="recPaymentMethodsList" style="flex:1; font-size:11px; display:flex; flex-direction:column; gap:4px; color:#475569;">
+          <!-- Medios de Pago (Nequi, Bre-Be, Bancolombia, etc.) -->
+          <div id="recPaymentContainer" style="display:none; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px; margin-bottom:10px;">
+            <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:5px;" id="lblRecPaymentTitle">💳 Medios para Pagar Cotización:</div>
+            <div id="recPaymentMethodsList" style="font-size:11px; display:flex; flex-direction:column; gap:4px; color:#475569;">
               <!-- Inyectado dinámicamente -->
             </div>
-            <div id="recQrWrapper" style="display:none; text-align:center; flex-shrink:0;">
-              <img id="recQrImg" src="" onclick="descargarImagenQR()" title="Toca para descargar código QR" style="width:72px; height:72px; border-radius:8px; border:1.5px solid #0284C7; object-fit:contain; background:#fff; cursor:pointer;">
-              <div style="font-size:9.5px; color:#0284C7; font-weight:700; margin-top:2px; cursor:pointer;" onclick="descargarImagenQR()">📥 Descargar QR</div>
+          </div>
+
+          <!-- SECCIÓN CÓDIGO QR DE PAGO (Centrado y siempre al final del ticket) -->
+          <div id="recQrBottomContainer" style="display:none; text-align:center; padding-top:10px; border-top:1px dashed #CBD5E1; margin-top:8px;">
+            <div style="font-size:11px; font-weight:700; color:#334155; margin-bottom:5px;">
+              📲 Escanea para transferir:
             </div>
+            <div style="display:inline-block; background:#FFFFFF; padding:6px; border-radius:14px; border:1.5px solid #006C46; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+              <img id="recQrImgBottom" src="" alt="Código QR de Pago" style="width:130px; height:130px; object-fit:contain; display:block; border-radius:8px;">
+            </div>
+            <div style="font-size:9.5px; color:#64748B; margin-top:4px;">
+              Nequi • Bre-Be • Bancolombia • Billeteras Digitales
+            </div>
+          </div>
+
+        </div>
+        <!-- FIN TARJETA PURA -->
+
+        <!-- Botones de Acción (Fuera de receiptTicketCard para NUNCA salir en la imagen/PDF) -->
+        <div class="no-print" style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+          <!-- Botón Principal: Compartir Imagen a WhatsApp -->
+          <button type="button" onclick="compartirReciboComoImagen()" style="width:100%; background:linear-gradient(135deg, #16A34A 0%, #22C55E 100%); color:#FFFFFF; border:none; padding:12px 14px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(22,163,74,0.3); transition:transform 0.1s ease;">
+            <span style="font-size:18px;">📲</span>
+            <span id="btnRecWhatsAppText">Enviar Imagen por WhatsApp</span>
+          </button>
+
+          <!-- Fila de Exportación Visual: Descargar Imagen PNG y Descargar PDF Visual -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button type="button" onclick="descargarImagenRecibo()" style="padding:10px; border-radius:12px; border:1px solid #CBD5E1; background:#FFFFFF; color:#1E293B; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 5px rgba(0,0,0,0.04);">
+              <span style="font-size:15px;">📸</span>
+              <span>Guardar Imagen</span>
+            </button>
+            <button type="button" onclick="descargarPdfReciboVisual()" style="padding:10px; border-radius:12px; border:1.5px solid #006C46; background:#F0FDF4; color:#006C46; font-size:11.5px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 6px rgba(0,108,70,0.08);">
+              <span style="font-size:15px;">📄</span>
+              <span>Descargar PDF</span>
+            </button>
+          </div>
+
+          <!-- Fila Secundaria: Copiar Texto e Imprimir Carta -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <button type="button" onclick="copiarTextoRecibo()" style="padding:8px; border-radius:10px; border:1px solid #E2E8F0; background:#F8FAFC; color:#64748B; font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+              <span>📋</span> Copiar Texto
+            </button>
+            <button type="button" onclick="imprimirFacturaRecibo()" style="padding:8px; border-radius:10px; border:1px solid #E2E8F0; background:#F8FAFC; color:#64748B; font-size:11px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
+              <span>🖨️</span> Imprimir Carta
+            </button>
           </div>
         </div>
 
-        <!-- Botones de Acción (Ocultos en Impresión) -->
-        <div class="no-print" style="display:flex; flex-direction:column; gap:8px;">
-          <button onclick="enviarReciboWhatsApp()" id="btnRecWhatsAppMain" style="width:100%; background:#25D366; color:#fff; border:none; padding:10px; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 10px rgba(37,211,102,0.25);">
-            <span>📲</span> <span id="btnRecWhatsAppText">Enviar por WhatsApp</span>
-          </button>
-          <button onclick="descargarImagenQR()" id="btnRecQrAction" style="display:none; width:100%; background:#0284C7; color:#fff; border:none; padding:8px; border-radius:10px; font-weight:700; font-size:11.5px; cursor:pointer; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 8px rgba(2,132,199,0.25);">
-            <span>📥</span> <span>Descargar Imagen QR de Pago</span>
-          </button>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
-            <button onclick="imprimirFacturaRecibo()" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; background:#FFFFFF; color:#334155; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
-              <span>🖨️</span> Imprimir / PDF
-            </button>
-            <button onclick="copiarTextoRecibo()" style="padding:8px; border-radius:10px; border:1px solid #CBD5E1; background:#FFFFFF; color:#334155; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px;">
-              <span>📋</span> Copiar Texto
-            </button>
-          </div>
-        </div>
+      </div>
+    </div>
 
       </div>
     </div>
@@ -6955,7 +6991,7 @@
         metodos.push({ tipo: 'Bancolombia', icon: '🔵', dato: bizProfile.bancolombia.trim() });
       }
       if (bizProfile && bizProfile.otherPayment && bizProfile.otherPayment.trim()) {
-        metodos.push({ tipo: 'Otro Medio', icon: '🟢', dato: bizProfile.otherPayment.trim() });
+        metodos.push({ tipo: 'Bre-Be', icon: '🟢', dato: bizProfile.otherPayment.trim() });
       }
       return metodos;
     }
@@ -7489,7 +7525,6 @@ Cliente: ${cliName}${docInfo}
 ${itemsText}
 
 💰 *TOTAL: $${total.toLocaleString('es-CO')} COP*
-⏳ Validez de la oferta: 15 días
 ${pagosText}${contactText}
 ¡Quedamos atentos a tu confirmación! ✨`;
     }
@@ -7528,7 +7563,6 @@ ${estadoStr}${contactText}
       }
 
       const docBadge = document.getElementById('recDocTypeBadge');
-      const noticeEl = document.getElementById('recValidityNotice');
       const btnWaText = document.getElementById('btnRecWhatsAppText');
 
       if (isQuote) {
@@ -7537,15 +7571,13 @@ ${estadoStr}${contactText}
           docBadge.style.background = '#FEF3C7';
           docBadge.style.color = '#92400E';
         }
-        if (noticeEl) noticeEl.style.display = 'block';
-        if (btnWaText) btnWaText.innerText = 'Enviar Cotización por WhatsApp';
+        if (btnWaText) btnWaText.innerText = 'Enviar Imagen por WhatsApp';
       } else {
         if (docBadge) {
           docBadge.innerText = '🧾 FACTURA OFICIAL';
           docBadge.style.background = '#DCFCE7';
           docBadge.style.color = '#166534';
         }
-        if (noticeEl) noticeEl.style.display = 'none';
         if (btnWaText) btnWaText.innerText = 'Enviar Factura por WhatsApp';
       }
 
@@ -7575,13 +7607,14 @@ ${estadoStr}${contactText}
           const tr = document.createElement('tr');
           const unit = it.unitPrice || it.price || 0;
           const sub = it.subtotal || (it.quantity * unit);
+          tr.style.borderBottom = '1px solid #F1F5F9';
           tr.innerHTML = `
-            <td style="font-weight:700; color:#0B1C30; padding:5px 6px; vertical-align:top;">${it.quantity}x</td>
-            <td style="color:#1E293B; font-weight:600; padding:5px 6px;">
+            <td style="font-weight:700; color:#0B1C30; padding:6px 6px; vertical-align:top;">${it.quantity}x</td>
+            <td style="color:#1E293B; font-weight:600; padding:6px 6px;">
               <div>${escaparHTML(it.name)}</div>
               ${it.description ? `<div style="font-size:10px; color:#64748B; font-weight:400; line-height:1.2; margin-top:2px;">${escaparHTML(it.description)}</div>` : ''}
             </td>
-            <td style="text-align:right; font-weight:700; color:#0B1C30; padding:5px 6px; vertical-align:top;">$${sub.toLocaleString('es-CO')}</td>
+            <td style="text-align:right; font-weight:700; color:#0B1C30; padding:6px 6px; vertical-align:top;">$${sub.toLocaleString('es-CO')}</td>
           `;
           tbody.appendChild(tr);
         });
@@ -7612,60 +7645,47 @@ ${estadoStr}${contactText}
         }
       }
 
-      // Medios de pago y QR (REGLA: En factura NUNCA se muestra QR porque ya pagaron)
+      // Medios de pago y QR al final
       const payContainer = document.getElementById('recPaymentContainer');
       const payTitle = document.getElementById('lblRecPaymentTitle');
       const payList = document.getElementById('recPaymentMethodsList');
-      const qrWrapper = document.getElementById('recQrWrapper');
-      const qrImg = document.getElementById('recQrImg');
-      const btnQrAction = document.getElementById('btnRecQrAction');
+      const qrBottom = document.getElementById('recQrBottomContainer');
+      const qrImgBottom = document.getElementById('recQrImgBottom');
 
       const metodos = obtenerMediosDePagoActivos();
       const hasQr = !!(bizProfile && bizProfile.qrImage);
 
       if (isQuote) {
-        // EN COTIZACIÓN: se habilita el código QR para que el cliente pague
+        // EN COTIZACIÓN:
         if (payTitle) payTitle.innerText = '💳 Medios para Pagar Cotización:';
-        if (hasQr && qrWrapper && qrImg) {
-          qrWrapper.style.display = 'block';
-          qrImg.src = bizProfile.qrImage;
-          if (btnQrAction) btnQrAction.style.display = 'flex';
-        } else {
-          if (qrWrapper) qrWrapper.style.display = 'none';
-          if (btnQrAction) btnQrAction.style.display = 'none';
-        }
-
-        if (payContainer && (metodos.length > 0 || hasQr)) {
+        if (payContainer && metodos.length > 0) {
           payContainer.style.display = 'block';
           if (payList) {
             payList.innerHTML = '';
-            if (metodos.length > 0) {
-              metodos.forEach(m => {
-                const row = document.createElement('div');
-                row.innerHTML = `<span>${m.icon} <b>${m.tipo}:</b> ${m.dato}</span>`;
-                payList.appendChild(row);
-              });
-            } else {
-              payList.innerHTML = '<span>📲 <b>Transferencia:</b> Escanea o descarga el código QR</span>';
-            }
+            metodos.forEach(m => {
+              const row = document.createElement('div');
+              row.innerHTML = `<span>${m.icon} <b>${m.tipo}:</b> ${m.dato}</span>`;
+              payList.appendChild(row);
+            });
           }
         } else if (payContainer) {
           payContainer.style.display = 'none';
         }
 
-        if (btnWaText) {
-          btnWaText.innerText = hasQr ? 'Enviar Cotización + QR por WhatsApp' : 'Enviar Cotización por WhatsApp';
+        // QR Centrado siempre al final después de productos y total
+        if (hasQr && qrBottom && qrImgBottom) {
+          qrBottom.style.display = 'block';
+          qrImgBottom.src = bizProfile.qrImage;
+        } else if (qrBottom) {
+          qrBottom.style.display = 'none';
         }
       } else {
-        // EN FACTURA: NUNCA se muestra la imagen del QR ("se supone que ya pagaron")
-        if (qrWrapper) qrWrapper.style.display = 'none';
-        if (btnQrAction) btnQrAction.style.display = 'none';
+        // EN FACTURA: NUNCA se muestra QR al final porque ya pagaron
+        if (qrBottom) qrBottom.style.display = 'none';
 
         if (data.saldo <= 0) {
-          // Si ya está pagada por completo, se oculta la sección de pago
           if (payContainer) payContainer.style.display = 'none';
         } else if (metodos.length > 0) {
-          // Factura con saldo pendiente: mostrar solo cuentas bancarias para transferir el resto
           if (payTitle) payTitle.innerText = '💳 Cuentas para Saldo Pendiente:';
           if (payContainer) payContainer.style.display = 'block';
           if (payList) {
@@ -7679,10 +7699,6 @@ ${estadoStr}${contactText}
         } else if (payContainer) {
           payContainer.style.display = 'none';
         }
-
-        if (btnWaText) {
-          btnWaText.innerText = 'Enviar Factura por WhatsApp';
-        }
       }
 
       document.getElementById('invoiceReceiptModal').style.display = 'flex';
@@ -7692,9 +7708,162 @@ ${estadoStr}${contactText}
       document.getElementById('invoiceReceiptModal').style.display = 'none';
     }
 
-    function enviarReciboWhatsApp() {
+    // =========================================================================
+    // EXPORTACIÓN VISUAL EN ALTA DEFINICIÓN (IMAGEN PNG Y PDF IDÉNTICO)
+    // =========================================================================
+    async function capturarCanvasRecibo() {
+      const card = document.getElementById('receiptTicketCard');
+      if (!card) throw new Error('No se encontró el comprobante para generar la imagen');
+
+      if (typeof html2canvas === 'undefined') {
+        throw new Error('La librería visual no está disponible. Revisa tu conexión a internet.');
+      }
+
+      showToast('⏳ Generando imagen en alta definición...');
+
+      const canvas = await html2canvas(card, {
+        scale: 2, // 2x para máxima nitidez en pantallas de celular y PDF
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#FFFFFF',
+        logging: false,
+        onclone: (clonedDoc) => {
+          const clonedCard = clonedDoc.getElementById('receiptTicketCard');
+          if (clonedCard) {
+            clonedCard.style.boxShadow = 'none';
+            clonedCard.style.margin = '0';
+          }
+        }
+      });
+      return canvas;
+    }
+
+    async function compartirReciboComoImagen() {
       if (!currentReceiptData) return;
-      compartirOEnviarCotizacionWhatsApp(currentReceiptData);
+      try {
+        const canvas = await capturarCanvasRecibo();
+        const consecutivo = (currentReceiptData.consecutivo || 'Zentra').replace(/[^a-zA-Z0-9_-]/g, '');
+        const fileName = `Cotizacion_${consecutivo}.png`;
+
+        canvas.toBlob(async (blob) => {
+          if (!blob) {
+            showToast('❌ No se pudo crear el archivo de imagen.');
+            return;
+          }
+
+          const file = new File([blob], fileName, { type: 'image/png' });
+          const cliPhone = currentReceiptData.clientPhone || '';
+          const cleanPhone = cliPhone.replace(/\D/g, '');
+          const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+          const msg = `Hola ${currentReceiptData.clientName || ''}, te compartimos la cotización ${currentReceiptData.consecutivo}.`;
+          const waUrl = fullPhone ? `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}` : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+
+          // 1. En móviles (Android / iOS): Compartir directamente como imagen a WhatsApp
+          if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({
+                title: `Cotización ${currentReceiptData.consecutivo}`,
+                text: msg,
+                files: [file]
+              });
+              showToast('✓ Cotización compartida como imagen');
+              return;
+            } catch (err) {
+              if (err.name === 'AbortError') return;
+              console.warn('Share cancelado o no soportado, continuando con descarga:', err);
+            }
+          }
+
+          // 2. En PC / Navegadores de escritorio:
+          descargarBlob(blob, fileName);
+
+          if (navigator.clipboard && navigator.clipboard.write && typeof ClipboardItem !== 'undefined') {
+            try {
+              await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+              showToast('📸 ¡Imagen copiada y descargada! Pégala con Ctrl+V en WhatsApp Web');
+            } catch (e) {
+              showToast('📥 Imagen descargada. Adjúntala al chat de WhatsApp');
+            }
+          } else {
+            showToast('📥 Imagen descargada. Adjúntala al chat de WhatsApp');
+          }
+
+          window.open(waUrl, '_blank');
+        }, 'image/png');
+      } catch (err) {
+        console.error('Error al exportar imagen:', err);
+        showToast('❌ Error al generar la imagen. Verifica tu conexión.');
+      }
+    }
+
+    async function descargarImagenRecibo() {
+      if (!currentReceiptData) return;
+      try {
+        const canvas = await capturarCanvasRecibo();
+        const consecutivo = (currentReceiptData.consecutivo || 'Zentra').replace(/[^a-zA-Z0-9_-]/g, '');
+        const fileName = `Cotizacion_${consecutivo}.png`;
+
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            showToast('❌ Error al procesar la imagen.');
+            return;
+          }
+          descargarBlob(blob, fileName);
+          showToast('✓ Imagen PNG descargada en alta definición');
+        }, 'image/png');
+      } catch (err) {
+        console.error('Error al descargar imagen:', err);
+        showToast('❌ No se pudo descargar la imagen.');
+      }
+    }
+
+    async function descargarPdfReciboVisual() {
+      if (!currentReceiptData) return;
+      try {
+        if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+          showToast('⚠️ Librería PDF no disponible. Descarga la imagen en PNG.');
+          return;
+        }
+
+        const canvas = await capturarCanvasRecibo();
+        const { jsPDF } = window.jspdf;
+
+        // Ancho estándar en milímetros para ticket/comprobante vertical
+        const pdfWidthMm = 95;
+        const pdfHeightMm = (canvas.height * pdfWidthMm) / canvas.width;
+
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: [pdfWidthMm, pdfHeightMm]
+        });
+
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', 0, 0, pdfWidthMm, pdfHeightMm);
+
+        const consecutivo = (currentReceiptData.consecutivo || 'Zentra').replace(/[^a-zA-Z0-9_-]/g, '');
+        const fileName = `Cotizacion_${consecutivo}.pdf`;
+        pdf.save(fileName);
+        showToast('✓ PDF descargado con diseño visual exacto');
+      } catch (err) {
+        console.error('Error al generar PDF visual:', err);
+        showToast('❌ No se pudo generar el PDF visual.');
+      }
+    }
+
+    function descargarBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function enviarReciboWhatsApp() {
+      compartirReciboComoImagen();
     }
 
     function copiarTextoRecibo() {

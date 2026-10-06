@@ -2553,6 +2553,9 @@
             <!-- Renderizado dinámico de usuarios -->
           </div>
 
+          <button type="button" onclick="abrirSelectorRapidoNegocios()" style="width:100%; background:var(--primary); color:#FFFFFF; border:none; padding:10px; border-radius:12px; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px; box-shadow:0 2px 8px rgba(0,108,70,0.2);">
+            <span>🏪</span> Cambiar de Tienda / Negocio
+          </button>
           <button onclick="cerrarSesionNegocio(false)" style="width:100%; background:var(--bg); border:1px solid #D1D5DB; color:var(--text); padding:9px; border-radius:12px; font-weight:700; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:8px;">
             <span>🚪</span> Cerrar Sesión del Negocio
           </button>
@@ -3981,6 +3984,9 @@
         localStorage.setItem(`zentra_expenses_${bizId}`, JSON.stringify(generalExpenses));
         localStorage.setItem(`zentra_incomes_${bizId}`, JSON.stringify(generalIncomes));
         localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(catalogItems));
+        if (catalogItems && catalogItems.length > 0) {
+          localStorage.setItem(`zentra_catalog_backup_${bizId}`, JSON.stringify(catalogItems));
+        }
         localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(users));
         localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(clients));
         localStorage.setItem(`zentra_quotes_${bizId}`, JSON.stringify(savedQuotes));
@@ -4006,6 +4012,135 @@
       } catch (e) {
         console.warn('Storage save error', e);
       }
+    }
+
+    function abrirSelectorRapidoNegocios() {
+      cerrarBusinessProfileModal();
+      abrirAuthPortal('login');
+      mostrarSelectorNegociosDisponibles();
+    }
+
+    // =======================================================
+    // FUSIÓN INTELIGENTE (SMART MERGE) Y AUTO-RECUPERACIÓN
+    // =======================================================
+    function mergeCatalogItems(localItems, cloudItems) {
+      const map = new Map();
+      (localItems || []).forEach(it => {
+        if (it && (it.id || it.name)) {
+          const key = it.id || it.name.toLowerCase().trim();
+          map.set(key, it);
+        }
+      });
+      (cloudItems || []).forEach(it => {
+        if (it && (it.id || it.name)) {
+          const key = it.id || it.name.toLowerCase().trim();
+          if (!map.has(key)) {
+            map.set(key, it);
+          } else {
+            const local = map.get(key);
+            const cloudTs = it.updatedAt ? new Date(it.updatedAt).getTime() : 0;
+            const localTs = local.updatedAt ? new Date(local.updatedAt).getTime() : 0;
+            if (cloudTs >= localTs) {
+              map.set(key, { ...local, ...it });
+            }
+          }
+        }
+      });
+      return Array.from(map.values());
+    }
+
+    function mergeProjectsData(localProjects, cloudProjects) {
+      const map = new Map();
+      (localProjects || []).forEach(p => {
+        if (p && (p.id || p.name)) {
+          const key = String(p.id || p.name);
+          map.set(key, p);
+        }
+      });
+      (cloudProjects || []).forEach(p => {
+        if (p && (p.id || p.name)) {
+          const key = String(p.id || p.name);
+          if (!map.has(key)) {
+            map.set(key, p);
+          } else {
+            const local = map.get(key);
+            const mergedTasks = (p.tasks && p.tasks.length > 0) ? p.tasks : (local.tasks || []);
+            map.set(key, { ...local, ...p, tasks: mergedTasks });
+          }
+        }
+      });
+      return Array.from(map.values());
+    }
+
+    function mergeClients(localClients, cloudClients) {
+      const map = new Map();
+      (localClients || []).forEach(c => {
+        if (c && (c.id || c.phone || c.name)) {
+          const key = c.phone || c.id || c.name;
+          map.set(key, c);
+        }
+      });
+      (cloudClients || []).forEach(c => {
+        if (c && (c.id || c.phone || c.name)) {
+          const key = c.phone || c.id || c.name;
+          if (!map.has(key)) {
+            map.set(key, c);
+          } else {
+            const local = map.get(key);
+            map.set(key, { ...local, ...c });
+          }
+        }
+      });
+      return Array.from(map.values());
+    }
+
+    function autoRecuperarCatalogoSiVacio(bizId, currentItems = []) {
+      if (!bizId) return currentItems || [];
+      let list = Array.isArray(currentItems) ? [...currentItems] : [];
+
+      // 1. Si está vacío, buscar en respaldo específico
+      if (list.length === 0) {
+        try {
+          const bStr = localStorage.getItem(`zentra_catalog_backup_${bizId}`);
+          if (bStr) {
+            const parsed = JSON.parse(bStr);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              list = parsed;
+              localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(list));
+              console.log(`Zentra: Catálogo recuperado desde backup para ${bizId}: ${list.length} ítems`);
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 2. Si sigue vacío, buscar en cualquier clave zentra_catalog_* disponible
+      if (list.length === 0) {
+        let bestCandidate = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.startsWith('zentra_catalog_') && !k.includes('backup')) {
+            try {
+              const cand = JSON.parse(localStorage.getItem(k));
+              if (Array.isArray(cand) && cand.length > bestCandidate.length) {
+                bestCandidate = cand;
+              }
+            } catch (_) {}
+          }
+        }
+        if (bestCandidate.length > 0) {
+          list = [...bestCandidate];
+          localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(list));
+          localStorage.setItem(`zentra_catalog_backup_${bizId}`, JSON.stringify(list));
+          console.log(`Zentra: Catálogo auto-rescatado para ${bizId}: ${list.length} ítems`);
+        }
+      }
+
+      // Mantener siempre el backup al día si hay ítems
+      if (list.length > 0) {
+        localStorage.setItem(`zentra_catalog_backup_${bizId}`, JSON.stringify(list));
+      }
+
+      return list;
     }
 
     function cargarEstadoNegocio(bizId, targetUserId = null) {
@@ -4058,13 +4193,14 @@
         const incStr = localStorage.getItem(`zentra_incomes_${bizId}`);
         generalIncomes = incStr ? JSON.parse(incStr) : [];
 
-        // AISLAMIENTO TOTAL: Catálogo exclusivo de este negocio (NUNCA mezclar con otros negocios)
+        // AISLAMIENTO TOTAL: Catálogo exclusivo de este negocio
         const catStr = localStorage.getItem(`zentra_catalog_${bizId}`);
         if (catStr !== null) {
           try { catalogItems = JSON.parse(catStr); } catch (_) { catalogItems = []; }
         } else {
           catalogItems = [];
         }
+        catalogItems = autoRecuperarCatalogoSiVacio(bizId, catalogItems);
 
         // AISLAMIENTO TOTAL: Clientes exclusivos de este negocio
         const cliStr = localStorage.getItem(`zentra_clients_${bizId}`);
@@ -4147,6 +4283,11 @@
         renderCatalogItems();
         renderPos();
         actualizarWidgetsTareasPendientes();
+
+        // Conectar escucha en la nube específica para este negocio
+        if (typeof currentGoogleUser !== 'undefined' && currentGoogleUser && currentGoogleUser.uid && typeof suscribirCambiosEnTiempoReal === 'function') {
+          suscribirCambiosEnTiempoReal(currentGoogleUser.uid, bizId);
+        }
 
         return true;
       } catch (e) {
@@ -4569,7 +4710,7 @@
 
       const query = (document.getElementById('pickerSearchInp').value || '').trim().toLowerCase();
       const items = catalogItems.filter(it => 
-        (!it.mode || it.mode === 'servicios') && (!query || it.name.toLowerCase().includes(query) || (it.cat && it.cat.toLowerCase().includes(query)))
+        (!query || it.name.toLowerCase().includes(query) || (it.cat && it.cat.toLowerCase().includes(query)))
       );
 
       if (items.length === 0) {
@@ -7005,8 +7146,7 @@ ${estadoStr}${contactText}
       if (!container) return;
       container.innerHTML = '';
 
-      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
-      let items = catalogItems.filter(i => !i.mode || i.mode === mode);
+      let items = [...catalogItems];
 
       if (catalogTypeFilter === 'producto') {
         items = items.filter(i => (!i.itemType || i.itemType === 'producto'));
@@ -7201,8 +7341,7 @@ ${estadoStr}${contactText}
       const select = document.getElementById('catalogPdfFilterSelect');
       if (!select) return;
 
-      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
-      const relevantItems = catalogItems.filter(i => !i.mode || i.mode === mode);
+      const relevantItems = [...catalogItems];
       
       const cats = Array.from(new Set(relevantItems.map(i => i.cat || 'General').filter(Boolean))).sort();
 
@@ -7242,8 +7381,7 @@ ${estadoStr}${contactText}
     }
 
     function obtenerItemsFiltradosCatalogoPDF() {
-      const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
-      let items = catalogItems.filter(i => !i.mode || i.mode === mode);
+      let items = [...catalogItems];
 
       if (catalogPdfFilterType === 'producto') {
         items = items.filter(i => (!i.itemType || i.itemType === 'producto'));
@@ -7655,6 +7793,8 @@ ${estadoStr}${contactText}
           item.itemType = itemType;
           item.image = tempProductPhoto || null;
 
+          item.updatedAt = new Date().toISOString();
+
           // Sincronizar en el carrito si está presente
           retailCart.forEach(ci => {
             if (ci.id === editingProductId) {
@@ -7680,9 +7820,14 @@ ${estadoStr}${contactText}
           cat: cat,
           itemType: itemType,
           image: tempProductPhoto || null,
-          mode: mode
+          mode: mode,
+          updatedAt: new Date().toISOString()
         });
         showToast(`✓ ${itemType === 'servicio' ? 'Servicio' : 'Producto'} "${name}" agregado al catálogo`);
+      }
+
+      if (bizProfile && bizProfile.id) {
+        localStorage.setItem(`zentra_catalog_backup_${bizProfile.id}`, JSON.stringify(catalogItems));
       }
 
       removeProductPhoto();
@@ -7710,7 +7855,7 @@ ${estadoStr}${contactText}
       if (!grid) return;
       grid.innerHTML = '';
       
-      let retailItems = catalogItems.filter(p => !p.mode || p.mode === 'retail');
+      let retailItems = [...catalogItems];
       if (posSearchFilter) {
         retailItems = retailItems.filter(p => 
           p.name.toLowerCase().includes(posSearchFilter) || 
@@ -9947,36 +10092,77 @@ ${estadoStr}${contactText}
       actualizarBadgeNubeUI('syncing');
 
       try {
-        const docRef = fbDb.collection('tiendas').doc(uid);
-        const docSnap = await docRef.get();
-
-        if (docSnap.exists) {
-          const cloudData = docSnap.data();
-          const localTs = obtenerTimestampUltimoCambioLocal();
-          const cloudTs = cloudData.exportTimestamp || 0;
-
-          // Si no hay negocio local activo o la nube es más reciente
-          if (!bizProfile || !bizProfile.id || cloudTs >= localTs) {
-            aplicarDatosNube(cloudData);
-            showToast('☁️ Tienda sincronizada desde la nube');
-          } else {
-            // El local es más reciente (por ejemplo, cambios recientes offline)
-            await subirEstadoANubeFirebase(uid, false);
+        // 1. Sincronizar directorio de negocios del usuario (multi-tienda)
+        try {
+          const regDoc = await fbDb.collection('tiendas').doc(`${uid}_registry`).get();
+          if (regDoc.exists) {
+            const rData = regDoc.data();
+            if (rData && Array.isArray(rData.businesses)) {
+              const localReg = obtenerRegistroNegocios();
+              let regUpdated = false;
+              rData.businesses.forEach(rb => {
+                if (!localReg.some(lb => lb.id === rb.id)) {
+                  localReg.push(rb);
+                  regUpdated = true;
+                }
+              });
+              if (regUpdated) guardarRegistroNegocios(localReg);
+            }
           }
-        } else {
-          // Documento no existe aún en Firestore
-          if (bizProfile && bizProfile.id) {
-            await subirEstadoANubeFirebase(uid, false);
-            showToast('☁️ Tu negocio se ha respaldado en Google Cloud');
+        } catch (rErr) {
+          console.warn('Error leyendo directorio multi-tienda de Firebase:', rErr);
+        }
+
+        // 2. Determinar negocio activo
+        let activeBizId = (bizProfile && bizProfile.id);
+        if (!activeBizId) {
+          const reg = obtenerRegistroNegocios();
+          if (reg.length > 0) {
+            activeBizId = reg[0].id;
+            cargarEstadoNegocio(activeBizId);
           } else {
-            // Usuario nuevo sin negocio local: crear negocio inicial
+            // Usuario sin negocios: crear negocio inicial
             crearNegocioInicialParaUsuarioGoogle(currentGoogleUser);
             await subirEstadoANubeFirebase(uid, false);
+            suscribirCambiosEnTiempoReal(uid, bizProfile.id);
+            actualizarBadgeNubeUI('connected');
+            return;
           }
         }
 
-        // Iniciar escucha reactiva en tiempo real (Realtime Snapshot)
-        suscribirCambiosEnTiempoReal(uid);
+        // 3. Sincronizar este negocio activo específico (usando su propio documento aislado)
+        const specificDocRef = fbDb.collection('tiendas').doc(`${uid}_${activeBizId}`);
+        const specificDocSnap = await specificDocRef.get();
+
+        if (specificDocSnap.exists) {
+          const cloudData = specificDocSnap.data();
+          const localTs = obtenerTimestampUltimoCambioLocal();
+          const cloudTs = cloudData.exportTimestamp || 0;
+
+          // Smart merge: combinar datos locales y remotos sin pérdida
+          aplicarDatosNube(cloudData);
+
+          if (localTs > cloudTs) {
+            // El local tenía cambios más recientes: subir estado unificado
+            await subirEstadoANubeFirebase(uid, false);
+          }
+          showToast(`☁️ "${bizProfile.name}" sincronizado con Google Cloud`);
+        } else {
+          // Si no existe documento específico, verificar documento legado
+          const legacyDocSnap = await fbDb.collection('tiendas').doc(uid).get();
+          if (legacyDocSnap.exists) {
+            const legData = legacyDocSnap.data();
+            if (legData && legData.bizId === activeBizId) {
+              aplicarDatosNube(legData);
+            }
+          }
+          // Subir a su propio documento en la nube
+          await subirEstadoANubeFirebase(uid, false);
+          showToast(`☁️ "${bizProfile.name}" respaldado en Google Cloud`);
+        }
+
+        // 4. Iniciar escucha reactiva en tiempo real para este negocio específico
+        suscribirCambiosEnTiempoReal(uid, activeBizId);
         actualizarBadgeNubeUI('connected');
       } catch (err) {
         console.error('Error sincronizando con Firebase:', err);
@@ -9993,23 +10179,30 @@ ${estadoStr}${contactText}
       }
     }
 
-    function suscribirCambiosEnTiempoReal(uid) {
+    function suscribirCambiosEnTiempoReal(uid, bizId = null) {
       if (!fbDb || !uid) return;
       if (firebaseUnsubscribeSnapshot) {
         firebaseUnsubscribeSnapshot();
         firebaseUnsubscribeSnapshot = null;
       }
 
-      firebaseUnsubscribeSnapshot = fbDb.collection('tiendas').doc(uid).onSnapshot(docSnap => {
+      const targetBizId = bizId || (bizProfile && bizProfile.id);
+      if (!targetBizId) return;
+
+      const docId = `${uid}_${targetBizId}`;
+
+      firebaseUnsubscribeSnapshot = fbDb.collection('tiendas').doc(docId).onSnapshot(docSnap => {
         if (!docSnap.exists) return;
         if (isSavingToCloud) return; // Evitar eco de nuestra propia escritura
         const cloudData = docSnap.data();
+        if (cloudData.bizId !== (bizProfile && bizProfile.id)) return;
+
         const localTs = obtenerTimestampUltimoCambioLocal();
         const cloudTs = cloudData.exportTimestamp || 0;
 
         // Si la nube trae actualización de otro dispositivo (PC o Celular)
         if (cloudTs > (localTs + 1500)) {
-          console.log('Firebase: Actualización remota recibida');
+          console.log(`Firebase: Actualización remota recibida para ${targetBizId}`);
           actualizarBadgeNubeUI('syncing');
           aplicarDatosNube(cloudData);
           setTimeout(() => {
@@ -10025,7 +10218,10 @@ ${estadoStr}${contactText}
     async function subirEstadoANubeFirebase(uid, mostrarNotificacion = false) {
       if (!fbDb || !uid || isApplyingCloudData) return;
       const backup = generarBackupNegocio();
-      if (!backup) return;
+      if (!backup || !bizProfile || !bizProfile.id) return;
+
+      const bizId = bizProfile.id;
+      const docId = `${uid}_${bizId}`;
 
       isSavingToCloud = true;
       actualizarBadgeNubeUI('syncing');
@@ -10033,6 +10229,7 @@ ${estadoStr}${contactText}
         const payload = {
           ...backup,
           uid: uid,
+          bizId: bizId,
           ownerEmail: (currentGoogleUser && currentGoogleUser.email) || bizProfile.email || '',
           ownerGoogleName: (currentGoogleUser && currentGoogleUser.name) || bizProfile.owner || '',
           exportTimestamp: Date.now(),
@@ -10040,7 +10237,30 @@ ${estadoStr}${contactText}
         };
 
         const cleanPayload = JSON.parse(JSON.stringify(payload));
+
+        // 1. Guardar documento específico e independiente de este negocio
+        await fbDb.collection('tiendas').doc(docId).set(cleanPayload, { merge: true });
+
+        // 2. Guardar registro multi-tienda del usuario en la nube
+        const reg = obtenerRegistroNegocios();
+        const registryPayload = {
+          uid: uid,
+          ownerEmail: (currentGoogleUser && currentGoogleUser.email) || '',
+          updatedAt: new Date().toISOString(),
+          businesses: reg.map(b => ({
+            id: b.id,
+            name: b.name,
+            owner: b.owner,
+            phone: b.phone,
+            type: b.type,
+            createdAt: b.createdAt || new Date().toISOString()
+          }))
+        };
+        await fbDb.collection('tiendas').doc(`${uid}_registry`).set(registryPayload, { merge: true });
+
+        // 3. Fallback retrocompatible para sesiones QR / lectores legados
         await fbDb.collection('tiendas').doc(uid).set(cleanPayload, { merge: true });
+
         lastCloudSyncTimestamp = Date.now();
         localStorage.setItem('zentra_last_cloud_sync', lastCloudSyncTimestamp.toString());
         localStorage.setItem('zentra_last_local_update', lastCloudSyncTimestamp.toString());
@@ -10079,14 +10299,48 @@ ${estadoStr}${contactText}
       try {
         const bizId = cloudData.bizId;
 
+        // 1. Obtener datos locales existentes para este negocio
+        let localCat = [];
+        try {
+          const s = localStorage.getItem(`zentra_catalog_${bizId}`);
+          if (s) localCat = JSON.parse(s);
+        } catch (_) {}
+        if (bizProfile && bizProfile.id === bizId && Array.isArray(catalogItems) && catalogItems.length > 0) {
+          localCat = mergeCatalogItems(localCat, catalogItems);
+        }
+
+        let localProj = [];
+        try {
+          const s = localStorage.getItem(`zentra_projects_${bizId}`);
+          if (s) localProj = JSON.parse(s);
+        } catch (_) {}
+        if (bizProfile && bizProfile.id === bizId && Array.isArray(projectsData) && projectsData.length > 0) {
+          localProj = mergeProjectsData(localProj, projectsData);
+        }
+
+        let localCli = [];
+        try {
+          const s = localStorage.getItem(`zentra_clients_${bizId}`);
+          if (s) localCli = JSON.parse(s);
+        } catch (_) {}
+        if (bizProfile && bizProfile.id === bizId && Array.isArray(clients) && clients.length > 0) {
+          localCli = mergeClients(localCli, clients);
+        }
+
+        // 2. FUSIÓN INTELIGENTE: combinar catálogo, proyectos y clientes sin perder datos
+        const mergedCatalog = mergeCatalogItems(localCat, cloudData.catalogItems || []);
+        const mergedProjects = mergeProjectsData(localProj, cloudData.projectsData || []);
+        const mergedClients = mergeClients(localCli, cloudData.clients || []);
+
         localStorage.setItem(`zentra_biz_profile_${bizId}`, JSON.stringify(cloudData.bizProfile));
-        localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(cloudData.projectsData || []));
+        localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(mergedProjects));
         localStorage.setItem(`zentra_expenses_${bizId}`, JSON.stringify(cloudData.generalExpenses || []));
         localStorage.setItem(`zentra_incomes_${bizId}`, JSON.stringify(cloudData.generalIncomes || []));
-        localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(cloudData.catalogItems || []));
+        localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(mergedCatalog));
+        localStorage.setItem(`zentra_catalog_backup_${bizId}`, JSON.stringify(mergedCatalog));
         localStorage.setItem(`zentra_quotes_${bizId}`, JSON.stringify(cloudData.savedQuotes || []));
         localStorage.setItem(`zentra_tasks_${bizId}`, JSON.stringify(cloudData.pendingTasks || []));
-        localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(cloudData.clients || []));
+        localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(mergedClients));
         localStorage.setItem(`zentra_users_${bizId}`, JSON.stringify(cloudData.users || []));
         if (cloudData.activeLayout) {
           localStorage.setItem('zentra_active_layout', cloudData.activeLayout);

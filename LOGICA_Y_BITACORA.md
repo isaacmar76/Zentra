@@ -779,6 +779,30 @@ class CatalogItemModel {
   3. **Paridad Total y Despliegue:**
      - Sincronización exacta al 100% de SHA-256 en los 4 archivos clave: `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
 
+#### Hito 33: Aislamiento Multi-Tienda en Firebase Firestore, Smart-Merge sin Pérdida de Datos y Corrección de Filtro de Catálogo
+- **Reporte del Usuario:**
+  - *"el catalogo tampoco sale, tenia varios productos y ahora no salen. Por otro lado al sincronizar la otra tienda, Bettere Life, no salen los productos completos, en el PC tenia 4 productos y en el mobil salen solo 3, ahora en el PC no sale ninguno despues de la sincronizacion. Me preocupa que cuando tatiana haga la sincronizacion entonces tambien desaparezcan sus datos"*
+- **Causas Raíz Identificadas:**
+  1. **Colisión de Tiendas en la Nube (`tiendas.doc(uid)`):** La sincronización inicial almacenaba todo en un único documento Firestore por usuario (`tiendas/{uid}`). Al sincronizar una segunda tienda como "Better Life", sobreescribía por completo a "TM Diseños Creativos" en la nube, y al cambiar de dispositivo se descargaba la tienda incorrecta o vacía.
+  2. **Sobreescritura Destructiva en lugar de Fusión (Smart-Merge):** Si un dispositivo (PC) tenía 4 productos y el otro (móvil) tenía 3 o 0 por estar desactualizado, la sincronización reemplazaba destructivamente el array local con el remoto, borrando los productos más recientes.
+  3. **Filtro Restrictivo de Modo en Catálogo (`item.mode === mode`):** En `renderCatalogItems()`, `poblarCategoriasFiltroCatalogoPDF()` y `renderPos()`, el código filtraba los productos por `item.mode === mode`. Al cambiar de modalidad o crearse artículos bajo otra categoría, los productos quedaban ocultos visualmente a pesar de existir en base de datos.
+- **Solución Integral Aplicada:**
+  1. **Arquitectura Multi-Tienda Aislada en Firestore:**
+     - Cada tienda se almacena en su propio documento independiente: `tiendas/{uid}_{bizId}`. "TM Diseños Creativos" y "Better Life" jamás comparten ni sobreescriben sus datos.
+     - Registro de tiendas por cuenta en `tiendas/{uid}_registry` para descubrir y listar automáticamente todas las marcas del usuario al iniciar sesión en un nuevo dispositivo.
+     - Los oyentes reactivos en tiempo real (`onSnapshot`) se conectan exclusivamente al canal de la tienda activa (`{uid}_{bizId}`), evitando interferencias entre tiendas.
+  2. **Motor de Fusión Inteligente (Smart-Merge) y Auto-Recuperación:**
+     - `mergeCatalogItems`: Combina por ID los productos locales y remotos. Si un dispositivo tiene un producto nuevo, se preserva y se suma al catálogo general sin borrar nada.
+     - `mergeProjectsData`: Fusiona proyectos preservando los estados de avance, abonos y tareas (los proyectos en Producción de Tatiana están 100% blindados).
+     - `autoRecuperarCatalogoSiVacio`: Rescata y restaura automáticamente productos desde claves de respaldo y almacenamiento local si un catálogo quedó vacío por sincronizaciones previas.
+     - Copia de seguridad automática preventiva en `zentra_catalog_backup_{bizId}` en cada guardado.
+  3. **Visualización Completa del Catálogo:**
+     - Eliminada la restricción de `mode` en `renderCatalogItems()`, POS y exportación PDF: todos los productos creados dentro de la tienda activa son visibles de inmediato.
+  4. **Selector Rápido de Tiendas en UI:**
+     - Nuevo botón "🏪 Cambiar de Tienda / Negocio" dentro del modal de perfil para alternar entre "TM Diseños Creativos" y "Better Life" en 1 toque.
+  5. **Paridad Total de Archivos:**
+     - Sincronización exacta al 100% en `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

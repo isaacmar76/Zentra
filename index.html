@@ -21,6 +21,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+  <!-- SheetJS para importar hojas de cálculo Excel / Google Sheets (.xlsx, .xls, .csv) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <style>
     :root, [data-theme="zentra_clarity"] {
       /* Tema Fintech Clarity (Zentra Core - nuevo_diseño.md) */
@@ -2061,7 +2063,10 @@
           <button onclick="irInicio()" style="background:none; border:none; color:var(--primary); font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:3px;">
             <span>‹ Volver al Inicio</span>
           </button>
-          <div style="display:flex; gap:6px;">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button onclick="abrirModalImportarSheets()" style="background:#F0FDF4; border:1.5px solid #22C55E; color:#15803D; padding:7px 11px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(34,197,94,0.12);">
+              <span>📊</span> Importar Sheets
+            </button>
             <button onclick="abrirModalExportarCatalogoPDF()" style="background:var(--primary-soft); color:var(--primary); border:1.5px solid var(--primary); padding:7px 11px; border-radius:10px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
               <span>📄</span> Exportar PDF
             </button>
@@ -3017,11 +3022,17 @@
           <button type="button" class="status-chip" id="chipCatServicios" onclick="filtrarCatalogoPorTipo('servicio')">✂️ Servicios / Proyectos</button>
         </div>
 
-        <!-- Botón Destacado: Exportar Catálogo para Clientes (PDF & WhatsApp) -->
-        <button type="button" onclick="abrirModalExportarCatalogoPDF()" style="width:100%; margin-bottom:12px; background:linear-gradient(135deg, #006C46 0%, #00D68F 100%); color:#FFFFFF; border:none; padding:10px 14px; border-radius:14px; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 3px 10px rgba(0,108,70,0.22); transition:transform 0.15s ease;">
-          <span style="font-size:16px;">📄</span>
-          <span>Exportar Catálogo para Clientes (PDF & WhatsApp)</span>
-        </button>
+        <!-- Acciones Destacadas: Exportar PDF / WhatsApp e Importar desde Google Sheets / Drive -->
+        <div style="display:grid; grid-template-columns:1.15fr 1fr; gap:8px; margin-bottom:12px;">
+          <button type="button" onclick="abrirModalExportarCatalogoPDF()" style="background:linear-gradient(135deg, #006C46 0%, #00D68F 100%); color:#FFFFFF; border:none; padding:10px 10px; border-radius:14px; font-weight:800; font-size:11.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 3px 10px rgba(0,108,70,0.22); transition:transform 0.15s ease;">
+            <span style="font-size:15px;">📄</span>
+            <span>Exportar PDF</span>
+          </button>
+          <button type="button" onclick="abrirModalImportarSheets()" style="background:#F0FDF4; border:1.5px solid #22C55E; color:#15803D; padding:10px 10px; border-radius:14px; font-weight:800; font-size:11.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; box-shadow:0 2px 6px rgba(34,197,94,0.15);">
+            <span style="font-size:15px;">📊</span>
+            <span>Importar Sheets</span>
+          </button>
+        </div>
 
         <!-- Acciones rápidas: Nuevo al Catálogo vs Ítem a Medida para el Pedido -->
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;">
@@ -3581,6 +3592,146 @@
         <!-- Listado Dinámico de Cotizaciones -->
         <div id="quotesListContainer" style="display:flex; flex-direction:column; gap:10px; min-height:120px; margin-bottom:10px;">
           <!-- Inyectado por JS -->
+        </div>
+
+    <!-- Modal: Importar Inventario desde Google Sheets / Google Drive -->
+    <div id="importarSheetsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.65); z-index:520; align-items:center; justify-content:center; backdrop-filter:blur(4px); padding:16px; box-sizing:border-box;">
+      <div style="background:var(--card-bg); width:100%; max-width:580px; border-radius:26px; padding:22px 18px; max-height:92vh; display:flex; flex-direction:column; color:var(--text); box-shadow:0 16px 45px rgba(0,0,0,0.3); box-sizing:border-box; overflow-y:auto;">
+        
+        <!-- Encabezado del Modal -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; border-bottom:1px solid var(--surface-border); padding-bottom:12px;">
+          <div>
+            <div style="font-size:17px; font-weight:800; color:var(--text); display:flex; align-items:center; gap:8px;">
+              <span>📊</span> Importar desde Google Sheets / Drive
+            </div>
+            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">
+              Carga tus productos, precios, costos y stock desde tu cuenta de Google / Gmail
+            </div>
+          </div>
+          <button onclick="cerrarModalImportarSheets()" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted); padding:4px;">✕</button>
+        </div>
+
+        <!-- Banner de Estado de Cuenta Google / Gmail -->
+        <div id="boxGoogleAccountSheetsStatus" style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:14px; padding:10px 12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:28px; height:28px; border-radius:50%; background:#4285F4; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px;" id="lblSheetsGoogleInitial">G</div>
+            <div>
+              <div style="font-size:11px; font-weight:700; color:#0B1C30;" id="lblSheetsGoogleUserText">Conexión con Google</div>
+              <div style="font-size:10px; color:#64748B;" id="lblSheetsGoogleEmailText">Sincroniza directamente con tus archivos de Drive</div>
+            </div>
+          </div>
+          <button type="button" onclick="abrirGoogleDriveWeb()" style="background:#EEF2FF; border:1px solid #C7D2FE; color:#3730A3; padding:6px 11px; border-radius:10px; font-size:11px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px; box-shadow:0 1px 3px rgba(79,70,229,0.1);">
+            <span>📂</span> Abrir mi Drive
+          </button>
+        </div>
+
+        <!-- Opciones de Carga -->
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:14px;">
+          
+          <!-- Opción 1: Archivo de Google Drive o Celular -->
+          <div style="background:var(--surface-subtle); border:1.5px dashed var(--primary); border-radius:16px; padding:14px; text-align:center;">
+            <div style="font-size:26px; margin-bottom:4px;">📁</div>
+            <div style="font-size:12.5px; font-weight:800; color:var(--text); margin-bottom:2px;">Selecciona tu Hoja de Cálculo</div>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px; line-height:1.4;">
+              Formatos compatibles: <b>Google Sheets (.xlsx, .csv, .tsv)</b> o Excel guardado en tu Drive o celular.
+            </div>
+            
+            <input type="file" id="sheetsFileInput" accept=".csv,.xlsx,.xls,.tsv,text/csv,text/tab-separated-values,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" style="display:none;" onchange="alSeleccionarArchivoSheets(event)">
+            
+            <div style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap;">
+              <button type="button" onclick="document.getElementById('sheetsFileInput').click()" style="background:var(--primary); color:#FFFFFF; border:none; padding:10px 16px; border-radius:12px; font-size:12px; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(0,108,70,0.25);">
+                <span>📂</span> Elegir de Drive / Celular
+              </button>
+              <button type="button" onclick="abrirGoogleDriveWeb()" style="background:#FFFFFF; border:1px solid var(--surface-border); color:var(--text); padding:10px 14px; border-radius:12px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;">
+                <span>🌐</span> Ir a Google Drive
+              </button>
+            </div>
+            
+            <div style="font-size:10px; color:#64748B; margin-top:8px; line-height:1.3;">
+              📱 <b>En celular:</b> al tocar "Elegir", abre el menú lateral y toca <b>"Drive"</b> para seleccionar tu hoja sin descargarla.
+            </div>
+          </div>
+
+          <!-- Opción 2: Enlace directo de Google Sheets -->
+          <div style="background:#FFFFFF; border:1px solid var(--surface-border); border-radius:14px; padding:12px;">
+            <label style="display:block; font-size:11px; font-weight:700; margin-bottom:4px; color:var(--text);">
+              🔗 O pega el enlace de tu Google Sheet:
+            </label>
+            <div style="display:flex; gap:6px;">
+              <input type="url" id="sheetsUrlInp" placeholder="https://docs.google.com/spreadsheets/d/1BxiMVs..." style="flex:1; padding:8px 10px; border-radius:10px; border:1px solid var(--surface-border); font-size:11.5px; background:var(--bg); color:var(--text); box-sizing:border-box;">
+              <button type="button" onclick="cargarDesdeEnlaceGoogleSheets()" style="background:#EEF2FF; border:1px solid #C7D2FE; color:#3730A3; padding:8px 12px; border-radius:10px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap;">
+                📥 Cargar
+              </button>
+            </div>
+            <div style="font-size:9.5px; color:#64748B; margin-top:4px;">
+              * Asegúrate de que la hoja esté compartida como <i>"Cualquier persona con el enlace puede ver"</i>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Descargar Plantilla y Guía de Columnas -->
+        <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:12px; padding:10px 12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div>
+            <div style="font-size:11px; font-weight:700; color:#0B1C30;">📋 Plantilla de Ejemplo Oficial</div>
+            <div style="font-size:10px; color:#64748B;">Columnas: Nombre, Descripción, Precio, Costo, Stock, Categoría, Tipo</div>
+          </div>
+          <button type="button" onclick="descargarPlantillaInventarioExcel()" style="background:transparent; border:1px dashed #006C46; color:#006C46; padding:5px 10px; border-radius:8px; font-size:10.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+            <span>📥</span> Descargar Plantilla (.csv)
+          </button>
+        </div>
+
+        <!-- Sección de Previsualización (aparece tras procesar el archivo o URL) -->
+        <div id="boxSheetsPreviewContainer" style="display:none; border-top:1.5px solid var(--surface-border); padding-top:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span id="lblSheetsDetectedCount" style="font-size:12px; font-weight:800; color:#15803D; background:#DCFCE7; padding:3px 10px; border-radius:10px;">
+              ✓ 0 productos detectados
+            </span>
+            <button type="button" onclick="cancelarPrevisualizacionSheets()" style="background:none; border:none; color:var(--text-muted); font-size:11px; cursor:pointer; font-weight:600;">
+              ✕ Limpiar
+            </button>
+          </div>
+
+          <!-- Modo de Importación (Combinar vs Reemplazar) -->
+          <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:12px; padding:10px; margin-bottom:10px;">
+            <div style="font-size:11px; font-weight:700; margin-bottom:6px; color:var(--text);">Selecciona cómo aplicar al catálogo:</div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:11.5px; cursor:pointer; margin-bottom:5px;">
+              <input type="radio" name="sheetsImportMode" id="radSheetsMerge" value="merge" checked style="accent-color:var(--primary);">
+              <span><b>Combinar y actualizar:</b> Suma productos nuevos y actualiza precios/stock de los existentes sin borrar nada.</span>
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; font-size:11.5px; cursor:pointer;">
+              <input type="radio" name="sheetsImportMode" id="radSheetsReplace" value="replace" style="accent-color:var(--alert);">
+              <span style="color:var(--alert);"><b>Reemplazar todo:</b> Borra el catálogo actual y deja solo los ítems de esta hoja.</span>
+            </label>
+          </div>
+
+          <!-- Tabla de Muestra (Primeros 6 ítems) -->
+          <div style="font-size:11px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">Vista previa de los primeros ítems:</div>
+          <div style="max-height:160px; overflow-y:auto; border:1px solid var(--surface-border); border-radius:10px; margin-bottom:14px; background:#FFFFFF;">
+            <table style="width:100%; border-collapse:collapse; font-size:11px; text-align:left;">
+              <thead>
+                <tr style="background:#F1F5F9; border-bottom:1px solid var(--surface-border);">
+                  <th style="padding:6px 8px; font-weight:700;">Producto</th>
+                  <th style="padding:6px 8px; font-weight:700;">Categoría</th>
+                  <th style="padding:6px 8px; font-weight:700;">Venta</th>
+                  <th style="padding:6px 8px; font-weight:700;">Costo</th>
+                  <th style="padding:6px 8px; font-weight:700;">Stock</th>
+                </tr>
+              </thead>
+              <tbody id="tblSheetsPreviewBody">
+                <!-- Inyectado dinámicamente -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Botones de Acción Final -->
+          <div style="display:flex; gap:8px;">
+            <button type="button" onclick="cancelarPrevisualizacionSheets()" style="flex:1; padding:10px; border-radius:12px; border:1px solid var(--surface-border); background:transparent; font-weight:600; font-size:12px; cursor:pointer;">
+              Cancelar
+            </button>
+            <button type="button" id="btnConfirmarImportarSheets" onclick="confirmarImportacionCatalogo()" style="flex:2; padding:10px; border-radius:12px; border:none; background:var(--primary); color:#FFFFFF; font-weight:800; font-size:12.5px; cursor:pointer; box-shadow:0 3px 8px rgba(0,108,70,0.3);">
+              ✓ Importar al Catálogo
+            </button>
+          </div>
         </div>
 
       </div>
@@ -8459,6 +8610,472 @@ ${estadoStr}${contactText}
         showToast('⚠️ No se pudo copiar automáticamente');
       }
       document.body.removeChild(t);
+    }
+
+    // =========================================================================
+    // MÓDULO: IMPORTAR INVENTARIO DESDE GOOGLE SHEETS Y GOOGLE DRIVE
+    // =========================================================================
+    let tempImportedCatalogItems = [];
+
+    function abrirModalImportarSheets() {
+      tempImportedCatalogItems = [];
+      const modal = document.getElementById('importarSheetsModal');
+      if (!modal) return;
+
+      // Actualizar estado de la cuenta de Google / Gmail
+      const userText = document.getElementById('lblSheetsGoogleUserText');
+      const emailText = document.getElementById('lblSheetsGoogleEmailText');
+      const initialEl = document.getElementById('lblSheetsGoogleInitial');
+      
+      if (currentGoogleUser && currentGoogleUser.email) {
+        if (userText) userText.innerText = `Cuenta vinculada: ${currentGoogleUser.name || 'Usuario Google'}`;
+        if (emailText) emailText.innerText = currentGoogleUser.email;
+        if (initialEl) initialEl.innerText = (currentGoogleUser.name || 'G').charAt(0).toUpperCase();
+      } else {
+        if (userText) userText.innerText = 'Google Drive / Gmail';
+        if (emailText) emailText.innerText = 'Abre tu Drive o selecciona cualquier archivo de tu dispositivo';
+        if (initialEl) initialEl.innerText = 'G';
+      }
+
+      // Limpiar inputs y ocultar sección de previsualización
+      const urlInp = document.getElementById('sheetsUrlInp');
+      if (urlInp) urlInp.value = '';
+      const fileInp = document.getElementById('sheetsFileInput');
+      if (fileInp) fileInp.value = '';
+      
+      cancelarPrevisualizacionSheets();
+      modal.style.display = 'flex';
+    }
+
+    function cerrarModalImportarSheets() {
+      const modal = document.getElementById('importarSheetsModal');
+      if (modal) modal.style.display = 'none';
+      cancelarPrevisualizacionSheets();
+    }
+
+    function abrirGoogleDriveWeb() {
+      const url = 'https://drive.google.com/drive/u/0/my-drive';
+      window.open(url, '_blank');
+      showToast('📂 Abriendo Google Drive en una nueva ventana');
+    }
+
+    function alSeleccionarArchivoSheets(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const fileName = file.name.toLowerCase();
+      showToast(`⏳ Leyendo "${file.name}"...`);
+
+      if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            if (typeof XLSX !== 'undefined') {
+              const data = new Uint8Array(e.target.result);
+              const wb = XLSX.read(data, { type: 'array' });
+              const firstSheet = wb.SheetNames[0];
+              const worksheet = wb.Sheets[firstSheet];
+              const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+              procesarFilasParaInventario(rows, file.name);
+            } else {
+              alert('⚠️ Librería de Excel no disponible en este momento. Prueba exportando o guardando como archivo CSV desde tu Drive.');
+            }
+          } catch (err) {
+            console.error('Error al procesar archivo Excel:', err);
+            alert('❌ No se pudo procesar el archivo Excel. Verifica que sea un archivo válido o expórtalo como .csv.');
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        // Tratar como CSV / TSV de texto plano
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const rows = parseCSVToRows(e.target.result);
+            procesarFilasParaInventario(rows, file.name);
+          } catch (err) {
+            console.error('Error al procesar CSV:', err);
+            alert('❌ No se pudo procesar el archivo CSV.');
+          }
+        };
+        reader.readAsText(file, 'UTF-8');
+      }
+    }
+
+    async function cargarDesdeEnlaceGoogleSheets() {
+      const urlInp = document.getElementById('sheetsUrlInp');
+      const url = (urlInp?.value || '').trim();
+      if (!url) {
+        showToast('Pega el enlace de tu hoja de Google Sheets');
+        return;
+      }
+
+      const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (!match) {
+        alert('⚠️ Enlace no reconocido.\n\nAsegúrate de copiar el enlace de Google Sheets que comienza con:\nhttps://docs.google.com/spreadsheets/d/...');
+        return;
+      }
+
+      const sheetId = match[1];
+      const gidMatch = url.match(/[#&?]gid=([0-9]+)/);
+      const gid = gidMatch ? gidMatch[1] : '0';
+
+      showToast('⏳ Descargando datos desde Google Sheets...');
+
+      const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
+      const gvizUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&gid=${gid}`;
+
+      let csvText = null;
+      try {
+        const res = await fetch(csvUrl);
+        if (res.ok) {
+          csvText = await res.text();
+        }
+      } catch (err) {
+        console.warn('Fallo fetch csv directo, intentando gviz:', err);
+      }
+
+      if (!csvText) {
+        try {
+          const res2 = await fetch(gvizUrl);
+          if (res2.ok) {
+            csvText = await res2.text();
+          }
+        } catch (err2) {
+          console.warn('Fallo gviz:', err2);
+        }
+      }
+
+      if (!csvText || csvText.includes('<!DOCTYPE html>')) {
+        alert('🔒 Hoja de Google Sheets Privada o Protegida:\n\nPara que Zentra pueda leer tu hoja directamente por enlace:\n1. En Google Sheets, presiona "Compartir" (arriba a la derecha).\n2. En "Acceso general", cambia a "Cualquier persona con el enlace (Lector)".\n\n💡 Alternativa en 1 clic:\nEn Google Sheets ve a Archivo > Descargar > Valores separados por comas (.csv) y súbela con el botón "Elegir de Drive / Celular".');
+        return;
+      }
+
+      try {
+        const rows = parseCSVToRows(csvText);
+        procesarFilasParaInventario(rows, 'Google Sheets Enlace');
+      } catch (err) {
+        console.error('Error al procesar CSV de Google Sheets:', err);
+        alert('❌ Error al procesar el contenido de la hoja de cálculo.');
+      }
+    }
+
+    function procesarFilasParaInventario(rows, sourceName) {
+      const items = mapRowsToCatalogItems(rows);
+      if (!items || items.length === 0) {
+        alert('⚠️ No se encontraron productos válidos en la hoja.\n\nVerifica que la primera fila contenga los títulos de las columnas (ej: Nombre, Precio, Costo, Stock, Categoría, Descripción).');
+        return;
+      }
+
+      tempImportedCatalogItems = items;
+      const countEl = document.getElementById('lblSheetsDetectedCount');
+      if (countEl) {
+        countEl.innerText = `✓ ${items.length} productos detectados (${sourceName})`;
+      }
+
+      const tbody = document.getElementById('tblSheetsPreviewBody');
+      if (tbody) {
+        tbody.innerHTML = '';
+        const previewLimit = Math.min(items.length, 6);
+        for (let i = 0; i < previewLimit; i++) {
+          const it = items[i];
+          const tr = document.createElement('tr');
+          tr.style.borderBottom = '1px solid #F1F5F9';
+          tr.innerHTML = `
+            <td style="padding:6px 8px; font-weight:700; color:var(--text);">${escaparHTML(it.name)}${it.description ? `<div style="font-size:9.5px; color:#64748B; font-weight:400; line-height:1.2;">${escaparHTML(it.description)}</div>` : ''}</td>
+            <td style="padding:6px 8px; color:var(--text-muted);"><span style="font-size:9.5px; background:#EEF2FF; color:#4F46E5; padding:1px 6px; border-radius:5px; font-weight:600;">${escaparHTML(it.cat)}</span></td>
+            <td style="padding:6px 8px; font-weight:800; color:var(--primary);">$${(it.price || 0).toLocaleString('es-CO')}</td>
+            <td style="padding:6px 8px; color:#64748B;">$${(it.cost || 0).toLocaleString('es-CO')}</td>
+            <td style="padding:6px 8px; font-weight:700; color:${it.itemType === 'servicio' ? '#4F46E5' : '#15803D'};">${it.itemType === 'servicio' ? 'Servicio' : it.stock}</td>
+          `;
+          tbody.appendChild(tr);
+        }
+        if (items.length > previewLimit) {
+          const trMore = document.createElement('tr');
+          trMore.innerHTML = `
+            <td colspan="5" style="padding:6px 8px; text-align:center; color:var(--text-muted); font-style:italic; background:#F8FAFC;">
+              ... y ${items.length - previewLimit} productos más listados en la hoja.
+            </td>
+          `;
+          tbody.appendChild(trMore);
+        }
+      }
+
+      const btnConfirm = document.getElementById('btnConfirmarImportarSheets');
+      if (btnConfirm) {
+        btnConfirm.innerText = `✓ Importar ${items.length} Ítems al Catálogo`;
+      }
+
+      const boxPreview = document.getElementById('boxSheetsPreviewContainer');
+      if (boxPreview) {
+        boxPreview.style.display = 'block';
+        boxPreview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      showToast(`✓ ${items.length} productos listos para importar`);
+    }
+
+    function cancelarPrevisualizacionSheets() {
+      tempImportedCatalogItems = [];
+      const box = document.getElementById('boxSheetsPreviewContainer');
+      if (box) box.style.display = 'none';
+      const fileInp = document.getElementById('sheetsFileInput');
+      if (fileInp) fileInp.value = '';
+    }
+
+    function confirmarImportacionCatalogo() {
+      if (!tempImportedCatalogItems || tempImportedCatalogItems.length === 0) {
+        showToast('No hay productos cargados para importar.');
+        return;
+      }
+
+      const mode = document.querySelector('input[name="sheetsImportMode"]:checked')?.value || 'merge';
+      const modeBiz = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
+      let added = 0;
+      let updated = 0;
+
+      if (mode === 'replace') {
+        const confirmar = confirm(`¿Estás seguro de REEMPLAZAR todo el catálogo?\n\nSe borrarán tus ${catalogItems.length} ítems actuales y se reemplazarán por los ${tempImportedCatalogItems.length} de la hoja.`);
+        if (!confirmar) return;
+
+        catalogItems = tempImportedCatalogItems.map(it => ({
+          id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+          name: it.name,
+          description: it.description || '',
+          price: it.price || 0,
+          cost: it.cost || 0,
+          stock: it.stock,
+          cat: it.cat || 'General',
+          itemType: it.itemType || 'producto',
+          image: null,
+          mode: modeBiz,
+          updatedAt: new Date().toISOString()
+        }));
+        added = catalogItems.length;
+      } else {
+        // Modo Combinar / Actualizar
+        tempImportedCatalogItems.forEach(it => {
+          const normName = it.name.trim().toLowerCase();
+          const existing = catalogItems.find(c => c.name && c.name.trim().toLowerCase() === normName);
+
+          if (existing) {
+            existing.price = it.price || existing.price;
+            existing.cost = it.cost !== undefined ? it.cost : existing.cost;
+            if (it.description) existing.description = it.description;
+            if (it.cat && it.cat !== 'General') existing.cat = it.cat;
+            if (it.itemType) existing.itemType = it.itemType;
+            if (it.stock !== undefined && existing.itemType !== 'servicio') existing.stock = it.stock;
+            existing.updatedAt = new Date().toISOString();
+            updated++;
+          } else {
+            catalogItems.unshift({
+              id: 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+              name: it.name,
+              description: it.description || '',
+              price: it.price || 0,
+              cost: it.cost || 0,
+              stock: it.stock,
+              cat: it.cat || 'General',
+              itemType: it.itemType || 'producto',
+              image: null,
+              mode: modeBiz,
+              updatedAt: new Date().toISOString()
+            });
+            added++;
+          }
+        });
+      }
+
+      // Guardar y sincronizar
+      persistirEstadoLocal();
+      if (bizProfile && bizProfile.id) {
+        localStorage.setItem(`zentra_catalog_backup_${bizProfile.id}`, JSON.stringify(catalogItems));
+      }
+      if (currentGoogleUser && currentGoogleUser.uid && fbDb) {
+        subirEstadoANubeFirebase(currentGoogleUser.uid, false);
+      }
+
+      renderCatalogItems();
+      renderCatalogIntegrated();
+      renderCurrentHomeLayout();
+      cerrarModalImportarSheets();
+
+      const resumenStr = mode === 'replace'
+        ? `Catálogo reemplazado con ${added} productos.`
+        : `${added} nuevos agregados, ${updated} actualizados.`;
+      showToast(`🎉 ¡Inventario importado con éxito! (${resumenStr})`);
+    }
+
+    function descargarPlantillaInventarioExcel() {
+      const csvContent = "\uFEFFNombre,Descripción,Precio Venta,Costo Unitario,Stock,Categoría,Tipo\n" +
+        "Cake Topper Shaker,Decoración multicapa con acetato y escarcha,45000,18000,15,Papelería Creativa,producto\n" +
+        "Agenda Personalizada 2026,Tapa dura laminada con foil dorado,65000,24000,8,Papelería Creativa,producto\n" +
+        "Diseño de Logo & Identidad,Entrega en vectores y formatos web,120000,0,999,Diseño Gráfico,servicio\n" +
+        "Arroz Blanco 1kg,Grano entero seleccionado,4500,3800,48,Abarrotes,producto\n" +
+        "Aceite Vegetal 900ml,Botella 100% puro de soya,9500,8100,24,Abarrotes,producto\n" +
+        "Servicio de Mantenimiento / Taller,Revisión y ajuste técnico,50000,15000,999,Servicios Técnicos,servicio\n";
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', 'Plantilla_Inventario_Zentra.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      showToast('✓ Plantilla descargada en formato CSV para Google Sheets o Excel');
+    }
+
+    function parseCSVToRows(text) {
+      let cleanText = text.replace(/^\uFEFF/, '').trim();
+      const lines = [];
+      let currentRow = [];
+      let currentField = '';
+      let insideQuotes = false;
+
+      const firstLine = cleanText.split('\n')[0];
+      const countComma = (firstLine.match(/,/g) || []).length;
+      const countSemicolon = (firstLine.match(/;/g) || []).length;
+      const countTab = (firstLine.match(/\t/g) || []).length;
+
+      let delimiter = ',';
+      if (countSemicolon > countComma && countSemicolon > countTab) delimiter = ';';
+      else if (countTab > countComma && countTab > countSemicolon) delimiter = '\t';
+
+      for (let i = 0; i < cleanText.length; i++) {
+        const char = cleanText[i];
+        const nextChar = cleanText[i + 1];
+
+        if (char === '"') {
+          if (insideQuotes && nextChar === '"') {
+            currentField += '"';
+            i++;
+          } else {
+            insideQuotes = !insideQuotes;
+          }
+        } else if (char === delimiter && !insideQuotes) {
+          currentRow.push(currentField.trim());
+          currentField = '';
+        } else if ((char === '\r' || char === '\n') && !insideQuotes) {
+          if (char === '\r' && nextChar === '\n') i++;
+          currentRow.push(currentField.trim());
+          if (currentRow.some(c => c.length > 0)) {
+            lines.push(currentRow);
+          }
+          currentRow = [];
+          currentField = '';
+        } else {
+          currentField += char;
+        }
+      }
+      if (currentField.length > 0 || currentRow.length > 0) {
+        currentRow.push(currentField.trim());
+        if (currentRow.some(c => c.length > 0)) {
+          lines.push(currentRow);
+        }
+      }
+      return lines;
+    }
+
+    function mapRowsToCatalogItems(rows) {
+      if (!rows || rows.length < 2) return [];
+      const rawHeaders = rows[0].map(h => String(h || '').trim());
+      const normHeaders = rawHeaders.map(h => 
+        h.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim()
+      );
+
+      let idxName = -1, idxDesc = -1, idxPrice = -1, idxCost = -1, idxStock = -1, idxCat = -1, idxType = -1;
+
+      normHeaders.forEach((h, idx) => {
+        if (idxName === -1 && (h === 'nombre' || h === 'producto' || h === 'articulo' || h === 'item' || h === 'name' || h === 'titulo' || h.includes('nombre'))) {
+          idxName = idx;
+        } else if (idxDesc === -1 && (h === 'descripcion' || h === 'detalle' || h === 'detalles' || h === 'description' || h === 'especificaciones' || h === 'obs' || h === 'nota' || h === 'notas')) {
+          idxDesc = idx;
+        } else if (idxPrice === -1 && (h === 'precio' || h === 'precio venta' || h === 'venta' || h === 'pvp' || h === 'valor venta' || h === 'valor' || h === 'price' || h.includes('precio') || h.includes('venta'))) {
+          idxPrice = idx;
+        } else if (idxCost === -1 && (h === 'costo' || h === 'costo unitario' || h === 'precio costo' || h === 'cost' || h === 'compra' || h.includes('costo'))) {
+          idxCost = idx;
+        } else if (idxStock === -1 && (h === 'stock' || h === 'cantidad' || h === 'cant' || h === 'existencias' || h === 'unidades' || h === 'quantity' || h === 'disp')) {
+          idxStock = idx;
+        } else if (idxCat === -1 && (h === 'categoria' || h === 'cat' || h === 'rubro' || h === 'grupo' || h === 'category' || h === 'seccion')) {
+          idxCat = idx;
+        } else if (idxType === -1 && (h === 'tipo' || h === 'tipo item' || h === 'item type' || h === 'type' || h === 'modalidad')) {
+          idxType = idx;
+        }
+      });
+
+      if (idxName === -1) idxName = 0;
+
+      const items = [];
+      for (let r = 1; r < rows.length; r++) {
+        const row = rows[r];
+        const name = String(row[idxName] || '').trim();
+        if (!name) continue;
+
+        const desc = idxDesc !== -1 ? String(row[idxDesc] || '').trim() : '';
+        const price = idxPrice !== -1 ? parsearNumeroMoneda(row[idxPrice]) : 0;
+        const cost = idxCost !== -1 ? parsearNumeroMoneda(row[idxCost]) : 0;
+        let stock = idxStock !== -1 ? parseInt(parsearNumeroMoneda(row[idxStock])) : 10;
+        if (isNaN(stock) || stock < 0) stock = 10;
+
+        let cat = idxCat !== -1 ? String(row[idxCat] || '').trim() : '';
+        if (!cat) cat = 'General';
+
+        let itemType = 'producto';
+        if (idxType !== -1) {
+          const tVal = String(row[idxType] || '').trim().toLowerCase();
+          if (tVal.includes('serv') || tVal.includes('taller') || tVal.includes('diseño') || tVal.includes('encargo')) {
+            itemType = 'servicio';
+          }
+        } else {
+          if (name.toLowerCase().includes('servicio') || cat.toLowerCase().includes('servicio') || cat.toLowerCase().includes('diseño')) {
+            itemType = 'servicio';
+          }
+        }
+
+        if (itemType === 'servicio' && stock < 99) stock = 999;
+
+        items.push({
+          name,
+          description: desc,
+          price,
+          cost,
+          stock,
+          cat,
+          itemType
+        });
+      }
+
+      return items;
+    }
+
+    function parsearNumeroMoneda(val) {
+      if (typeof val === 'number') return isNaN(val) ? 0 : val;
+      if (!val) return 0;
+      let str = String(val).trim().replace(/[\$\u20ACCOPcop\s]/gi, '');
+      if (str.includes('.') && str.includes(',')) {
+        if (str.lastIndexOf(',') > str.lastIndexOf('.')) {
+          str = str.replace(/\./g, '').replace(',', '.');
+        } else {
+          str = str.replace(/,/g, '');
+        }
+      } else if (str.includes('.') && !str.includes(',')) {
+        const parts = str.split('.');
+        if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3)) {
+          str = str.replace(/\./g, '');
+        }
+      } else if (str.includes(',') && !str.includes('.')) {
+        const parts = str.split(',');
+        if (parts.length > 2 || (parts.length === 2 && parts[1].length === 3)) {
+          str = str.replace(/,/g, '');
+        } else {
+          str = str.replace(',', '.');
+        }
+      }
+      const num = parseFloat(str);
+      return isNaN(num) ? 0 : num;
     }
 
     function abrirModalNuevoProducto() {

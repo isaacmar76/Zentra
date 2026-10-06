@@ -1935,24 +1935,13 @@
           <div style="display:flex; justify-content:space-between; align-items:flex-start;">
             <div onclick="abrirSelectorRapidoNegocios()" style="cursor:pointer;" title="Toca para cambiar de tienda">
               <div class="clasico-v1-date" id="clasicoDateStr">Hoy</div>
-              <div class="clasico-v1-biz-name" id="clasicoBizName">TM Diseños Creativos</div>
+              <div class="clasico-v1-biz-name" id="clasicoBizName">Mi Negocio</div>
             </div>
             <div class="clasico-v1-badge-status" onclick="abrirSelectorRapidoNegocios()" style="cursor:pointer;" title="Toca para cambiar de tienda">
               <span>●</span>
               <span>Modo Clásico</span>
             </div>
           </div>
-        </div>
-
-        <!-- Banner Inteligente de Sugerencia / Cambio a TM Diseños Creativos -->
-        <div id="bannerSwitchStoreTip" style="display:none; margin:10px 0; background:linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border:1.5px solid #F59E0B; border-radius:14px; padding:10px 14px; align-items:center; justify-content:space-between; gap:10px; box-shadow:0 2px 8px rgba(245,158,11,0.15);">
-          <div style="font-size:12px; color:#92400E; font-weight:700; line-height:1.3;">
-            <span style="font-size:14px;">📍</span> Estás viendo <span id="bannerCurrentStoreName">otra tienda</span>.<br>
-            <span style="font-size:11px; font-weight:600; color:#B45309;">¿Deseas abrir tus proyectos de TM Diseños Creativos?</span>
-          </div>
-          <button type="button" onclick="cambiarDirectoATMDisenos()" style="background:#D97706; color:#FFFFFF; border:none; padding:7px 12px; border-radius:10px; font-weight:800; font-size:11.5px; cursor:pointer; white-space:nowrap; box-shadow:0 2px 6px rgba(217,119,6,0.25);">
-            Ir a TM ➔
-          </button>
         </div>
 
         <!-- Matriz de Estadísticas 2x2 Original -->
@@ -3862,83 +3851,65 @@
     let clientModalTarget = 'clients'; // 'clients' | 'order' | 'cart'
     let selectedCartClientId = null;
 
-    // Clientes de muestra EXCLUSIVOS para TM Diseños Creativos (Migración legada)
-    const DEFAULT_CLIENTS_TM = [
-      { id: 'cli_1', name: 'Ana María Gómez', phone: '312 456 7890', document: '1020304050', email: 'ana.gomez@gmail.com', address: 'Calle 10 # 25-14', notes: 'Boda en noviembre. Tonos rosa pastel y dorado.', createdAt: '2026-09-15' },
-      { id: 'cli_2', name: 'Carlos Mendoza', phone: '315 889 1234', document: '900123456-1', email: 'carlos@eventos.co', address: 'Av. Las Palmas # 12', notes: 'Eventos corporativos y souvenirs en acrílico.', createdAt: '2026-09-18' },
-      { id: 'cli_3', name: 'Laura Restrepo', phone: '320 654 9871', document: '1035987654', email: 'laura.res@hotmail.com', address: 'Cra 43A # 1-50', notes: 'Cumpleaños infantil temática Safari.', createdAt: '2026-09-22' }
-    ];
+    // ==========================================
+    // VALIDACIÓN Y PURGA DE DATOS FICTICIOS
+    // ==========================================
+    function esProyectoFicticio(p) {
+      if (!p) return false;
+      const n = (p.name || '').toLowerCase();
+      const c = (p.client || '').toLowerCase();
+      if (n.includes('boda ana & carlos') || n.includes('boda ana y carlos') || n.includes('cumpleaños safari') || n.includes('cumpleanos safari')) return true;
+      if (c.includes('ana maría gómez') || c.includes('ana maria gomez') || c.includes('laura restrepo')) return true;
+      return false;
+    }
 
-    // Estado para Edición y Foto del Producto
-    let editingProductId = null;
-    let tempProductPhoto = null;
+    function esClienteFicticio(c) {
+      if (!c) return false;
+      const n = (c.name || '').toLowerCase();
+      const e = (c.email || '').toLowerCase();
+      if (n.includes('ana maría gómez') || n.includes('ana maria gomez') || n.includes('carlos mendoza') || n.includes('laura restrepo')) return true;
+      if (e.includes('ana.gomez@') || e.includes('carlos@eventos') || e.includes('laura.res@')) return true;
+      return false;
+    }
 
-    // Estado para QR y Medios de Pago del Negocio
-    let tempBizQrPhoto = null;
+    function purgarDatosFicticios() {
+      try {
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (!k) continue;
 
-    // Estado para Ítems/Productos dentro del Pedido
-    let tempOrderItems = [];
-    let catalogPickerTarget = 'new_order'; // 'new_order' o 'active_project'
+          if (k.startsWith('zentra_projects')) {
+            try {
+              const val = localStorage.getItem(k);
+              if (val) {
+                const arr = JSON.parse(val);
+                if (Array.isArray(arr) && arr.some(esProyectoFicticio)) {
+                  const limpios = arr.filter(p => !esProyectoFicticio(p));
+                  localStorage.setItem(k, JSON.stringify(limpios));
+                  console.log(`Zentra: Proyectos ficticios purgados de ${k}`);
+                }
+              }
+            } catch (_) {}
+          }
 
-    // Catálogo EXCLUSIVO para TM Diseños Creativos (Migración legada de Tatiana)
-    const DEFAULT_CATALOG_TM_SERVICIOS = [
-      { id: 'c_topper', name: 'Cake Topper Shaker 3D', price: 35000, cost: 12000, stock: 15, cat: 'Papelería Creativa', mode: 'servicios', image: null },
-      { id: 'c_platos', name: 'Portaplatos Temáticos (Paquete x10)', price: 30000, cost: 10000, stock: 20, cat: 'Mesa & Fiesta', mode: 'servicios', image: null },
-      { id: 'c_dulces', name: 'Dulces Personalizados (Paquete x25)', price: 50000, cost: 18000, stock: 30, cat: 'Repostería', mode: 'servicios', image: null },
-      { id: 'c_invitaciones', name: 'Invitaciones Físicas Caladas (x10)', price: 35000, cost: 9000, stock: 25, cat: 'Invitaciones', mode: 'servicios', image: null },
-      { id: 'c_libro', name: 'Libro de Firmas / Agenda Personalizada', price: 45000, cost: 16000, stock: 10, cat: 'Papelería Creativa', mode: 'servicios', image: null }
-    ];
-
-    // Proyectos de muestra EXCLUSIVOS para TM Diseños Creativos (Blindaje y Rescate de Tatiana)
-    const DEFAULT_PROJECTS_TM = [
-      {
-        id: 1,
-        clientId: 'cli_1',
-        name: 'Boda Ana & Carlos - Decoración & Papelería',
-        client: 'Ana María Gómez',
-        phone: '312 456 7890',
-        services: 'Cake Topper Shaker 3D, Portaplatos x10, Libro de Firmas',
-        items: [
-          { id: 'c_topper', name: 'Cake Topper Shaker 3D Dorado', qty: 1, price: 35000, cost: 12000 },
-          { id: 'c_platos', name: 'Portaplatos Temáticos (Paquete x10)', qty: 3, price: 30000, cost: 10000 },
-          { id: 'c_libro', name: 'Libro de Firmas Personalizado', qty: 1, price: 45000, cost: 16000 }
-        ],
-        total: 170000,
-        cobrado: 90000,
-        directCompras: 47000,
-        daysLeft: 3,
-        status: 'Producción',
-        tasks: [
-          { id: 101, title: 'Definir requerimientos y boceto inicial', isDone: true, isPurchase: false, cost: 0 },
-          { id: 102, title: 'Comprar materiales o insumos específicos', isDone: true, isPurchase: true, cost: 47000 },
-          { id: 103, title: 'Producción y confección del pedido', isDone: false, isPurchase: false, cost: 0 },
-          { id: 104, title: 'Empaque final y entrega al cliente', isDone: false, isPurchase: false, cost: 0 }
-        ]
-      },
-      {
-        id: 2,
-        clientId: 'cli_3',
-        name: 'Cumpleaños Safari - Decoración Infantil',
-        client: 'Laura Restrepo',
-        phone: '320 654 9871',
-        services: 'Dulces Personalizados x25, Invitaciones Caladas x10',
-        items: [
-          { id: 'c_dulces', name: 'Dulces Personalizados (Paquete x25)', qty: 2, price: 50000, cost: 18000 },
-          { id: 'c_invitaciones', name: 'Invitaciones Físicas Caladas (x10)', qty: 1, price: 35000, cost: 9000 }
-        ],
-        total: 135000,
-        cobrado: 50000,
-        directCompras: 28000,
-        daysLeft: 5,
-        status: 'Producción',
-        tasks: [
-          { id: 201, title: 'Definir requerimientos y boceto inicial', isDone: true, isPurchase: false, cost: 0 },
-          { id: 202, title: 'Comprar materiales o insumos específicos', isDone: true, isPurchase: true, cost: 28000 },
-          { id: 203, title: 'Producción y confección del pedido', isDone: false, isPurchase: false, cost: 0 },
-          { id: 204, title: 'Empaque final y entrega al cliente', isDone: false, isPurchase: false, cost: 0 }
-        ]
+          if (k.startsWith('zentra_clients')) {
+            try {
+              const val = localStorage.getItem(k);
+              if (val) {
+                const arr = JSON.parse(val);
+                if (Array.isArray(arr) && arr.some(esClienteFicticio)) {
+                  const limpios = arr.filter(c => !esClienteFicticio(c));
+                  localStorage.setItem(k, JSON.stringify(limpios));
+                  console.log(`Zentra: Clientes ficticios purgados de ${k}`);
+                }
+              }
+            } catch (_) {}
+          }
+        }
+      } catch (err) {
+        console.warn('Error en purga de datos ficticios:', err);
       }
-    ];
+    }
 
     // ==========================================
     // MULTI-TENANCY: GESTIÓN Y AISLAMIENTO DE NEGOCIOS
@@ -3997,11 +3968,10 @@
           }
         }
 
-        // Blindaje garantizado: si en algún momento existió o existe TM Diseños Creativos, incluirlo siempre
+        // Preservar TM Diseños Creativos si existen sus claves en este dispositivo
         const hasTmKey = localStorage.getItem('zentra_projects_biz_tm_disenos') ||
                          localStorage.getItem('zentra_catalog_biz_tm_disenos') ||
-                         localStorage.getItem('zentra_biz_profile_biz_tm_disenos') ||
-                         localStorage.getItem('zentra_projects');
+                         localStorage.getItem('zentra_biz_profile_biz_tm_disenos');
         if (hasTmKey && !registry.some(b => b.id === 'biz_tm_disenos')) {
           registry.unshift({
             id: 'biz_tm_disenos',
@@ -4073,9 +4043,19 @@
             localStorage.setItem(`zentra_biz_profile_${legacyBizId}`, JSON.stringify(newProfile));
           }
 
-          if (legacyProjStr && !localStorage.getItem(`zentra_projects_${legacyBizId}`)) {
-            localStorage.setItem(`zentra_projects_${legacyBizId}`, legacyProjStr);
-            localStorage.setItem(`zentra_projects_backup_${legacyBizId}`, legacyProjStr);
+          if (legacyProjStr) {
+            let parsedProj = [];
+            try { parsedProj = JSON.parse(legacyProjStr); } catch (_) {}
+            const realProj = Array.isArray(parsedProj) ? parsedProj.filter(p => !esProyectoFicticio(p)) : [];
+            if (realProj.length > 0) {
+              const currentBizProj = localStorage.getItem(`zentra_projects_${legacyBizId}`);
+              let currentArr = [];
+              try { if (currentBizProj) currentArr = JSON.parse(currentBizProj).filter(p => !esProyectoFicticio(p)); } catch (_) {}
+              if (currentArr.length === 0) {
+                localStorage.setItem(`zentra_projects_${legacyBizId}`, JSON.stringify(realProj));
+                localStorage.setItem(`zentra_projects_backup_${legacyBizId}`, JSON.stringify(realProj));
+              }
+            }
           }
 
           if (legacyCatStr && !localStorage.getItem(`zentra_catalog_${legacyBizId}`)) {
@@ -4083,8 +4063,18 @@
             localStorage.setItem(`zentra_catalog_backup_${legacyBizId}`, legacyCatStr);
           }
 
-          if (legacyCliStr && !localStorage.getItem(`zentra_clients_${legacyBizId}`)) {
-            localStorage.setItem(`zentra_clients_${legacyBizId}`, legacyCliStr);
+          if (legacyCliStr) {
+            let parsedCli = [];
+            try { parsedCli = JSON.parse(legacyCliStr); } catch (_) {}
+            const realCli = Array.isArray(parsedCli) ? parsedCli.filter(c => !esClienteFicticio(c)) : [];
+            if (realCli.length > 0) {
+              const currentBizCli = localStorage.getItem(`zentra_clients_${legacyBizId}`);
+              let currentCliArr = [];
+              try { if (currentBizCli) currentCliArr = JSON.parse(currentBizCli).filter(c => !esClienteFicticio(c)); } catch (_) {}
+              if (currentCliArr.length === 0) {
+                localStorage.setItem(`zentra_clients_${legacyBizId}`, JSON.stringify(realCli));
+              }
+            }
           }
 
           if (legacyExpStr && !localStorage.getItem(`zentra_expenses_${legacyBizId}`)) {
@@ -4257,16 +4247,6 @@
       ingresarDirectoANegocio(bizId);
     }
 
-    function cambiarDirectoATMDisenos() {
-      const reg = obtenerRegistroNegocios();
-      const tmBiz = reg.find(b => b.id === 'biz_tm_disenos' || (b.name && b.name.toLowerCase().includes('tm')));
-      if (tmBiz) {
-        seleccionarTiendaRapida(tmBiz.id);
-      } else {
-        cargarEstadoNegocio('biz_tm_disenos');
-      }
-    }
-
     // =======================================================
     // FUSIÓN INTELIGENTE (SMART MERGE) Y AUTO-RECUPERACIÓN
     // =======================================================
@@ -4299,13 +4279,13 @@
     function mergeProjectsData(localProjects, cloudProjects) {
       const map = new Map();
       (localProjects || []).forEach(p => {
-        if (p && (p.id || p.name)) {
+        if (p && (p.id || p.name) && !esProyectoFicticio(p)) {
           const key = String(p.id || p.name);
           map.set(key, p);
         }
       });
       (cloudProjects || []).forEach(p => {
-        if (p && (p.id || p.name)) {
+        if (p && (p.id || p.name) && !esProyectoFicticio(p)) {
           const key = String(p.id || p.name);
           if (!map.has(key)) {
             map.set(key, p);
@@ -4322,13 +4302,13 @@
     function mergeClients(localClients, cloudClients) {
       const map = new Map();
       (localClients || []).forEach(c => {
-        if (c && (c.id || c.phone || c.name)) {
+        if (c && (c.id || c.phone || c.name) && !esClienteFicticio(c)) {
           const key = c.phone || c.id || c.name;
           map.set(key, c);
         }
       });
       (cloudClients || []).forEach(c => {
-        if (c && (c.id || c.phone || c.name)) {
+        if (c && (c.id || c.phone || c.name) && !esClienteFicticio(c)) {
           const key = c.phone || c.id || c.name;
           if (!map.has(key)) {
             map.set(key, c);
@@ -4360,7 +4340,23 @@
         } catch (_) {}
       }
 
-      // 2. Si sigue vacío, buscar en cualquier clave zentra_catalog_* disponible
+      // 2. Si sigue vacío, buscar en clave legada zentra_catalog
+      if (list.length === 0) {
+        try {
+          const legCat = localStorage.getItem('zentra_catalog');
+          if (legCat) {
+            const parsed = JSON.parse(legCat);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              list = parsed;
+              localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(list));
+              localStorage.setItem(`zentra_catalog_backup_${bizId}`, JSON.stringify(list));
+              console.log(`Zentra: Catálogo recuperado desde clave legada para ${bizId}: ${list.length} ítems`);
+            }
+          }
+        } catch (_) {}
+      }
+
+      // 3. Si sigue vacío, buscar en cualquier clave zentra_catalog_* disponible
       if (list.length === 0) {
         let bestCandidate = [];
         for (let i = 0; i < localStorage.length; i++) {
@@ -4382,16 +4378,7 @@
         }
       }
 
-      // 3. Fallback especial garantizado para TM Diseños Creativos
-      const isTM = bizId === 'biz_tm_disenos' || (bizProfile && bizProfile.name && bizProfile.name.toLowerCase().includes('tm'));
-      if (list.length === 0 && isTM) {
-        list = JSON.parse(JSON.stringify(DEFAULT_CATALOG_TM_SERVICIOS));
-        localStorage.setItem(`zentra_catalog_${bizId}`, JSON.stringify(list));
-        localStorage.setItem(`zentra_catalog_backup_${bizId}`, JSON.stringify(list));
-        console.log(`Zentra: Catálogo inicial TM Diseños asignado a ${bizId}: ${list.length} ítems`);
-      }
-
-      // Mantener siempre el backup al día si hay ítems
+      // Mantener siempre el backup al día si hay ítems reales
       if (list.length > 0) {
         localStorage.setItem(`zentra_catalog_backup_${bizId}`, JSON.stringify(list));
       }
@@ -4403,32 +4390,41 @@
       if (!bizId) return currentProjects || [];
       let list = Array.isArray(currentProjects) ? [...currentProjects] : [];
 
+      // Filtrar cualquier proyecto ficticio residual
+      list = list.filter(p => !esProyectoFicticio(p));
+
       // 1. Si está vacío, buscar en respaldo específico
       if (list.length === 0) {
         try {
           const bStr = localStorage.getItem(`zentra_projects_backup_${bizId}`);
           if (bStr) {
             const parsed = JSON.parse(bStr);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              list = parsed;
-              localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(list));
-              console.log(`Zentra: Proyectos recuperados desde backup para ${bizId}: ${list.length}`);
+            if (Array.isArray(parsed)) {
+              const filtrados = parsed.filter(p => !esProyectoFicticio(p));
+              if (filtrados.length > 0) {
+                list = filtrados;
+                localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(list));
+                console.log(`Zentra: Proyectos recuperados desde backup para ${bizId}: ${list.length}`);
+              }
             }
           }
         } catch (_) {}
       }
 
-      // 2. Si es la tienda principal de Tatiana o modo servicios y sigue vacío, buscar clave legada zentra_projects
+      // 2. Si sigue vacío, buscar en clave legada zentra_projects
       if (list.length === 0) {
         try {
           const legStr = localStorage.getItem('zentra_projects');
           if (legStr) {
             const parsed = JSON.parse(legStr);
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              list = parsed;
-              localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(list));
-              localStorage.setItem(`zentra_projects_backup_${bizId}`, JSON.stringify(list));
-              console.log(`Zentra: Proyectos recuperados desde clave legada para ${bizId}: ${list.length}`);
+            if (Array.isArray(parsed)) {
+              const filtrados = parsed.filter(p => !esProyectoFicticio(p));
+              if (filtrados.length > 0) {
+                list = filtrados;
+                localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(list));
+                localStorage.setItem(`zentra_projects_backup_${bizId}`, JSON.stringify(list));
+                console.log(`Zentra: Proyectos recuperados desde clave legada para ${bizId}: ${list.length}`);
+              }
             }
           }
         } catch (_) {}
@@ -4442,14 +4438,16 @@
           if (k && k.startsWith('zentra_projects_') && !k.includes('backup') && k !== `zentra_projects_${bizId}`) {
             try {
               const cand = JSON.parse(localStorage.getItem(k));
-              if (Array.isArray(cand) && cand.length > bestCandidate.length) {
-                bestCandidate = cand;
+              if (Array.isArray(cand)) {
+                const filtrados = cand.filter(p => !esProyectoFicticio(p));
+                if (filtrados.length > bestCandidate.length) {
+                  bestCandidate = filtrados;
+                }
               }
             } catch (_) {}
           }
         }
-        const isTM = bizId === 'biz_tm_disenos' || (bizProfile && bizProfile.name && bizProfile.name.toLowerCase().includes('tm'));
-        if (bestCandidate.length > 0 && isTM) {
+        if (bestCandidate.length > 0) {
           list = [...bestCandidate];
           localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(list));
           localStorage.setItem(`zentra_projects_backup_${bizId}`, JSON.stringify(list));
@@ -4457,16 +4455,7 @@
         }
       }
 
-      // 4. Fallback especial garantizado para TM Diseños Creativos (Tatiana)
-      const isTM = bizId === 'biz_tm_disenos' || (bizProfile && bizProfile.name && bizProfile.name.toLowerCase().includes('tm'));
-      if (list.length === 0 && isTM && typeof DEFAULT_PROJECTS_TM !== 'undefined') {
-        list = JSON.parse(JSON.stringify(DEFAULT_PROJECTS_TM));
-        localStorage.setItem(`zentra_projects_${bizId}`, JSON.stringify(list));
-        localStorage.setItem(`zentra_projects_backup_${bizId}`, JSON.stringify(list));
-        console.log(`Zentra: Proyectos demo iniciales asignados a ${bizId}: ${list.length}`);
-      }
-
-      // Mantener siempre el backup al día si hay proyectos
+      // Mantener siempre el backup al día si hay proyectos reales (CERO datos ficticios)
       if (list.length > 0) {
         localStorage.setItem(`zentra_projects_backup_${bizId}`, JSON.stringify(list));
       }
@@ -4541,10 +4530,20 @@
         } else {
           clients = [];
         }
-        const isTM = bizId === 'biz_tm_disenos' || (bizProfile && bizProfile.name && bizProfile.name.toLowerCase().includes('tm'));
-        if (clients.length === 0 && isTM) {
-          clients = JSON.parse(JSON.stringify(DEFAULT_CLIENTS_TM));
-          localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(clients));
+        clients = clients.filter(c => !esClienteFicticio(c));
+        if (clients.length === 0) {
+          try {
+            const legCli = localStorage.getItem('zentra_clients');
+            if (legCli) {
+              const parsed = JSON.parse(legCli);
+              if (Array.isArray(parsed)) {
+                clients = parsed.filter(c => !esClienteFicticio(c));
+                if (clients.length > 0) {
+                  localStorage.setItem(`zentra_clients_${bizId}`, JSON.stringify(clients));
+                }
+              }
+            }
+          } catch (_) {}
         }
 
         // AISLAMIENTO TOTAL: Usuarios de este negocio
@@ -4739,62 +4738,39 @@
 
     function cargarEstadoLocal() {
       try {
-        // 1. Migración de versión anterior si aplica
+        // 1. Purga preventiva de datos ficticios
+        purgarDatosFicticios();
+
+        // 2. Migración de versión anterior si aplica
         migrarDatosLegadosSiAplica();
 
-        // 2. Diseño de pantalla de inicio activo
+        // 3. Diseño de pantalla de inicio activo
         const savedLayout = localStorage.getItem('zentra_active_layout') || 'layout_a';
         applyHomeLayout(savedLayout, false);
 
-        // 3. Verificar si hay un negocio autenticado activo
+        // 4. Verificar si hay un negocio autenticado activo en este dispositivo
         let activeBizId = localStorage.getItem('zentra_active_biz_id');
         let registry = obtenerRegistroNegocios();
-
-        // BLINDAJE INTELIGENTE: Si estamos en Modo Clásico (layout_e) y el negocio activo es retail o está vacío de proyectos,
-        // pero existe TM Diseños Creativos con proyectos, priorizar TM Diseños para evitar que Tatiana vea pantalla en blanco
-        if (savedLayout === 'layout_e' && registry.length > 1) {
-          const tmBiz = registry.find(b => b.id === 'biz_tm_disenos' || (b.name && b.name.toLowerCase().includes('tm')));
-          if (tmBiz) {
-            const curPrj = activeBizId ? localStorage.getItem(`zentra_projects_${activeBizId}`) : null;
-            let curPrjCount = 0;
-            try { if (curPrj) curPrjCount = JSON.parse(curPrj).length; } catch (_) {}
-            if (curPrjCount === 0 && activeBizId !== tmBiz.id) {
-              activeBizId = tmBiz.id;
-              localStorage.setItem('zentra_active_biz_id', tmBiz.id);
-            }
-          }
-        }
 
         if (activeBizId && registry.some(b => b.id === activeBizId)) {
           cargarEstadoNegocio(activeBizId);
         } else if (registry.length > 0) {
-          // Si activeBizId es nulo o fue eliminado, AUTO-SELECCIONAR el mejor negocio disponible (NUNCA limpiar pantalla)
-          let bestBiz = registry.find(b => b.id === 'biz_tm_disenos' || (b.name && b.name.toLowerCase().includes('tm')));
-          if (!bestBiz) {
-            bestBiz = registry.find(b => {
-              const prj = localStorage.getItem(`zentra_projects_${b.id}`);
-              return prj && JSON.parse(prj).length > 0;
-            });
-          }
-          if (!bestBiz) {
-            bestBiz = registry.find(b => {
-              const cat = localStorage.getItem(`zentra_catalog_${b.id}`);
-              return cat && JSON.parse(cat).length > 0;
-            });
-          }
-          if (!bestBiz) bestBiz = registry[0];
-
-          localStorage.setItem('zentra_active_biz_id', bestBiz.id);
-          cargarEstadoNegocio(bestBiz.id);
-          console.log(`Zentra Auto-Healer: Cargada tienda activa ${bestBiz.name} (${bestBiz.id})`);
+          // Si activeBizId es nulo o no coincide, auto-cargar la tienda registrada en este dispositivo (NUNCA limpiar pantalla)
+          activeBizId = registry[0].id;
+          localStorage.setItem('zentra_active_biz_id', activeBizId);
+          cargarEstadoNegocio(activeBizId);
+          console.log(`Zentra: Tienda local cargada automáticamente: ${registry[0].name} (${activeBizId})`);
         } else {
           // Si registry está vacío, buscar llaves huérfanas antes de limpiar
           let rescuedBizId = null;
           for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i);
             if (k && (k.startsWith('zentra_projects_') || k.startsWith('zentra_catalog_') || k.startsWith('zentra_biz_profile_'))) {
-              rescuedBizId = k.split('_').slice(2).join('_') || 'biz_tm_disenos';
-              break;
+              const parts = k.split('_');
+              if (parts.length >= 3) {
+                rescuedBizId = parts.slice(2).join('_');
+                break;
+              }
             }
           }
           if (rescuedBizId) {
@@ -9454,25 +9430,10 @@ ${estadoStr}${contactText}
     // OPCIÓN E: DISEÑO CLÁSICO V1 (ORIGINAL NUDE & BLUSH)
     // ------------------------------------------
     function renderLayoutClasicoV1() {
-      const bizName = (bizProfile.name || 'TM Diseños Creativos').trim();
+      const bizName = (bizProfile && bizProfile.name ? bizProfile.name : 'Mi Negocio').trim();
       const elBiz = document.getElementById('clasicoBizName');
       if (elBiz) {
-        elBiz.innerHTML = `${bizName} <span style="font-size:10.5px; opacity:0.85; font-weight:700; background:rgba(0,0,0,0.06); padding:2px 7px; border-radius:8px; margin-left:4px;">Cambiar 🔄</span>`;
-      }
-
-      // Banner inteligente de sugerencia de tienda (si no está en TM Diseños pero TM Diseños tiene proyectos)
-      const banner = document.getElementById('bannerSwitchStoreTip');
-      if (banner) {
-        const reg = obtenerRegistroNegocios();
-        const tmBiz = reg.find(b => b.id === 'biz_tm_disenos' || (b.name && b.name.toLowerCase().includes('tm')));
-        const isNotTM = (!bizProfile || bizProfile.id !== 'biz_tm_disenos');
-        if (isNotTM && tmBiz) {
-          const bannerCur = document.getElementById('bannerCurrentStoreName');
-          if (bannerCur) bannerCur.innerText = `"${bizName}"`;
-          banner.style.display = 'flex';
-        } else {
-          banner.style.display = 'none';
-        }
+        elBiz.innerText = bizName;
       }
 
       const elDate = document.getElementById('clasicoDateStr');
@@ -10694,8 +10655,7 @@ ${estadoStr}${contactText}
         if (!activeBizId) {
           const reg = obtenerRegistroNegocios();
           if (reg.length > 0) {
-            const tmBiz = reg.find(b => b.id === 'biz_tm_disenos' || (b.name && b.name.toLowerCase().includes('tm')));
-            activeBizId = tmBiz ? tmBiz.id : reg[0].id;
+            activeBizId = reg[0].id;
             cargarEstadoNegocio(activeBizId);
           } else {
             // Comprobar si hay datos huérfanos antes de crear uno en blanco
@@ -10999,12 +10959,12 @@ ${estadoStr}${contactText}
       projectsData = [];
       generalExpenses = [];
       generalIncomes = [];
-      catalogItems = [...DEFAULT_CATALOG_TM_SERVICIOS];
+      catalogItems = [];
       savedQuotes = [];
       pendingTasks = [
         { id: 'task_demo_1', text: 'Configurar información de mi negocio', priority: 'alta', completed: false, createdAt: new Date().toISOString(), completedAt: null }
       ];
-      clients = [...DEFAULT_CLIENTS_TM];
+      clients = [];
       users = [{
         id: 'usr_owner_' + Date.now(),
         bizId: newBizId,

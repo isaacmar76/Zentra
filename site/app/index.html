@@ -3537,10 +3537,10 @@
 
         <!-- Botones de Acción (Fuera de receiptTicketCard para NUNCA salir en la imagen/PDF) -->
         <div class="no-print" style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
-          <!-- Botón Principal: Compartir Imagen a WhatsApp -->
-          <button type="button" onclick="compartirReciboComoImagen()" style="width:100%; background:linear-gradient(135deg, #16A34A 0%, #22C55E 100%); color:#FFFFFF; border:none; padding:12px 14px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(22,163,74,0.3); transition:transform 0.1s ease;">
+          <!-- Botón Principal: Enviar a WhatsApp -->
+          <button type="button" onclick="enviarReciboWhatsApp()" style="width:100%; background:linear-gradient(135deg, #16A34A 0%, #22C55E 100%); color:#FFFFFF; border:none; padding:12px 14px; border-radius:14px; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(22,163,74,0.3); transition:transform 0.1s ease;">
             <span style="font-size:18px;">📲</span>
-            <span id="btnRecWhatsAppText">Enviar Imagen por WhatsApp</span>
+            <span id="btnRecWhatsAppText">Enviar por WhatsApp</span>
           </button>
 
           <!-- Fila de Exportación Visual: Descargar Imagen PNG y Descargar PDF Visual -->
@@ -7571,7 +7571,7 @@ ${estadoStr}${contactText}
           docBadge.style.background = '#FEF3C7';
           docBadge.style.color = '#92400E';
         }
-        if (btnWaText) btnWaText.innerText = 'Enviar Imagen por WhatsApp';
+        if (btnWaText) btnWaText.innerText = 'Enviar por WhatsApp';
       } else {
         if (docBadge) {
           docBadge.innerText = '🧾 FACTURA OFICIAL';
@@ -7863,7 +7863,8 @@ ${estadoStr}${contactText}
     }
 
     function enviarReciboWhatsApp() {
-      compartirReciboComoImagen();
+      if (!currentReceiptData) return;
+      compartirOEnviarCotizacionWhatsApp(currentReceiptData);
     }
 
     function copiarTextoRecibo() {
@@ -7918,7 +7919,6 @@ ${estadoStr}${contactText}
       };
 
       abrirFacturaReciboConDatos(receiptData);
-      compartirOEnviarCotizacionWhatsApp(receiptData);
     }
 
     function verPedidosPorVencer() {
@@ -10035,7 +10035,7 @@ ${estadoStr}${contactText}
 
       cerrarCarritoRetail();
       abrirFacturaReciboConDatos(receiptData);
-      compartirOEnviarCotizacionWhatsApp(receiptData);
+      showToast('✓ Cotización generada. Revisa o comparte cuando estés listo.');
     }
 
     function generarComprobanteRetail(isQuote = true) {

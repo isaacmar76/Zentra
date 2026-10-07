@@ -7791,12 +7791,11 @@
         await navigator.clipboard.writeText(storeUrl).catch(() => {});
       }
 
-      if (navigator.share && navigator.canShare && navigator.canShare({ title: bizName, text: shareText, url: storeUrl })) {
+      if (navigator.share) {
         try {
           await navigator.share({
             title: `Tienda Virtual - ${bizName}`,
-            text: shareText,
-            url: storeUrl
+            text: shareText
           });
           showToast('✓ Enlace de tienda compartido');
           return;

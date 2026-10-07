@@ -4449,6 +4449,13 @@
         if (typeof programarSincronizacionNube === 'function') {
           programarSincronizacionNube();
         }
+
+        // Auto-sincronizar catálogo público de la tienda en segundo plano
+        if (typeof publicarCatalogoTiendaEnNube === 'function') {
+          setTimeout(() => {
+            publicarCatalogoTiendaEnNube(true).catch(() => {});
+          }, 800);
+        }
       } catch (e) {
         console.warn('Storage save error', e);
       }
@@ -4905,6 +4912,15 @@
         localStorage.setItem('zentra_active_biz_id', bizId);
         retailCart = [];
         cart = [];
+
+        // Si el negocio es TM Diseños o tiene tema clásico, activar su diseño original y paleta clásica
+        const isTm = (bizId === 'biz_tm_disenos') ||
+                     (bizProfile.name && bizProfile.name.toLowerCase().includes('tm diseñ')) ||
+                     (bizProfile.theme === 'clasico');
+        if (isTm) {
+          bizProfile.theme = 'clasico';
+          applyHomeLayout('layout_e', false);
+        }
 
         aplicarUsuarioActivo();
         aplicarModalidadNegocio();
@@ -6108,6 +6124,7 @@
 
       // ID Único e irrepetible para el negocio
       const newBizId = 'biz_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+      const isTm = (newBizId === 'biz_tm_disenos') || name.toLowerCase().includes('tm diseñ');
 
       bizProfile = {
         id: newBizId,
@@ -6120,10 +6137,15 @@
         otherPayment: '',
         qrImage: null,
         type: selectedSetupMode,
+        theme: isTm ? 'clasico' : 'default',
         showPendingTasks: true,
         configured: true,
         createdAt: new Date().toISOString()
       };
+
+      if (isTm) {
+        applyHomeLayout('layout_e', false);
+      }
 
       // Crear usuario Dueño inicial para este negocio
       currentUser = {
@@ -7321,17 +7343,58 @@
       try {
         const ordersRef = fbDb.collection('tiendas_publicas').doc(bizProfile.id).collection('pedidos');
         onlineOrdersUnsubscribe = ordersRef.onSnapshot(snap => {
-          const list = [];
-          snap.forEach(doc => {
-            list.push(doc.data());
+          // SMART MERGE: NUNCA SOBRESCRIBIR NI VACIAR PEDIDOS SI FIRESTORE RETORNA 0 DOCS O ESTÁ SINCRONIZANDO
+          const ordersMap = new Map();
+
+          // 1. Conservar pedidos que ya tenemos en memoria y en almacenamiento local
+          let localSaved = [];
+          try {
+            const raw = localStorage.getItem(`zentra_orders_${bizProfile.id}`);
+            if (raw) localSaved = JSON.parse(raw);
+          } catch (_) {}
+
+          const baseOrders = (onlineOrders && onlineOrders.length > 0) ? onlineOrders : localSaved;
+          baseOrders.forEach(ord => {
+            if (ord && ord.orderId) {
+              ordersMap.set(ord.orderId, ord);
+            }
           });
-          list.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-          onlineOrders = list;
+
+          // 2. Fusionar documentos entrantes de Firestore
+          const remoteIds = new Set();
+          snap.forEach(doc => {
+            const remoteData = doc.data();
+            if (remoteData && remoteData.orderId) {
+              remoteIds.add(remoteData.orderId);
+              const localOrd = ordersMap.get(remoteData.orderId);
+              if (localOrd) {
+                // Conservar estado local si el comerciante ya avanzó de estado localmente
+                ordersMap.set(remoteData.orderId, { ...remoteData, ...localOrd });
+              } else {
+                ordersMap.set(remoteData.orderId, remoteData);
+              }
+            }
+          });
+
+          // 3. Ordenar cronológicamente descendente
+          const mergedList = Array.from(ordersMap.values());
+          mergedList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+          onlineOrders = mergedList;
           guardarPedidosWebLocal();
           actualizarBadgesPedidosWeb();
           if (document.getElementById('ordersWebModal') && document.getElementById('ordersWebModal').style.display === 'flex') {
             renderizarListaPedidosWeb();
           }
+
+          // 4. Auto-respaldo a Firestore: si hay pedidos locales que la nube aún no tenía, subirlos
+          mergedList.forEach(ord => {
+            if (!remoteIds.has(ord.orderId)) {
+              ordersRef.doc(ord.orderId).set(ord, { merge: true }).catch(e => {
+                console.warn('Sync de pedido local a Firestore:', e);
+              });
+            }
+          });
         }, err => {
           console.warn('Listener de pedidos web Firestore:', err);
         });
@@ -7671,6 +7734,11 @@
     async function publicarCatalogoTiendaEnNube(silencioso = false) {
       if (!fbDb || !bizProfile || !bizProfile.id) return false;
       try {
+        const isTm = (bizProfile.id === 'biz_tm_disenos') ||
+                     (bizProfile.name && bizProfile.name.toLowerCase().includes('tm diseñ')) ||
+                     (bizProfile.theme === 'clasico');
+        const publicTheme = isTm ? 'clasico' : (bizProfile.theme || 'default');
+
         const publicData = {
           bizId: bizProfile.id,
           name: bizProfile.name || 'Mi Tienda',
@@ -7681,6 +7749,7 @@
           bancolombia: bizProfile.bancolombia || '',
           brebe: bizProfile.otherPayment || '',
           qrImage: bizProfile.qrImage || null,
+          theme: publicTheme,
           catalog: (catalogItems || []).map(it => ({
             id: it.id,
             name: it.name,
@@ -7710,7 +7779,7 @@
       }
 
       showToast('⏳ Sincronizando catálogo en línea...');
-      await publicarCatalogoTiendaEnNube(true);
+      await publicarCatalogoTiendaEnNube(false);
 
       const origin = window.location.origin;
       const storeUrl = `${origin}/tienda.html?biz=${bizProfile.id}`;

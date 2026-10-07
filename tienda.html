@@ -7,10 +7,11 @@
   <meta name="description" content="Haz tu pedido en línea de forma rápida, segura y directa por WhatsApp.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..700,0..1,0&display=swap" rel="stylesheet">
   <!-- Firebase SDK Compat -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <style>
     :root {
@@ -672,64 +673,284 @@
       padding: 40px 20px;
       color: var(--text-muted);
     }
+
+    /* TEMA CLÁSICO ARTESANAL (TM Diseños Creativos - Nude & Blush) */
+    body.theme-clasico {
+      --bg: #F5EFE6;
+      --card-bg: #FFFFFF;
+      --border: #E8C4C4;
+      --text: #5C4A3E;
+      --text-muted: #8D7768;
+      --primary: #B37070;
+      --primary-hover: #9E5B5B;
+      --primary-soft: #F9EBEA;
+      --primary-border: #E8C4C4;
+      --accent: #D4A5A5;
+      --danger: #E07A5F;
+      --shadow-sm: 0 2px 8px rgba(92, 74, 62, 0.05);
+      --shadow-md: 0 6px 18px rgba(92, 74, 62, 0.07);
+      --shadow-lg: 0 12px 30px rgba(92, 74, 62, 0.10);
+    }
+
+    body.theme-clasico,
+    body.theme-clasico * {
+      font-family: 'Poppins', 'Plus Jakarta Sans', sans-serif !important;
+    }
+
+    body.theme-clasico .store-header {
+      background: #FFFFFF;
+      border-bottom-color: #E8C4C4;
+    }
+
+    body.theme-clasico .store-avatar {
+      background: linear-gradient(135deg, #B37070 0%, #D4A5A5 100%);
+      box-shadow: 0 4px 12px rgba(179, 112, 112, 0.28);
+    }
+
+    body.theme-clasico .store-name {
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .verified-badge {
+      color: #B37070;
+    }
+
+    body.theme-clasico .store-badge-open {
+      background: #F9EBEA;
+      color: #B37070;
+      border: 1px solid #E8C4C4;
+    }
+
+    body.theme-clasico .payment-pill {
+      background: #FAF5EF;
+      border-color: #E8C4C4;
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .search-box {
+      background: #FFFFFF;
+      border-color: #E8C4C4;
+    }
+
+    body.theme-clasico .search-box input {
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .search-box input::placeholder {
+      color: #8D7768;
+    }
+
+    body.theme-clasico .cat-btn {
+      background: #FFFFFF;
+      border-color: #E8C4C4;
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .cat-btn.active {
+      background: #B37070;
+      color: #FFFFFF;
+      border-color: #B37070;
+      box-shadow: 0 2px 8px rgba(179, 112, 112, 0.35);
+    }
+
+    body.theme-clasico .product-card {
+      background: #FFFFFF;
+      border-color: #E8C4C4;
+      box-shadow: 0 2px 10px rgba(92, 74, 62, 0.05);
+    }
+
+    body.theme-clasico .product-category {
+      color: #8D7768;
+    }
+
+    body.theme-clasico .product-title {
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .product-desc {
+      color: #8D7768;
+    }
+
+    body.theme-clasico .product-price {
+      color: #B37070;
+    }
+
+    body.theme-clasico .btn-add-cart {
+      background: #F9EBEA;
+      color: #B37070;
+      border-color: #E8C4C4;
+    }
+
+    body.theme-clasico .btn-add-cart:hover {
+      background: #B37070;
+      color: #FFFFFF;
+    }
+
+    body.theme-clasico .qty-btn,
+    body.theme-clasico .qty-stepper button {
+      background: #F9EBEA;
+      color: #B37070;
+    }
+
+    body.theme-clasico .floating-cart-bar {
+      background: linear-gradient(135deg, #B37070 0%, #D4A5A5 100%);
+      box-shadow: 0 8px 24px rgba(179, 112, 112, 0.35);
+    }
+
+    body.theme-clasico .floating-cart-count {
+      background: #FFFFFF;
+      color: #B37070;
+    }
+
+    body.theme-clasico .cart-drawer-box {
+      background: #FFFFFF;
+    }
+
+    body.theme-clasico .drawer-header {
+      border-bottom-color: #E8C4C4;
+    }
+
+    body.theme-clasico .drawer-title {
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .cart-item-name {
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .cart-item-price {
+      color: #B37070;
+    }
+
+    body.theme-clasico .form-group label {
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .form-group input,
+    body.theme-clasico .form-group select,
+    body.theme-clasico .form-group textarea {
+      background: #FAF5EF;
+      border-color: #E8C4C4;
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .form-group input:focus,
+    body.theme-clasico .form-group select:focus,
+    body.theme-clasico .form-group textarea:focus {
+      border-color: #B37070;
+      background: #FFFFFF;
+    }
+
+    body.theme-clasico .drawer-footer {
+      border-top-color: #E8C4C4;
+      background: #FAF5EF;
+    }
+
+    body.theme-clasico .drawer-total-val {
+      color: #B37070;
+    }
+
+    body.theme-clasico .btn-submit-order {
+      background: linear-gradient(135deg, #B37070 0%, #D4A5A5 100%);
+      box-shadow: 0 4px 14px rgba(179, 112, 112, 0.3);
+    }
+
+    body.theme-clasico .pay-card {
+      border-color: #E8C4C4;
+      background: #FFFFFF;
+      color: #5C4A3E;
+    }
+
+    body.theme-clasico .payment-option input[type="radio"]:checked + .pay-card {
+      border-color: #B37070;
+      background: #F9EBEA;
+    }
+
+    @keyframes spinStore {
+      to { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
 
-  <!-- ENCABEZADO DE LA TIENDA -->
-  <header class="store-header">
-    <div class="store-header-top">
-      <div class="store-avatar" id="storeAvatar">🏪</div>
-      <div class="store-info">
-        <div class="store-name-row">
-          <h1 class="store-name" id="storeName">Cargando tienda...</h1>
-          <span class="material-symbols-outlined verified-badge" title="Tienda verificada">verified</span>
+  <!-- ESTADO DE CARGA ESTILIZADO -->
+  <div id="storeLoadingState" style="text-align:center; padding:90px 20px; max-width:440px; margin:0 auto;">
+    <div style="width:48px; height:48px; border:3.5px solid var(--border); border-top-color:var(--primary); border-radius:50%; margin:0 auto 18px; animation:spinStore 0.9s linear infinite;"></div>
+    <div style="font-size:16px; font-weight:800; color:var(--text);">Conectando con la tienda...</div>
+    <div style="font-size:12.5px; color:var(--text-muted); margin-top:6px; line-height:1.5;">Cargando catálogo oficial y precios actualizados directamente desde la nube.</div>
+  </div>
+
+  <!-- ESTADO: TIENDA NO ENCONTRADA / ENLACE INCOMPLETO (SIN FALLBACK A OTRA TIENDA) -->
+  <div id="storeNotFoundState" style="display:none; text-align:center; padding:80px 24px; max-width:460px; margin:0 auto;">
+    <div style="width:72px; height:72px; border-radius:24px; background:#FEE2E2; color:#DC2626; display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:36px; box-shadow:0 6px 16px rgba(220,38,38,0.15);">
+      🏪
+    </div>
+    <h2 id="storeNotFoundTitle" style="font-size:19px; font-weight:800; color:var(--text); margin-bottom:8px;">Tienda no disponible</h2>
+    <p id="storeNotFoundMsg" style="font-size:13px; color:var(--text-muted); line-height:1.6; margin-bottom:24px;">
+      El enlace que abriste no contiene el código de la tienda o su catálogo aún no ha sido publicado en la nube. Por favor solicita el enlace directo a tu comercio o vendedor.
+    </p>
+    <a href="https://zentra.app" style="display:inline-flex; align-items:center; gap:6px; background:#0F172A; color:#FFFFFF; text-decoration:none; padding:10px 18px; border-radius:12px; font-size:12px; font-weight:700;">
+      <span>Conocer más sobre Zentra</span>
+    </a>
+  </div>
+
+  <!-- CONTENIDO PRINCIPAL DE LA TIENDA (SE MUESTRA ÚNICAMENTE SI LA TIENDA EXISTE) -->
+  <div id="storeMainContent" style="display:none;">
+    <!-- ENCABEZADO DE LA TIENDA -->
+    <header class="store-header">
+      <div class="store-header-top">
+        <div class="store-avatar" id="storeAvatar">🏪</div>
+        <div class="store-info">
+          <div class="store-name-row">
+            <h1 class="store-name" id="storeName">Cargando tienda...</h1>
+            <span class="material-symbols-outlined verified-badge" title="Tienda verificada">verified</span>
+          </div>
+          <div class="store-sub">
+            <span class="store-badge-open">Abierto para pedidos</span>
+            <span id="storePhoneText">📞 Contacto disponible</span>
+          </div>
         </div>
-        <div class="store-sub">
-          <span class="store-badge-open">Abierto para pedidos</span>
-          <span id="storePhoneText">📞 Contacto disponible</span>
-        </div>
+      </div>
+
+      <!-- Píldoras de Medios de Pago -->
+      <div class="store-payment-pills" id="storePaymentPills">
+        <!-- Dinámico -->
+      </div>
+    </header>
+
+    <!-- BUSCADOR Y CATEGORÍAS -->
+    <div class="controls-container">
+      <div class="search-box">
+        <span class="material-symbols-outlined" style="color:var(--text-muted); font-size:20px;">search</span>
+        <input type="text" id="searchInput" placeholder="Buscar en el catálogo..." oninput="filtrarProductos()">
+      </div>
+
+      <div class="category-pills" id="categoryPills">
+        <button class="cat-btn active" onclick="filtrarCategoria('todos', this)">Todos</button>
       </div>
     </div>
 
-    <!-- Píldoras de Medios de Pago -->
-    <div class="store-payment-pills" id="storePaymentPills">
-      <!-- Dinámico -->
-    </div>
-  </header>
+    <!-- CATÁLOGO -->
+    <main class="catalog-wrapper">
+      <div class="catalog-grid" id="catalogGrid">
+        <!-- Inyectado dinámicamente -->
+      </div>
+      <div id="emptyCatalog" class="empty-state" style="display:none;">
+        <span class="material-symbols-outlined" style="font-size:48px; opacity:0.5;">inventory_2</span>
+        <p style="margin-top:8px; font-weight:600;">No encontramos productos con ese nombre.</p>
+      </div>
+    </main>
 
-  <!-- BUSCADOR Y CATEGORÍAS -->
-  <div class="controls-container">
-    <div class="search-box">
-      <span class="material-symbols-outlined" style="color:var(--text-muted); font-size:20px;">search</span>
-      <input type="text" id="searchInput" placeholder="Buscar en el catálogo..." oninput="filtrarProductos()">
-    </div>
-
-    <div class="category-pills" id="categoryPills">
-      <button class="cat-btn active" onclick="filtrarCategoria('todos', this)">Todos</button>
-    </div>
-  </div>
-
-  <!-- CATÁLOGO -->
-  <main class="catalog-wrapper">
-    <div class="catalog-grid" id="catalogGrid">
-      <!-- Inyectado dinámicamente -->
-    </div>
-    <div id="emptyCatalog" class="empty-state" style="display:none;">
-      <span class="material-symbols-outlined" style="font-size:48px; opacity:0.5;">inventory_2</span>
-      <p style="margin-top:8px; font-weight:600;">No encontramos productos con ese nombre.</p>
-    </div>
-  </main>
-
-  <!-- BARRA FLOTANTE DE CARRITO -->
-  <div class="floating-cart-bar" id="floatingCartBar" onclick="abrirDrawerCarrito()">
-    <div class="floating-cart-info">
-      <div class="floating-cart-count" id="cartBadgeCount">0 items</div>
-      <div class="floating-cart-total" id="cartBadgeTotal">$0 COP</div>
-    </div>
-    <div class="floating-cart-cta">
-      <span>Ver Pedido</span>
-      <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+    <!-- BARRA FLOTANTE DE CARRITO -->
+    <div class="floating-cart-bar" id="floatingCartBar" onclick="abrirDrawerCarrito()">
+      <div class="floating-cart-info">
+        <div class="floating-cart-count" id="cartBadgeCount">0 items</div>
+        <div class="floating-cart-total" id="cartBadgeTotal">$0 COP</div>
+      </div>
+      <div class="floating-cart-cta">
+        <span>Ver Pedido</span>
+        <span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span>
+      </div>
     </div>
   </div>
 
@@ -855,6 +1076,11 @@
       if (typeof firebase !== 'undefined') {
         fbApp = firebase.initializeApp(firebaseConfig, 'publicStoreApp');
         fbDb = fbApp.firestore();
+        if (fbApp.auth) {
+          fbApp.auth().signInAnonymously().catch(err => {
+            console.warn('Autenticación anónima opcional:', err);
+          });
+        }
       }
     } catch (e) {
       console.warn('Firebase init error:', e);
@@ -864,12 +1090,14 @@
     let storeData = {
       bizId: '',
       name: 'Tienda Oficial',
+      owner: '',
       phone: '',
       nequi: '',
       daviplata: '',
       bancolombia: '',
       brebe: '',
       qrImage: null,
+      theme: 'default',
       catalog: []
     };
 
@@ -877,7 +1105,7 @@
     let activeCategory = 'todos';
     let currentCreatedOrder = null;
 
-    // Obtener parámetro de tienda desde la URL
+    // Obtener parámetro de tienda desde la URL (soporta ?biz=..., ?t=..., ?tienda=... y /t/:id)
     function getStoreIdFromUrl() {
       const params = new URLSearchParams(window.location.search);
       let biz = params.get('biz') || params.get('t') || params.get('tienda');
@@ -885,8 +1113,9 @@
 
       // Soporte para rutas amigables tipo /t/nombre_tienda
       const pathParts = window.location.pathname.split('/').filter(Boolean);
-      if (pathParts.length >= 2 && pathParts[0] === 't') {
-        return pathParts[1];
+      const tIndex = pathParts.indexOf('t');
+      if (tIndex !== -1 && pathParts[tIndex + 1]) {
+        return pathParts[tIndex + 1].trim();
       }
       return null;
     }
@@ -895,14 +1124,27 @@
     window.addEventListener('DOMContentLoaded', async () => {
       const bizId = getStoreIdFromUrl();
       await cargarDatosTienda(bizId);
-      renderizarHeaderTienda();
-      renderizarCategorias();
-      renderizarProductos();
     });
 
     async function cargarDatosTienda(bizId) {
-      // 1. Intentar cargar desde Firestore (Colección de tiendas públicas)
-      if (bizId && fbDb) {
+      const loadingEl = document.getElementById('storeLoadingState');
+      const notFoundEl = document.getElementById('storeNotFoundState');
+      const mainEl = document.getElementById('storeMainContent');
+
+      // 1. Si no hay ID en la URL, mostrar pantalla limpia de error (NUNCA mostrar otra tienda)
+      if (!bizId) {
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (mainEl) mainEl.style.display = 'none';
+        if (notFoundEl) {
+          document.getElementById('storeNotFoundTitle').innerText = 'Enlace de tienda incompleto';
+          document.getElementById('storeNotFoundMsg').innerText = 'Este enlace no contiene el código de la tienda. Solicita a tu negocio el enlace directo actualizado para ver sus productos.';
+          notFoundEl.style.display = 'block';
+        }
+        return false;
+      }
+
+      // 2. Intentar cargar desde Firestore (Colección de tiendas públicas en la nube)
+      if (fbDb) {
         try {
           const docRef = fbDb.collection('tiendas_publicas').doc(bizId);
           const snap = await docRef.get();
@@ -911,68 +1153,94 @@
             storeData = {
               bizId: bizId,
               name: data.name || 'Tienda Oficial',
+              owner: data.owner || '',
               phone: data.phone || '',
               nequi: data.nequi || '',
               daviplata: data.daviplata || '',
               bancolombia: data.bancolombia || '',
               brebe: data.brebe || data.otherPayment || '',
               qrImage: data.qrImage || null,
+              theme: data.theme || 'default',
               catalog: Array.isArray(data.catalog) ? data.catalog : []
             };
-            return;
+            activarVistaTienda();
+            return true;
           }
         } catch (err) {
           console.warn('Error leyendo tienda en Firestore:', err);
         }
       }
 
-      // 2. Si es local o estamos en el mismo navegador (fallback rápido para pruebas locales)
-      if (bizId) {
-        try {
-          const pStr = localStorage.getItem(`zentra_biz_profile_${bizId}`);
+      // 3. Si no está en Firestore o es offline en el mismo navegador, buscar en almacenamiento local
+      // ÚNICAMENTE si coincide exactamente con el bizId solicitado
+      try {
+        const pStr = localStorage.getItem(`zentra_biz_profile_${bizId}`);
+        if (pStr) {
+          const p = JSON.parse(pStr);
           const cStr = localStorage.getItem(`zentra_catalog_${bizId}`);
-          if (pStr) {
-            const p = JSON.parse(pStr);
-            const c = cStr ? JSON.parse(cStr) : [];
-            storeData = {
-              bizId: bizId,
-              name: p.name || 'Tienda Oficial',
-              phone: p.phone || '',
-              nequi: p.nequi || '',
-              daviplata: p.daviplata || '',
-              bancolombia: p.bancolombia || '',
-              brebe: p.otherPayment || '',
-              qrImage: p.qrImage || null,
-              catalog: c.map(it => ({
-                id: it.id,
-                name: it.name,
-                price: it.price || 0,
-                category: it.category || 'General',
-                desc: it.desc || '',
-                photo: it.photo || null
-              }))
-            };
-            return;
-          }
-        } catch (_) {}
+          const c = cStr ? JSON.parse(cStr) : [];
+          storeData = {
+            bizId: bizId,
+            name: p.name || 'Tienda Oficial',
+            owner: p.owner || '',
+            phone: p.phone || '',
+            nequi: p.nequi || '',
+            daviplata: p.daviplata || '',
+            bancolombia: p.bancolombia || '',
+            brebe: p.otherPayment || '',
+            qrImage: p.qrImage || null,
+            theme: p.theme || ((bizId === 'biz_tm_disenos' || (p.name && p.name.toLowerCase().includes('tm diseñ'))) ? 'clasico' : 'default'),
+            catalog: c.map(it => ({
+              id: it.id,
+              name: it.name,
+              price: it.price || 0,
+              category: it.category || 'General',
+              desc: it.desc || '',
+              photo: it.photo || null
+            }))
+          };
+          activarVistaTienda();
+          return true;
+        }
+      } catch (_) {}
+
+      // 4. Si la tienda no existe ni en Firestore ni localmente, MOSTRAR PANTALLA DE ERROR
+      // ESTRICTO: NUNCA caer en productos ficticios o de otra tienda
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (mainEl) mainEl.style.display = 'none';
+      if (notFoundEl) {
+        document.getElementById('storeNotFoundTitle').innerText = 'Tienda no encontrada';
+        document.getElementById('storeNotFoundMsg').innerText = `No encontramos una tienda pública activa con el identificador "${bizId}". Asegúrate de que el comercio haya publicado su catálogo en línea o solicita el enlace actualizado.`;
+        notFoundEl.style.display = 'block';
+      }
+      return false;
+    }
+
+    function activarVistaTienda() {
+      const loadingEl = document.getElementById('storeLoadingState');
+      const notFoundEl = document.getElementById('storeNotFoundState');
+      const mainEl = document.getElementById('storeMainContent');
+
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (notFoundEl) notFoundEl.style.display = 'none';
+      if (mainEl) mainEl.style.display = 'block';
+
+      // Detectar y aplicar paleta de colores del tema clásico si corresponde a TM Diseños
+      const isTmDisenos = (storeData.bizId === 'biz_tm_disenos') ||
+                          (storeData.theme === 'clasico') ||
+                          (storeData.theme === 'nude') ||
+                          (storeData.theme === 'theme-clasico-v1') ||
+                          (storeData.name && storeData.name.toLowerCase().includes('tm diseñ'));
+
+      if (isTmDisenos) {
+        document.body.classList.add('theme-clasico');
+      } else {
+        document.body.classList.remove('theme-clasico');
       }
 
-      // 3. Fallback demostrativo (Better Life / Tienda Demo)
-      storeData = {
-        bizId: bizId || 'demo_store',
-        name: 'BETTER LIFE • Tienda Oficial',
-        phone: '3215311523',
-        nequi: '3215311523',
-        brebe: '@3215311523',
-        bancolombia: 'Ahorros 456-789012-34',
-        qrImage: null,
-        catalog: [
-          { id: 'p1', name: 'Club Colombia Dorada SixPack', price: 44000, category: 'Cervezas', desc: 'Pack x6 unidades latas 330ml frías', photo: null },
-          { id: 'p2', name: 'Tequila Don Julio Blanco (700 ml)', price: 249900, category: 'Licores', desc: '100% Agave azul, botella sellada', photo: null },
-          { id: 'p3', name: 'Whisky Buchanan\'s 12 Años', price: 165000, category: 'Licores', desc: 'Botella original 750ml con sello fiscal', photo: null },
-          { id: 'p4', name: 'Agua Manantial con Gas 500ml', price: 4500, category: 'Bebidas', desc: 'Refrescante agua mineral de manantial', photo: null }
-        ]
-      };
+      renderizarHeaderTienda();
+      renderizarCategorias();
+      renderizarProductos();
     }
 
     function renderizarHeaderTienda() {

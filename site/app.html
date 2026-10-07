@@ -3165,6 +3165,13 @@
           <input type="text" id="prodNameInp" placeholder="Ej: Cake Topper Shaker, Agendas, Tarjetas x50" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
+        <!-- CAMPO CATEGORÍA: PERMANENTE, NUNCA OCULTO -->
+        <div style="margin-bottom:10px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Categoría *</label>
+          <input type="text" id="prodCatInp" list="prodCatSuggestions" placeholder="Ej: Papelería, Abarrotes, Bebidas, Regalos, Servicios..." style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
+          <datalist id="prodCatSuggestions"></datalist>
+        </div>
+
         <div style="margin-bottom:10px;">
           <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Descripción Breve (Opcional)</label>
           <textarea id="prodDescInp" rows="2" placeholder="Ej: Medidas, material, colores o detalles para el cliente..." style="width:100%; padding:8px 12px; border-radius:12px; border:1px solid var(--surface-border); background:var(--bg); color:var(--text); font-size:12px; font-family:inherit; resize:vertical; box-sizing:border-box;"></textarea>
@@ -3187,25 +3194,15 @@
           <b id="lblProfitLive" style="color:#15803D; font-weight:800;">+$0 COP (0% margen)</b>
         </div>
 
-        <!-- Contenedor condicional: Stock para Productos Físicos vs Mensaje para Servicios -->
-        <div id="boxProdStock" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;">
-          <div>
-            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Stock Inicial *</label>
-            <input type="number" id="prodStockInp" value="10" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
-          </div>
-          <div>
-            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Categoría</label>
-            <input type="text" id="prodCatInp" placeholder="Papelería" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
-          </div>
+        <!-- Contenedor condicional: Stock solo para Productos Físicos -->
+        <div id="boxProdStock" style="margin-bottom:14px;">
+          <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Stock / Existencias Disponibles *</label>
+          <input type="number" id="prodStockInp" value="10" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
         </div>
 
         <div id="boxProdServiceNotice" style="display:none; margin-bottom:14px;">
-          <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:12px; padding:9px 12px; font-size:11px; color:#1E40AF; margin-bottom:8px; line-height:1.4;">
+          <div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:12px; padding:9px 12px; font-size:11px; color:#1E40AF; line-height:1.4;">
             ✂️ <b>Servicio / Elaboración a Medida:</b> Se produce bajo encargo o cotización para el cliente. No descuenta stock físico rígido.
-          </div>
-          <div>
-            <label style="display:block; font-size:11px; font-weight:600; margin-bottom:3px;">Categoría de Servicio</label>
-            <input type="text" id="prodServiceCatInp" placeholder="Diseño, Impresión, Decoración" style="width:100%; padding:9px 12px; border-radius:12px; border:1px solid var(--primary); background:var(--bg); color:var(--text); font-size:13px; box-sizing:border-box;">
           </div>
         </div>
 
@@ -7754,9 +7751,9 @@
             id: it.id,
             name: it.name,
             price: it.price || 0,
-            category: it.category || 'General',
-            desc: it.desc || '',
-            photo: it.photo || null
+            category: it.cat || it.category || 'General',
+            desc: it.description || it.desc || '',
+            photo: it.image || it.photo || null
           })),
           updatedAt: new Date().toISOString()
         };
@@ -7772,14 +7769,14 @@
       }
     }
 
-    async function compartirTiendaVirtual() {
+    function compartirTiendaVirtual() {
       if (!bizProfile || !bizProfile.id) {
         showToast('Primero configura los datos de tu negocio.');
         return;
       }
 
-      showToast('⏳ Sincronizando catálogo en línea...');
-      await publicarCatalogoTiendaEnNube(false);
+      // Sincronizar catálogo en la nube en segundo plano (sin bloquear el hilo de interacción del navegador)
+      publicarCatalogoTiendaEnNube(true).catch(() => {});
 
       const origin = window.location.origin;
       const storeUrl = `${origin}/tienda.html?biz=${bizProfile.id}`;
@@ -7787,26 +7784,24 @@
 
       const shareText = `¡Hola! 👋 Te invitamos a conocer el catálogo virtual de *${bizName}*. Puedes ver todos nuestros productos y hacer tu pedido directamente aquí:\n\n👉 ${storeUrl}\n\n¡Esperamos tu pedido!`;
 
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(storeUrl).catch(() => {});
-      }
-
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: `Tienda Virtual - ${bizName}`,
-            text: shareText
-          });
+      // 1. En dispositivos móviles con Web Share API:
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile && navigator.share) {
+        navigator.share({
+          title: `Tienda Virtual - ${bizName}`,
+          text: shareText
+        }).then(() => {
           showToast('✓ Enlace de tienda compartido');
-          return;
-        } catch (err) {
-          if (err.name === 'AbortError') return;
-        }
+        }).catch(err => {
+          if (err.name !== 'AbortError') {
+            abrirWhatsAppDirecto(shareText);
+          }
+        });
+        return;
       }
 
-      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
-      window.open(waUrl, '_blank');
-      showToast('📋 Enlace copiado al portapapeles y WhatsApp abierto');
+      // 2. En PC o sin Web Share: abrir directamente WhatsApp
+      abrirWhatsAppDirecto(shareText);
     }
 
     // ==========================================
@@ -8870,7 +8865,7 @@ ${estadoStr}${contactText}
           btnServ.style.fontWeight = '600';
           btnServ.style.boxShadow = 'none';
         }
-        if (boxStock) boxStock.style.display = 'grid';
+        if (boxStock) boxStock.style.display = 'block';
         if (boxNotice) boxNotice.style.display = 'none';
         if (lblName) lblName.innerText = 'Nombre del Producto *';
         if (inpName) inpName.placeholder = 'Ej: Cake Topper Shaker, Agendas, Portaplatos';
@@ -9462,7 +9457,9 @@ ${estadoStr}${contactText}
       const texto = generarTextoCatalogoWhatsApp();
       const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'Mi Negocio';
 
-      if (navigator.share) {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (isMobile && navigator.share) {
         navigator.share({
           title: `Catálogo de Productos - ${bizName}`,
           text: texto
@@ -9470,18 +9467,58 @@ ${estadoStr}${contactText}
           showToast('✓ Catálogo compartido con éxito');
         }).catch(err => {
           if (err.name !== 'AbortError') {
-            abrirWhatsAppWebConTexto(texto);
+            abrirWhatsAppDirecto(texto);
           }
         });
-      } else {
-        abrirWhatsAppWebConTexto(texto);
+        return;
       }
+
+      abrirWhatsAppDirecto(texto);
+    }
+
+    function abrirWhatsAppDirecto(texto) {
+      if (!texto) return;
+
+      // 1. Siempre copiar al portapapeles de inmediato para garantizar respaldo
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(texto).catch(() => {});
+        } else {
+          fallbackCopiarTextoCatalogo(texto);
+        }
+      } catch (_) {}
+
+      // 2. Control estricto de longitud de URL para WhatsApp
+      // Si el texto completo supera ~1600 caracteres codificados, WhatsApp Web se rompe con HTTP 414.
+      // En ese caso sintetizamos el mensaje e incluimos el enlace directo a la tienda online
+      let textoParaUrl = texto;
+      if (encodeURIComponent(texto).length > 1600) {
+        const origin = window.location.origin;
+        const storeUrl = (bizProfile && bizProfile.id) ? `${origin}/tienda.html?biz=${bizProfile.id}` : '';
+        const bizName = (bizProfile && bizProfile.name) ? bizProfile.name : 'nuestra tienda';
+        textoParaUrl = `¡Hola! 👋 Te invitamos a conocer el catálogo completo de *${bizName}*.\n\nPuedes ver todos nuestros productos, fotos, precios actualizados y hacer tu pedido directamente en línea aquí:\n\n👉 ${storeUrl}\n\n¡Esperamos tu pedido! 😊`;
+      }
+
+      const encoded = encodeURIComponent(textoParaUrl);
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const waUrl = isMobile
+        ? `https://api.whatsapp.com/send?text=${encoded}`
+        : `https://api.whatsapp.com/send?text=${encoded}`;
+
+      // Disparar apertura mediante enlace <a> en el DOM para evitar que el navegador bloquee el popup
+      const a = document.createElement('a');
+      a.href = waUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => a.remove(), 250);
+
+      showToast('✓ Abriendo WhatsApp y mensaje copiado al portapapeles');
     }
 
     function abrirWhatsAppWebConTexto(texto) {
-      const url = `https://wa.me/?text=${encodeURIComponent(texto)}`;
-      window.open(url, '_blank');
-      showToast('✓ Abriendo WhatsApp para compartir tu catálogo');
+      abrirWhatsAppDirecto(texto);
     }
 
     function copiarTextoCatalogoWhatsApp() {
@@ -9979,6 +10016,20 @@ ${estadoStr}${contactText}
       return isNaN(num) ? 0 : num;
     }
 
+    function poblarSugerenciasCategorias() {
+      const datalist = document.getElementById('prodCatSuggestions');
+      if (!datalist) return;
+      const cats = Array.from(new Set(
+        (catalogItems || [])
+          .map(it => (it.cat || it.category || '').trim())
+          .filter(Boolean)
+      ));
+      if (cats.length === 0) {
+        cats.push('Papelería', 'Personalizados', 'Abarrotes', 'Bebidas', 'Servicios', 'General');
+      }
+      datalist.innerHTML = cats.map(c => `<option value="${c}">`).join('');
+    }
+
     function abrirModalNuevoProducto() {
       editingProductId = null;
       const titleEl = document.getElementById('lblNewProdModalTitle');
@@ -9993,10 +10044,8 @@ ${estadoStr}${contactText}
       document.getElementById('prodCostInp').value = '';
       document.getElementById('prodStockInp').value = '10';
       const mode = (bizProfile && bizProfile.type) ? bizProfile.type : 'servicios';
+      poblarSugerenciasCategorias();
       document.getElementById('prodCatInp').value = mode === 'servicios' ? 'Papelería' : 'Abarrotes';
-      if (document.getElementById('prodServiceCatInp')) {
-        document.getElementById('prodServiceCatInp').value = 'Diseño & Elaboración';
-      }
       removeProductPhoto();
       seleccionarTipoItemCatalogo('producto');
       document.getElementById('newProductModal').style.display = 'flex';
@@ -10020,16 +10069,14 @@ ${estadoStr}${contactText}
       document.getElementById('prodCostInp').value = item.cost || '';
       document.getElementById('prodStockInp').value = item.stock !== undefined ? item.stock : 10;
 
+      poblarSugerenciasCategorias();
+      document.getElementById('prodCatInp').value = item.cat || item.category || 'General';
+
       const isServ = item.itemType === 'servicio';
       seleccionarTipoItemCatalogo(isServ ? 'servicio' : 'producto');
-      if (isServ && document.getElementById('prodServiceCatInp')) {
-        document.getElementById('prodServiceCatInp').value = item.cat || '';
-      } else {
-        document.getElementById('prodCatInp').value = item.cat || '';
-      }
 
       // Cargar foto existente
-      tempProductPhoto = item.image || null;
+      tempProductPhoto = item.image || item.photo || null;
       const prev = document.getElementById('prodImgPreview');
       const btnRemove = document.getElementById('btnRemoveProdPhoto');
       const statusText = document.getElementById('prodPhotoStatusText');
@@ -10059,13 +10106,7 @@ ${estadoStr}${contactText}
       const cost = parseFloat(document.getElementById('prodCostInp').value) || 0;
       const itemType = document.getElementById('prodTypeInp').value || 'producto';
       const stock = itemType === 'servicio' ? 999 : (parseInt(document.getElementById('prodStockInp').value) || 1);
-      
-      let cat = 'General';
-      if (itemType === 'servicio') {
-        cat = (document.getElementById('prodServiceCatInp')?.value || '').trim() || 'Servicios';
-      } else {
-        cat = (document.getElementById('prodCatInp')?.value || '').trim() || 'Abarrotes';
-      }
+      const cat = (document.getElementById('prodCatInp')?.value || '').trim() || 'General';
 
       if (!name || price <= 0) {
         showToast('Ingresa nombre y precio de venta válido.');
@@ -10083,9 +10124,10 @@ ${estadoStr}${contactText}
           item.cost = cost;
           item.stock = stock;
           item.cat = cat;
+          item.category = cat;
           item.itemType = itemType;
           item.image = tempProductPhoto || null;
-
+          item.photo = tempProductPhoto || null;
           item.updatedAt = new Date().toISOString();
 
           // Sincronizar en el carrito si está presente
@@ -10096,7 +10138,10 @@ ${estadoStr}${contactText}
               ci.price = price;
               ci.cost = cost;
               ci.image = tempProductPhoto || null;
+              ci.photo = tempProductPhoto || null;
               ci.itemType = itemType;
+              ci.cat = cat;
+              ci.category = cat;
               ci.subtotal = ci.quantity * price;
             }
           });
@@ -10113,8 +10158,10 @@ ${estadoStr}${contactText}
           cost: cost,
           stock: stock,
           cat: cat,
+          category: cat,
           itemType: itemType,
           image: tempProductPhoto || null,
+          photo: tempProductPhoto || null,
           mode: mode,
           updatedAt: new Date().toISOString()
         });

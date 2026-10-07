@@ -1147,8 +1147,40 @@
       if (fbDb) {
         try {
           const docRef = fbDb.collection('tiendas_publicas').doc(bizId);
-          const snap = await docRef.get();
-          if (snap.exists) {
+          let snap = await docRef.get();
+          if (!snap.exists) {
+            // Consulta directa a la base de datos central de negocios si aún no está en tiendas_publicas
+            const bizDocRef = fbDb.collection('negocios_zentra').doc(bizId);
+            const bizSnap = await bizDocRef.get();
+            if (bizSnap.exists) {
+              const bData = bizSnap.data();
+              const p = bData.bizProfile || {};
+              const cat = Array.isArray(bData.catalogItems) ? bData.catalogItems : [];
+              const isTm = (bizId === 'biz_tm_disenos') || (p.name && p.name.toLowerCase().includes('tm diseñ')) || (p.theme === 'clasico');
+              storeData = {
+                bizId: bizId,
+                name: p.name || 'Tienda Oficial',
+                owner: p.owner || '',
+                phone: p.phone || '',
+                nequi: p.nequi || '',
+                daviplata: p.daviplata || '',
+                bancolombia: p.bancolombia || '',
+                brebe: p.otherPayment || '',
+                qrImage: p.qrImage || null,
+                theme: isTm ? 'clasico' : (p.theme || 'default'),
+                catalog: cat.map(it => ({
+                  id: it.id,
+                  name: it.name,
+                  price: it.price || 0,
+                  category: it.cat || it.category || 'General',
+                  desc: it.description || it.desc || '',
+                  photo: it.image || it.photo || null
+                }))
+              };
+              activarVistaTienda();
+              return true;
+            }
+          } else {
             const data = snap.data();
             storeData = {
               bizId: bizId,
@@ -1161,7 +1193,14 @@
               brebe: data.brebe || data.otherPayment || '',
               qrImage: data.qrImage || null,
               theme: data.theme || 'default',
-              catalog: Array.isArray(data.catalog) ? data.catalog : []
+              catalog: Array.isArray(data.catalog) ? data.catalog.map(it => ({
+                id: it.id,
+                name: it.name,
+                price: it.price || 0,
+                category: it.category || it.cat || 'General',
+                desc: it.desc || it.description || '',
+                photo: it.photo || it.image || null
+              })) : []
             };
             activarVistaTienda();
             return true;
@@ -1194,9 +1233,9 @@
               id: it.id,
               name: it.name,
               price: it.price || 0,
-              category: it.category || 'General',
-              desc: it.desc || '',
-              photo: it.photo || null
+              category: it.cat || it.category || 'General',
+              desc: it.description || it.desc || '',
+              photo: it.image || it.photo || null
             }))
           };
           activarVistaTienda();

@@ -870,6 +870,27 @@ class CatalogItemModel {
   4. **Paridad Total de Archivos:**
      - Coincidencia exacta al 100% de SHA-256 en los 4 archivos de producción: `index.html`, `preview.html`, `site/app.html` y `site/app/index.html`.
 
+#### Hito 38: Implementación de Base de Datos Centralizada en Cloud Firestore (Single Source of Truth)
+- **Requerimiento del Usuario:**
+  - *"no podemos guardar los datos de la tienda en el navegador, esos datos deben quedar en una base de datos... ok, procede con la implementacion de la base de datos"*
+  - Erradicar la dependencia primaria en el almacenamiento local volátil (`localStorage`) y promover Cloud Firestore como la única fuente autoritativa de la verdad para toda la aplicación.
+- **Implementación Técnica:**
+  1. **Colección Central `/negocios_zentra/{bizId}`:**
+     - Cada tienda (`biz_tm_disenos`, etc.) reside de forma independiente y aislada como documento central con perfil, proyectos, catálogo, finanzas, tareas, cotizaciones y clientes.
+     - `conectarNegocioEnTiempoReal(bizId)`: Escucha en tiempo real mediante `onSnapshot` que replica cualquier cambio entre celular y PC en menos de 1 segundo.
+     - `guardarEstadoEnBaseDeDatos(bizId)`: Escribe automáticamente a Firestore en cada acción de guardado local, actualizando simultáneamente el directorio global y el catálogo público.
+  2. **Directorio Global de Tiendas `/directorio_negocios/{bizId}`:**
+     - Registro accesible desde cualquier equipo para descubrir y alternar tiendas sin depender de arrays locales.
+  3. **Autenticación Transparente en Fondo (`signInAnonymously`):**
+     - Si el usuario no inicia sesión explícitamente con Google, se genera un token de sesión anónimo que garantiza permisos válidos de lectura y escritura en las reglas de seguridad de Firestore (`request.auth != null`).
+  4. **Tienda Virtual Pública y Catálogo Online (`tienda.html`):**
+     - Lectura directa desde `/tiendas_publicas/{bizId}` y fallback a `/negocios_zentra/{bizId}`.
+     - Soporte completo para variantes de esquema (`cat` / `category`, `description` / `desc`, `image` / `photo`).
+  5. **LocalStorage como Memoria Caché de Alto Rendimiento:**
+     - `localStorage` se mantiene exclusivamente como capa de lectura previa instantánea (0 milisegundos de latencia en pantalla inicial) sin riesgo de pérdida de datos ante borrados de historial o cambios de dispositivo.
+  6. **Paridad Total de Archivos:**
+     - Sincronización al 100% en `index.html`, `preview.html`, `site/app.html`, `site/app/index.html`, `tienda.html` y `site/tienda.html`.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

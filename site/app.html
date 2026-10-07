@@ -7772,10 +7772,10 @@
 
         const publicData = {
           bizId: bizProfile.id,
-          name: bizProfile.name || 'Mi Tienda',
-          owner: bizProfile.owner || '',
-          phone: bizProfile.phone || '',
-          nequi: bizProfile.nequi || '',
+          name: bizProfile.name || (isTm ? 'TM Diseños Creativos' : 'Mi Tienda'),
+          owner: bizProfile.owner || (isTm ? 'Tatiana Marín' : ''),
+          phone: bizProfile.phone || (isTm ? '3124567890' : ''),
+          nequi: bizProfile.nequi || (isTm ? '3124567890' : ''),
           daviplata: bizProfile.daviplata || '',
           bancolombia: bizProfile.bancolombia || '',
           brebe: bizProfile.otherPayment || '',

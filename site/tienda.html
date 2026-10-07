@@ -294,7 +294,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 84px;
+      min-height: 84px;
     }
 
     .product-title {
@@ -322,28 +322,60 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 6px;
       margin-top: auto;
+      flex-wrap: wrap;
     }
 
     .product-price {
-      font-size: 14px;
+      font-size: 13.5px;
       font-weight: 800;
       color: var(--primary);
+      white-space: nowrap;
+    }
+
+    .card-action-btns {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-fast-order {
+      background: #25D366;
+      border: 1px solid #1EBE5D;
+      color: #FFFFFF;
+      padding: 5px 9px;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.15s ease;
+      box-shadow: 0 2px 6px rgba(37,211,102,0.25);
+      white-space: nowrap;
+    }
+
+    .btn-fast-order:active {
+      transform: scale(0.95);
+      background: #1EBE5D;
     }
 
     .btn-add-cart {
       background: var(--primary-soft);
       border: 1px solid var(--primary);
       color: var(--primary);
-      padding: 6px 12px;
-      border-radius: 10px;
-      font-size: 12px;
+      padding: 5px 9px;
+      border-radius: 9px;
+      font-size: 11px;
       font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       transition: all 0.15s ease;
+      white-space: nowrap;
     }
 
     .btn-add-cart:active {
@@ -667,6 +699,34 @@
       background: #FFFFFF;
     }
 
+    /* TOAST DE NOTIFICACIONES */
+    .store-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-30px);
+      background: #0F172A;
+      color: #FFFFFF;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 90%;
+      text-align: center;
+    }
+    .store-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
     /* VACÍO / LOADING */
     .empty-state {
       text-align: center;
@@ -978,23 +1038,23 @@
           </div>
 
           <div class="form-group">
-            <label for="custName">Tu Nombre Completo *</label>
-            <input type="text" id="custName" placeholder="Ej: Carlos Pérez" required>
+            <label for="custName">Tu Nombre Completo</label>
+            <input type="text" id="custName" placeholder="Ej: Carlos Pérez">
           </div>
 
           <div class="form-group">
-            <label for="custPhone">Tu WhatsApp / Celular *</label>
-            <input type="tel" id="custPhone" placeholder="Ej: 3215311523" required>
+            <label for="custPhone">Tu WhatsApp / Celular</label>
+            <input type="tel" id="custPhone" placeholder="Ej: 3215311523">
           </div>
 
           <div class="form-group">
-            <label for="custAddress">Dirección de Entrega / Barrio *</label>
-            <input type="text" id="custAddress" placeholder="Ej: Carrera 15 # 45-20, Apto 302" required>
+            <label for="custAddress">Dirección de Entrega / Barrio (Opcional)</label>
+            <input type="text" id="custAddress" placeholder="Ej: Carrera 15 # 45-20 o 'Recoger en tienda'">
           </div>
 
           <div class="form-group">
-            <label for="custPaymentMethod">Medio de Pago a Utilizar *</label>
-            <select id="custPaymentMethod" required>
+            <label for="custPaymentMethod">Medio de Pago a Utilizar</label>
+            <select id="custPaymentMethod">
               <option value="Nequi">🟣 Nequi</option>
               <option value="Bre-Be">🟢 Bre-Be</option>
               <option value="Bancolombia">🔵 Bancolombia / Transferencia</option>
@@ -1005,7 +1065,7 @@
 
           <div class="form-group">
             <label for="custNotes">Notas o indicaciones (Opcional)</label>
-            <textarea id="custNotes" rows="2" placeholder="Ej: Timbrar en portería, sin cebolla, etc."></textarea>
+            <textarea id="custNotes" rows="2" placeholder="Ej: Timbrar en portería, diseño especial, etc."></textarea>
           </div>
         </form>
       </div>
@@ -1016,8 +1076,8 @@
           <span class="drawer-total-val" id="drawerTotalVal">$0 COP</span>
         </div>
         <button type="button" class="btn-submit-order" onclick="confirmarPedido()">
-          <span>Hacer Pedido</span>
-          <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span>
+          <span class="material-symbols-outlined" style="font-size:20px;">send</span>
+          <span>Confirmar y Pedir por WhatsApp</span>
         </button>
       </div>
     </div>
@@ -1027,14 +1087,14 @@
   <div class="success-modal" id="successModal">
     <div class="success-box">
       <div class="success-icon">✓</div>
-      <h2 style="font-size:18px; font-weight:800; color:var(--text);">¡Pedido Recibido con Éxito!</h2>
+      <h2 style="font-size:18px; font-weight:800; color:var(--text);">¡Pedido Enviado a WhatsApp!</h2>
       <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">
         Número de Pedido: <b style="color:var(--primary); font-size:14px;" id="successOrderNum">#PED-1001</b>
       </p>
 
       <div class="payment-notice-card">
-        <b>⏳ Tu pedido está en espera de confirmación de pago.</b><br>
-        Transfiere el valor de <b id="successTotalText">$0 COP</b> al medio seleccionado y envía el comprobante para que la tienda comience la preparación.
+        <b>📲 Tu pedido se ha generado y enviado a WhatsApp.</b><br>
+        Para iniciar la preparación de tu orden, realiza la transferencia por <b id="successTotalText">$0 COP</b> a los medios autorizados a continuación y envía tu comprobante.
       </div>
 
       <!-- Datos de Pago de la Tienda -->
@@ -1049,7 +1109,7 @@
       </div>
 
       <button type="button" class="btn-submit-order" onclick="notificarPorWhatsApp()">
-        <span>📲 Enviar Comprobante por WhatsApp</span>
+        <span>💬 Reabrir Pedido / Enviar Comprobante por WhatsApp</span>
       </button>
 
       <button type="button" onclick="cerrarModalExito()" style="margin-top:10px; background:transparent; border:none; color:var(--text-muted); font-size:12px; font-weight:700; cursor:pointer;">
@@ -1159,19 +1219,19 @@
               const isTm = (bizId === 'biz_tm_disenos') || (p.name && p.name.toLowerCase().includes('tm diseñ')) || (p.theme === 'clasico');
               storeData = {
                 bizId: bizId,
-                name: p.name || 'Tienda Oficial',
-                owner: p.owner || '',
-                phone: p.phone || '',
-                nequi: p.nequi || '',
+                name: p.name || (isTm ? 'TM Diseños Creativos' : 'Tienda Oficial'),
+                owner: p.owner || (isTm ? 'Tatiana Marín' : ''),
+                phone: p.phone || (isTm ? '3124567890' : ''),
+                nequi: p.nequi || (isTm ? '3124567890' : ''),
                 daviplata: p.daviplata || '',
                 bancolombia: p.bancolombia || '',
                 brebe: p.otherPayment || '',
                 qrImage: p.qrImage || null,
                 theme: isTm ? 'clasico' : (p.theme || 'default'),
-                catalog: cat.map(it => ({
-                  id: it.id,
-                  name: it.name,
-                  price: it.price || 0,
+                catalog: cat.map((it, idx) => ({
+                  id: String(it.id || `p_${idx}`),
+                  name: it.name || 'Producto',
+                  price: Number(it.price) || 0,
                   category: it.cat || it.category || 'General',
                   desc: it.description || it.desc || '',
                   photo: it.image || it.photo || null
@@ -1182,21 +1242,22 @@
             }
           } else {
             const data = snap.data();
+            const isTm = (bizId === 'biz_tm_disenos') || (data.name && data.name.toLowerCase().includes('tm diseñ')) || (data.theme === 'clasico');
             storeData = {
               bizId: bizId,
-              name: data.name || 'Tienda Oficial',
-              owner: data.owner || '',
-              phone: data.phone || '',
-              nequi: data.nequi || '',
+              name: data.name || (isTm ? 'TM Diseños Creativos' : 'Tienda Oficial'),
+              owner: data.owner || (isTm ? 'Tatiana Marín' : ''),
+              phone: data.phone || (isTm ? '3124567890' : ''),
+              nequi: data.nequi || (isTm ? '3124567890' : ''),
               daviplata: data.daviplata || '',
               bancolombia: data.bancolombia || '',
               brebe: data.brebe || data.otherPayment || '',
               qrImage: data.qrImage || null,
-              theme: data.theme || 'default',
-              catalog: Array.isArray(data.catalog) ? data.catalog.map(it => ({
-                id: it.id,
-                name: it.name,
-                price: it.price || 0,
+              theme: data.theme || (isTm ? 'clasico' : 'default'),
+              catalog: Array.isArray(data.catalog) ? data.catalog.map((it, idx) => ({
+                id: String(it.id || `p_${idx}`),
+                name: it.name || 'Producto',
+                price: Number(it.price) || 0,
                 category: it.category || it.cat || 'General',
                 desc: it.desc || it.description || '',
                 photo: it.photo || it.image || null
@@ -1218,21 +1279,22 @@
           const p = JSON.parse(pStr);
           const cStr = localStorage.getItem(`zentra_catalog_${bizId}`);
           const c = cStr ? JSON.parse(cStr) : [];
+          const isTm = (bizId === 'biz_tm_disenos') || (p.name && p.name.toLowerCase().includes('tm diseñ')) || (p.theme === 'clasico');
           storeData = {
             bizId: bizId,
-            name: p.name || 'Tienda Oficial',
-            owner: p.owner || '',
-            phone: p.phone || '',
-            nequi: p.nequi || '',
+            name: p.name || (isTm ? 'TM Diseños Creativos' : 'Tienda Oficial'),
+            owner: p.owner || (isTm ? 'Tatiana Marín' : ''),
+            phone: p.phone || (isTm ? '3124567890' : ''),
+            nequi: p.nequi || (isTm ? '3124567890' : ''),
             daviplata: p.daviplata || '',
             bancolombia: p.bancolombia || '',
             brebe: p.otherPayment || '',
             qrImage: p.qrImage || null,
-            theme: p.theme || ((bizId === 'biz_tm_disenos' || (p.name && p.name.toLowerCase().includes('tm diseñ'))) ? 'clasico' : 'default'),
-            catalog: c.map(it => ({
-              id: it.id,
-              name: it.name,
-              price: it.price || 0,
+            theme: p.theme || (isTm ? 'clasico' : 'default'),
+            catalog: c.map((it, idx) => ({
+              id: String(it.id || `p_${idx}`),
+              name: it.name || 'Producto',
+              price: Number(it.price) || 0,
               category: it.cat || it.category || 'General',
               desc: it.description || it.desc || '',
               photo: it.image || it.photo || null
@@ -1286,7 +1348,12 @@
       document.getElementById('storeName').innerText = storeData.name;
       document.title = `${storeData.name} • Catálogo y Pedidos en Línea`;
       if (storeData.phone) {
-        document.getElementById('storePhoneText').innerText = `📞 WhatsApp: ${storeData.phone}`;
+        const phoneEl = document.getElementById('storePhoneText');
+        if (phoneEl) {
+          phoneEl.innerHTML = `📞 WhatsApp: <span style="text-decoration:underline;">${storeData.phone}</span>`;
+          phoneEl.style.cursor = 'pointer';
+          phoneEl.onclick = () => despacharWhatsApp(storeData.phone, `¡Hola *${storeData.name}*! 👋 Tengo una consulta sobre su catálogo en línea.`);
+        }
       }
 
       const avatarBox = document.getElementById('storeAvatar');
@@ -1350,7 +1417,7 @@
 
       empty.style.display = 'none';
       grid.innerHTML = items.map(p => {
-        const inCart = cart.find(c => c.id === p.id);
+        const inCart = cart.find(c => String(c.id) === String(p.id));
         const qty = inCart ? inCart.cant : 0;
         const imgHtml = p.photo 
           ? `<img src="${p.photo}" alt="${p.name}">` 
@@ -1362,9 +1429,14 @@
               <span>${qty}</span>
               <button type="button" onclick="modificarCantidad('${p.id}', 1)">+</button>
              </div>`
-          : `<button type="button" class="btn-add-cart" onclick="agregarAlCarrito('${p.id}')">
-              <span>+ Agregar</span>
-             </button>`;
+          : `<div class="card-action-btns">
+              <button type="button" class="btn-fast-order" onclick="pedirProductoDirecto('${p.id}')" title="Pedir este producto de inmediato por WhatsApp">
+                <span>💬 Pedir</span>
+              </button>
+              <button type="button" class="btn-add-cart" onclick="agregarAlCarrito('${p.id}')" title="Agregar al carrito de compras">
+                <span>+ Carrito</span>
+              </button>
+             </div>`;
 
         return `
           <div class="product-card">
@@ -1385,25 +1457,31 @@
     }
 
     function agregarAlCarrito(prodId) {
-      const prod = storeData.catalog.find(p => p.id === prodId);
+      const prod = storeData.catalog.find(p => String(p.id) === String(prodId));
       if (!prod) return;
-      cart.push({
-        id: prod.id,
-        name: prod.name,
-        price: prod.price || 0,
-        cant: 1,
-        photo: prod.photo || null
-      });
+      const existing = cart.find(c => String(c.id) === String(prodId));
+      if (existing) {
+        existing.cant += 1;
+      } else {
+        cart.push({
+          id: String(prod.id),
+          name: prod.name,
+          price: prod.price || 0,
+          cant: 1,
+          photo: prod.photo || null
+        });
+      }
       actualizarBarraCarrito();
       renderizarProductos();
+      showStoreToast(`✓ ${prod.name} agregado al carrito`);
     }
 
     function modificarCantidad(prodId, delta) {
-      const item = cart.find(c => c.id === prodId);
+      const item = cart.find(c => String(c.id) === String(prodId));
       if (!item) return;
       item.cant += delta;
       if (item.cant <= 0) {
-        cart = cart.filter(c => c.id !== prodId);
+        cart = cart.filter(c => String(c.id) !== String(prodId));
       }
       actualizarBarraCarrito();
       renderizarProductos();
@@ -1461,27 +1539,99 @@
       `).join('');
     }
 
-    // CONFIRMAR PEDIDO Y ENVIAR A FIRESTORE
-    async function confirmarPedido() {
-      const name = document.getElementById('custName').value.trim();
-      const phone = document.getElementById('custPhone').value.trim();
-      const address = document.getElementById('custAddress').value.trim();
-      const paymentMethod = document.getElementById('custPaymentMethod').value;
-      const notes = document.getElementById('custNotes').value.trim();
+    // PEDIDO DIRECTO DE UN SOLO PRODUCTO VÍA WHATSAPP (1-TAP ORDER)
+    function pedirProductoDirecto(prodId) {
+      const prod = storeData.catalog.find(p => String(p.id) === String(prodId));
+      if (!prod) return;
 
-      if (!name || !phone || !address) {
-        alert('Por favor completa tu Nombre, Teléfono y Dirección de entrega.');
+      const consecutivoNum = Math.floor(1000 + Math.random() * 9000);
+      const orderId = `PED-${consecutivoNum}`;
+      const priceText = (prod.price || 0).toLocaleString('es-CO');
+
+      const targetPhone = storeData.phone || '3124567890';
+      const msg = `¡Hola *${storeData.name}*! 👋\n\n` +
+                  `Me gustaría hacer el pedido de este producto de su catálogo en línea:\n\n` +
+                  `🛍️ *${prod.name}*\n` +
+                  `💰 *Precio:* $${priceText} COP\n` +
+                  `🆔 *Ref:* #${orderId}\n\n` +
+                  `¿Tienen disponibilidad? Me gustaría coordinar los detalles del pedido y el pago. ¡Muchas gracias!`;
+
+      // Payload para registrar en Firestore para que aparezca en el panel del comerciante
+      const quickOrder = {
+        orderId: orderId,
+        bizId: storeData.bizId,
+        storeName: storeData.name,
+        client: {
+          name: 'Cliente WhatsApp Directo',
+          phone: '',
+          address: 'Por acordar vía WhatsApp',
+          notes: `Interés directo en: ${prod.name}`
+        },
+        items: [{
+          id: String(prod.id),
+          name: prod.name,
+          cant: 1,
+          price: prod.price || 0,
+          subtotal: prod.price || 0
+        }],
+        total: prod.price || 0,
+        paymentMethod: 'Por acordar',
+        status: 'pendiente_pago',
+        incomeRegistered: false,
+        createdAt: new Date().toISOString()
+      };
+
+      currentCreatedOrder = quickOrder;
+
+      // Registrar en Firestore sin bloquear la navegación
+      if (fbDb && storeData.bizId) {
+        fbDb.collection('tiendas_publicas')
+            .doc(storeData.bizId)
+            .collection('pedidos')
+            .doc(orderId)
+            .set(quickOrder)
+            .catch(err => console.warn('Sync pedido directo en Firestore:', err));
+      }
+
+      // Guardar localmente
+      try {
+        const localKey = `zentra_orders_${storeData.bizId}`;
+        const existing = JSON.parse(localStorage.getItem(localKey) || '[]');
+        existing.unshift(quickOrder);
+        localStorage.setItem(localKey, JSON.stringify(existing));
+      } catch (_) {}
+
+      // Abrir WhatsApp inmediatamente
+      despacharWhatsApp(targetPhone, msg);
+      showStoreToast(`💬 Abriendo WhatsApp con ${storeData.name}...`);
+    }
+
+    // CONFIRMAR PEDIDO DEL CARRITO Y DESPACHAR A WHATSAPP
+    async function confirmarPedido() {
+      if (cart.length === 0) {
+        showStoreToast('Tu carrito está vacío. Agrega al menos un producto para hacer el pedido.');
         return;
       }
 
-      if (cart.length === 0) {
-        alert('Agrega al menos un producto al carrito para ordenar.');
-        return;
+      let name = (document.getElementById('custName')?.value || '').trim();
+      let phone = (document.getElementById('custPhone')?.value || '').trim();
+      let address = (document.getElementById('custAddress')?.value || '').trim();
+      const paymentMethod = document.getElementById('custPaymentMethod')?.value || 'Nequi';
+      const notes = (document.getElementById('custNotes')?.value || '').trim();
+
+      if (!name) {
+        name = 'Cliente Web';
+      }
+
+      if (!address) {
+        address = 'Por coordinar por WhatsApp / Recoger en tienda';
       }
 
       const total = cart.reduce((acc, it) => acc + (it.cant * it.price), 0);
       const consecutivoNum = Math.floor(1000 + Math.random() * 9000);
       const orderId = `PED-${consecutivoNum}`;
+
+      const itemsText = cart.map(it => `• ${it.cant}x ${it.name} ($${(it.cant * it.price).toLocaleString('es-CO')})`).join('\n');
 
       const orderPayload = {
         orderId: orderId,
@@ -1494,7 +1644,7 @@
           notes: notes
         },
         items: cart.map(it => ({
-          id: it.id,
+          id: String(it.id),
           name: it.name,
           cant: it.cant,
           price: it.price,
@@ -1502,27 +1652,37 @@
         })),
         total: total,
         paymentMethod: paymentMethod,
-        status: 'pendiente_pago', // 'pendiente_pago' | 'en_preparacion' | 'empacado' | 'enviado' | 'entregado'
+        status: 'pendiente_pago',
         incomeRegistered: false,
         createdAt: new Date().toISOString()
       };
 
       currentCreatedOrder = orderPayload;
 
-      // 1. Guardar en Firestore para que la app del comerciante lo reciba en vivo
+      // 1. Construir mensaje de WhatsApp con formato prolijo
+      let msg = `¡Hola *${storeData.name}*! 👋\n\n` +
+                `Acabo de realizar mi pedido desde tu catálogo en línea:\n` +
+                `📦 *Pedido:* #${orderId}\n` +
+                `👤 *Cliente:* ${name}\n`;
+      if (phone) msg += `📞 *Teléfono:* ${phone}\n`;
+      msg += `📍 *Entrega:* ${address}\n`;
+      if (notes) msg += `📝 *Notas:* ${notes}\n`;
+      msg += `\n🛒 *Productos:*\n${itemsText}\n\n` +
+             `💰 *TOTAL A PAGAR:* $${total.toLocaleString('es-CO')} COP\n` +
+             `💳 *Medio de Pago:* ${paymentMethod}\n\n` +
+             `Quedo atento(a) para confirmar la disponibilidad y proceder con el pago. ¡Muchas gracias!`;
+
+      // 2. Guardar en Firestore en segundo plano (no bloqueante)
       if (fbDb && storeData.bizId) {
-        try {
-          await fbDb.collection('tiendas_publicas')
-                    .doc(storeData.bizId)
-                    .collection('pedidos')
-                    .doc(orderId)
-                    .set(orderPayload);
-        } catch (err) {
-          console.warn('Error guardando pedido en Firestore:', err);
-        }
+        fbDb.collection('tiendas_publicas')
+            .doc(storeData.bizId)
+            .collection('pedidos')
+            .doc(orderId)
+            .set(orderPayload)
+            .catch(err => console.warn('Error guardando pedido en Firestore:', err));
       }
 
-      // 2. Guardar también en localStorage para consulta local en el navegador
+      // 3. Guardar en localStorage para consulta local en el navegador
       try {
         const localOrdersKey = `zentra_orders_${storeData.bizId}`;
         const existing = JSON.parse(localStorage.getItem(localOrdersKey) || '[]');
@@ -1530,14 +1690,20 @@
         localStorage.setItem(localOrdersKey, JSON.stringify(existing));
       } catch (_) {}
 
-      // 3. Mostrar Pantalla de Éxito y Cuentas para Transferir
+      // 4. Despachar inmediatamente a WhatsApp en el contexto del click del usuario
+      const targetPhone = storeData.phone || '3124567890';
+      despacharWhatsApp(targetPhone, msg);
+
+      // 5. Cerrar Drawer y Mostrar Pantalla de Cuentas para Transferir
       cerrarDrawerCarrito();
       mostrarModalExito(orderPayload);
 
-      // Limpiar carrito
+      // 6. Limpiar carrito
       cart = [];
       actualizarBarraCarrito();
       renderizarProductos();
+
+      showStoreToast(`✓ Pedido #${orderId} despachado a WhatsApp`);
     }
 
     function mostrarModalExito(order) {
@@ -1573,18 +1739,70 @@
     function notificarPorWhatsApp() {
       if (!currentCreatedOrder) return;
       const o = currentCreatedOrder;
-      const targetPhone = storeData.phone || '';
-      const cleanPhone = targetPhone.replace(/\D/g, '');
-      const fullPhone = cleanPhone.length === 10 ? '57' + cleanPhone : cleanPhone;
+      const targetPhone = storeData.phone || '3124567890';
 
       const itemsText = o.items.map(it => `• ${it.cant}x ${it.name} ($${it.subtotal.toLocaleString('es-CO')})`).join('\n');
-      const msg = `¡Hola *${storeData.name}*! 👋\n\nAcabo de realizar mi pedido en tu tienda web:\n*Pedido:* #${o.orderId}\n*Cliente:* ${o.client.name}\n*Dirección:* ${o.client.address}\n\n*Productos:*\n${itemsText}\n\n💰 *Total a Pagar:* $${o.total.toLocaleString('es-CO')} COP\n💳 *Medio de Pago:* ${o.paymentMethod}\n\nAdjunto te envío el comprobante de la transferencia para que por favor confirmes el pago. ¡Muchas gracias!`;
+      const msg = `¡Hola *${storeData.name}*! 👋\n\n` +
+                  `Te contacto respecto a mi pedido web:\n` +
+                  `*Pedido:* #${o.orderId}\n` +
+                  `*Cliente:* ${o.client.name}\n` +
+                  `*Dirección:* ${o.client.address}\n\n` +
+                  `*Productos:*\n${itemsText}\n\n` +
+                  `💰 *Total a Pagar:* $${o.total.toLocaleString('es-CO')} COP\n` +
+                  `💳 *Medio de Pago:* ${o.paymentMethod}\n\n` +
+                  `Adjunto te envío el comprobante de la transferencia para confirmar el pago y comenzar la preparación. ¡Muchas gracias!`;
 
+      despacharWhatsApp(targetPhone, msg);
+    }
+
+    function despacharWhatsApp(telefono, texto) {
+      if (!texto) return;
+
+      // Respaldo inmediato en portapapeles
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(texto).catch(() => {});
+        }
+      } catch (_) {}
+
+      const cleanPhone = (telefono || '').replace(/\D/g, '');
+      let fullPhone = cleanPhone;
+      if (cleanPhone.length === 10) {
+        fullPhone = '57' + cleanPhone;
+      }
+
+      const encoded = encodeURIComponent(texto);
+      
+      // Enlace universal compatible con app nativa en Android/iOS y web en PC
       const waUrl = fullPhone 
-        ? `https://wa.me/${fullPhone}?text=${encodeURIComponent(msg)}`
-        : `https://wa.me/?text=${encodeURIComponent(msg)}`;
+        ? `https://api.whatsapp.com/send?phone=${fullPhone}&text=${encoded}`
+        : `https://api.whatsapp.com/send?text=${encoded}`;
 
-      window.open(waUrl, '_blank');
+      // Inyección y clic en enlace DOM para sortear bloqueador de popups en navegadores móviles
+      const a = document.createElement('a');
+      a.href = waUrl;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => a.remove(), 300);
+    }
+
+    let toastTimeout = null;
+    function showStoreToast(msg) {
+      let t = document.getElementById('storeToast');
+      if (!t) {
+        t = document.createElement('div');
+        t.id = 'storeToast';
+        t.className = 'store-toast';
+        document.body.appendChild(t);
+      }
+      t.innerText = msg;
+      t.classList.add('show');
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        t.classList.remove('show');
+      }, 3000);
     }
   </script>
 </body>

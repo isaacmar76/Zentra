@@ -356,7 +356,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      height: 115px;
+      min-height: 150px;
       transition: all 0.15s ease;
       box-shadow: var(--shadow-sm);
     }
@@ -368,6 +368,26 @@
     .pos-product-card:hover {
       border-color: var(--primary);
       box-shadow: var(--shadow-md);
+    }
+
+    .pos-product-thumb {
+      width: 100%;
+      height: 72px;
+      border-radius: 10px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 6px;
+      font-size: 26px;
+    }
+
+    .pos-product-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
     }
 
     .pos-product-name {
@@ -831,6 +851,261 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
+
+    /* BOTÓN COMPARTIR CATÁLOGO EN HEADER */
+    .btn-header-share {
+      background: linear-gradient(135deg, #10B981, #059669);
+      color: #FFFFFF;
+      border: none;
+      border-radius: 10px;
+      padding: 6px 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-header-share:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+
+    /* ELEMENTOS CLICKEABLES EN TABLA DE INVENTARIO */
+    .prod-table-clickable {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: opacity 0.15s ease;
+    }
+
+    .prod-table-clickable:hover .prod-clickable-name {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    .prod-table-img {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+      font-size: 22px;
+    }
+
+    .prod-table-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* BANNER PARA COMPARTIR TIENDA EN DASHBOARD */
+    .share-catalog-banner {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(0, 108, 70, 0.08));
+      border: 1.5px solid var(--primary-container);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .share-banner-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .share-banner-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: var(--shadow-sm);
+      flex-shrink: 0;
+    }
+
+    .share-banner-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-share-action {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 9px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-share-action:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .btn-share-action.whatsapp {
+      background: #25D366;
+      color: #FFFFFF;
+      border-color: #25D366;
+    }
+
+    .btn-share-action.whatsapp:hover {
+      background: #1EBE5D;
+      color: #FFFFFF;
+    }
+
+    /* ESTILOS DE VISTA ÓRDENES ONLINE & DOMICILIOS */
+    .orders-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .orders-stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .orders-stat-val {
+      font-size: 20px;
+      font-weight: 800;
+      margin-top: 4px;
+    }
+
+    .orders-filter-bar {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+    }
+
+    .order-filter-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .order-filter-chip.active {
+      background: var(--primary);
+      color: #FFFFFF;
+      border-color: var(--primary);
+    }
+
+    .order-card {
+      background: var(--card-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .order-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .order-id-badge {
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--text);
+    }
+
+    .order-status-badge {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-recibido {
+      background: #FEF3C7;
+      color: #92400E;
+      border: 1px solid #FCD34D;
+    }
+
+    .status-pagado {
+      background: #D1FAE5;
+      color: #065F46;
+      border: 1px solid #6EE7B7;
+    }
+
+    .status-en_camino {
+      background: #DBEAFE;
+      color: #1E40AF;
+      border: 1px solid #93C5FD;
+    }
+
+    .status-entregado {
+      background: #F3F4F6;
+      color: #374151;
+      border: 1px solid #E5E7EB;
+    }
+
+    .order-actions-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--surface-subtle);
+    }
+
+    .btn-order-action {
+      border: none;
+      padding: 7px 12px;
+      border-radius: 9px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
   </style>
 </head>
 <body>
@@ -847,6 +1122,11 @@
       </div>
 
       <div class="header-actions">
+        <button type="button" class="btn-header-share" onclick="abrirModalCompartirTienda()" title="Compartir Catálogo Online con Clientes">
+          <span class="material-symbols-outlined" style="font-size:16px;">share</span>
+          <span>Compartir Catálogo</span>
+        </button>
+
         <button type="button" class="btn-header-tool" onclick="abrirModalTemas()" title="Cambiar Tema Visual">
           <span class="material-symbols-outlined" style="font-size:16px;">palette</span>
           <span id="lblTemaActual">Tema</span>
@@ -865,7 +1145,7 @@
     </div>
   </header>
 
-  <!-- SELECTOR DE VISTAS PRINCIPALES: MOSTRADOR POS VS DASHBOARD -->
+  <!-- SELECTOR DE VISTAS PRINCIPALES: MOSTRADOR POS VS DASHBOARD VS PEDIDOS -->
   <div class="view-switcher-bar">
     <button class="switcher-btn active" id="btnSwitchPos" onclick="cambiarVistaRetail('pos')">
       <span class="material-symbols-outlined" style="font-size:17px;">point_of_sale</span>
@@ -873,11 +1153,15 @@
     </button>
     <button class="switcher-btn" id="btnSwitchDashboard" onclick="cambiarVistaRetail('dashboard')">
       <span class="material-symbols-outlined" style="font-size:17px;">dashboard</span>
-      <span>Dashboard (Métricas & Pedidos)</span>
+      <span>Dashboard (Métricas)</span>
     </button>
     <button class="switcher-btn" id="btnSwitchInventario" onclick="cambiarVistaRetail('inventario')">
       <span class="material-symbols-outlined" style="font-size:17px;">inventory_2</span>
-      <span>Inventario & Stock</span>
+      <span>Inventario & Catálogo</span>
+    </button>
+    <button class="switcher-btn" id="btnSwitchPedidos" onclick="cambiarVistaRetail('pedidos')">
+      <span class="material-symbols-outlined" style="font-size:17px;">local_shipping</span>
+      <span>Pedidos Online <span id="badgePedidosNuevos" style="display:none; background:var(--alert); color:#fff; font-size:10px; font-weight:800; padding:1px 6px; border-radius:10px; margin-left:4px;">0</span></span>
     </button>
     <button class="switcher-btn" id="btnSwitchCierres" onclick="cambiarVistaRetail('cierres')">
       <span class="material-symbols-outlined" style="font-size:17px;">receipt_long</span>
@@ -967,13 +1251,46 @@
         </button>
       </div>
 
-      <!-- Cuadrícula 2x2 de Accesos Directos -->
+      <!-- Banner Catálogo Online para Clientes -->
+      <div class="share-catalog-banner">
+        <div class="share-banner-top">
+          <div class="share-banner-icon">🛍️</div>
+          <div>
+            <div style="font-weight:800; font-size:14px; color:var(--text);">Tu Catálogo de Ventas Online</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">Comparte este enlace para que tus clientes hagan pedidos por WhatsApp en segundos.</div>
+          </div>
+        </div>
+        <div class="share-banner-actions">
+          <button type="button" class="btn-share-action" onclick="copiarEnlaceTiendaPublica()">
+            <span class="material-symbols-outlined" style="font-size:15px;">content_copy</span>
+            <span>Copiar Enlace</span>
+          </button>
+          <button type="button" class="btn-share-action whatsapp" onclick="compartirTiendaWhatsApp()">
+            <span style="font-size:15px;">📲</span>
+            <span>Compartir por WhatsApp</span>
+          </button>
+          <button type="button" class="btn-share-action" onclick="abrirTiendaPublicaPestana()">
+            <span class="material-symbols-outlined" style="font-size:15px;">open_in_new</span>
+            <span>Ver como Cliente</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cuadrícula de Accesos Directos -->
       <div class="dashboard-shortcuts-grid">
         <div class="shortcut-card" onclick="cambiarVistaRetail('pos')">
           <div class="shortcut-icon">🛒</div>
           <div>
             <div class="shortcut-title">Vender (POS)</div>
             <div class="shortcut-sub">Mostrador rápido</div>
+          </div>
+        </div>
+
+        <div class="shortcut-card" onclick="cambiarVistaRetail('pedidos')">
+          <div class="shortcut-icon">📦</div>
+          <div>
+            <div class="shortcut-title">Pedidos Online</div>
+            <div class="shortcut-sub" id="dashOrdersSub">Domicilios web</div>
           </div>
         </div>
 
@@ -986,10 +1303,10 @@
         </div>
 
         <div class="shortcut-card" onclick="cambiarVistaRetail('inventario')">
-          <div class="shortcut-icon">📦</div>
+          <div class="shortcut-icon">🏷️</div>
           <div>
             <div class="shortcut-title">Catálogo & Stock</div>
-            <div class="shortcut-sub">Precios y costos</div>
+            <div class="shortcut-sub">Precios y fotos</div>
           </div>
         </div>
 
@@ -1020,25 +1337,31 @@
     </section>
 
     <!-- ==========================================
-         VISTA 3: INVENTARIO Y STOCK
+         VISTA 3: INVENTARIO Y CATÁLOGO FÍSICO
          ========================================== -->
     <section id="secInventario" style="display:none;">
       <div style="background:var(--card-bg); border:1.5px solid var(--surface-border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-sm);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
           <div>
-            <div style="font-weight:800; font-size:16px;">Control de Existencias Físicas y Costos</div>
-            <div style="font-size:11.5px; color:var(--text-muted);">Gestiona precios, costos de compra y existencias físicas</div>
+            <div style="font-weight:800; font-size:16px;">Control de Catálogo, Precios y Stock</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">Toca el nombre o la foto de cualquier producto para editarlo</div>
           </div>
-          <button type="button" onclick="abrirModalNuevoProducto()" class="btn-main-order" style="width:auto; padding:8px 16px; font-size:12.5px;">
-            + Nuevo Producto
-          </button>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button type="button" onclick="abrirModalCompartirTienda()" class="btn-share-action" style="background:var(--primary-soft); color:var(--primary); border-color:var(--primary-container);">
+              <span class="material-symbols-outlined" style="font-size:16px;">share</span>
+              <span>Compartir Catálogo</span>
+            </button>
+            <button type="button" onclick="abrirModalNuevoProducto()" class="btn-main-order" style="width:auto; padding:8px 16px; font-size:12.5px;">
+              + Nuevo Producto
+            </button>
+          </div>
         </div>
 
         <div style="overflow-x:auto;">
           <table style="width:100%; border-collapse:collapse; font-size:13px;">
             <thead>
               <tr style="border-bottom:1.5px solid var(--surface-border); text-align:left; color:var(--text-muted); font-size:11px; text-transform:uppercase;">
-                <th style="padding:10px;">Producto</th>
+                <th style="padding:10px;">Producto (Toca para editar)</th>
                 <th style="padding:10px;">Categoría</th>
                 <th style="padding:10px;">Costo</th>
                 <th style="padding:10px;">Venta</th>
@@ -1051,6 +1374,52 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VISTA 4: PEDIDOS ONLINE & DOMICILIOS
+         ========================================== -->
+    <section id="secPedidos" style="display:none;">
+      <!-- Métricas rápidas de pedidos -->
+      <div class="orders-stat-grid">
+        <div class="orders-stat-card">
+          <div style="font-size:10px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Total Pedidos</div>
+          <div class="orders-stat-val" id="statOrdersTotal">0</div>
+        </div>
+        <div class="orders-stat-card">
+          <div style="font-size:10px; color:#D97706; font-weight:700; text-transform:uppercase;">🟡 Pendientes Pago</div>
+          <div class="orders-stat-val" style="color:#D97706;" id="statOrdersPendientes">0</div>
+        </div>
+        <div class="orders-stat-card">
+          <div style="font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase;">🟢 Pagados / En Prep.</div>
+          <div class="orders-stat-val" style="color:var(--primary);" id="statOrdersPagados">0</div>
+        </div>
+        <div class="orders-stat-card">
+          <div style="font-size:10px; color:#2563EB; font-weight:700; text-transform:uppercase;">🛵 En Camino</div>
+          <div class="orders-stat-val" style="color:#2563EB;" id="statOrdersEnCamino">0</div>
+        </div>
+      </div>
+
+      <!-- Barra de Filtros y Compartir -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div class="orders-filter-bar" id="ordersFilterChips">
+          <button type="button" class="order-filter-chip active" onclick="filtrarPedidosOnline('todos', this)">Todos (<span id="countFilTodos">0</span>)</button>
+          <button type="button" class="order-filter-chip" onclick="filtrarPedidosOnline('pendientes', this)">🟡 Pendientes Pago (<span id="countFilPend">0</span>)</button>
+          <button type="button" class="order-filter-chip" onclick="filtrarPedidosOnline('pagados', this)">🟢 Pagados (<span id="countFilPag">0</span>)</button>
+          <button type="button" class="order-filter-chip" onclick="filtrarPedidosOnline('en_camino', this)">🛵 Con Mensajero (<span id="countFilCamino">0</span>)</button>
+          <button type="button" class="order-filter-chip" onclick="filtrarPedidosOnline('entregados', this)">✅ Entregados (<span id="countFilEntregados">0</span>)</button>
+        </div>
+
+        <button type="button" class="btn-share-action" onclick="abrirModalCompartirTienda()" style="background:var(--primary); color:#fff; border:none; padding:8px 14px; border-radius:10px;">
+          <span class="material-symbols-outlined" style="font-size:16px;">share</span>
+          <span>Compartir Catálogo</span>
+        </button>
+      </div>
+
+      <!-- Contenedor de Pedidos -->
+      <div id="listaPedidosOnlineContainer">
+        <!-- Inyectado por JS -->
       </div>
     </section>
 
@@ -1148,6 +1517,28 @@
       <form id="formProductoRetail" onsubmit="event.preventDefault(); guardarProducto();">
         <input type="hidden" id="prodIdHidden">
 
+        <!-- Imagen / Foto del Producto -->
+        <div class="form-group">
+          <label>Foto / Imagen del Producto</label>
+          <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
+            <div id="prodImgPreviewBox" style="width:62px; height:62px; border-radius:12px; background:var(--surface-subtle); border:1px solid var(--surface-border); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:26px; flex-shrink:0;">
+              🛍️
+            </div>
+            <div style="flex:1;">
+              <label style="display:inline-flex; align-items:center; gap:6px; background:var(--surface-subtle); border:1px solid var(--surface-border); padding:7px 12px; border-radius:9px; font-size:11.5px; font-weight:700; cursor:pointer; color:var(--text);">
+                <span class="material-symbols-outlined" style="font-size:16px;">add_a_photo</span>
+                <span>Subir foto (celular o PC)</span>
+                <input type="file" id="prodImgFileInput" accept="image/*" style="display:none;" onchange="procesarFotoProductoLocal(this)">
+              </label>
+              <button type="button" id="btnQuitarFotoProd" onclick="quitarFotoProducto()" style="display:none; background:none; border:none; color:var(--alert); font-size:11px; cursor:pointer; margin-left:6px; font-weight:700;">
+                ✕ Quitar
+              </button>
+              <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">Puedes subir un archivo o pegar un enlace web abajo</div>
+            </div>
+          </div>
+          <input type="url" id="prodImgUrlInp" placeholder="O pega el enlace URL de la foto (https://...)" oninput="actualizarPreviewFotoUrl(this.value)">
+        </div>
+
         <div class="form-group">
           <label>Nombre del Producto *</label>
           <input type="text" id="prodNombreInp" placeholder="Ej: Arroz Diana 1kg, Coca Cola 400ml" required>
@@ -1190,8 +1581,83 @@
           <input type="number" id="prodStockInp" placeholder="24" min="0" required>
         </div>
 
+        <div class="form-group">
+          <label>Descripción para catálogo en línea (Opcional)</label>
+          <input type="text" id="prodDescInp" placeholder="Ej: Arroz blanco seleccionado de primera">
+        </div>
+
         <button type="submit" class="btn-submit-modal">
           <span>Guardar Producto</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: COMPARTIR TIENDA ONLINE
+       ========================================== -->
+  <div class="modal-overlay" id="modalCompartirTienda">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🛍️ Tu Catálogo de Ventas Online</div>
+        <button type="button" class="modal-close" onclick="cerrarModalCompartirTienda()">✕</button>
+      </div>
+      <div style="padding:10px 0;">
+        <p style="font-size:12.5px; color:var(--text-muted); line-height:1.45; margin-bottom:14px;">
+          Tus clientes pueden abrir este enlace en su celular para ver todos tus productos con fotos, agregarlos al carrito y enviarte el pedido con sus datos de entrega por WhatsApp:
+        </p>
+
+        <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:12px; padding:10px; display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+          <input type="text" id="inpEnlaceTiendaPublica" readonly style="flex:1; background:transparent; border:none; font-size:12px; color:var(--text); font-weight:600; outline:none;">
+          <button type="button" onclick="copiarEnlaceTiendaPublica()" style="background:var(--primary); color:#fff; border:none; border-radius:8px; padding:7px 12px; font-size:11.5px; font-weight:700; cursor:pointer;">
+            Copiar
+          </button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <button type="button" onclick="compartirTiendaWhatsApp()" style="background:#25D366; color:#fff; border:none; border-radius:12px; padding:12px; font-weight:700; font-size:12.5px; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
+            <span style="font-size:16px;">📲</span> WhatsApp
+          </button>
+          <button type="button" onclick="abrirTiendaPublicaPestana()" style="background:var(--surface-subtle); color:var(--text); border:1px solid var(--surface-border); border-radius:12px; padding:12px; font-weight:700; font-size:12.5px; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
+            <span style="font-size:16px;">🌐</span> Ver Catálogo
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: DESPACHAR PEDIDO CON MENSAJERO
+       ========================================== -->
+  <div class="modal-overlay" id="modalDespachoPedido">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">🛵 Despachar Pedido y Notificar</div>
+        <button type="button" class="modal-close" onclick="cerrarModalDespacho()">✕</button>
+      </div>
+
+      <form id="formDespachoPedido" onsubmit="event.preventDefault(); confirmarDespachoPedido();">
+        <input type="hidden" id="despachoOrderIdHidden">
+        
+        <div style="background:var(--surface-subtle); border-radius:12px; padding:12px; margin-bottom:14px;">
+          <div style="font-size:11px; color:var(--text-muted); font-weight:700; text-transform:uppercase;">Destino de Entrega</div>
+          <div style="font-size:13px; font-weight:800; color:var(--text); margin-top:2px;" id="lblDespachoCliente">Cliente</div>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:2px;" id="lblDespachoDireccion">Dirección</div>
+        </div>
+
+        <div class="form-group">
+          <label>Nombre del Mensajero o Empresa de Envíos *</label>
+          <input type="text" id="inpNombreMensajero" placeholder="Ej: Carlos Gómez (Moto 2), Domiciliario Express" required>
+        </div>
+
+        <div class="form-group">
+          <label>Teléfono o Placa del Mensajero (Opcional)</label>
+          <input type="text" id="inpTelMensajero" placeholder="Ej: 3105551234 / Placa XYZ-98">
+        </div>
+
+        <button type="submit" class="btn-submit-modal" style="background:linear-gradient(135deg, #2563EB, #1D4ED8);">
+          <span class="material-symbols-outlined" style="font-size:18px;">send</span>
+          <span>Despachar y Notificar por WhatsApp</span>
         </button>
       </form>
     </div>
@@ -1382,14 +1848,18 @@
     };
 
     let inventory = [
-      { id: 'r1', name: 'Arroz Diana 1kg', price: 4800, cost: 3900, stock: 24, cat: 'Abarrotes' },
-      { id: 'r2', name: 'Aceite Premier 900ml', price: 9200, cost: 7800, stock: 15, cat: 'Abarrotes' },
-      { id: 'r3', name: 'Coca Cola 400ml Pet', price: 2500, cost: 1800, stock: 30, cat: 'Bebidas' },
-      { id: 'r4', name: 'Cerveza Águila 330ml', price: 3000, cost: 2300, stock: 48, cat: 'Licores' },
-      { id: 'r5', name: 'Leche Alquería Entera 1L', price: 4500, cost: 3700, stock: 18, cat: 'Lácteos' },
-      { id: 'r6', name: 'Papas Margarita Pollo 105g', price: 3800, cost: 2900, stock: 12, cat: 'Snacks & Dulces' },
-      { id: 'r7', name: 'Jabón Rey Barra 300g', price: 2800, cost: 2100, stock: 20, cat: 'Aseo & Limpieza' }
+      { id: 'r1', name: 'Arroz Diana 1kg', price: 4800, cost: 3900, stock: 24, cat: 'Abarrotes', image: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80', photo: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=300&q=80', desc: 'Arroz blanco seleccionado de grano largo' },
+      { id: 'r2', name: 'Aceite Premier 900ml', price: 9200, cost: 7800, stock: 15, cat: 'Abarrotes', image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80', photo: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?auto=format&fit=crop&w=300&q=80', desc: 'Aceite vegetal comestible puro' },
+      { id: 'r3', name: 'Coca Cola 400ml Pet', price: 2500, cost: 1800, stock: 30, cat: 'Bebidas', image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=300&q=80', photo: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=300&q=80', desc: 'Gaseosa refrescante sabor original' },
+      { id: 'r4', name: 'Cerveza Águila 330ml', price: 3000, cost: 2300, stock: 48, cat: 'Licores', image: 'https://images.unsplash.com/photo-1608270199042-494b7c11f715?auto=format&fit=crop&w=300&q=80', photo: 'https://images.unsplash.com/photo-1608270199042-494b7c11f715?auto=format&fit=crop&w=300&q=80', desc: 'Cerveza tradicional helada en botella' },
+      { id: 'r5', name: 'Leche Alquería Entera 1L', price: 4500, cost: 3700, stock: 18, cat: 'Lácteos', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=300&q=80', photo: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=300&q=80', desc: 'Leche entera pasteurizada en bolsa' },
+      { id: 'r6', name: 'Papas Margarita Pollo 105g', price: 3800, cost: 2900, stock: 12, cat: 'Snacks & Dulces', image: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=300&q=80', photo: 'https://images.unsplash.com/photo-1566478989037-eec170784d0b?auto=format&fit=crop&w=300&q=80', desc: 'Papas crujientes sabor a pollo' },
+      { id: 'r7', name: 'Jabón Rey Barra 300g', price: 2800, cost: 2100, stock: 20, cat: 'Aseo & Limpieza', image: 'https://images.unsplash.com/photo-1607006314144-c7eb07aa849c?auto=format&fit=crop&w=300&q=80', photo: 'https://images.unsplash.com/photo-1607006314144-c7eb07aa849c?auto=format&fit=crop&w=300&q=80', desc: 'Jabón en barra azul tradicional' }
     ];
+
+    let onlineOrders = [];
+    let filtroPedidosActual = 'todos';
+    let prodFotoActualBase64 = null;
 
     let cart = [];
     let quotes = [];
@@ -1434,6 +1904,30 @@
             if (Array.isArray(data.clients)) clients = data.clients;
             loadedFromCloud = true;
           }
+
+          // Cargar pedidos online desde la subcolección
+          const snapPedidos = await fbDb.collection('negocios_zentra').doc(currentBizId).collection('pedidos').orderBy('createdAt', 'desc').limit(50).get();
+          if (!snapPedidos.empty) {
+            onlineOrders = snapPedidos.docs.map(d => d.data());
+          } else {
+            const snapPub = await fbDb.collection('tiendas_publicas').doc(currentBizId).collection('pedidos').orderBy('createdAt', 'desc').limit(50).get();
+            if (!snapPub.empty) {
+              onlineOrders = snapPub.docs.map(d => d.data());
+            }
+          }
+
+          // Escuchar en vivo nuevos pedidos
+          fbDb.collection('negocios_zentra').doc(currentBizId).collection('pedidos')
+            .onSnapshot(snapshot => {
+              if (snapshot && !snapshot.empty) {
+                const updated = snapshot.docs.map(d => d.data());
+                updated.sort((a,b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+                onlineOrders = updated;
+                renderizarPedidosOnline();
+                actualizarBadgePedidos();
+              }
+            }, err => console.warn('Snapshot pedidos:', err));
+
         } catch (e) {
           console.warn('Firestore Retail Load:', e);
         }
@@ -1455,6 +1949,40 @@
         } catch (_) {}
       }
 
+      if (onlineOrders.length === 0) {
+        try {
+          const localSavedOrders = localStorage.getItem(`zentra_orders_${currentBizId}`);
+          if (localSavedOrders) onlineOrders = JSON.parse(localSavedOrders);
+        } catch (_) {}
+      }
+
+      // Pedido demo de muestra si no hay pedidos aún
+      if (onlineOrders.length === 0 && currentBizId === 'biz_retail_demo') {
+        onlineOrders = [
+          {
+            orderId: 'PED-4821',
+            bizId: 'biz_retail_demo',
+            storeName: 'Zentra Minimarket',
+            client: {
+              name: 'Camila Rodríguez',
+              phone: '3157891234',
+              address: 'Calle 45 # 18-32 Apto 402',
+              neighborhood: 'La Floresta',
+              notes: 'Timbrar en el 402'
+            },
+            items: [
+              { id: 'r1', name: 'Arroz Diana 1kg', cant: 2, price: 4800, subtotal: 9600 },
+              { id: 'r3', name: 'Coca Cola 400ml Pet', cant: 2, price: 2500, subtotal: 5000 },
+              { id: 'r6', name: 'Papas Margarita Pollo 105g', cant: 1, price: 3800, subtotal: 3800 }
+            ],
+            total: 18400,
+            paymentMethod: 'Nequi',
+            status: 'recibido',
+            createdAt: new Date(Date.now() - 35 * 60 * 1000).toISOString()
+          }
+        ];
+      }
+
       // Sincronizar Header
       document.getElementById('hdrBizName').innerText = bizProfile.name || 'Zentra Minimarket';
       document.title = `${bizProfile.name || 'Mi Comercio'} • Zentra Retail`;
@@ -1464,6 +1992,8 @@
       renderizarPosGrid();
       renderizarDashboardMetricas();
       renderizarInventarioTabla();
+      renderizarPedidosOnline();
+      actualizarBadgePedidos();
       renderizarCierres();
       actualizarIndicadorSync('Sincronizado');
     }
@@ -1478,9 +2008,10 @@
         localStorage.setItem(`zentra_finances_${currentBizId}`, JSON.stringify(finances));
         localStorage.setItem(`zentra_quotes_${currentBizId}`, JSON.stringify(quotes));
         localStorage.setItem(`zentra_closures_${currentBizId}`, JSON.stringify(cashClosures));
+        localStorage.setItem(`zentra_orders_${currentBizId}`, JSON.stringify(onlineOrders));
       } catch (_) {}
 
-      // 2. Cloud Firestore
+      // 2. Cloud Firestore (Dual write en negocios_zentra y tiendas_publicas para sincronía con tienda.html)
       if (fbDb && currentBizId) {
         try {
           await fbDb.collection('negocios_zentra').doc(currentBizId).set({
@@ -1493,6 +2024,31 @@
             clients,
             updatedAt: new Date().toISOString()
           }, { merge: true });
+
+          await fbDb.collection('tiendas_publicas').doc(currentBizId).set({
+            bizId: currentBizId,
+            name: bizProfile.name || 'Mi Comercio',
+            owner: bizProfile.owner || '',
+            phone: bizProfile.phone || '',
+            nequi: bizProfile.nequi || bizProfile.phone || '',
+            daviplata: bizProfile.daviplata || '',
+            bancolombia: bizProfile.bancolombia || '',
+            brebe: bizProfile.otherPayment || '',
+            theme: bizProfile.theme || 'default',
+            catalog: inventory.map(it => ({
+              id: it.id,
+              name: it.name,
+              price: Number(it.price) || 0,
+              cost: Number(it.cost) || 0,
+              stock: Number(it.stock) || 0,
+              category: it.cat || it.category || 'General',
+              desc: it.desc || it.description || '',
+              photo: it.image || it.photo || null,
+              image: it.image || it.photo || null
+            })),
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+
         } catch (e) {
           console.warn('Firestore Retail Save:', e);
         }
@@ -1513,10 +2069,10 @@
     }
 
     // ==========================================
-    // CAMBIO DE VISTAS (POS VS DASHBOARD VS STOCK)
+    // CAMBIO DE VISTAS (POS VS DASHBOARD VS STOCK VS PEDIDOS)
     // ==========================================
     function cambiarVistaRetail(vista) {
-      ['pos', 'dashboard', 'inventario', 'cierres'].forEach(v => {
+      ['pos', 'dashboard', 'inventario', 'pedidos', 'cierres'].forEach(v => {
         const sec = document.getElementById(`sec${v.charAt(0).toUpperCase() + v.slice(1)}`);
         const btn = document.getElementById(`btnSwitch${v.charAt(0).toUpperCase() + v.slice(1)}`);
         if (sec) sec.style.display = (v === vista) ? 'block' : 'none';
@@ -1531,6 +2087,7 @@
 
       if (vista === 'dashboard') renderizarDashboardMetricas();
       if (vista === 'inventario') renderizarInventarioTabla();
+      if (vista === 'pedidos') renderizarPedidosOnline();
       if (vista === 'cierres') renderizarCierres();
     }
 
@@ -1586,10 +2143,17 @@
         const stock = Number(p.stock) || 0;
         const isLow = stock > 0 && stock <= 5;
         const isEmpty = stock <= 0;
+        const imgUrl = p.image || p.photo;
+        const imgHtml = imgUrl 
+          ? `<img src="${imgUrl}" alt="${p.name}" onerror="this.onerror=null;this.parentNode.innerHTML='🛍️';">` 
+          : '🛍️';
 
         return `
           <div class="pos-product-card" onclick="agregarAlCarrito('${p.id}')">
-            <div class="pos-product-name">${p.name}</div>
+            <div>
+              <div class="pos-product-thumb">${imgHtml}</div>
+              <div class="pos-product-name">${p.name}</div>
+            </div>
             <div>
               <div class="pos-product-bottom">
                 <div class="pos-product-price">$${(Number(p.price)||0).toLocaleString('es-CO')}</div>
@@ -1969,7 +2533,7 @@
     }
 
     // ==========================================
-    // VISTA 3: INVENTARIO FÍSICO
+    // VISTA 3: INVENTARIO Y CATÁLOGO FÍSICO
     // ==========================================
     function renderizarInventarioTabla() {
       const tbody = document.getElementById('tablaInventarioBody');
@@ -1986,11 +2550,22 @@
         if (stock <= 0) badgeColor = 'var(--alert)';
         else if (stock <= 5) badgeColor = 'var(--warning)';
 
+        const imgUrl = p.image || p.photo;
+        const imgHtml = imgUrl 
+          ? `<img src="${imgUrl}" alt="${p.name}" onerror="this.onerror=null;this.parentNode.innerHTML='🛍️';">` 
+          : '🛍️';
+
         return `
           <tr style="border-bottom:1px solid var(--surface-subtle);">
             <td style="padding:10px;">
-              <div style="font-weight:700;">${p.name}</div>
-              ${p.barcode ? `<div style="font-size:10px; color:var(--text-muted);">Cód: ${p.barcode}</div>` : ''}
+              <div class="prod-table-clickable" onclick="editarProducto('${p.id}')" title="Toca el nombre o la foto para editar este producto">
+                <div class="prod-table-img">${imgHtml}</div>
+                <div>
+                  <div class="prod-clickable-name" style="font-weight:700; font-size:13px; color:var(--text);">${p.name}</div>
+                  ${p.barcode ? `<div style="font-size:10px; color:var(--text-muted);">Cód: ${p.barcode}</div>` : ''}
+                  <div style="font-size:10.5px; color:var(--primary); font-weight:600; margin-top:2px;">✏️ Toca para editar</div>
+                </div>
+              </div>
             </td>
             <td style="padding:10px; color:var(--text-muted);">${p.cat || p.category || 'General'}</td>
             <td style="padding:10px;">$${(Number(p.cost)||0).toLocaleString('es-CO')}</td>
@@ -2000,8 +2575,8 @@
             </td>
             <td style="padding:10px;">
               <div style="display:flex; gap:6px;">
-                <button type="button" onclick="editarProducto('${p.id}')" style="background:var(--surface-subtle); border:none; padding:4px 8px; border-radius:6px; cursor:pointer; font-size:12px;">✏️</button>
-                <button type="button" onclick="eliminarProducto('${p.id}')" style="background:none; border:1px solid var(--alert); color:var(--alert); padding:4px 8px; border-radius:6px; cursor:pointer; font-size:12px;">🗑️</button>
+                <button type="button" onclick="editarProducto('${p.id}')" style="background:var(--surface-subtle); border:none; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Editar">✏️</button>
+                <button type="button" onclick="eliminarProducto('${p.id}')" style="background:none; border:1px solid var(--alert); color:var(--alert); padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Eliminar">🗑️</button>
               </div>
             </td>
           </tr>
@@ -2009,10 +2584,76 @@
       }).join('');
     }
 
+    // GESTIÓN DE FOTOS DE PRODUCTO
+    function procesarFotoProductoLocal(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 600;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          prodFotoActualBase64 = canvas.toDataURL('image/jpeg', 0.8);
+          actualizarPreviewFotoElemento(prodFotoActualBase64);
+          mostrarRetailToast('✓ Foto cargada con éxito');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function quitarFotoProducto() {
+      prodFotoActualBase64 = null;
+      const fileInp = document.getElementById('prodImgFileInput');
+      if (fileInp) fileInp.value = '';
+      const urlInp = document.getElementById('prodImgUrlInp');
+      if (urlInp) urlInp.value = '';
+      actualizarPreviewFotoElemento(null);
+    }
+
+    function actualizarPreviewFotoUrl(url) {
+      if (url && url.trim().startsWith('http')) {
+        prodFotoActualBase64 = null;
+        actualizarPreviewFotoElemento(url.trim());
+      } else if (!url) {
+        actualizarPreviewFotoElemento(prodFotoActualBase64);
+      }
+    }
+
+    function actualizarPreviewFotoElemento(src) {
+      const box = document.getElementById('prodImgPreviewBox');
+      const btnQ = document.getElementById('btnQuitarFotoProd');
+      if (!box) return;
+      if (src) {
+        box.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.parentNode.innerHTML='🛍️';">`;
+        if (btnQ) btnQ.style.display = 'inline-block';
+      } else {
+        box.innerHTML = '🛍️';
+        if (btnQ) btnQ.style.display = 'none';
+      }
+    }
+
     function abrirModalNuevoProducto() {
       document.getElementById('lblModalProdTitle').innerText = '+ Nuevo Producto';
       document.getElementById('prodIdHidden').value = '';
       document.getElementById('formProductoRetail').reset();
+      quitarFotoProducto();
       document.getElementById('modalProductoRetail').style.display = 'flex';
       setTimeout(() => document.getElementById('prodNombreInp')?.focus(), 100);
     }
@@ -2033,6 +2674,13 @@
       document.getElementById('prodCostoInp').value = p.cost || 0;
       document.getElementById('prodPrecioInp').value = p.price || 0;
       document.getElementById('prodStockInp').value = p.stock || 0;
+      document.getElementById('prodDescInp').value = p.desc || p.description || '';
+
+      const img = p.image || p.photo || '';
+      prodFotoActualBase64 = img;
+      document.getElementById('prodImgUrlInp').value = (img && img.startsWith('http')) ? img : '';
+      actualizarPreviewFotoElemento(img);
+
       document.getElementById('modalProductoRetail').style.display = 'flex';
     }
 
@@ -2044,6 +2692,8 @@
       const cost = Number(document.getElementById('prodCostoInp').value) || 0;
       const price = Number(document.getElementById('prodPrecioInp').value) || 0;
       const stock = Number(document.getElementById('prodStockInp').value) || 0;
+      const desc = document.getElementById('prodDescInp').value.trim();
+      const imageToSave = prodFotoActualBase64 || document.getElementById('prodImgUrlInp').value.trim() || null;
 
       const pData = {
         id: idExistente || `r_${Date.now()}`,
@@ -2054,6 +2704,10 @@
         cost,
         price,
         stock,
+        desc,
+        description: desc,
+        image: imageToSave,
+        photo: imageToSave,
         updatedAt: new Date().toISOString()
       };
 
@@ -2084,6 +2738,474 @@
       renderizarInventarioTabla();
       await persistirDatosRetail();
       mostrarRetailToast('✓ Producto eliminado');
+    }
+
+    // ==========================================
+    // COMPARTIR CATÁLOGO ONLINE
+    // ==========================================
+    function abrirModalCompartirTienda() {
+      const origin = window.location.origin;
+      const link = `${origin}/tienda.html?biz=${currentBizId}`;
+      const inp = document.getElementById('inpEnlaceTiendaPublica');
+      if (inp) inp.value = link;
+      document.getElementById('modalCompartirTienda').style.display = 'flex';
+    }
+
+    function cerrarModalCompartirTienda() {
+      document.getElementById('modalCompartirTienda').style.display = 'none';
+    }
+
+    function copiarEnlaceTiendaPublica() {
+      const origin = window.location.origin;
+      const link = `${origin}/tienda.html?biz=${currentBizId}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(() => {
+          mostrarRetailToast('✓ Enlace copiado al portapapeles');
+        }).catch(() => {
+          copiarFallback(link);
+        });
+      } else {
+        copiarFallback(link);
+      }
+    }
+
+    function copiarFallback(text) {
+      const inp = document.createElement('textarea');
+      inp.value = text;
+      document.body.appendChild(inp);
+      inp.select();
+      try {
+        document.execCommand('copy');
+        mostrarRetailToast('✓ Enlace copiado al portapapeles');
+      } catch (_) {
+        prompt('Copia este enlace de tu tienda:', text);
+      }
+      document.body.removeChild(inp);
+    }
+
+    function compartirTiendaWhatsApp() {
+      const origin = window.location.origin;
+      const link = `${origin}/tienda.html?biz=${currentBizId}`;
+      const msg = `¡Hola! 👋 Te invito a conocer nuestro catálogo en línea y hacer tus pedidos directamente aquí:\n\n` +
+                  `🛍️ *${bizProfile.name || 'Mi Comercio'}*\n` +
+                  `🔗 ${link}\n\n` +
+                  `¡Elige tus productos, ingresa tu dirección y te lo llevamos a domicilio! 🛵💨`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: bizProfile.name || 'Catálogo Online',
+          text: msg,
+          url: link
+        }).catch(() => {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        });
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+    }
+
+    function abrirTiendaPublicaPestana() {
+      const link = `tienda.html?biz=${currentBizId}`;
+      window.open(link, '_blank');
+    }
+
+    // ==========================================
+    // VISTA 4: PEDIDOS ONLINE & DOMICILIOS
+    // ==========================================
+    function actualizarBadgePedidos() {
+      const pends = onlineOrders.filter(o => o.status === 'recibido' || o.status === 'pendiente_pago').length;
+      const badge = document.getElementById('badgePedidosNuevos');
+      if (badge) {
+        if (pends > 0) {
+          badge.innerText = pends;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      const subDash = document.getElementById('dashOrdersSub');
+      if (subDash) {
+        subDash.innerText = pends > 0 ? `${pends} pendiente(s)` : 'Al día 🟢';
+      }
+    }
+
+    function filtrarPedidosOnline(filtro, btn) {
+      filtroPedidosActual = filtro;
+      document.querySelectorAll('#ordersFilterChips .order-filter-chip').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderizarPedidosOnline();
+    }
+
+    function renderizarPedidosOnline() {
+      const cont = document.getElementById('listaPedidosOnlineContainer');
+      if (!cont) return;
+
+      // Actualizar contadores
+      const total = onlineOrders.length;
+      const pends = onlineOrders.filter(o => o.status === 'recibido' || o.status === 'pendiente_pago').length;
+      const pagados = onlineOrders.filter(o => o.status === 'pagado').length;
+      const camino = onlineOrders.filter(o => o.status === 'en_camino').length;
+      const entregados = onlineOrders.filter(o => o.status === 'entregado').length;
+
+      document.getElementById('statOrdersTotal').innerText = total;
+      document.getElementById('statOrdersPendientes').innerText = pends;
+      document.getElementById('statOrdersPagados').innerText = pagados;
+      document.getElementById('statOrdersEnCamino').innerText = camino;
+
+      const cTodos = document.getElementById('countFilTodos'); if (cTodos) cTodos.innerText = total;
+      const cPend = document.getElementById('countFilPend'); if (cPend) cPend.innerText = pends;
+      const cPag = document.getElementById('countFilPag'); if (cPag) cPag.innerText = pagados;
+      const cCamino = document.getElementById('countFilCamino'); if (cCamino) cCamino.innerText = camino;
+      const cEnt = document.getElementById('countFilEntregados'); if (cEnt) cEnt.innerText = entregados;
+
+      // Filtrar lista
+      let lista = onlineOrders;
+      if (filtroPedidosActual === 'pendientes') {
+        lista = lista.filter(o => o.status === 'recibido' || o.status === 'pendiente_pago');
+      } else if (filtroPedidosActual === 'pagados') {
+        lista = lista.filter(o => o.status === 'pagado');
+      } else if (filtroPedidosActual === 'en_camino') {
+        lista = lista.filter(o => o.status === 'en_camino');
+      } else if (filtroPedidosActual === 'entregados') {
+        lista = lista.filter(o => o.status === 'entregado');
+      }
+
+      if (lista.length === 0) {
+        cont.innerHTML = `
+          <div style="background:var(--card-bg); border:1px solid var(--surface-border); border-radius:var(--radius); padding:40px 20px; text-align:center;">
+            <div style="font-size:36px; margin-bottom:10px;">📦</div>
+            <div style="font-weight:800; font-size:15px; color:var(--text);">No hay pedidos en esta categoría</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Comparte tu catálogo online para recibir órdenes de tus clientes.</div>
+            <button type="button" onclick="abrirModalCompartirTienda()" class="btn-main-order" style="display:inline-flex; width:auto; margin-top:14px; padding:8px 18px; font-size:12.5px;">
+              🔗 Compartir Catálogo Online
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = lista.map(o => {
+        let badgeHtml = '';
+        if (o.status === 'recibido' || o.status === 'pendiente_pago') {
+          badgeHtml = '<span class="order-status-badge status-recibido">🟡 Pendiente de Pago</span>';
+        } else if (o.status === 'pagado') {
+          badgeHtml = '<span class="order-status-badge status-pagado">🟢 Pago Confirmado</span>';
+        } else if (o.status === 'en_camino') {
+          badgeHtml = '<span class="order-status-badge status-en_camino">🛵 En Camino</span>';
+        } else if (o.status === 'entregado') {
+          badgeHtml = '<span class="order-status-badge status-entregado">✅ Entregado</span>';
+        }
+
+        const itemsList = Array.isArray(o.items) 
+          ? o.items.map(it => `• ${it.cant}x ${it.name} ($${(it.subtotal || (it.cant * it.price)).toLocaleString('es-CO')})`).join('<br>')
+          : 'Sin detalle';
+
+        const clientName = o.client?.name || 'Cliente Web';
+        const clientPhone = o.client?.phone || '';
+        const clientAddress = o.client?.address || 'Por coordinar';
+        const clientNeigh = o.client?.neighborhood ? ` (${o.client.neighborhood})` : '';
+        const clientNotes = o.client?.notes ? `<div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">📝 <i>${o.client.notes}</i></div>` : '';
+
+        // Botones de acción según estado
+        let actionButtonsHtml = '';
+        if (o.status === 'recibido' || o.status === 'pendiente_pago') {
+          actionButtonsHtml = `
+            <button type="button" class="btn-order-action" style="background:var(--primary); color:#fff;" onclick="registrarPagoPedido('${o.orderId}')">
+              <span>💵 Confirmar Pago</span>
+            </button>
+            <button type="button" class="btn-order-action" style="background:#25D366; color:#fff;" onclick="enviarReciboWhatsApp('${o.orderId}')">
+              <span>🧾 Enviar Recibo WhatsApp</span>
+            </button>
+            <button type="button" class="btn-order-action" style="background:var(--surface-subtle); color:var(--text);" onclick="abrirModalDespacho('${o.orderId}')">
+              <span>🛵 Asignar Mensajero</span>
+            </button>
+          `;
+        } else if (o.status === 'pagado') {
+          actionButtonsHtml = `
+            <button type="button" class="btn-order-action" style="background:#25D366; color:#fff;" onclick="enviarReciboWhatsApp('${o.orderId}')">
+              <span>🧾 Enviar Recibo WhatsApp</span>
+            </button>
+            <button type="button" class="btn-order-action" style="background:#2563EB; color:#fff;" onclick="abrirModalDespacho('${o.orderId}')">
+              <span>🛵 Despachar con Mensajero</span>
+            </button>
+            <button type="button" class="btn-order-action" style="background:var(--surface-subtle); color:var(--text);" onclick="marcarEntregado('${o.orderId}')">
+              <span>✅ Marcar Entregado</span>
+            </button>
+          `;
+        } else if (o.status === 'en_camino') {
+          actionButtonsHtml = `
+            <button type="button" class="btn-order-action" style="background:#2563EB; color:#fff;" onclick="reenviarDespachoWhatsApp('${o.orderId}')">
+              <span>🛵 Reenviar Notif. Mensajero</span>
+            </button>
+            <button type="button" class="btn-order-action" style="background:var(--success); color:#fff;" onclick="marcarEntregado('${o.orderId}')">
+              <span>✅ Marcar como Entregado</span>
+            </button>
+            <button type="button" class="btn-order-action" style="background:#25D366; color:#fff;" onclick="enviarReciboWhatsApp('${o.orderId}')">
+              <span>🧾 Recibo</span>
+            </button>
+          `;
+        } else {
+          actionButtonsHtml = `
+            <button type="button" class="btn-order-action" style="background:#25D366; color:#fff;" onclick="enviarReciboWhatsApp('${o.orderId}')">
+              <span>🧾 Reenviar Recibo</span>
+            </button>
+          `;
+        }
+
+        return `
+          <div class="order-card">
+            <div class="order-card-header">
+              <div>
+                <span class="order-id-badge">#${o.orderId}</span>
+                <span style="font-size:11.5px; color:var(--text-muted); margin-left:8px;">${new Date(o.createdAt || Date.now()).toLocaleString('es-CO')}</span>
+              </div>
+              <div>${badgeHtml}</div>
+            </div>
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px; font-size:12.5px;">
+              <div>
+                <div style="font-weight:700; color:var(--text); display:flex; align-items:center; gap:6px;">
+                  <span>👤 ${clientName}</span>
+                  ${clientPhone ? `<button type="button" onclick="abrirWhatsAppDirecto('${clientPhone}', '¡Hola ${clientName}! Te escribo de ${bizProfile.name} respecto a tu pedido #${o.orderId}')" style="background:none; border:none; color:#25D366; font-size:14px; cursor:pointer;" title="Chatear en WhatsApp">💬</button>` : ''}
+                </div>
+                ${clientPhone ? `<div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">📞 ${clientPhone}</div>` : ''}
+                <div style="font-size:12px; color:var(--text); margin-top:4px;">📍 ${clientAddress}${clientNeigh}</div>
+                ${clientNotes}
+              </div>
+
+              <div>
+                <div style="font-size:11.5px; color:var(--text-muted); line-height:1.4;">
+                  ${itemsList}
+                </div>
+                <div style="font-weight:800; font-size:14.5px; color:var(--primary); margin-top:6px;">
+                  Total: $${(Number(o.total)||0).toLocaleString('es-CO')} COP • <span style="font-weight:600; font-size:11.5px; color:var(--text-muted);">${o.paymentMethod || 'Transferencia'}</span>
+                </div>
+                ${o.courier ? `<div style="font-size:11.5px; font-weight:700; color:#2563EB; margin-top:4px;">🛵 Mensajero: ${o.courier}</div>` : ''}
+              </div>
+            </div>
+
+            <div class="order-actions-row">
+              ${actionButtonsHtml}
+              <button type="button" class="btn-order-action" style="background:none; border:1px solid var(--alert); color:var(--alert); margin-left:auto;" onclick="eliminarPedidoOnline('${o.orderId}')" title="Cancelar Pedido">
+                🗑️
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // REGISTRAR PAGO DE PEDIDO
+    async function registrarPagoPedido(orderId) {
+      const o = onlineOrders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      if (!confirm(`¿Confirmar pago de $${(Number(o.total)||0).toLocaleString('es-CO')} para el pedido #${o.orderId}? Esto registrará el dinero en el flujo de caja.`)) return;
+
+      o.status = 'pagado';
+      o.paidAt = new Date().toISOString();
+
+      // Registrar ingreso en finanzas de Retail
+      const fItem = {
+        id: `f_${Date.now()}`,
+        type: 'ingreso',
+        concept: `Pago Pedido Web #${o.orderId} • ${o.client?.name || 'Cliente'}`,
+        amount: Number(o.total) || 0,
+        paymentMethod: o.paymentMethod || 'Transferencia',
+        date: new Date().toISOString()
+      };
+      finances.unshift(fItem);
+
+      // Guardar en Firestore
+      if (fbDb && currentBizId) {
+        try {
+          await fbDb.collection('negocios_zentra').doc(currentBizId).collection('pedidos').doc(o.orderId).set(o, { merge: true });
+          await fbDb.collection('tiendas_publicas').doc(currentBizId).collection('pedidos').doc(o.orderId).set(o, { merge: true });
+        } catch (e) {
+          console.warn('Sync pago pedido Firestore:', e);
+        }
+      }
+
+      await persistirDatosRetail();
+      renderizarPedidosOnline();
+      actualizarBadgePedidos();
+      mostrarRetailToast('✓ Pago confirmado e ingreso asentado en caja');
+
+      // Preguntar para enviar recibo
+      setTimeout(() => {
+        if (confirm(`¿Deseas enviar el recibo de compra al cliente (${o.client?.name}) por WhatsApp?`)) {
+          enviarReciboWhatsApp(o.orderId);
+        }
+      }, 300);
+    }
+
+    // ENVIAR RECIBO POR WHATSAPP
+    function enviarReciboWhatsApp(orderId) {
+      const o = onlineOrders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      const itemsText = Array.isArray(o.items)
+        ? o.items.map(it => `• ${it.cant}x ${it.name} ($${(it.subtotal || (it.cant * it.price)).toLocaleString('es-CO')})`).join('\n')
+        : 'Productos adquiridos';
+
+      const fechaTxt = new Date(o.paidAt || o.createdAt || Date.now()).toLocaleString('es-CO');
+
+      const msg = `🧾 *RECIBO OFICIAL DE COMPRA* 🧾\n` +
+                  `🏢 *${bizProfile.name || 'Mi Comercio'}*\n` +
+                  `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                  `📦 *Pedido:* #${o.orderId}\n` +
+                  `👤 *Cliente:* ${o.client?.name || 'Cliente'}\n` +
+                  `📅 *Fecha:* ${fechaTxt}\n` +
+                  `💳 *Medio de Pago:* ${o.paymentMethod || 'Transferencia'}\n` +
+                  `📍 *Entrega:* ${o.client?.address || ''}${o.client?.neighborhood ? ' (' + o.client.neighborhood + ')' : ''}\n\n` +
+                  `🛒 *DETALLE DE PRODUCTOS:*\n${itemsText}\n\n` +
+                  `💰 *TOTAL PAGADO:* $${(Number(o.total)||0).toLocaleString('es-CO')} COP\n` +
+                  `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                  `✅ *Estado:* Pago recibido y verificado con éxito.\n` +
+                  `¡Tu pedido se encuentra en preparación! Te avisaremos tan pronto el mensajero salga hacia tu dirección. ¡Muchas gracias por tu compra! 🙌`;
+
+      const phone = o.client?.phone || '';
+      abrirWhatsAppDirecto(phone, msg);
+    }
+
+    // DESPACHO CON MENSAJERO
+    function abrirModalDespacho(orderId) {
+      const o = onlineOrders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      document.getElementById('despachoOrderIdHidden').value = o.orderId;
+      document.getElementById('lblDespachoCliente').innerText = `Pedido #${o.orderId} • ${o.client?.name || 'Cliente'}`;
+      document.getElementById('lblDespachoDireccion').innerText = `📍 ${o.client?.address || ''}${o.client?.neighborhood ? ' - ' + o.client.neighborhood : ''}`;
+      document.getElementById('inpNombreMensajero').value = o.courier || '';
+      document.getElementById('inpTelMensajero').value = '';
+      document.getElementById('modalDespachoPedido').style.display = 'flex';
+      setTimeout(() => document.getElementById('inpNombreMensajero')?.focus(), 100);
+    }
+
+    function cerrarModalDespacho() {
+      document.getElementById('modalDespachoPedido').style.display = 'none';
+    }
+
+    async function confirmarDespachoPedido() {
+      const orderId = document.getElementById('despachoOrderIdHidden').value;
+      const courierName = document.getElementById('inpNombreMensajero').value.trim();
+      const courierPhone = document.getElementById('inpTelMensajero').value.trim();
+
+      const o = onlineOrders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      o.status = 'en_camino';
+      o.courier = courierName;
+      o.courierPhone = courierPhone || null;
+      o.dispatchedAt = new Date().toISOString();
+
+      // Guardar en Firestore
+      if (fbDb && currentBizId) {
+        try {
+          await fbDb.collection('negocios_zentra').doc(currentBizId).collection('pedidos').doc(o.orderId).set(o, { merge: true });
+          await fbDb.collection('tiendas_publicas').doc(currentBizId).collection('pedidos').doc(o.orderId).set(o, { merge: true });
+        } catch (e) {
+          console.warn('Sync despacho pedido Firestore:', e);
+        }
+      }
+
+      await persistirDatosRetail();
+      cerrarModalDespacho();
+      renderizarPedidosOnline();
+      actualizarBadgePedidos();
+      mostrarRetailToast(`✓ Pedido #${o.orderId} en camino con ${courierName}`);
+
+      // Notificar por WhatsApp
+      reenviarDespachoWhatsApp(o.orderId);
+    }
+
+    function reenviarDespachoWhatsApp(orderId) {
+      const o = onlineOrders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      const courierName = o.courier || 'Nuestro Mensajero';
+      const itemsText = Array.isArray(o.items)
+        ? o.items.map(it => `• ${it.cant}x ${it.name}`).join('\n')
+        : '';
+
+      const msg = `🛵💨 *¡TU PEDIDO YA VA EN CAMINO!* 🛵💨\n` +
+                  `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                  `¡Hola *${o.client?.name || 'Cliente'}*! 👋 Buenas noticias:\n\n` +
+                  `Tu pedido *#${o.orderId}* de *${bizProfile.name || 'Mi Comercio'}* ya salió de la tienda y va rumbo a tu dirección.\n\n` +
+                  `🛵 *Mensajero a cargo:* *${courierName}*\n` +
+                  (o.courierPhone ? `📞 *Contacto mensajero:* ${o.courierPhone}\n` : '') +
+                  `📍 *Dirección de Entrega:* ${o.client?.address || ''}${o.client?.neighborhood ? ' - Barrio: ' + o.client.neighborhood : ''}\n` +
+                  (o.client?.notes ? `📝 *Indicaciones:* ${o.client.notes}\n` : '') +
+                  `\n📦 *Artículos:* \n${itemsText}\n\n` +
+                  `Por favor mantente pendiente para recibir tu entrega. ¡Que lo disfrutes mucho! 😊`;
+
+      const phone = o.client?.phone || '';
+      abrirWhatsAppDirecto(phone, msg);
+    }
+
+    async function marcarEntregado(orderId) {
+      const o = onlineOrders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      if (!confirm(`¿Marcar el pedido #${o.orderId} como Entregado?`)) return;
+
+      o.status = 'entregado';
+      o.deliveredAt = new Date().toISOString();
+
+      if (fbDb && currentBizId) {
+        try {
+          await fbDb.collection('negocios_zentra').doc(currentBizId).collection('pedidos').doc(o.orderId).set(o, { merge: true });
+          await fbDb.collection('tiendas_publicas').doc(currentBizId).collection('pedidos').doc(o.orderId).set(o, { merge: true });
+        } catch (e) {
+          console.warn('Sync entrega pedido Firestore:', e);
+        }
+      }
+
+      await persistirDatosRetail();
+      renderizarPedidosOnline();
+      actualizarBadgePedidos();
+      mostrarRetailToast('✓ Pedido marcado como Entregado');
+
+      setTimeout(() => {
+        if (confirm('¿Deseas enviar un mensaje de agradecimiento al cliente por WhatsApp?')) {
+          const msg = `🎉 *¡PEDIDO ENTREGADO CON ÉXITO!* 🎉\n` +
+                      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+                      `¡Hola *${o.client?.name || 'Cliente'}*! Te confirmamos que tu pedido *#${o.orderId}* de *${bizProfile.name || 'Mi Comercio'}* ha sido entregado.\n\n` +
+                      `Esperamos que todo sea de tu total agrado. ¡Fue un gusto atenderte y te esperamos pronto de nuevo! ⭐⭐⭐⭐⭐`;
+          abrirWhatsAppDirecto(o.client?.phone || '', msg);
+        }
+      }, 300);
+    }
+
+    async function eliminarPedidoOnline(orderId) {
+      const o = onlineOrders.find(x => x.orderId === orderId);
+      if (!o) return;
+
+      if (!confirm(`¿Eliminar o cancelar el pedido #${o.orderId} de ${o.client?.name}?`)) return;
+
+      onlineOrders = onlineOrders.filter(x => x.orderId !== orderId);
+
+      if (fbDb && currentBizId) {
+        try {
+          await fbDb.collection('negocios_zentra').doc(currentBizId).collection('pedidos').doc(orderId).delete();
+          await fbDb.collection('tiendas_publicas').doc(currentBizId).collection('pedidos').doc(orderId).delete();
+        } catch (e) {
+          console.warn('Delete pedido Firestore:', e);
+        }
+      }
+
+      await persistirDatosRetail();
+      renderizarPedidosOnline();
+      actualizarBadgePedidos();
+      mostrarRetailToast('✓ Pedido cancelado');
+    }
+
+    function abrirWhatsAppDirecto(tel, msg) {
+      const clean = (tel || '').replace(/\D/g, '');
+      const full = clean.length === 10 ? '57' + clean : clean;
+      const url = full ? `https://api.whatsapp.com/send?phone=${full}&text=${encodeURIComponent(msg)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
     }
 
     // ==========================================

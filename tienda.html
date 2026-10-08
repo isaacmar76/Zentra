@@ -1043,29 +1043,59 @@
           </div>
 
           <div class="form-group">
-            <label for="custPhone">Tu WhatsApp / Celular</label>
-            <input type="tel" id="custPhone" placeholder="Ej: 3215311523">
+            <label for="custPhone">Tu WhatsApp / Celular *</label>
+            <input type="tel" id="custPhone" placeholder="Ej: 3215311523" required>
           </div>
 
           <div class="form-group">
-            <label for="custAddress">Dirección de Entrega / Barrio (Opcional)</label>
-            <input type="text" id="custAddress" placeholder="Ej: Carrera 15 # 45-20 o 'Recoger en tienda'">
+            <label for="custAddress">Dirección de Entrega Exacta *</label>
+            <input type="text" id="custAddress" placeholder="Ej: Carrera 15 # 45-20, Casa 3 o 'Recoger en tienda'">
           </div>
 
           <div class="form-group">
-            <label for="custPaymentMethod">Medio de Pago a Utilizar</label>
-            <select id="custPaymentMethod">
+            <label for="custNeighborhood">Barrio / Municipio</label>
+            <input type="text" id="custNeighborhood" placeholder="Ej: San Francisco, Centro, El Poblado">
+          </div>
+
+          <div class="form-group">
+            <label for="custPaymentMethod">Medio de Pago</label>
+            <select id="custPaymentMethod" onchange="actualizarInfoMedioPagoCheckout(this.value)">
               <option value="Nequi">🟣 Nequi</option>
               <option value="Bre-Be">🟢 Bre-Be</option>
               <option value="Bancolombia">🔵 Bancolombia / Transferencia</option>
               <option value="Daviplata">🟡 Daviplata</option>
-              <option value="Efectivo">💵 Efectivo al recibir</option>
+              <option value="Efectivo">💵 Efectivo al recibir (Contraentrega)</option>
             </select>
           </div>
 
+          <!-- Soporte o Comprobante de Pago -->
+          <div class="form-group" style="background:var(--surface-subtle, #F8FAFC); border:1.5px dashed var(--border); border-radius:12px; padding:10px;">
+            <label style="font-weight:700; color:var(--text); display:flex; align-items:center; gap:6px;">
+              <span>📎 Comprobante de Pago</span>
+              <span style="font-size:10px; font-weight:normal; color:var(--text-muted);">(Opcional si es transferencia)</span>
+            </label>
+            <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px; line-height:1.3;">
+              Si ya realizaste la transferencia o pago móvil, puedes adjuntar la captura aquí o enviarla en el chat de WhatsApp al confirmar tu pedido.
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:8px;">
+              <label style="background:var(--card-bg, #fff); border:1px solid var(--border); padding:6px 12px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; color:var(--text);">
+                <span>📷 Adjuntar Soporte</span>
+                <input type="file" id="custVoucherFile" accept="image/*" style="display:none;" onchange="procesarVoucherCliente(this)">
+              </label>
+              <button type="button" id="btnQuitarVoucher" onclick="quitarVoucherCliente()" style="display:none; background:none; border:none; color:var(--alert, #DC2626); font-size:11px; cursor:pointer; font-weight:700;">
+                Quitar soporte
+              </button>
+            </div>
+
+            <div id="voucherPreviewContainer" style="display:none; margin-top:8px;">
+              <img id="voucherPreviewImg" src="" alt="Comprobante" style="max-height:100px; border-radius:8px; border:1px solid var(--border); object-fit:contain;">
+            </div>
+          </div>
+
           <div class="form-group">
-            <label for="custNotes">Notas o indicaciones (Opcional)</label>
-            <textarea id="custNotes" rows="2" placeholder="Ej: Timbrar en portería, diseño especial, etc."></textarea>
+            <label for="custNotes">Notas o indicaciones de entrega (Opcional)</label>
+            <textarea id="custNotes" rows="2" placeholder="Ej: Timbrar en portería, apto 402, diseño especial, etc."></textarea>
           </div>
         </form>
       </div>
@@ -1077,7 +1107,7 @@
         </div>
         <button type="button" class="btn-submit-order" onclick="confirmarPedido()">
           <span class="material-symbols-outlined" style="font-size:20px;">send</span>
-          <span>Confirmar y Pedir por WhatsApp</span>
+          <span>Enviar Pedido por WhatsApp</span>
         </button>
       </div>
     </div>
@@ -1606,6 +1636,64 @@
       showStoreToast(`💬 Abriendo WhatsApp con ${storeData.name}...`);
     }
 
+    let voucherBase64 = null;
+
+    function procesarVoucherCliente(input) {
+      if (!input.files || !input.files[0]) return;
+      const file = input.files[0];
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxDim = 700;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          voucherBase64 = canvas.toDataURL('image/jpeg', 0.75);
+
+          const previewCont = document.getElementById('voucherPreviewContainer');
+          const previewImg = document.getElementById('voucherPreviewImg');
+          const btnQuitar = document.getElementById('btnQuitarVoucher');
+          if (previewCont && previewImg) {
+            previewImg.src = voucherBase64;
+            previewCont.style.display = 'block';
+          }
+          if (btnQuitar) btnQuitar.style.display = 'inline-block';
+          showStoreToast('✓ Comprobante adjuntado con éxito');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function quitarVoucherCliente() {
+      voucherBase64 = null;
+      const fileInp = document.getElementById('custVoucherFile');
+      if (fileInp) fileInp.value = '';
+      const previewCont = document.getElementById('voucherPreviewContainer');
+      const btnQuitar = document.getElementById('btnQuitarVoucher');
+      if (previewCont) previewCont.style.display = 'none';
+      if (btnQuitar) btnQuitar.style.display = 'none';
+      showStoreToast('Comprobante retirado');
+    }
+
+    function actualizarInfoMedioPagoCheckout(medio) {
+      // Opcional feedback según medio
+    }
+
     // CONFIRMAR PEDIDO DEL CARRITO Y DESPACHAR A WHATSAPP
     async function confirmarPedido() {
       if (cart.length === 0) {
@@ -1616,6 +1704,7 @@
       let name = (document.getElementById('custName')?.value || '').trim();
       let phone = (document.getElementById('custPhone')?.value || '').trim();
       let address = (document.getElementById('custAddress')?.value || '').trim();
+      let neighborhood = (document.getElementById('custNeighborhood')?.value || '').trim();
       const paymentMethod = document.getElementById('custPaymentMethod')?.value || 'Nequi';
       const notes = (document.getElementById('custNotes')?.value || '').trim();
 
@@ -1641,6 +1730,7 @@
           name: name,
           phone: phone,
           address: address,
+          neighborhood: neighborhood,
           notes: notes
         },
         items: cart.map(it => ({
@@ -1652,8 +1742,10 @@
         })),
         total: total,
         paymentMethod: paymentMethod,
-        status: 'pendiente_pago',
-        incomeRegistered: false,
+        status: 'recibido',
+        hasVoucher: !!voucherBase64,
+        voucherImage: voucherBase64 || null,
+        courier: null,
         createdAt: new Date().toISOString()
       };
 
@@ -1665,21 +1757,33 @@
                 `📦 *Pedido:* #${orderId}\n` +
                 `👤 *Cliente:* ${name}\n`;
       if (phone) msg += `📞 *Teléfono:* ${phone}\n`;
-      msg += `📍 *Entrega:* ${address}\n`;
+      msg += `📍 *Entrega:* ${address}${neighborhood ? ' - Barrio: ' + neighborhood : ''}\n`;
       if (notes) msg += `📝 *Notas:* ${notes}\n`;
       msg += `\n🛒 *Productos:*\n${itemsText}\n\n` +
              `💰 *TOTAL A PAGAR:* $${total.toLocaleString('es-CO')} COP\n` +
-             `💳 *Medio de Pago:* ${paymentMethod}\n\n` +
-             `Quedo atento(a) para confirmar la disponibilidad y proceder con el pago. ¡Muchas gracias!`;
+             `💳 *Medio de Pago:* ${paymentMethod}\n`;
+      if (voucherBase64) {
+        msg += `📎 *Soporte de Pago:* ¡Ya adjunté la captura a mi orden web! (Te la comparto en este chat también)\n\n`;
+      } else {
+        msg += `📎 *Soporte de Pago:* Te compartiré la captura de la transferencia a continuación.\n\n`;
+      }
+      msg += `Quedo atento(a) para confirmar la disponibilidad y despacho. ¡Muchas gracias! 🙌`;
 
-      // 2. Guardar en Firestore en segundo plano (no bloqueante)
+      // 2. Guardar en Firestore en segundo plano (dual write para tiendas_publicas y negocios_zentra)
       if (fbDb && storeData.bizId) {
         fbDb.collection('tiendas_publicas')
             .doc(storeData.bizId)
             .collection('pedidos')
             .doc(orderId)
             .set(orderPayload)
-            .catch(err => console.warn('Error guardando pedido en Firestore:', err));
+            .catch(err => console.warn('Error tiendas_publicas Firestore:', err));
+
+        fbDb.collection('negocios_zentra')
+            .doc(storeData.bizId)
+            .collection('pedidos')
+            .doc(orderId)
+            .set(orderPayload)
+            .catch(err => console.warn('Error negocios_zentra Firestore:', err));
       }
 
       // 3. Guardar en localStorage para consulta local en el navegador
@@ -1698,8 +1802,16 @@
       cerrarDrawerCarrito();
       mostrarModalExito(orderPayload);
 
-      // 6. Limpiar carrito
+      // 6. Limpiar carrito y resetear voucher
       cart = [];
+      voucherBase64 = null;
+      const fileInp = document.getElementById('custVoucherFile');
+      if (fileInp) fileInp.value = '';
+      const previewCont = document.getElementById('voucherPreviewContainer');
+      const btnQuitar = document.getElementById('btnQuitarVoucher');
+      if (previewCont) previewCont.style.display = 'none';
+      if (btnQuitar) btnQuitar.style.display = 'none';
+
       actualizarBarraCarrito();
       renderizarProductos();
 

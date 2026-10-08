@@ -946,6 +946,42 @@ class CatalogItemModel {
      - Conexión a Cloud Firestore (`negocios_zentra/{bizProfile.id}`).
      - Réplica exacta en `site/retail.html`.
 
+#### Hito 41: Edición Táctil de Productos (Nombre y Foto), Catálogo Compartible y Gestión de Pedidos Online con Recibo y Notificación de Mensajero
+- **Requerimiento del Usuario:**
+  - *"cuando entro al catalogo quiero poder editar el proucto tocando, ya sea en el nombre o en la imagen, pero quitaste las imagenes de los productos. No veo tampoco la opcion de compartir el catalogo para que el cliente entre a la pagina de ventas y pueda crear su pedido, debe tener un boton de enviar pedido con los datos del cliente, medio de pago, datos de entrega y que el cliente envie el soporte. Luego se registre el pago se debe poder desde la app enviar el recibo y notificar el estado de su pedido, ojala con el nombre del mensajero o algo asi que permita saber que ya va en camino"*
+- **Implementación Técnica:**
+  1. **Edición Táctil Directa y Restauración de Fotos de Producto:**
+     - En la tabla de *Inventario & Catálogo* de Zentra-Retail (`retail.html`), cada producto presenta su miniatura fotográfica (`prod-table-img`) y nombre destacado.
+     - Tocar directamente sobre la **imagen** o sobre el **nombre** abre al instante el modal de edición (`editarProducto(id)`).
+     - En el punto de venta (POS Grid), cada tarjeta incluye miniatura fotográfica (`pos-product-thumb`), precio destacado y alertas de stock.
+     - En el modal de producto (`#modalProductoRetail`): soporte para subir foto desde archivo/cámara con optimización automática por Canvas a JPEG Base64 (<40KB) y soporte para URL externa, con vista previa y botón para remover foto.
+  2. **Opción Universal para Compartir Catálogo:**
+     - Botón `Compartir Catálogo` en la cabecera superior (`.btn-header-share`), en la barra del Inventario y como banner destacado en el Dashboard.
+     - Modal `#modalCompartirTienda` con:
+       * Enlace público directo (`tienda.html?biz={bizId}`).
+       * Copiado rápido al portapapeles con confirmación Toast.
+       * Envío por WhatsApp con mensaje de invitación prediseñado.
+       * Soporte nativo para Web Share API (`navigator.share`) en dispositivos móviles.
+  3. **Tienda Online Pública (`tienda.html`): Checkout con Entrega, Medio de Pago y Soporte:**
+     - Formulario de checkout en el cajón de compra con:
+       * Datos del cliente: Nombre y WhatsApp/Celular obligatorios.
+       * Dirección exacta de entrega y campo dedicado para Barrio / Municipio.
+       * Selector de medios de pago: Nequi, Daviplata, Bancolombia, Bre-B, Efectivo contraentrega.
+       * Sección para adjuntar soporte o captura de la transferencia con previsualización.
+       * Botón de acción: `🚀 Enviar Pedido por WhatsApp`.
+     - Doble guardado en Firestore: tanto en `tiendas_publicas/{bizId}/pedidos/{orderId}` como en `negocios_zentra/{bizId}/pedidos/{orderId}`.
+  4. **Gestión de Pedidos Online & Domicilios en Zentra-Retail (`retail.html`):**
+     - Nueva vista dedicada `#secPedidos` y pestaña en el switcher (`btnSwitchPedidos`) con badge dinámico de pedidos pendientes.
+     - Tarjetas de resumen estadístico: Total, Pendientes de Pago, Pagados y En Camino.
+     - Filtros por chips para segmentar por estado.
+     - Acciones de ciclo de vida del pedido:
+       * **Registrar Pago (`registrarPagoPedido`):** actualiza estado a `pagado`, asienta automáticamente el ingreso en el flujo de caja (`finances`) y ofrece enviar recibo.
+       * **Enviar Recibo Oficial por WhatsApp (`enviarReciboWhatsApp`):** genera un recibo digital formateado con el desglose de productos, número de pedido, cliente, total pagado y agradecimiento.
+       * **Despachar con Mensajero (`abrirModalDespacho`, `confirmarDespachoPedido`):** modal para ingresar el nombre del mensajero (y teléfono/placa opcional), cambia estado a `en_camino`, y despacha inmediatamente la notificación al cliente por WhatsApp: *"🛵💨 ¡Tu pedido #[ID] ya va en camino con nuestro mensajero [Nombre] a tu dirección [Dirección]!"*.
+       * **Marcar Entregado (`marcarEntregado`):** actualiza estado y ofrece enviar mensaje de entrega satisfactoria.
+  5. **Paridad y Sincronización:**
+     - Sincronización completa 1:1 en `site/retail.html` y `site/tienda.html`.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

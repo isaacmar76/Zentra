@@ -3,6 +3,9 @@
   "rewrites": [
     { "source": "/landing", "destination": "/landing.html" },
     { "source": "/app", "destination": "/index.html" },
+    { "source": "/hub", "destination": "/index.html" },
+    { "source": "/studio", "destination": "/studio.html" },
+    { "source": "/retail", "destination": "/retail.html" },
     { "source": "/tienda", "destination": "/tienda.html" },
     { "source": "/catalogo", "destination": "/tienda.html" },
     { "source": "/t/:biz", "destination": "/tienda.html" }

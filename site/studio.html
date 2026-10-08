@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Zentra Studio • Gestión Integral de Talleres y Proyectos</title>
+  <meta name="description" content="Plataforma especializada para talleres creativos, diseño por encargo, anticipos, tareas y catálogo de creaciones.">
+  <link rel="icon" type="image/png" href="img/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..700,0..1,0&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      /* Paleta Artesanal Cálida (Estilo TM Diseños Creativos - Nude & Blush) */
+      --bg: #F5EFE6;
+      --card-bg: #FFFFFF;
+      --border: #E8C4C4;
+      --surface-border: #E8C4C4;
+      --text: #5C4A3E;
+      --text-muted: #8D7768;
+      --primary: #B37070;
+      --primary-hover: #9E5B5B;
+      --primary-soft: #F9EBEA;
+      --primary-border: #E8C4C4;
+      --accent: #D4A5A5;
+      --success: #15803D;
+      --success-soft: #DCFCE7;
+      --warning: #B45309;
+      --warning-soft: #FEF3C7;
+      --danger: #B91C1C;
+      --danger-soft: #FEE2E2;
+      --shadow-sm: 0 2px 8px rgba(92, 74, 62, 0.05);
+      --shadow-md: 0 6px 18px rgba(92, 74, 62, 0.08);
+      --shadow-lg: 0 12px 30px rgba(92, 74, 62, 0.12);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* BARRA SUPERIOR / HEADER */
+    .studio-header {
+      background: #FFFFFF;
+      border-bottom: 1.5px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .header-logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #B37070 0%, #D4A5A5 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 10px rgba(179, 112, 112, 0.28);
+      flex-shrink: 0;
+    }
+
+    .header-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .studio-app-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .studio-biz-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-header-hub {
+      background: #FAF5EF;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+
+    .btn-header-hub:hover {
+      background: #FFFFFF;
+      border-color: var(--primary);
+    }
+
+    .btn-header-sync {
+      background: var(--primary-soft);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 7px 12px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* CONTENEDOR PRINCIPAL */
+    .studio-container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* COCKPIT DE MÉTRICAS */
+    .cockpit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .metric-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .metric-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .metric-val {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.1;
+    }
+
+    .metric-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* ACCIONES RÁPIDAS DE TALLER */
+    .quick-actions-bar {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 22px;
+      scrollbar-width: none;
+    }
+    .quick-actions-bar::-webkit-scrollbar { display: none; }
+
+    .btn-quick-action {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      padding: 10px 18px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.15s ease;
+    }
+
+    .btn-quick-action:hover {
+      border-color: var(--primary);
+      background: #FFFFFF;
+      transform: translateY(-1px);
+    }
+
+    .btn-quick-action.primary {
+      background: linear-gradient(135deg, #B37070 0%, #D4A5A5 100%);
+      color: #FFFFFF;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(179, 112, 112, 0.28);
+    }
+
+    /* SECCIONES Y PESTAÑAS */
+    .studio-tabs {
+      display: flex;
+      border-bottom: 1.5px solid var(--border);
+      margin-bottom: 18px;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .studio-tabs::-webkit-scrollbar { display: none; }
+
+    .studio-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      white-space: nowrap;
+      transition: color 0.15s ease;
+    }
+
+    .studio-tab-btn.active {
+      color: var(--primary);
+    }
+
+    .studio-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1.5px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* TABLERO DE PROYECTOS */
+    .projects-filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .search-input-box {
+      flex: 1;
+      min-width: 240px;
+      background: #FFFFFF;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search-input-box input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 13px;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .project-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.15s ease;
+      position: relative;
+    }
+
+    .project-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--primary);
+    }
+
+    .project-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .project-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .project-client-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-pill {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .status-cotizado { background: #F1F5F9; color: #475569; }
+    .status-anticipo { background: var(--warning-soft); color: var(--warning); }
+    .status-diseno { background: #EEF2FF; color: #4338CA; }
+    .status-produccion { background: #FDF4FF; color: #A21CAF; }
+    .status-listo { background: #ECFEFF; color: #0E7490; }
+    .status-entregado { background: var(--success-soft); color: var(--success); }
+
+    .project-finances-row {
+      background: #FAF5EF;
+      border-radius: 14px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+    }
+
+    .project-deadline-row {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .project-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      padding-top: 10px;
+      border-top: 1px solid #FAF5EF;
+    }
+
+    .btn-card-action {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-card-action:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* MODALES */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(44, 30, 24, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 480px;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow-lg);
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1.5px solid var(--border);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .modal-close {
+      background: #FAF5EF;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      font-size: 13px;
+      color: var(--text);
+      background: #FFFFFF;
+      outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-submit-modal {
+      width: 100%;
+      background: linear-gradient(135deg, #B37070 0%, #D4A5A5 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(179, 112, 112, 0.3);
+      margin-top: 8px;
+    }
+
+    /* TOAST DE NOTIFICACIONES */
+    .studio-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-40px);
+      background: #5C4A3E;
+      color: #FFFFFF;
+      padding: 12px 22px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      max-width: 90%;
+      text-align: center;
+    }
+    .studio-toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* TAREAS DE TALLER */
+    .task-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #FAF5EF;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+
+    .task-item-row.completed {
+      opacity: 0.6;
+      text-decoration: line-through;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER DE ZENTRA STUDIO -->
+  <header class="studio-header">
+    <div class="header-inner">
+      <div class="header-brand" onclick="location.reload()">
+        <div class="header-logo-badge">🎨</div>
+        <div class="header-titles">
+          <div class="studio-app-badge">
+            <span>Zentra Studio</span>
+            <span style="font-size:8px;">• TALLER</span>
+          </div>
+          <div class="studio-biz-name" id="hdrBizName">TM Diseños Creativos</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a href="index.html" class="btn-header-hub" title="Cambiar de negocio o volver al Portal">
+          <span class="material-symbols-outlined" style="font-size:16px;">apps</span>
+          <span>Universo Zentra</span>
+        </a>
+        <button type="button" class="btn-header-sync" onclick="sincronizarConNube()" id="btnSyncCloud" title="Sincronizar datos con Cloud Firestore">
+          <span class="material-symbols-outlined" style="font-size:16px;">cloud_sync</span>
+          <span id="syncText">Sincronizado</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="studio-container">
+    
+    <!-- COCKPIT DE MÉTRICAS DEL TALLER -->
+    <div class="cockpit-grid">
+      <div class="metric-card">
+        <div class="metric-icon-box" style="background:#FDF4FF; color:#A21CAF;">✂️</div>
+        <div>
+          <div class="metric-val" id="valProyectosActivos">0</div>
+          <div class="metric-label">Proyectos en Proceso</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-box" style="background:var(--warning-soft); color:var(--warning);">⏳</div>
+        <div>
+          <div class="metric-val" id="valSaldosCobrar">$0</div>
+          <div class="metric-label">Por Cobrar (Saldos)</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-box" style="background:#EEF2FF; color:#4338CA;">📅</div>
+        <div>
+          <div class="metric-val" id="valEntregasSemana">0</div>
+          <div class="metric-label">Entregas de la Semana</div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-icon-box" style="background:var(--success-soft); color:var(--success);">💰</div>
+        <div>
+          <div class="metric-val" id="valIngresosMes">$0</div>
+          <div class="metric-label">Ingresos del Mes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ACCIONES RÁPIDAS -->
+    <div class="quick-actions-bar">
+      <button type="button" class="btn-quick-action primary" onclick="abrirModalNuevoProyecto()">
+        <span class="material-symbols-outlined" style="font-size:18px;">add_circle</span>
+        <span>Nuevo Encargo / Proyecto</span>
+      </button>
+
+      <button type="button" class="btn-quick-action" onclick="abrirModalTareas()">
+        <span class="material-symbols-outlined" style="font-size:18px;">task_alt</span>
+        <span>Tareas de Taller (<b id="badgeTareasContador">0</b>)</span>
+      </button>
+
+      <button type="button" class="btn-quick-action" onclick="compartirCatalogoOnline()">
+        <span class="material-symbols-outlined" style="font-size:18px;">storefront</span>
+        <span>Catálogo Online Clientes</span>
+      </button>
+
+      <button type="button" class="btn-quick-action" onclick="abrirModalGasto()">
+        <span class="material-symbols-outlined" style="font-size:18px;">shopping_bag</span>
+        <span>Registrar Gasto de Material</span>
+      </button>
+    </div>
+
+    <!-- PESTAÑAS DE VISTA -->
+    <div class="studio-tabs">
+      <button class="studio-tab-btn active" id="tabProyectos" onclick="cambiarVistaStudio('proyectos')">
+        <span class="material-symbols-outlined" style="font-size:18px;">design_services</span>
+        <span>Proyectos y Encargos</span>
+      </button>
+      <button class="studio-tab-btn" id="tabCatalogo" onclick="cambiarVistaStudio('catalogo')">
+        <span class="material-symbols-outlined" style="font-size:18px;">category</span>
+        <span>Catálogo de Creaciones</span>
+      </button>
+      <button class="studio-tab-btn" id="tabClientes" onclick="cambiarVistaStudio('clientes')">
+        <span class="material-symbols-outlined" style="font-size:18px;">group</span>
+        <span>Clientes</span>
+      </button>
+      <button class="studio-tab-btn" id="tabFinanzas" onclick="cambiarVistaStudio('finanzas')">
+        <span class="material-symbols-outlined" style="font-size:18px;">payments</span>
+        <span>Flujo de Caja</span>
+      </button>
+    </div>
+
+    <!-- VISTA: PROYECTOS -->
+    <section id="secProyectos">
+      <div class="projects-filter-bar">
+        <div class="search-input-box">
+          <span class="material-symbols-outlined" style="font-size:18px; color:var(--text-muted);">search</span>
+          <input type="text" id="inpBuscarProyectos" placeholder="Buscar por cliente, temática o detalle..." oninput="filtrarProyectos()">
+        </div>
+        
+        <select id="selFiltroEstado" onchange="filtrarProyectos()" style="background:#FFFFFF; border:1.5px solid var(--border); border-radius:14px; padding:8px 12px; font-size:12.5px; font-weight:700; color:var(--text); outline:none;">
+          <option value="todos">Todos los Estados</option>
+          <option value="activos" selected>Solo Activos en Taller</option>
+          <option value="cotizado">Cotizados</option>
+          <option value="anticipo_recibido">Con Anticipo</option>
+          <option value="en_diseno">En Diseño</option>
+          <option value="en_produccion">En Fabricación</option>
+          <option value="listo_entrega">Listos para Entrega</option>
+          <option value="entregado">Entregados</option>
+        </select>
+      </div>
+
+      <div class="projects-grid" id="gridProyectos">
+        <!-- Inyectado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- VISTA: CATÁLOGO DE CREACIONES -->
+    <section id="secCatalogo" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div style="font-size:14px; font-weight:800;">Catálogo de Productos y Servicios</div>
+        <button type="button" class="btn-quick-action primary" onclick="abrirModalNuevoItemCatalogo()">
+          <span>+ Agregar Ítem</span>
+        </button>
+      </div>
+      <div class="projects-grid" id="gridCatalogoStudio">
+        <!-- Inyectado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- VISTA: CLIENTES -->
+    <section id="secClientes" style="display:none;">
+      <div style="font-size:14px; font-weight:800; margin-bottom:14px;">Directorio de Clientes de Taller</div>
+      <div class="projects-grid" id="gridClientesStudio">
+        <!-- Inyectado dinámicamente -->
+      </div>
+    </section>
+
+    <!-- VISTA: FINANZAS -->
+    <section id="secFinanzas" style="display:none;">
+      <div style="font-size:14px; font-weight:800; margin-bottom:14px;">Flujo de Caja del Taller</div>
+      <div id="listaFinanzasStudio">
+        <!-- Inyectado dinámicamente -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: NUEVO / EDITAR PROYECTO -->
+  <div class="modal-overlay" id="modalProyecto">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="lblModalProyectoTitle">Nuevo Encargo de Taller</div>
+        <button class="modal-close" onclick="cerrarModalProyecto()">✕</button>
+      </div>
+
+      <form id="formProyecto" onsubmit="event.preventDefault(); guardarProyecto();">
+        <input type="hidden" id="projIdHidden">
+
+        <div class="form-group">
+          <label>Nombre del Cliente *</label>
+          <input type="text" id="projClienteInp" placeholder="Ej: Marcela Gómez" required>
+        </div>
+
+        <div class="form-group">
+          <label>WhatsApp / Celular *</label>
+          <input type="tel" id="projTelefonoInp" placeholder="Ej: 312 456 7890" required>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción del Trabajo / Temática *</label>
+          <input type="text" id="projTituloInp" placeholder="Ej: Cake Topper Shaker Safari con luz LED" required>
+        </div>
+
+        <div class="form-group">
+          <label>Detalles o Especificaciones de Diseño</label>
+          <textarea id="projDetallesInp" rows="2" placeholder="Colores, nombre del festejado, medidas, etc."></textarea>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Valor Total Acordado (COP) *</label>
+            <input type="number" id="projValorTotalInp" placeholder="35000" min="0" oninput="calcularSaldoProyecto()" required>
+          </div>
+
+          <div class="form-group">
+            <label>Anticipo / Abono Recibido</label>
+            <input type="number" id="projAnticipoInp" placeholder="20000" min="0" oninput="calcularSaldoProyecto()">
+          </div>
+        </div>
+
+        <div style="background:#FAF5EF; border:1px solid var(--border); border-radius:12px; padding:10px; margin-bottom:12px; font-size:12.5px; font-weight:700; display:flex; justify-content:space-between;">
+          <span>Saldo Pendiente por Cobrar:</span>
+          <span style="color:var(--primary); font-size:14px;" id="lblSaldoCalculado">$0 COP</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Medio de Pago del Anticipo</label>
+            <select id="projMedioPagoSel">
+              <option value="Nequi">🟣 Nequi</option>
+              <option value="Bre-Be">🟢 Bre-Be</option>
+              <option value="Bancolombia">🔵 Bancolombia</option>
+              <option value="Daviplata">🟡 Daviplata</option>
+              <option value="Efectivo">💵 Efectivo</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha Prometida de Entrega *</label>
+            <input type="date" id="projFechaEntregaInp" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Estado Inicial en el Taller</label>
+          <select id="projEstadoSel">
+            <option value="anticipo_recibido">🟡 Anticipo Recibido</option>
+            <option value="en_diseno">🎨 En Diseño Digital</option>
+            <option value="en_produccion">✂️ En Fabricación / Armado</option>
+            <option value="listo_entrega">📦 Listo para Entregar</option>
+            <option value="cotizado">📝 Solo Cotización (Sin Anticipo)</option>
+            <option value="entregado">✅ Entregado y Liquidado</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit-modal">
+          <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+          <span>Guardar Encargo</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TAREAS DE TALLER -->
+  <div class="modal-overlay" id="modalTareas">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">📋 Tareas y Pendientes del Taller</div>
+        <button class="modal-close" onclick="cerrarModalTareas()">✕</button>
+      </div>
+
+      <div style="display:flex; gap:8px; margin-bottom:14px;">
+        <input type="text" id="inpNuevaTarea" placeholder="Ej: Comprar acetato y cartulina dorada..." style="flex:1; padding:9px 12px; border-radius:12px; border:1.5px solid var(--border); font-size:12.5px;">
+        <button type="button" onclick="agregarTareaTaller()" class="btn-quick-action primary" style="padding:9px 14px;">
+          <span>+ Agregar</span>
+        </button>
+      </div>
+
+      <div id="listaTareasTaller" style="max-height:300px; overflow-y:auto;">
+        <!-- Inyectado dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: REGISTRAR GASTO DE TALLER -->
+  <div class="modal-overlay" id="modalGasto">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">💸 Registrar Compra o Gasto de Taller</div>
+        <button class="modal-close" onclick="cerrarModalGasto()">✕</button>
+      </div>
+
+      <form onsubmit="event.preventDefault(); guardarGastoTaller();">
+        <div class="form-group">
+          <label>Concepto o Material Comprado *</label>
+          <input type="text" id="gastoConceptoInp" placeholder="Ej: Vinilos adhesivos, acetato, silicona" required>
+        </div>
+
+        <div class="form-group">
+          <label>Valor del Gasto (COP) *</label>
+          <input type="number" id="gastoValorInp" placeholder="25000" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label>Medio de Pago</label>
+          <select id="gastoMedioPagoSel">
+            <option value="Efectivo">💵 Efectivo de Caja</option>
+            <option value="Nequi">🟣 Nequi</option>
+            <option value="Bancolombia">🔵 Bancolombia</option>
+            <option value="Daviplata">🟡 Daviplata</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-submit-modal">
+          <span>Registrar Salida de Dinero</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ÍTEM DE CATÁLOGO / CREACIÓN -->
+  <div class="modal-overlay" id="modalItemCatalogo">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="lblModalCatTitle">✨ Nueva Creación / Producto</div>
+        <button class="modal-close" onclick="cerrarModalNuevoItemCatalogo()">✕</button>
+      </div>
+
+      <form id="formItemCatalogo" onsubmit="event.preventDefault(); guardarNuevoItemCatalogo();">
+        <input type="hidden" id="catItemIdHidden">
+
+        <div class="form-group">
+          <label>Nombre del Producto o Creación *</label>
+          <input type="text" id="catItemNameInp" placeholder="Ej: Agenda Personalizada 2026, Cuadro Floral" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Categoría</label>
+            <input type="text" id="catItemCatInp" placeholder="Ej: Papelería, Decoración, Detalles" list="listaCategoriasSugeridas">
+            <datalist id="listaCategoriasSugeridas">
+              <option value="Papelería Creativa">
+              <option value="Cajas & Empaques">
+              <option value="Decoración de Fiestas">
+              <option value="Sublimación & Vinilo">
+              <option value="Detalles & Regalos">
+              <option value="Diseño Digital">
+            </datalist>
+          </div>
+
+          <div class="form-group">
+            <label>Precio de Venta (COP) *</label>
+            <input type="number" id="catItemPriceInp" placeholder="45000" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descripción / Materiales</label>
+          <textarea id="catItemDescInp" placeholder="Tamaño, acabados, tiempo estimado de elaboración..." rows="2" style="width:100%; padding:9px 12px; border-radius:12px; border:1.5px solid var(--border); font-size:12.5px;"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>URL de Imagen o Foto (Opcional)</label>
+          <input type="url" id="catItemPhotoInp" placeholder="https://ejemplo.com/foto.jpg">
+        </div>
+
+        <button type="submit" class="btn-submit-modal">
+          <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+          <span>Guardar en Catálogo</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- NOTIFICADOR TOAST -->
+  <div id="studioToast" class="studio-toast">Notificación</div>
+
+  <script>
+    // ==========================================
+    // CONFIGURACIÓN FIREBASE CLOUD (ZENTRA)
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAscjzcp4-d5UNoTUxYkaSqUrjmXxabkKs",
+      authDomain: "zentra-d2b9e.firebaseapp.com",
+      projectId: "zentra-d2b9e",
+      storageBucket: "zentra-d2b9e.firebasestorage.app",
+      messagingSenderId: "839899175783",
+      appId: "1:839899175783:web:4044684ba833a61ddd2dc2"
+    };
+
+    let fbApp = null;
+    let fbDb = null;
+    let fbAuth = null;
+
+    try {
+      if (typeof firebase !== 'undefined') {
+        fbApp = firebase.initializeApp(firebaseConfig, 'zentraStudioApp');
+        fbDb = fbApp.firestore();
+        fbAuth = fbApp.auth();
+      }
+    } catch (e) {
+      console.warn('Firebase Studio Init:', e);
+    }
+
+    // ==========================================
+    // ESTADO DE ZENTRA STUDIO
+    // ==========================================
+    let currentBizId = 'biz_tm_disenos'; // Negocio principal predeterminado de taller
+    let bizProfile = {
+      id: 'biz_tm_disenos',
+      name: 'TM Diseños Creativos',
+      owner: 'Tatiana Marín',
+      phone: '3124567890',
+      nequi: '3124567890',
+      daviplata: '',
+      bancolombia: '',
+      brebe: '',
+      type: 'studio',
+      theme: 'clasico'
+    };
+
+    let projects = [];
+    let tasks = [];
+    let catalog = [];
+    let clients = [];
+    let finances = [];
+
+    // ==========================================
+    // INICIALIZACIÓN
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', async () => {
+      // 1. Obtener ID de la URL si se pasa ?biz=...
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlBiz = urlParams.get('biz');
+      if (urlBiz) {
+        currentBizId = urlBiz.trim();
+      }
+
+      await cargarDatosStudio();
+    });
+
+    async function cargarDatosStudio() {
+      actualizarIndicadorSync('Sincronizando...');
+
+      // 1. Intentar cargar desde Cloud Firestore (Single Source of Truth)
+      let loadedFromCloud = false;
+      if (fbDb) {
+        try {
+          const docRef = fbDb.collection('negocios_zentra').doc(currentBizId);
+          const snap = await docRef.get();
+          if (snap.exists) {
+            const data = snap.data();
+            if (data.bizProfile) bizProfile = { ...bizProfile, ...data.bizProfile };
+            if (Array.isArray(data.projectsData)) projects = data.projectsData;
+            if (Array.isArray(data.tasks)) tasks = data.tasks;
+            if (Array.isArray(data.catalogItems)) catalog = data.catalogItems;
+            if (Array.isArray(data.clients)) clients = data.clients;
+            if (Array.isArray(data.finances)) finances = data.finances;
+            loadedFromCloud = true;
+            console.log(`Zentra Studio: Cargados datos desde Cloud Firestore para ${currentBizId}`);
+          }
+        } catch (err) {
+          console.warn('Lectura Firestore en Studio:', err);
+        }
+      }
+
+      // 2. Si no cargó de la nube o es offline, respaldo local
+      if (!loadedFromCloud) {
+        try {
+          const pStr = localStorage.getItem(`zentra_projects_${currentBizId}`);
+          if (pStr) projects = JSON.parse(pStr);
+          const tStr = localStorage.getItem(`zentra_tasks_${currentBizId}`);
+          if (tStr) tasks = JSON.parse(tStr);
+          const cStr = localStorage.getItem(`zentra_catalog_${currentBizId}`);
+          if (cStr) catalog = JSON.parse(cStr);
+          const clStr = localStorage.getItem(`zentra_clients_${currentBizId}`);
+          if (clStr) clients = JSON.parse(clStr);
+          const bStr = localStorage.getItem(`zentra_biz_profile_${currentBizId}`);
+          if (bStr) bizProfile = { ...bizProfile, ...JSON.parse(bStr) };
+        } catch (_) {}
+      }
+
+      // Si las tareas están vacías, agregar tareas operativas sugeridas
+      if (tasks.length === 0) {
+        tasks = [
+          { id: 't1', text: 'Confirmar lista de insumos para encargos de esta semana', priority: 'alta', completed: false },
+          { id: 't2', text: 'Enviar propuestas de diseño a clientes por WhatsApp', priority: 'normal', completed: false }
+        ];
+      }
+
+      actualizarUIStudio();
+      actualizarIndicadorSync('Sincronizado');
+    }
+
+    function actualizarUIStudio() {
+      // Header
+      document.getElementById('hdrBizName').innerText = bizProfile.name || 'TM Diseños Creativos';
+      document.title = `${bizProfile.name || 'TM Diseños'} • Zentra Studio`;
+
+      // Métricas de Cockpit
+      const activos = projects.filter(p => p.status !== 'entregado');
+      document.getElementById('valProyectosActivos').innerText = activos.length;
+
+      const saldos = activos.reduce((sum, p) => sum + (Number(p.saldo) || 0), 0);
+      document.getElementById('valSaldosCobrar').innerText = `$${saldos.toLocaleString('es-CO')}`;
+
+      // Entregas de los próximos 7 días
+      const hoy = new Date();
+      const sieteDias = new Date();
+      sieteDias.setDate(hoy.getDate() + 7);
+      const entregasSem = activos.filter(p => {
+        if (!p.fechaEntrega) return false;
+        const f = new Date(p.fechaEntrega);
+        return f >= hoy && f <= sieteDias;
+      }).length;
+      document.getElementById('valEntregasSemana').innerText = entregasSem;
+
+      // Ingresos del mes
+      const mesActual = hoy.getMonth();
+      const anoActual = hoy.getFullYear();
+      let ingresosMes = finances.filter(f => {
+        const d = new Date(f.date || 0);
+        return d.getMonth() === mesActual && d.getFullYear() === anoActual && f.type === 'ingreso';
+      }).reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
+
+      // Si finances está vacío, sumar anticipos de proyectos del mes
+      if (ingresosMes === 0) {
+        ingresosMes = projects.reduce((sum, p) => sum + (Number(p.anticipo) || 0), 0);
+      }
+      document.getElementById('valIngresosMes').innerText = `$${ingresosMes.toLocaleString('es-CO')}`;
+
+      // Badge contador de tareas pendientes
+      const pend = tasks.filter(t => !t.completed).length;
+      document.getElementById('badgeTareasContador').innerText = pend;
+
+      // Renderizar vistas
+      renderizarProyectos();
+      renderizarTareas();
+      renderizarCatalogo();
+      renderizarClientes();
+      renderizarFinanzas();
+    }
+
+    // ==========================================
+    // GESTIÓN DE PROYECTOS / ENCARGOS
+    // ==========================================
+    function renderizarProyectos() {
+      const grid = document.getElementById('gridProyectos');
+      const q = (document.getElementById('inpBuscarProyectos')?.value || '').toLowerCase().trim();
+      const filtro = document.getElementById('selFiltroEstado')?.value || 'activos';
+
+      let filtrados = projects.filter(p => {
+        const matchQ = !q || 
+                       (p.cliente && p.cliente.toLowerCase().includes(q)) || 
+                       (p.titulo && p.titulo.toLowerCase().includes(q)) ||
+                       (p.detalles && p.detalles.toLowerCase().includes(q));
+
+        let matchEstado = true;
+        if (filtro === 'activos') {
+          matchEstado = p.status !== 'entregado';
+        } else if (filtro !== 'todos') {
+          matchEstado = p.status === filtro;
+        }
+
+        return matchQ && matchEstado;
+      });
+
+      if (filtrados.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:40px 20px; background:#FFFFFF; border:1.5px dashed var(--border); border-radius:18px;">
+            <div style="font-size:36px; margin-bottom:8px;">🎨</div>
+            <div style="font-weight:700; font-size:14px; color:var(--text);">No hay proyectos en esta vista</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Toca "+ Nuevo Encargo" para registrar tu primer trabajo del taller.</div>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtrados.map(p => {
+        const total = Number(p.valorTotal) || 0;
+        const abono = Number(p.anticipo) || 0;
+        const saldo = Number(p.saldo) || 0;
+
+        let badgeClass = 'status-anticipo';
+        let statusLabel = '🟡 Anticipo Recibido';
+        if (p.status === 'cotizado') { badgeClass = 'status-cotizado'; statusLabel = '📝 Cotización'; }
+        if (p.status === 'en_diseno') { badgeClass = 'status-diseno'; statusLabel = '🎨 En Diseño'; }
+        if (p.status === 'en_produccion') { badgeClass = 'status-produccion'; statusLabel = '✂️ En Fabricación'; }
+        if (p.status === 'listo_entrega') { badgeClass = 'status-listo'; statusLabel = '📦 Listo para Entrega'; }
+        if (p.status === 'entregado') { badgeClass = 'status-entregado'; statusLabel = '✅ Entregado'; }
+
+        // Formato fecha
+        let fechaTxt = 'Sin fecha';
+        if (p.fechaEntrega) {
+          const parts = p.fechaEntrega.split('-');
+          if (parts.length === 3) fechaTxt = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        return `
+          <div class="project-card">
+            <div>
+              <div class="project-card-header">
+                <div>
+                  <div class="project-title">${p.titulo || 'Encargo Sin Título'}</div>
+                  <div class="project-client-name">
+                    <span>👤 ${p.cliente || 'Cliente'}</span>
+                    ${p.telefono ? `<span style="color:var(--primary); cursor:pointer;" onclick="abrirWhatsAppCliente('${p.telefono}', '${p.cliente}', '${p.titulo}')">📞 ${p.telefono}</span>` : ''}
+                  </div>
+                </div>
+                <span class="status-pill ${badgeClass}">${statusLabel}</span>
+              </div>
+
+              ${p.detalles ? `<div style="font-size:11.5px; color:var(--text-muted); margin-top:8px; line-height:1.35; background:#FAF5EF; padding:6px 10px; border-radius:10px;">${p.detalles}</div>` : ''}
+            </div>
+
+            <div>
+              <div class="project-finances-row">
+                <div>Total: <b>$${total.toLocaleString('es-CO')}</b></div>
+                <div>Abonado: <b style="color:var(--success);">$${abono.toLocaleString('es-CO')}</b></div>
+                <div>Saldo: <b style="color:${saldo > 0 ? 'var(--warning)' : 'var(--text-muted)'};">$${saldo.toLocaleString('es-CO')}</b></div>
+              </div>
+
+              <div class="project-deadline-row" style="margin-top:8px;">
+                <span>📅 Entrega: <b>${fechaTxt}</b></span>
+                <select onchange="cambiarEstadoProyecto('${p.id}', this.value)" style="background:#FFFFFF; border:1px solid var(--border); border-radius:8px; font-size:11px; padding:3px 6px; font-weight:700; color:var(--text); outline:none;">
+                  <option value="anticipo_recibido" ${p.status==='anticipo_recibido'?'selected':''}>🟡 Con Anticipo</option>
+                  <option value="en_diseno" ${p.status==='en_diseno'?'selected':''}>🎨 En Diseño</option>
+                  <option value="en_produccion" ${p.status==='en_produccion'?'selected':''}>✂️ En Fabricación</option>
+                  <option value="listo_entrega" ${p.status==='listo_entrega'?'selected':''}>📦 Listo Entrega</option>
+                  <option value="entregado" ${p.status==='entregado'?'selected':''}>✅ Entregado</option>
+                </select>
+              </div>
+
+              <div class="project-card-footer">
+                <button type="button" class="btn-card-action" onclick="enviarReciboWhatsApp('${p.id}')" title="Enviar comprobante del encargo por WhatsApp">
+                  <span>💬 Recibo WhatsApp</span>
+                </button>
+                <button type="button" class="btn-card-action" onclick="editarProyecto('${p.id}')">
+                  <span>✏️ Editar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filtrarProyectos() {
+      renderizarProyectos();
+    }
+
+    function calcularSaldoProyecto() {
+      const total = Number(document.getElementById('projValorTotalInp').value) || 0;
+      const abono = Number(document.getElementById('projAnticipoInp').value) || 0;
+      const saldo = Math.max(0, total - abono);
+      document.getElementById('lblSaldoCalculado').innerText = `$${saldo.toLocaleString('es-CO')} COP`;
+    }
+
+    function abrirModalNuevoProyecto() {
+      document.getElementById('lblModalProyectoTitle').innerText = 'Nuevo Encargo de Taller';
+      document.getElementById('projIdHidden').value = '';
+      document.getElementById('formProyecto').reset();
+      
+      // Fecha entrega sugerida: en 4 días
+      const hoy = new Date();
+      hoy.setDate(hoy.getDate() + 4);
+      document.getElementById('projFechaEntregaInp').value = hoy.toISOString().split('T')[0];
+
+      calcularSaldoProyecto();
+      document.getElementById('modalProyecto').style.display = 'flex';
+    }
+
+    function editarProyecto(id) {
+      const p = projects.find(x => x.id === id);
+      if (!p) return;
+
+      document.getElementById('lblModalProyectoTitle').innerText = 'Editar Encargo de Taller';
+      document.getElementById('projIdHidden').value = p.id;
+      document.getElementById('projClienteInp').value = p.cliente || '';
+      document.getElementById('projTelefonoInp').value = p.telefono || '';
+      document.getElementById('projTituloInp').value = p.titulo || '';
+      document.getElementById('projDetallesInp').value = p.detalles || '';
+      document.getElementById('projValorTotalInp').value = p.valorTotal || '';
+      document.getElementById('projAnticipoInp').value = p.anticipo || '';
+      document.getElementById('projMedioPagoSel').value = p.medioPago || 'Nequi';
+      document.getElementById('projFechaEntregaInp').value = p.fechaEntrega || '';
+      document.getElementById('projEstadoSel').value = p.status || 'anticipo_recibido';
+
+      calcularSaldoProyecto();
+      document.getElementById('modalProyecto').style.display = 'flex';
+    }
+
+    function cerrarModalProyecto() {
+      document.getElementById('modalProyecto').style.display = 'none';
+    }
+
+    async function guardarProyecto() {
+      const idExistente = document.getElementById('projIdHidden').value;
+      const cliente = document.getElementById('projClienteInp').value.trim();
+      const telefono = document.getElementById('projTelefonoInp').value.trim();
+      const titulo = document.getElementById('projTituloInp').value.trim();
+      const detalles = document.getElementById('projDetallesInp').value.trim();
+      const valorTotal = Number(document.getElementById('projValorTotalInp').value) || 0;
+      const anticipo = Number(document.getElementById('projAnticipoInp').value) || 0;
+      const saldo = Math.max(0, valorTotal - anticipo);
+      const medioPago = document.getElementById('projMedioPagoSel').value;
+      const fechaEntrega = document.getElementById('projFechaEntregaInp').value;
+      const status = document.getElementById('projEstadoSel').value;
+
+      const pData = {
+        id: idExistente || `proj_${Date.now()}`,
+        cliente,
+        telefono,
+        titulo,
+        detalles,
+        valorTotal,
+        anticipo,
+        saldo,
+        medioPago,
+        fechaEntrega,
+        status,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (idExistente) {
+        const idx = projects.findIndex(x => x.id === idExistente);
+        if (idx !== -1) projects[idx] = pData;
+        mostrarStudioToast('✓ Encargo actualizado exitosamente');
+      } else {
+        projects.unshift(pData);
+        // Registrar anticipo como ingreso en finanzas si es mayor a cero
+        if (anticipo > 0) {
+          finances.unshift({
+            id: `fin_${Date.now()}`,
+            type: 'ingreso',
+            concept: `Anticipo encargo: ${titulo} (${cliente})`,
+            amount: anticipo,
+            method: medioPago,
+            date: new Date().toISOString()
+          });
+        }
+        mostrarStudioToast('✓ Encargo registrado en taller');
+      }
+
+      cerrarModalProyecto();
+      actualizarUIStudio();
+      await persistirDatosStudio();
+    }
+
+    async function cambiarEstadoProyecto(id, nuevoEstado) {
+      const p = projects.find(x => x.id === id);
+      if (!p) return;
+      p.status = nuevoEstado;
+      p.updatedAt = new Date().toISOString();
+
+      // Si se marca como entregado y tenía saldo pendiente, consultar si desea liquidarlo
+      if (nuevoEstado === 'entregado' && p.saldo > 0) {
+        if (confirm(`El proyecto tiene un saldo pendiente de $${p.saldo.toLocaleString('es-CO')} COP.\n\n¿Deseas marcar el saldo como PAGADO y registrarlo como ingreso en el taller?`)) {
+          finances.unshift({
+            id: `fin_${Date.now()}`,
+            type: 'ingreso',
+            concept: `Liquidación saldo encargo: ${p.titulo} (${p.cliente})`,
+            amount: p.saldo,
+            method: 'Nequi',
+            date: new Date().toISOString()
+          });
+          p.anticipo = p.valorTotal;
+          p.saldo = 0;
+        }
+      }
+
+      actualizarUIStudio();
+      await persistirDatosStudio();
+      mostrarStudioToast('✓ Estado actualizado');
+    }
+
+    function enviarReciboWhatsApp(id) {
+      const p = projects.find(x => x.id === id);
+      if (!p || !p.telefono) {
+        alert('Este encargo no tiene un teléfono celular registrado.');
+        return;
+      }
+
+      const total = Number(p.valorTotal) || 0;
+      const abono = Number(p.anticipo) || 0;
+      const saldo = Number(p.saldo) || 0;
+
+      const msg = `¡Hola *${p.cliente}*! 👋\n\n` +
+                  `Te compartimos el comprobante de tu encargo en *${bizProfile.name}*:\n\n` +
+                  `🎨 *Trabajo:* ${p.titulo}\n` +
+                  (p.detalles ? `📝 *Detalles:* ${p.detalles}\n` : '') +
+                  `📅 *Fecha de Entrega:* ${p.fechaEntrega}\n\n` +
+                  `💰 *Valor Total:* $${total.toLocaleString('es-CO')} COP\n` +
+                  `🟢 *Anticipo Recibido:* $${abono.toLocaleString('es-CO')} COP\n` +
+                  `⏳ *Saldo Pendiente:* $${saldo.toLocaleString('es-CO')} COP\n\n` +
+                  `¡Tu proyecto está en proceso en nuestro taller con todo el amor y detalle! ✨`;
+
+      const clean = p.telefono.replace(/\D/g, '');
+      const full = clean.length === 10 ? '57' + clean : clean;
+      const url = `https://api.whatsapp.com/send?phone=${full}&text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
+    function abrirWhatsAppCliente(tel, nombre, titulo) {
+      const clean = tel.replace(/\D/g, '');
+      const full = clean.length === 10 ? '57' + clean : clean;
+      const msg = `¡Hola *${nombre}*! Te escribo de *${bizProfile.name}* respecto a tu encargo: *${titulo}*.`;
+      window.open(`https://api.whatsapp.com/send?phone=${full}&text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    // ==========================================
+    // TAREAS DE TALLER
+    // ==========================================
+    function abrirModalTareas() {
+      renderizarTareas();
+      document.getElementById('modalTareas').style.display = 'flex';
+      setTimeout(() => document.getElementById('inpNuevaTarea')?.focus(), 100);
+    }
+
+    function cerrarModalTareas() {
+      document.getElementById('modalTareas').style.display = 'none';
+    }
+
+    function renderizarTareas() {
+      const list = document.getElementById('listaTareasTaller');
+      if (!list) return;
+
+      if (tasks.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:12px;">No hay tareas pendientes en el taller.</div>';
+        return;
+      }
+
+      list.innerHTML = tasks.map(t => `
+        <div class="task-item-row ${t.completed ? 'completed' : ''}">
+          <div style="display:flex; align-items:center; gap:8px; flex:1; cursor:pointer;" onclick="toggleTarea('${t.id}')">
+            <input type="checkbox" ${t.completed ? 'checked' : ''} style="accent-color:var(--primary); cursor:pointer;">
+            <span style="font-size:12.5px; font-weight:600;">${t.text}</span>
+          </div>
+          <button type="button" onclick="eliminarTarea('${t.id}')" style="background:none; border:none; color:var(--danger); font-size:14px; cursor:pointer;" title="Eliminar">✕</button>
+        </div>
+      `).join('');
+    }
+
+    async function agregarTareaTaller() {
+      const inp = document.getElementById('inpNuevaTarea');
+      const val = inp.value.trim();
+      if (!val) return;
+
+      tasks.unshift({
+        id: `t_${Date.now()}`,
+        text: val,
+        priority: 'normal',
+        completed: false
+      });
+
+      inp.value = '';
+      actualizarUIStudio();
+      await persistirDatosStudio();
+    }
+
+    async function toggleTarea(id) {
+      const t = tasks.find(x => x.id === id);
+      if (!t) return;
+      t.completed = !t.completed;
+      actualizarUIStudio();
+      await persistirDatosStudio();
+    }
+
+    async function eliminarTarea(id) {
+      tasks = tasks.filter(x => x.id !== id);
+      actualizarUIStudio();
+      await persistirDatosStudio();
+    }
+
+    // ==========================================
+    // GASTOS DE MATERIALES
+    // ==========================================
+    function abrirModalGasto() {
+      document.getElementById('modalGasto').style.display = 'flex';
+    }
+
+    function cerrarModalGasto() {
+      document.getElementById('modalGasto').style.display = 'none';
+    }
+
+    async function guardarGastoTaller() {
+      const concepto = document.getElementById('gastoConceptoInp').value.trim();
+      const valor = Number(document.getElementById('gastoValorInp').value) || 0;
+      const medio = document.getElementById('gastoMedioPagoSel').value;
+
+      finances.unshift({
+        id: `fin_${Date.now()}`,
+        type: 'gasto',
+        concept: concepto,
+        amount: valor,
+        method: medio,
+        date: new Date().toISOString()
+      });
+
+      cerrarModalGasto();
+      actualizarUIStudio();
+      await persistirDatosStudio();
+      mostrarStudioToast('✓ Gasto registrado en el taller');
+    }
+
+    // ==========================================
+    // OTRAS VISTAS (CATÁLOGO, CLIENTES, FINANZAS)
+    // ==========================================
+    function cambiarVistaStudio(vista) {
+      ['proyectos', 'catalogo', 'clientes', 'finanzas'].forEach(v => {
+        const sec = document.getElementById(`sec${v.charAt(0).toUpperCase() + v.slice(1)}`);
+        const btn = document.getElementById(`tab${v.charAt(0).toUpperCase() + v.slice(1)}`);
+        if (sec) sec.style.display = (v === vista) ? 'block' : 'none';
+        if (btn) btn.classList.toggle('active', v === vista);
+      });
+    }
+
+    function abrirModalNuevoItemCatalogo() {
+      document.getElementById('lblModalCatTitle').innerText = '✨ Nueva Creación / Producto';
+      document.getElementById('catItemIdHidden').value = '';
+      document.getElementById('formItemCatalogo').reset();
+      document.getElementById('modalItemCatalogo').style.display = 'flex';
+      setTimeout(() => document.getElementById('catItemNameInp')?.focus(), 100);
+    }
+
+    function cerrarModalNuevoItemCatalogo() {
+      document.getElementById('modalItemCatalogo').style.display = 'none';
+    }
+
+    function editarItemCatalogo(id) {
+      const it = catalog.find(x => x.id === id);
+      if (!it) return;
+      document.getElementById('lblModalCatTitle').innerText = '✏️ Editar Producto de Catálogo';
+      document.getElementById('catItemIdHidden').value = it.id;
+      document.getElementById('catItemNameInp').value = it.name || '';
+      document.getElementById('catItemCatInp').value = it.category || it.cat || '';
+      document.getElementById('catItemPriceInp').value = it.price || 0;
+      document.getElementById('catItemDescInp').value = it.description || it.desc || '';
+      document.getElementById('catItemPhotoInp').value = it.photo || it.image || '';
+      document.getElementById('modalItemCatalogo').style.display = 'flex';
+    }
+
+    async function guardarNuevoItemCatalogo() {
+      const idExistente = document.getElementById('catItemIdHidden').value;
+      const name = document.getElementById('catItemNameInp').value.trim();
+      const category = document.getElementById('catItemCatInp').value.trim() || 'General';
+      const price = Number(document.getElementById('catItemPriceInp').value) || 0;
+      const description = document.getElementById('catItemDescInp').value.trim();
+      const photo = document.getElementById('catItemPhotoInp').value.trim();
+
+      const itemData = {
+        id: idExistente || `prod_${Date.now()}`,
+        name,
+        category,
+        cat: category,
+        price,
+        description,
+        desc: description,
+        photo: photo || null,
+        image: photo || null,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (idExistente) {
+        const idx = catalog.findIndex(x => x.id === idExistente);
+        if (idx !== -1) catalog[idx] = itemData;
+        mostrarStudioToast('✓ Creación actualizada');
+      } else {
+        catalog.unshift(itemData);
+        mostrarStudioToast('✓ Creación agregada al catálogo');
+      }
+
+      cerrarModalNuevoItemCatalogo();
+      renderizarCatalogo();
+      await persistirDatosStudio();
+    }
+
+    async function eliminarItemCatalogo(id) {
+      const it = catalog.find(x => x.id === id);
+      if (!it) return;
+      if (!confirm(`¿Eliminar "${it.name}" del catálogo?`)) return;
+      catalog = catalog.filter(x => x.id !== id);
+      renderizarCatalogo();
+      await persistirDatosStudio();
+      mostrarStudioToast('✓ Creación eliminada');
+    }
+
+    function renderizarCatalogo() {
+      const grid = document.getElementById('gridCatalogoStudio');
+      if (!grid) return;
+      if (catalog.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted); font-size:12px;">No tienes productos o servicios en el catálogo. Toca "+ Agregar Ítem" para publicar creaciones.</div>';
+        return;
+      }
+
+      grid.innerHTML = catalog.map(c => `
+        <div class="project-card">
+          <div style="display:flex; gap:12px; align-items:flex-start;">
+            <div style="width:70px; height:70px; border-radius:12px; background:#FAF5EF; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:26px; overflow:hidden; flex-shrink:0;">
+              ${(c.photo || c.image) ? `<img src="${c.photo || c.image}" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.parentNode.innerHTML='🎨';">` : '🎨'}
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="font-weight:800; font-size:14px; color:var(--text); line-height:1.2;">${c.name}</div>
+                <div style="font-size:13px; font-weight:800; color:var(--primary);">$${(Number(c.price)||0).toLocaleString('es-CO')}</div>
+              </div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">📁 ${c.category || c.cat || 'General'}</div>
+              ${(c.description || c.desc) ? `<div style="font-size:11.5px; color:var(--text-muted); margin-top:4px; line-height:1.3;">${c.description || c.desc}</div>` : ''}
+              
+              <div style="display:flex; gap:8px; margin-top:10px;">
+                <button type="button" class="btn-card-action" onclick="editarItemCatalogo('${c.id}')" style="padding:4px 8px; font-size:11px;">
+                  <span>✏️ Editar</span>
+                </button>
+                <button type="button" class="btn-card-action" onclick="eliminarItemCatalogo('${c.id}')" style="padding:4px 8px; font-size:11px; color:var(--danger); border-color:var(--danger-soft);">
+                  <span>🗑️ Eliminar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderizarClientes() {
+      const grid = document.getElementById('gridClientesStudio');
+      if (!grid) return;
+
+      // Extraer clientes únicos de los proyectos y del listado
+      const clientMap = new Map();
+      projects.forEach(p => {
+        if (p.cliente) {
+          const key = p.cliente.toLowerCase().trim();
+          if (!clientMap.has(key)) {
+            clientMap.set(key, { name: p.cliente, phone: p.telefono || '', count: 1 });
+          } else {
+            clientMap.get(key).count++;
+          }
+        }
+      });
+
+      const list = Array.from(clientMap.values());
+      if (list.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:30px; color:var(--text-muted); font-size:12px;">No hay clientes registrados aún.</div>';
+        return;
+      }
+
+      grid.innerHTML = list.map(c => `
+        <div class="project-card">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:800; font-size:14px;">${c.name}</div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">📞 ${c.phone || 'Sin WhatsApp'}</div>
+              <div style="font-size:11px; color:var(--primary); font-weight:700; margin-top:4px;">${c.count} encargo(s) realizados</div>
+            </div>
+            ${c.phone ? `<button type="button" class="btn-card-action" onclick="abrirWhatsAppCliente('${c.phone}', '${c.name}', 'tus encargos')"><span>💬 Chat</span></button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderizarFinanzas() {
+      const box = document.getElementById('listaFinanzasStudio');
+      if (!box) return;
+      if (finances.length === 0) {
+        box.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:12px;">No hay movimientos de dinero registrados.</div>';
+        return;
+      }
+
+      box.innerHTML = finances.map(f => {
+        const isIngreso = f.type === 'ingreso';
+        return `
+          <div style="background:#FFFFFF; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-weight:700; font-size:13px;">${f.concept}</div>
+              <div style="font-size:10.5px; color:var(--text-muted);">${f.date ? new Date(f.date).toLocaleDateString() : ''} • ${f.method || 'Nequi'}</div>
+            </div>
+            <div style="font-weight:800; font-size:14px; color:${isIngreso ? 'var(--success)' : 'var(--danger)'};">
+              ${isIngreso ? '+' : '-'}$${(Number(f.amount)||0).toLocaleString('es-CO')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function compartirCatalogoOnline() {
+      const url = `${window.location.origin}/tienda.html?biz=${currentBizId}`;
+      window.open(url, '_blank');
+    }
+
+    // ==========================================
+    // PERSISTENCIA Y SINCRONIZACIÓN CLOUD
+    // ==========================================
+    async function persistirDatosStudio() {
+      actualizarIndicadorSync('Guardando...');
+
+      // 1. Guardar localmente
+      try {
+        localStorage.setItem(`zentra_projects_${currentBizId}`, JSON.stringify(projects));
+        localStorage.setItem(`zentra_tasks_${currentBizId}`, JSON.stringify(tasks));
+        localStorage.setItem(`zentra_catalog_${currentBizId}`, JSON.stringify(catalog));
+        localStorage.setItem(`zentra_biz_profile_${currentBizId}`, JSON.stringify(bizProfile));
+      } catch (_) {}
+
+      // 2. Guardar en Cloud Firestore (negocios_zentra)
+      if (fbDb && currentBizId) {
+        try {
+          await fbDb.collection('negocios_zentra').doc(currentBizId).set({
+            id: currentBizId,
+            bizProfile: bizProfile,
+            projectsData: projects,
+            tasks: tasks,
+            catalogItems: catalog,
+            finances: finances,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch (err) {
+          console.warn('Error guardando en Firestore:', err);
+        }
+      }
+
+      actualizarIndicadorSync('Sincronizado');
+    }
+
+    async function sincronizarConNube() {
+      mostrarStudioToast('⏳ Sincronizando con Cloud Firestore...');
+      await persistirDatosStudio();
+      mostrarStudioToast('☁️ Taller 100% sincronizado en la nube');
+    }
+
+    function actualizarIndicadorSync(texto) {
+      const txt = document.getElementById('syncText');
+      if (txt) txt.innerText = texto;
+    }
+
+    function mostrarStudioToast(msg) {
+      const t = document.getElementById('studioToast');
+      if (!t) return;
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2800);
+    }
+  </script>
+</body>
+</html>

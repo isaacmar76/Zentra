@@ -891,6 +891,35 @@ class CatalogItemModel {
   6. **Paridad Total de Archivos:**
      - Sincronización al 100% en `index.html`, `preview.html`, `site/app.html`, `site/app/index.html`, `tienda.html` y `site/tienda.html`.
 
+#### Hito 39: Desacoplamiento de Aplicaciones en Aplicaciones Independientes y Portal "Mundo Zentra"
+- **Requerimiento del Usuario:**
+  - *"quiero separar la aplicacion para talleres estilo TM Diseños en una app totalmente independiente de otro modelo llamado Zentra-Retail... vamos a concentrarnos primero en Zentra-Studio... antes de continuar quiero que crees un login para entrar al mundo Zentra. Incluso las personas que ya tienen una tienda deben volver a logearse y quiero que esa pantalla de bienvenida muestre Zentra-Studio; Zentra-Retail y proximamente Zentra-Barber. Entonces la persona que ya existe en nuestro universo Zentra vuelve a loguearse con su correo y Zentra detecta cual es la tienda que esta asociada a ese correo y le abre el modo que corresponde. La misma persona puede tener varios negocios de modelos diferentes... listo procede con las novedades y vamos a separar las aplicaciones"*
+- **Implementación Técnica:**
+  1. **Portal Unificado y Smart Login Gateway (`index.html`):**
+     - Pantalla de bienvenida estética de alto impacto visual con diseño radial oscuro, orbes ambientales y tarjetas para los 3 pilares: **Zentra-Studio** (Talleres & Encargos), **Zentra-Retail** (Comercio & POS) y **Zentra-Barber** (Próximamente).
+     - Inicio de sesión con 1 toque mediante Google Sign-In y acceso manual por correo/PIN.
+     - Detección inteligente de negocios: consulta en tiempo real Cloud Firestore (`negocios_zentra`) y la caché local.
+     - Si la cuenta tiene 1 solo negocio asociado (ej. TM Diseños Creativos), abre de forma inmediata y automática la app correspondiente (`studio.html?biz=biz_tm_disenos`).
+     - Si la cuenta administra múltiples negocios de modelos diferentes (ej. Studio y Retail), despliega el selector modal interactivo para alternar entre ellos con un solo toque o registrar nuevos comercios.
+  2. **Zentra-Studio Independiente (`studio.html`):**
+     - Aplicación 100% especializada para talleres artesanales, diseño y proyectos por encargo (TM Diseños Creativos).
+     - Cero interferencias o saturación de códigos de barra o mostrador POS.
+     - Cockpit operativo: proyectos en proceso, saldos por cobrar, entregas de los próximos 7 días e ingresos del mes.
+     - Embudo de estados: *Cotizado* $\rightarrow$ *Con Anticipo* $\rightarrow$ *En Diseño* $\rightarrow$ *En Fabricación* $\rightarrow$ *Listo para Entrega* $\rightarrow$ *Entregado*.
+     - Generación de comprobante WhatsApp con saldo, anticipo y liquidación al entregar.
+     - Checklist de tareas de taller con badges de prioridad y contador dinámico.
+     - Catálogo de creaciones, directorio de clientes y flujo de caja con persistencia directa en Firestore.
+     - Enlace en cabecera para retornar al Universo Zentra / cambiar de negocio.
+  3. **Zentra-Retail Independiente (`retail.html`):**
+     - Aplicación especializada para tiendas de mostrador, minimarkets y comercio físico.
+     - Caja rápida de mostrador (POS), lector de códigos de barras, carrito y cálculo de vueltas.
+     - Control de existencias físicas, costos unitarios y alertas de stock bajo.
+     - Registro y auditoría de cierres diarios de caja.
+  4. **Persistencia Centralizada y Enrutamiento Vercel:**
+     - Ambas aplicaciones leen y escriben sobre la base de datos central en Cloud Firestore (`negocios_zentra/{bizId}`).
+     - Enrutamiento limpio configurado en `vercel.json` y `site/vercel.json` para `/studio`, `/retail`, `/hub`, `/app` y `/tienda`.
+     - Paridad y réplica exacta en `site/` para despliegues continuos.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

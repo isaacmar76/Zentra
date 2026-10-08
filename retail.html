@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Zentra Retail • Punto de Venta e Inventario Rápido</title>
+  <meta name="description" content="Sistema punto de venta rápido (POS), inventario físico y cierre de caja para minimarkets y tiendas de mostrador.">
+  <link rel="icon" type="image/png" href="img/icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..700,0..1,0&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+  <style>
+    :root {
+      /* Paleta Retail Moderna (Esmeralda & Contraste Alto) */
+      --bg: #F8FAFC;
+      --card-bg: #FFFFFF;
+      --border: #E2E8F0;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --primary: #006C46;
+      --primary-hover: #005637;
+      --primary-soft: #ECFDF5;
+      --accent: #10B981;
+      --success: #16A34A;
+      --warning: #D97706;
+      --danger: #DC2626;
+      --danger-soft: #FEE2E2;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.08);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .retail-header {
+      background: #FFFFFF;
+      border-bottom: 1.5px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .header-logo-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #006C46 0%, #059669 100%);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 10px rgba(0,108,70,0.25);
+    }
+
+    .header-titles {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .retail-app-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .retail-biz-name {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-header-hub {
+      background: #F1F5F9;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 12px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-header-hub:hover {
+      background: #E2E8F0;
+    }
+
+    .btn-header-sync {
+      background: var(--primary-soft);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      padding: 7px 12px;
+      border-radius: 12px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* CONTENEDOR */
+    .retail-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px;
+      width: 100%;
+      flex: 1;
+    }
+
+    /* PESTAÑAS */
+    .retail-tabs {
+      display: flex;
+      border-bottom: 1.5px solid var(--border);
+      margin-bottom: 16px;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .retail-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 10px 18px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .retail-tab-btn.active {
+      color: var(--primary);
+    }
+
+    .retail-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1.5px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--primary);
+      border-radius: 3px 3px 0 0;
+    }
+
+    /* POS LAYOUT */
+    .pos-layout {
+      display: grid;
+      grid-template-columns: 1.6fr 1.1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 800px) {
+      .pos-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pos-products-box {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .pos-cart-box {
+      background: var(--card-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 480px;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 10px;
+      max-height: 520px;
+      overflow-y: auto;
+      margin-top: 12px;
+      padding-right: 4px;
+    }
+
+    .pos-item-card {
+      background: #F8FAFC;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 110px;
+    }
+
+    .pos-item-card:hover {
+      border-color: var(--primary);
+      background: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .cart-items-list {
+      flex: 1;
+      overflow-y: auto;
+      margin: 12px 0;
+      max-height: 280px;
+    }
+
+    .cart-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #F1F5F9;
+      font-size: 13px;
+    }
+
+    .btn-checkout {
+      width: 100%;
+      background: linear-gradient(135deg, #006C46 0%, #059669 100%);
+      color: #FFFFFF;
+      border: none;
+      padding: 14px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(0,108,70,0.3);
+      transition: all 0.15s ease;
+    }
+
+    .btn-checkout:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    /* MODAL OVERLAY */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: #FFFFFF;
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      box-shadow: var(--shadow-lg);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .modal-close {
+      background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block; font-size: 11.5px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted);
+    }
+
+    .form-group input, .form-group select {
+      width: 100%; padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--border); font-size: 13px; outline: none;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--primary);
+    }
+
+    .btn-submit-modal {
+      width: 100%; background: var(--primary); color: #FFF; border: none; padding: 12px; border-radius: 12px; font-weight: 800; font-size: 13.5px; cursor: pointer; margin-top: 8px;
+    }
+
+    /* INVENTORY TABLE */
+    .inv-table {
+      width: 100%; border-collapse: collapse; font-size: 13px;
+    }
+
+    .inv-table th {
+      text-align: left; padding: 10px 12px; background: #F8FAFC; border-bottom: 1.5px solid var(--border); font-weight: 800; color: var(--text-muted); font-size: 11px; text-transform: uppercase;
+    }
+
+    .inv-table td {
+      padding: 12px; border-bottom: 1px solid var(--border);
+    }
+
+    .stock-badge {
+      display: inline-block; padding: 3px 8px; border-radius: 20px; font-weight: 800; font-size: 11px;
+    }
+    .stock-ok { background: #DCFCE7; color: #166534; }
+    .stock-low { background: #FEF3C7; color: #92400E; }
+    .stock-empty { background: #FEE2E2; color: #991B1B; }
+
+    /* TOAST */
+    .retail-toast {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-40px);
+      background: var(--primary); color: #FFFFFF; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 700;
+      box-shadow: var(--shadow-md); z-index: 2000; opacity: 0; pointer-events: none; transition: all 0.25s ease;
+    }
+    .retail-toast.show {
+      transform: translateX(-50%) translateY(0); opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="retail-header">
+    <div class="header-inner">
+      <div class="header-brand" onclick="location.reload()">
+        <div class="header-logo-badge">🛒</div>
+        <div class="header-titles">
+          <div class="retail-app-badge">Zentra Retail • POS & STOCK</div>
+          <div class="retail-biz-name" id="hdrBizName">Mi Comercio</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a href="index.html" class="btn-header-hub" title="Cambiar de negocio">
+          <span class="material-symbols-outlined" style="font-size:16px;">apps</span>
+          <span>Universo Zentra</span>
+        </a>
+        <button type="button" class="btn-header-sync" onclick="sincronizarConNube()" title="Sincronizar">
+          <span class="material-symbols-outlined" style="font-size:16px;">cloud_sync</span>
+          <span id="syncText">Sincronizado</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="retail-container">
+    <div class="retail-tabs">
+      <button class="retail-tab-btn active" id="tabPos" onclick="cambiarVistaRetail('pos')">
+        <span class="material-symbols-outlined" style="font-size:18px;">point_of_sale</span>
+        <span>Caja / Venta Rápida (POS)</span>
+      </button>
+      <button class="retail-tab-btn" id="tabInventario" onclick="cambiarVistaRetail('inventario')">
+        <span class="material-symbols-outlined" style="font-size:18px;">inventory_2</span>
+        <span>Inventario y Stock</span>
+      </button>
+      <button class="retail-tab-btn" id="tabCierres" onclick="cambiarVistaRetail('cierres')">
+        <span class="material-symbols-outlined" style="font-size:18px;">receipt_long</span>
+        <span>Cierres de Caja</span>
+      </button>
+    </div>
+
+    <!-- VISTA POS -->
+    <section id="secPos">
+      <div class="pos-layout">
+        <!-- Catálogo de productos para cobrar -->
+        <div class="pos-products-box">
+          <input type="text" id="inpBuscarPos" placeholder="🔍 Buscar por nombre o código..." oninput="filtrarPos()" style="width:100%; padding:10px 14px; border-radius:12px; border:1.5px solid var(--border); font-size:13.5px; outline:none;">
+          <div class="products-grid" id="gridProductosPos">
+            <!-- Inyectado dinámicamente -->
+          </div>
+        </div>
+
+        <!-- Carrito de mostrador -->
+        <div class="pos-cart-box">
+          <div>
+            <div style="font-size:15px; font-weight:800; border-bottom:1px solid var(--border); padding-bottom:8px; display:flex; justify-content:space-between;">
+              <span>Ticket de Mostrador</span>
+              <button onclick="limpiarCarritoPos()" style="background:none; border:none; color:var(--danger); font-size:11.5px; font-weight:700; cursor:pointer;">Vaciar</button>
+            </div>
+            <div class="cart-items-list" id="listaCarritoPos">
+              <!-- Inyectado -->
+            </div>
+          </div>
+
+          <div>
+            <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; font-size:16px; font-weight:800;">
+                <span>TOTAL:</span>
+                <span style="color:var(--primary);" id="lblTotalPos">$0 COP</span>
+              </div>
+            </div>
+
+            <button type="button" class="btn-checkout" onclick="abrirModalCobroPos()">
+              <span class="material-symbols-outlined">payments</span>
+              <span>Cobrar Venta</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA INVENTARIO -->
+    <section id="secInventario" style="display:none;">
+      <div style="background:#FFF; border:1.5px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-sm);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+          <div style="font-weight:800; font-size:16px;">Control de Existencias Físicas y Costos</div>
+          <button onclick="abrirModalNuevoProducto()" style="background:var(--primary); color:#FFF; border:none; padding:9px 16px; border-radius:12px; font-weight:700; font-size:13px; cursor:pointer;">+ Nuevo Producto</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="inv-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Categoría</th>
+                <th>Costo Unit.</th>
+                <th>Precio Venta</th>
+                <th>Stock Físico</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaInventario">
+              <!-- Inyectado dinámicamente -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- VISTA CIERRES -->
+    <section id="secCierres" style="display:none;">
+      <div style="background:#FFF; border:1.5px solid var(--border); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow-sm);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <div style="font-weight:800; font-size:16px;">Historial de Cierres de Caja</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Auditoría de ventas del día y arqueo de mostrador</div>
+          </div>
+          <button type="button" onclick="hacerCierreDeCaja()" style="background:var(--primary); color:#FFF; border:none; padding:9px 16px; border-radius:12px; font-weight:700; font-size:13px; cursor:pointer;">
+            🔒 Hacer Cierre de Caja
+          </button>
+        </div>
+        <div id="listaCierresCaja">
+          <!-- Inyectado -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: PRODUCTO DE INVENTARIO -->
+  <div class="modal-overlay" id="modalProductoRetail">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title" id="lblModalProdTitle">+ Nuevo Producto</div>
+        <button class="modal-close" onclick="cerrarModalNuevoProducto()">✕</button>
+      </div>
+
+      <form id="formProductoRetail" onsubmit="event.preventDefault(); guardarNuevoProducto();">
+        <input type="hidden" id="prodIdHidden">
+
+        <div class="form-group">
+          <label>Nombre del Producto *</label>
+          <input type="text" id="prodNombreInp" placeholder="Ej: Arroz Diana 1kg, Coca Cola 400ml" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Categoría</label>
+            <input type="text" id="prodCatInp" placeholder="Ej: Abarrotes, Bebidas, Lácteos" list="catSugeridas">
+            <datalist id="catSugeridas">
+              <option value="Abarrotes">
+              <option value="Bebidas">
+              <option value="Lácteos">
+              <option value="Snacks">
+              <option value="Aseo & Limpieza">
+              <option value="Licores">
+            </datalist>
+          </div>
+
+          <div class="form-group">
+            <label>Código de Barras</label>
+            <input type="text" id="prodCodigoInp" placeholder="Opcional">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Costo de Compra (COP)</label>
+            <input type="number" id="prodCostoInp" placeholder="3800" min="0">
+          </div>
+
+          <div class="form-group">
+            <label>Precio de Venta (COP) *</label>
+            <input type="number" id="prodPrecioInp" placeholder="4800" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Stock Físico Inicial (Unidades) *</label>
+          <input type="number" id="prodStockInp" placeholder="24" min="0" required>
+        </div>
+
+        <button type="submit" class="btn-submit-modal">
+          <span>Guardar Producto</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: COBRAR VENTA POS -->
+  <div class="modal-overlay" id="modalCobroPos">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">💰 Cobro de Mostrador</div>
+        <button class="modal-close" onclick="cerrarModalCobroPos()">✕</button>
+      </div>
+
+      <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px; text-align:center;">
+        <div style="font-size:12px; color:var(--text-muted); font-weight:700;">TOTAL A COBRAR</div>
+        <div style="font-size:26px; font-weight:900; color:var(--primary); margin-top:4px;" id="lblTotalCobroModal">$0 COP</div>
+      </div>
+
+      <div class="form-group">
+        <label>Medio de Pago</label>
+        <select id="posMedioPagoSel" onchange="actualizarCambioCobro()">
+          <option value="Efectivo">💵 Efectivo</option>
+          <option value="Nequi">🟣 Nequi</option>
+          <option value="Daviplata">🟡 Daviplata</option>
+          <option value="Tarjeta">💳 Datáfono / Tarjeta</option>
+          <option value="Bre-Be">🟢 Bre-Be</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="grpEfectivoRecibido">
+        <label>Dinero Recibido (COP)</label>
+        <input type="number" id="inpEfectivoRecibido" placeholder="0" oninput="actualizarCambioCobro()">
+      </div>
+
+      <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:800; margin-bottom:14px; padding:10px; background:#ECFDF5; border-radius:10px;">
+        <span>Cambio / Vueltas:</span>
+        <span id="lblCambioCalculado" style="color:var(--primary);">$0 COP</span>
+      </div>
+
+      <button type="button" class="btn-checkout" onclick="confirmarCobroPos()">
+        <span>✓ Finalizar Cobro y Generar Ticket</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="retailToast" class="retail-toast">Aviso</div>
+
+  <script>
+    // ==========================================
+    // CONFIGURACIÓN FIREBASE
+    // ==========================================
+    const firebaseConfig = {
+      apiKey: "AIzaSyAscjzcp4-d5UNoTUxYkaSqUrjmXxabkKs",
+      authDomain: "zentra-d2b9e.firebaseapp.com",
+      projectId: "zentra-d2b9e",
+      storageBucket: "zentra-d2b9e.firebasestorage.app",
+      messagingSenderId: "839899175783",
+      appId: "1:839899175783:web:4044684ba833a61ddd2dc2"
+    };
+
+    let fbApp = null;
+    let fbDb = null;
+
+    try {
+      if (typeof firebase !== 'undefined') {
+        fbApp = firebase.initializeApp(firebaseConfig, 'zentraRetailApp');
+        fbDb = fbApp.firestore();
+      }
+    } catch (e) {
+      console.warn('Firebase Retail Init:', e);
+    }
+
+    // ==========================================
+    // ESTADO RETAIL
+    // ==========================================
+    let bizProfile = { id: 'biz_retail_demo', name: 'Zentra Minimarket', type: 'retail' };
+    let inventory = [
+      { id: 'r1', name: 'Arroz Diana 1kg', price: 4800, cost: 3900, stock: 24, cat: 'Abarrotes' },
+      { id: 'r2', name: 'Aceite Premier 900ml', price: 9200, cost: 7800, stock: 15, cat: 'Abarrotes' },
+      { id: 'r3', name: 'Coca Cola 400ml Pet', price: 2500, cost: 1800, stock: 30, cat: 'Bebidas' },
+      { id: 'r4', name: 'Cerveza Águila 330ml', price: 3000, cost: 2300, stock: 48, cat: 'Licores' }
+    ];
+    let cart = [];
+    let salesHistory = [];
+    let cashClosures = [];
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlBiz = urlParams.get('biz');
+      if (urlBiz) bizProfile.id = urlBiz.trim();
+
+      await cargarDatosRetail();
+    });
+
+    async function cargarDatosRetail() {
+      // 1. Cargar desde Firestore
+      if (fbDb && bizProfile.id) {
+        try {
+          const doc = await fbDb.collection('negocios_zentra').doc(bizProfile.id).get();
+          if (doc.exists) {
+            const data = doc.data();
+            if (data.bizProfile) bizProfile = { ...bizProfile, ...data.bizProfile };
+            if (Array.isArray(data.catalogItems) && data.catalogItems.length > 0) inventory = data.catalogItems;
+            if (Array.isArray(data.finances)) salesHistory = data.finances;
+            if (Array.isArray(data.cashClosures)) cashClosures = data.cashClosures;
+          }
+        } catch (e) {
+          console.warn('Firestore Retail Load:', e);
+        }
+      }
+
+      // 2. Respaldo local
+      try {
+        const savedInv = localStorage.getItem(`zentra_catalog_${bizProfile.id}`);
+        if (savedInv) inventory = JSON.parse(savedInv);
+        const savedBiz = localStorage.getItem(`zentra_biz_profile_${bizProfile.id}`);
+        if (savedBiz) bizProfile = { ...bizProfile, ...JSON.parse(savedBiz) };
+        const savedClosures = localStorage.getItem(`zentra_closures_${bizProfile.id}`);
+        if (savedClosures) cashClosures = JSON.parse(savedClosures);
+      } catch(_) {}
+
+      document.getElementById('hdrBizName').innerText = bizProfile.name || 'Zentra Minimarket';
+      document.title = `${bizProfile.name || 'Mi Comercio'} • Zentra Retail`;
+
+      renderizarPos();
+      renderizarInventario();
+      renderizarCierres();
+    }
+
+    async function persistirDatosRetail() {
+      // 1. Local
+      try {
+        localStorage.setItem(`zentra_catalog_${bizProfile.id}`, JSON.stringify(inventory));
+        localStorage.setItem(`zentra_biz_profile_${bizProfile.id}`, JSON.stringify(bizProfile));
+        localStorage.setItem(`zentra_closures_${bizProfile.id}`, JSON.stringify(cashClosures));
+      } catch(_) {}
+
+      // 2. Firestore
+      if (fbDb && bizProfile.id) {
+        try {
+          await fbDb.collection('negocios_zentra').doc(bizProfile.id).set({
+            id: bizProfile.id,
+            bizProfile,
+            catalogItems: inventory,
+            finances: salesHistory,
+            cashClosures,
+            updatedAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(e) {
+          console.warn('Firestore Retail Save:', e);
+        }
+      }
+    }
+
+    async function sincronizarConNube() {
+      mostrarRetailToast('⏳ Sincronizando con Cloud Firestore...');
+      await persistirDatosRetail();
+      mostrarRetailToast('☁️ Inventario 100% sincronizado');
+    }
+
+    // ==========================================
+    // POS (VENTA RÁPIDA)
+    // ==========================================
+    function renderizarPos() {
+      const grid = document.getElementById('gridProductosPos');
+      if (!grid) return;
+      grid.innerHTML = inventory.map(p => `
+        <div class="pos-item-card" onclick="agregarAlCarritoPos('${p.id}')">
+          <div style="font-size:12.5px; font-weight:700; line-height:1.2;">${p.name}</div>
+          <div>
+            <div style="font-size:10px; color:var(--text-muted);">Stock: ${p.stock !== undefined ? p.stock : '∞'}</div>
+            <div style="font-size:13px; font-weight:800; color:var(--primary);">$${(Number(p.price)||0).toLocaleString('es-CO')}</div>
+          </div>
+        </div>
+      `).join('');
+      actualizarCarritoPosUI();
+    }
+
+    function agregarAlCarritoPos(id) {
+      const p = inventory.find(x => x.id === id);
+      if (!p) return;
+      const exist = cart.find(x => x.id === id);
+      if (exist) {
+        if (p.stock !== undefined && exist.qty >= p.stock) {
+          mostrarRetailToast(`⚠️ Stock máximo alcanzado (${p.stock} unids)`);
+          return;
+        }
+        exist.qty++;
+      } else {
+        if (p.stock !== undefined && p.stock <= 0) {
+          mostrarRetailToast(`⚠️ Producto agotado en inventario`);
+          return;
+        }
+        cart.push({ id: p.id, name: p.name, price: p.price, qty: 1 });
+      }
+      actualizarCarritoPosUI();
+    }
+
+    function actualizarCarritoPosUI() {
+      const list = document.getElementById('listaCarritoPos');
+      if (cart.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:30px 10px; color:var(--text-muted); font-size:12px;">Carrito vacío. Toca un producto para agregar.</div>';
+        document.getElementById('lblTotalPos').innerText = '$0 COP';
+        return;
+      }
+
+      let total = 0;
+      list.innerHTML = cart.map(it => {
+        const sub = it.qty * it.price;
+        total += sub;
+        return `
+          <div class="cart-item-row">
+            <div>
+              <div style="font-weight:700;">${it.name}</div>
+              <div style="font-size:11px; color:var(--text-muted);">${it.qty} x $${it.price.toLocaleString('es-CO')}</div>
+            </div>
+            <div style="font-weight:800; color:var(--primary);">$${sub.toLocaleString('es-CO')}</div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('lblTotalPos').innerText = `$${total.toLocaleString('es-CO')} COP`;
+    }
+
+    function limpiarCarritoPos() {
+      cart = [];
+      actualizarCarritoPosUI();
+    }
+
+    function abrirModalCobroPos() {
+      if (cart.length === 0) {
+        mostrarRetailToast('Agrega productos al carrito para cobrar');
+        return;
+      }
+      const total = cart.reduce((s, it) => s + (it.qty * it.price), 0);
+      document.getElementById('lblTotalCobroModal').innerText = `$${total.toLocaleString('es-CO')} COP`;
+      document.getElementById('inpEfectivoRecibido').value = total;
+      actualizarCambioCobro();
+      document.getElementById('modalCobroPos').style.display = 'flex';
+    }
+
+    function cerrarModalCobroPos() {
+      document.getElementById('modalCobroPos').style.display = 'none';
+    }
+
+    function actualizarCambioCobro() {
+      const total = cart.reduce((s, it) => s + (it.qty * it.price), 0);
+      const medio = document.getElementById('posMedioPagoSel').value;
+      const grp = document.getElementById('grpEfectivoRecibido');
+      
+      if (medio !== 'Efectivo') {
+        grp.style.display = 'none';
+        document.getElementById('lblCambioCalculado').innerText = '$0 COP';
+        return;
+      }
+      grp.style.display = 'block';
+      const recibido = Number(document.getElementById('inpEfectivoRecibido').value) || 0;
+      const cambio = Math.max(0, recibido - total);
+      document.getElementById('lblCambioCalculado').innerText = `$${cambio.toLocaleString('es-CO')} COP`;
+    }
+
+    async function confirmarCobroPos() {
+      const total = cart.reduce((s, it) => s + (it.qty * it.price), 0);
+      const medio = document.getElementById('posMedioPagoSel').value;
+
+      // 1. Descontar stock
+      cart.forEach(cItem => {
+        const prod = inventory.find(p => p.id === cItem.id);
+        if (prod && prod.stock !== undefined) {
+          prod.stock = Math.max(0, prod.stock - cItem.qty);
+        }
+      });
+
+      // 2. Registrar en historial de ventas
+      salesHistory.unshift({
+        id: `sale_${Date.now()}`,
+        type: 'ingreso',
+        concept: `Venta POS mostrador (${cart.length} ítems)`,
+        amount: total,
+        method: medio,
+        date: new Date().toISOString()
+      });
+
+      cerrarModalCobroPos();
+      limpiarCarritoPos();
+      renderizarPos();
+      renderizarInventario();
+      await persistirDatosRetail();
+      mostrarRetailToast(`✓ Venta de $${total.toLocaleString('es-CO')} cobrada`);
+    }
+
+    // ==========================================
+    // INVENTARIO FÍSICO
+    // ==========================================
+    function renderizarInventario() {
+      const tbody = document.getElementById('tablaInventario');
+      if (!tbody) return;
+
+      if (inventory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:var(--text-muted);">No hay productos en inventario. Toca "+ Nuevo Producto" para añadir.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = inventory.map(p => {
+        const stock = Number(p.stock) || 0;
+        let badgeClass = 'stock-ok';
+        if (stock === 0) badgeClass = 'stock-empty';
+        else if (stock < 5) badgeClass = 'stock-low';
+
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:700;">${p.name}</div>
+              ${p.barcode ? `<div style="font-size:10.5px; color:var(--text-muted);">Cód: ${p.barcode}</div>` : ''}
+            </td>
+            <td>${p.category || p.cat || 'General'}</td>
+            <td>$${(Number(p.cost)||0).toLocaleString('es-CO')}</td>
+            <td style="font-weight:800; color:var(--primary);">$${(Number(p.price)||0).toLocaleString('es-CO')}</td>
+            <td>
+              <span class="stock-badge ${badgeClass}">${stock} unid.</span>
+            </td>
+            <td>
+              <div style="display:flex; gap:6px;">
+                <button type="button" onclick="editarProducto('${p.id}')" style="background:#F1F5F9; border:none; padding:5px 9px; border-radius:8px; cursor:pointer; font-size:11.5px; font-weight:700;">✏️</button>
+                <button type="button" onclick="eliminarProducto('${p.id}')" style="background:var(--danger-soft); color:var(--danger); border:none; padding:5px 9px; border-radius:8px; cursor:pointer; font-size:11.5px; font-weight:700;">✕</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function abrirModalNuevoProducto() {
+      document.getElementById('lblModalProdTitle').innerText = '+ Nuevo Producto';
+      document.getElementById('prodIdHidden').value = '';
+      document.getElementById('formProductoRetail').reset();
+      document.getElementById('modalProductoRetail').style.display = 'flex';
+      setTimeout(() => document.getElementById('prodNombreInp')?.focus(), 100);
+    }
+
+    function cerrarModalNuevoProducto() {
+      document.getElementById('modalProductoRetail').style.display = 'none';
+    }
+
+    function editarProducto(id) {
+      const p = inventory.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('lblModalProdTitle').innerText = '✏️ Editar Producto';
+      document.getElementById('prodIdHidden').value = p.id;
+      document.getElementById('prodNombreInp').value = p.name || '';
+      document.getElementById('prodCatInp').value = p.category || p.cat || '';
+      document.getElementById('prodCodigoInp').value = p.barcode || '';
+      document.getElementById('prodCostoInp').value = p.cost || 0;
+      document.getElementById('prodPrecioInp').value = p.price || 0;
+      document.getElementById('prodStockInp').value = p.stock || 0;
+      document.getElementById('modalProductoRetail').style.display = 'flex';
+    }
+
+    async function guardarNuevoProducto() {
+      const idExistente = document.getElementById('prodIdHidden').value;
+      const name = document.getElementById('prodNombreInp').value.trim();
+      const cat = document.getElementById('prodCatInp').value.trim() || 'General';
+      const barcode = document.getElementById('prodCodigoInp').value.trim();
+      const cost = Number(document.getElementById('prodCostoInp').value) || 0;
+      const price = Number(document.getElementById('prodPrecioInp').value) || 0;
+      const stock = Number(document.getElementById('prodStockInp').value) || 0;
+
+      const pData = {
+        id: idExistente || `r_${Date.now()}`,
+        name,
+        category: cat,
+        cat: cat,
+        barcode,
+        cost,
+        price,
+        stock,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (idExistente) {
+        const idx = inventory.findIndex(x => x.id === idExistente);
+        if (idx !== -1) inventory[idx] = pData;
+        mostrarRetailToast('✓ Producto actualizado');
+      } else {
+        inventory.unshift(pData);
+        mostrarRetailToast('✓ Producto agregado al inventario');
+      }
+
+      cerrarModalNuevoProducto();
+      renderizarPos();
+      renderizarInventario();
+      await persistirDatosRetail();
+    }
+
+    async function eliminarProducto(id) {
+      const p = inventory.find(x => x.id === id);
+      if (!p) return;
+      if (!confirm(`¿Eliminar "${p.name}" del inventario?`)) return;
+      inventory = inventory.filter(x => x.id !== id);
+      renderizarPos();
+      renderizarInventario();
+      await persistirDatosRetail();
+      mostrarRetailToast('✓ Producto eliminado');
+    }
+
+    // ==========================================
+    // CIERRES DE CAJA
+    // ==========================================
+    async function hacerCierreDeCaja() {
+      const hoy = new Date().toLocaleDateString('es-CO');
+      const ventasHoy = salesHistory.filter(s => {
+        const d = new Date(s.date || 0).toLocaleDateString('es-CO');
+        return d === hoy;
+      });
+
+      const totalDia = ventasHoy.reduce((s, it) => s + (Number(it.amount)||0), 0);
+      const tickets = ventasHoy.length;
+
+      if (!confirm(`Cierre de caja para hoy (${hoy}):\n\nTotal de Ventas: $${totalDia.toLocaleString('es-CO')} COP\nNúmero de Tickets: ${tickets}\n\n¿Deseas guardar este cierre?`)) {
+        return;
+      }
+
+      cashClosures.unshift({
+        id: `close_${Date.now()}`,
+        date: new Date().toISOString(),
+        totalSales: totalDia,
+        ticketsCount: tickets
+      });
+
+      renderizarCierres();
+      await persistirDatosRetail();
+      mostrarRetailToast('✓ Cierre de caja guardado con éxito');
+    }
+
+    function renderizarCierres() {
+      const box = document.getElementById('listaCierresCaja');
+      if (!box) return;
+
+      if (cashClosures.length === 0) {
+        box.innerHTML = '<p style="color:var(--text-muted); font-size:12px; padding:16px 0;">No hay cierres de caja registrados aún.</p>';
+        return;
+      }
+
+      box.innerHTML = cashClosures.map(c => `
+        <div style="background:#F8FAFC; border:1px solid var(--border); border-radius:12px; padding:12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <div style="font-weight:800; font-size:13.5px;">Cierre: ${new Date(c.date).toLocaleDateString()} ${new Date(c.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+            <div style="font-size:11px; color:var(--text-muted);">${c.ticketsCount || 0} tickets emitidos</div>
+          </div>
+          <div style="font-weight:800; font-size:15px; color:var(--primary);">$${(Number(c.totalSales)||0).toLocaleString('es-CO')} COP</div>
+        </div>
+      `).join('');
+    }
+
+    function cambiarVistaRetail(vista) {
+      ['pos', 'inventario', 'cierres'].forEach(v => {
+        const sec = document.getElementById(`sec${v.charAt(0).toUpperCase() + v.slice(1)}`);
+        const btn = document.getElementById(`tab${v.charAt(0).toUpperCase() + v.slice(1)}`);
+        if (sec) sec.style.display = (v === vista) ? 'block' : 'none';
+        if (btn) btn.classList.toggle('active', v === vista);
+      });
+    }
+
+    function filtrarPos() {
+      const q = (document.getElementById('inpBuscarPos')?.value || '').toLowerCase().trim();
+      const grid = document.getElementById('gridProductosPos');
+      const filtered = inventory.filter(p => !q || p.name.toLowerCase().includes(q) || (p.barcode && p.barcode.includes(q)));
+      grid.innerHTML = filtered.map(p => `
+        <div class="pos-item-card" onclick="agregarAlCarritoPos('${p.id}')">
+          <div style="font-size:12.5px; font-weight:700; line-height:1.2;">${p.name}</div>
+          <div>
+            <div style="font-size:10px; color:var(--text-muted);">Stock: ${p.stock !== undefined ? p.stock : '∞'}</div>
+            <div style="font-size:13px; font-weight:800; color:var(--primary);">$${(Number(p.price)||0).toLocaleString('es-CO')}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function mostrarRetailToast(msg) {
+      const t = document.getElementById('retailToast');
+      if (!t) return;
+      t.innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+  </script>
+</body>
+</html>

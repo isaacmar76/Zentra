@@ -920,6 +920,32 @@ class CatalogItemModel {
      - Enrutamiento limpio configurado en `vercel.json` y `site/vercel.json` para `/studio`, `/retail`, `/hub`, `/app` y `/tienda`.
      - Paridad y réplica exacta en `site/` para despliegues continuos.
 
+#### Hito 40: Reintegración de Temas Visuales y Modos POS & Dashboard en Zentra-Retail
+- **Requerimiento del Usuario:**
+  - *"hoy quiero que trabajemos en Zentra-Retail. Quiero que recuperes los temas que teniamos antes en ZentraApp, menos el tema que llamamos Clasico que ese se deja solo para la modalidad de taller. Pero los otros temas que teniamos vamos a recuperar por lo menos el POS y el tema que permite tomar pedidos y tiene como un dashboard donde puedo ver metricas del negocio, con esos 2 es suficiente... procede con lo de Zentra-Retail"*
+- **Implementación Técnica:**
+  1. **Sistema de Temas Comerciales (Cero Clásico):**
+     - Integrado selector modal de temas con 4 paletas: **Zentra Clarity (Fintech Core)**, **Esmeralda & Menta (Retail Don Pedro)**, **Océano & Medianoche (Azul Ejecutivo)** y **Midnight (Modo Oscuro)**.
+     - El tema Clásico (Nude & Blush) queda 100% aislado y exclusivo para Zentra-Studio.
+  2. **Modo Mostrador Rápido (POS Táctil):**
+     - Métricas superiores de *Ventas de Hoy* y *Cotizaciones activas*.
+     - Buscador en vivo por nombre o código de barras.
+     - Selector por chips horizontales deslizables de categorías de productos.
+     - Cuadrícula táctil con precios grandes, existencias físicas y alertas de stock bajo/agotado.
+     - Barra flotante de carrito fija en la parte inferior mostrando unidades, total acumulado y botón `COBRAR / COTIZAR ➔`.
+     - Modal de cobro con cálculo instantáneo de vueltas en efectivo, múltiples medios de pago (Nequi, Daviplata, Tarjeta, Bre-Be) y opción de guardar cotización.
+  3. **Modo Dashboard Modular (Tomar Pedido & Métricas):**
+     - Tarjeta Hero de **Saldo Disponible Real** en caja con botones para registrar ingresos y gastos directos.
+     - Botón protagonista de acción: **`⚡ TOMAR PEDIDO / COTIZAR`**.
+     - Accesos directos 2x2: Vender (POS), Cotizaciones, Catálogo & Stock, y Directorio de Clientes.
+     - Panel de alertas prioritarias de productos agotados o críticos.
+     - Registro de actividad y ventas recientes del día.
+  4. **Inventario, Cierres de Caja y Sincronización:**
+     - Tabla detallada de existencias físicas con costo de compra y precio de venta.
+     - Registro y auditoría de cierres de caja diarios con arqueo de mostrador.
+     - Conexión a Cloud Firestore (`negocios_zentra/{bizProfile.id}`).
+     - Réplica exacta en `site/retail.html`.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

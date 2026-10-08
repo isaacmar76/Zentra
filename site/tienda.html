@@ -334,34 +334,6 @@
       white-space: nowrap;
     }
 
-    .card-action-btns {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-
-    .btn-fast-order {
-      background: #25D366;
-      border: 1px solid #1EBE5D;
-      color: #FFFFFF;
-      padding: 5px 9px;
-      border-radius: 9px;
-      font-size: 11px;
-      font-weight: 800;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 3px;
-      transition: all 0.15s ease;
-      box-shadow: 0 2px 6px rgba(37,211,102,0.25);
-      white-space: nowrap;
-    }
-
-    .btn-fast-order:active {
-      transform: scale(0.95);
-      background: #1EBE5D;
-    }
-
     .btn-add-cart {
       background: var(--primary-soft);
       border: 1px solid var(--primary);
@@ -632,6 +604,34 @@
       justify-content: center;
       gap: 8px;
       box-shadow: 0 4px 14px rgba(22,163,74,0.3);
+    }
+
+    /* MODAL DE DETALLES DEL PRODUCTO (CLIENTE) */
+    .product-detail-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 250;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .product-detail-box {
+      background: #FFFFFF;
+      width: 100%;
+      max-width: 440px;
+      border-radius: 24px;
+      padding: 22px 20px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.2);
+      max-height: 90vh;
+      overflow-y: auto;
+      border: 1px solid var(--border);
     }
 
     /* PANTALLA DE ÉXITO TRAS HACER PEDIDO */
@@ -1068,28 +1068,12 @@
             </select>
           </div>
 
-          <!-- Soporte o Comprobante de Pago -->
-          <div class="form-group" style="background:var(--surface-subtle, #F8FAFC); border:1.5px dashed var(--border); border-radius:12px; padding:10px;">
-            <label style="font-weight:700; color:var(--text); display:flex; align-items:center; gap:6px;">
-              <span>📎 Comprobante de Pago</span>
-              <span style="font-size:10px; font-weight:normal; color:var(--text-muted);">(Opcional si es transferencia)</span>
-            </label>
-            <div style="font-size:11px; color:var(--text-muted); margin-bottom:8px; line-height:1.3;">
-              Si ya realizaste la transferencia o pago móvil, puedes adjuntar la captura aquí o enviarla en el chat de WhatsApp al confirmar tu pedido.
-            </div>
-            
-            <div style="display:flex; align-items:center; gap:8px;">
-              <label style="background:var(--card-bg, #fff); border:1px solid var(--border); padding:6px 12px; border-radius:8px; font-size:11.5px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px; color:var(--text);">
-                <span>📷 Adjuntar Soporte</span>
-                <input type="file" id="custVoucherFile" accept="image/*" style="display:none;" onchange="procesarVoucherCliente(this)">
-              </label>
-              <button type="button" id="btnQuitarVoucher" onclick="quitarVoucherCliente()" style="display:none; background:none; border:none; color:var(--alert, #DC2626); font-size:11px; cursor:pointer; font-weight:700;">
-                Quitar soporte
-              </button>
-            </div>
-
-            <div id="voucherPreviewContainer" style="display:none; margin-top:8px;">
-              <img id="voucherPreviewImg" src="" alt="Comprobante" style="max-height:100px; border-radius:8px; border:1px solid var(--border); object-fit:contain;">
+          <!-- Soporte o Comprobante de Pago (se envía después desde WhatsApp) -->
+          <div style="background:var(--primary-soft, #ECFDF5); border:1px solid var(--primary-border, #A7F3D0); border-radius:14px; padding:12px; margin-bottom:14px; display:flex; align-items:flex-start; gap:10px;">
+            <span class="material-symbols-outlined" style="font-size:22px; color:var(--primary); flex-shrink:0; margin-top:2px;">photo_camera</span>
+            <div style="font-size:11.5px; color:var(--text); line-height:1.4;">
+              <b style="color:var(--primary);">Soporte de Pago vía WhatsApp:</b><br>
+              Al pulsar <b>Enviar Pedido por WhatsApp</b> se abrirá el chat con el resumen de tu compra. <b>El comprobante o captura de tu transferencia se envía directamente en ese mismo chat de WhatsApp</b> después del mensaje.
             </div>
           </div>
 
@@ -1109,6 +1093,33 @@
           <span class="material-symbols-outlined" style="font-size:20px;">send</span>
           <span>Enviar Pedido por WhatsApp</span>
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DETALLES Y CARACTERÍSTICAS DEL PRODUCTO (CLIENTE) -->
+  <div class="product-detail-overlay" id="modalDetalleProductoCliente">
+    <div class="product-detail-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <span id="cliDetalleCat" style="background:var(--primary-soft); color:var(--primary); font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.04em;">Producto</span>
+        <button type="button" onclick="cerrarDetalleProductoCliente()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted); padding:4px;">✕</button>
+      </div>
+
+      <div style="text-align:center; margin-bottom:14px;">
+        <div id="cliDetalleImgBox" style="width:170px; height:170px; border-radius:20px; background:var(--bg); border:1.5px solid var(--border); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:var(--shadow-sm);">
+          🛍️
+        </div>
+        <h3 id="cliDetalleNombre" style="font-size:18px; font-weight:800; color:var(--text); line-height:1.25; margin-bottom:6px;"></h3>
+        <div id="cliDetallePrecio" style="font-size:21px; font-weight:800; color:var(--primary); margin-bottom:6px;"></div>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px; letter-spacing:0.04em;">Características & Detalles</div>
+        <div id="cliDetalleDesc" style="font-size:12.5px; color:var(--text); line-height:1.5; background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:12px;"></div>
+      </div>
+
+      <div id="cliDetalleAcciones">
+        <!-- Inyectado dinámicamente con botón para agregar al carrito -->
       </div>
     </div>
   </div>
@@ -1454,22 +1465,18 @@
           : `<span>🛍️</span>`;
 
         const btnHtml = qty > 0
-          ? `<div class="qty-stepper">
+          ? `<div class="qty-stepper" onclick="event.stopPropagation()">
               <button type="button" onclick="modificarCantidad('${p.id}', -1)">-</button>
               <span>${qty}</span>
               <button type="button" onclick="modificarCantidad('${p.id}', 1)">+</button>
              </div>`
-          : `<div class="card-action-btns">
-              <button type="button" class="btn-fast-order" onclick="pedirProductoDirecto('${p.id}')" title="Pedir este producto de inmediato por WhatsApp">
-                <span>💬 Pedir</span>
-              </button>
-              <button type="button" class="btn-add-cart" onclick="agregarAlCarrito('${p.id}')" title="Agregar al carrito de compras">
-                <span>+ Carrito</span>
-              </button>
-             </div>`;
+          : `<button type="button" class="btn-add-cart" onclick="event.stopPropagation(); agregarAlCarrito('${p.id}')" title="Agregar al carrito de compras">
+              <span class="material-symbols-outlined" style="font-size:16px;">add_shopping_cart</span>
+              <span>+ Carrito</span>
+             </button>`;
 
         return `
-          <div class="product-card">
+          <div class="product-card" onclick="verDetalleProductoCliente('${p.id}')" style="cursor:pointer;" title="Toca para ver características del producto">
             <div class="product-img-box">${imgHtml}</div>
             <div class="product-details">
               <div>
@@ -1478,12 +1485,74 @@
               </div>
               <div class="product-bottom-row">
                 <div class="product-price">$${(p.price || 0).toLocaleString('es-CO')} COP</div>
-                ${btnHtml}
+                <div>${btnHtml}</div>
               </div>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    let prodClienteActivoId = null;
+
+    function verDetalleProductoCliente(prodId) {
+      const p = storeData.catalog.find(x => String(x.id) === String(prodId));
+      if (!p) return;
+      prodClienteActivoId = p.id;
+
+      document.getElementById('cliDetalleCat').innerText = p.category || 'General';
+      document.getElementById('cliDetalleNombre').innerText = p.name || '';
+      document.getElementById('cliDetallePrecio').innerText = `$${(Number(p.price)||0).toLocaleString('es-CO')} COP`;
+
+      const imgBox = document.getElementById('cliDetalleImgBox');
+      const photo = p.photo || p.image;
+      if (imgBox) {
+        if (photo) {
+          imgBox.innerHTML = `<img src="${photo}" alt="${p.name}" style="width:100%; height:100%; object-fit:contain; border-radius:18px;">`;
+        } else {
+          imgBox.innerHTML = `<span style="font-size:52px;">🛍️</span>`;
+        }
+      }
+
+      document.getElementById('cliDetalleDesc').innerText = p.desc || p.description || 'Producto disponible para pedido a domicilio o entrega inmediata en tienda.';
+
+      actualizarBotonModalDetalleCliente();
+      document.getElementById('modalDetalleProductoCliente').style.display = 'flex';
+    }
+
+    function actualizarBotonModalDetalleCliente() {
+      if (!prodClienteActivoId) return;
+      const cont = document.getElementById('cliDetalleAcciones');
+      if (!cont) return;
+
+      const inCart = cart.find(c => String(c.id) === String(prodClienteActivoId));
+      const qty = inCart ? inCart.cant : 0;
+
+      if (qty > 0) {
+        cont.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:8px 14px;">
+            <span style="font-size:12px; font-weight:700; color:var(--text-muted);">${qty} en tu carrito</span>
+            <div class="qty-stepper">
+              <button type="button" onclick="modificarCantidad('${prodClienteActivoId}', -1); actualizarBotonModalDetalleCliente();">-</button>
+              <span>${qty}</span>
+              <button type="button" onclick="modificarCantidad('${prodClienteActivoId}', 1); actualizarBotonModalDetalleCliente();">+</button>
+            </div>
+          </div>
+        `;
+      } else {
+        cont.innerHTML = `
+          <button type="button" onclick="agregarAlCarrito('${prodClienteActivoId}'); actualizarBotonModalDetalleCliente();" style="width:100%; background:var(--primary); color:#FFFFFF; border:none; padding:13px; border-radius:14px; font-weight:800; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);">
+            <span class="material-symbols-outlined" style="font-size:18px;">add_shopping_cart</span>
+            <span>Agregar al Carrito de Compra</span>
+          </button>
+        `;
+      }
+    }
+
+    function cerrarDetalleProductoCliente() {
+      const modal = document.getElementById('modalDetalleProductoCliente');
+      if (modal) modal.style.display = 'none';
+      prodClienteActivoId = null;
     }
 
     function agregarAlCarrito(prodId) {
@@ -1762,11 +1831,7 @@
       msg += `\n🛒 *Productos:*\n${itemsText}\n\n` +
              `💰 *TOTAL A PAGAR:* $${total.toLocaleString('es-CO')} COP\n` +
              `💳 *Medio de Pago:* ${paymentMethod}\n`;
-      if (voucherBase64) {
-        msg += `📎 *Soporte de Pago:* ¡Ya adjunté la captura a mi orden web! (Te la comparto en este chat también)\n\n`;
-      } else {
-        msg += `📎 *Soporte de Pago:* Te compartiré la captura de la transferencia a continuación.\n\n`;
-      }
+      msg += `📸 *Soporte de Pago:* Te comparto la captura de mi comprobante a continuación por este mismo chat.\n\n`;
       msg += `Quedo atento(a) para confirmar la disponibilidad y despacho. ¡Muchas gracias! 🙌`;
 
       // 2. Guardar en Firestore en segundo plano (dual write para tiendas_publicas y negocios_zentra)
@@ -1802,15 +1867,9 @@
       cerrarDrawerCarrito();
       mostrarModalExito(orderPayload);
 
-      // 6. Limpiar carrito y resetear voucher
+      // 6. Limpiar carrito
       cart = [];
       voucherBase64 = null;
-      const fileInp = document.getElementById('custVoucherFile');
-      if (fileInp) fileInp.value = '';
-      const previewCont = document.getElementById('voucherPreviewContainer');
-      const btnQuitar = document.getElementById('btnQuitarVoucher');
-      if (previewCont) previewCont.style.display = 'none';
-      if (btnQuitar) btnQuitar.style.display = 'none';
 
       actualizarBarraCarrito();
       renderizarProductos();

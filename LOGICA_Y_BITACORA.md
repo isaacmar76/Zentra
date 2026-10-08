@@ -982,6 +982,36 @@ class CatalogItemModel {
   5. **Paridad y Sincronización:**
      - Sincronización completa 1:1 en `site/retail.html` y `site/tienda.html`.
 
+#### Hito 42: Rediseño Hero con Botones de Íconos en Zentra-Retail, Modal de Configuración Integral de Tienda, Ficha de Características de Producto con Edición de Propiedades y Carrito Exclusivo para Clientes
+- **Requerimiento del Usuario:**
+  - *"quiero cambiar un poroc el hero en Zentra-Retail, vamos a voler a colocar los iconos que se tenian antes, icono para enviar/compartir el catalogo, icono de configuracion de la tienda donde abra un menu con las opciones para editar la informacion del negocio, temas etc. En la vista del catalogo quitar el boton de enviar que aparece al lado de cada producto, dejar el icono para agregar al carrito de compra, para terminar el pedido el cliente debe ir al carrito; luego que pueda enviar el pedido para que me aparezca en la app y se haga el envio por whatsapp, el soporte de pago se envia despues desde whatsapp. Al tocar el producto que este se abra para mostrar sus caracteristicas y con boton para editar sus propiedades."*
+- **Implementación Técnica:**
+  1. **Cabecera y Hero en Zentra-Retail (`retail.html`):**
+     - Restaurada la botonera clásica de íconos redondeados (`.header-icon-btn` de 40x40px) en la cabecera:
+       * **Ícono Compartir Catálogo (`share`):** abre `#modalCompartirTienda` para copiar link, enviar por WhatsApp o previsualizar el catálogo online.
+       * **Ícono Configuración de la Tienda (`settings`):** abre el nuevo menú integral de configuración `#modalConfiguracionTienda`.
+       * **Ícono Universo Zentra Hub (`apps`):** enlace directo para alternar entre aplicaciones y modos de negocio.
+       * **Ícono Sincronización en la Nube (`cloud_sync`):** sincronización bidireccional con Cloud Firestore.
+  2. **Modal de Configuración de la Tienda (`#modalConfiguracionTienda`):**
+     - Menú por pestañas dinámicas:
+       * **🏢 Negocio:** edición de Nombre del Negocio / Marca, Propietario(a), Teléfono WhatsApp de Pedidos y Dirección física.
+       * **💳 Cuentas & Pagos:** configuración de cuentas Nequi, Daviplata, Bancolombia y Bre-B / Llave Transfiya.
+       * **🎨 Temas:** selector visual directo entre las 4 paletas de color comerciales (Clarity, Esmeralda, Océano, Midnight).
+     - Al guardar, actualiza el estado local (`bizProfile`), el encabezado de la app y replica automáticamente en Cloud Firestore (`negocios_zentra/{bizId}` y `tiendas_publicas/{bizId}`).
+  3. **Ficha y Características del Producto en Zentra-Retail (`retail.html`):**
+     - Al tocar cualquier producto en la tabla de inventario o el botón de inspección rápida en el mostrador POS, se abre `#modalDetalleProducto`.
+     - Muestra foto ampliada, nombre, categoría, código de barras, desglose de rentabilidad (precio de venta, costo de compra, margen % y ganancia neta en pesos), badge de stock físico y descripción detallada/características.
+     - Botón destacado: **`✏️ Editar Propiedades`** (`abrirEdicionDesdeDetalle`), que abre de inmediato el formulario `#modalProductoRetail` precargado con todas sus propiedades para modificar y guardar.
+     - Botón de venta rápida: `🛒 Agregar a la Venta (+1)` para POS.
+  4. **Catálogo Exclusivo por Carrito y Flujo sin Fricción en Tienda Pública (`tienda.html`):**
+     - Retirado el botón directo de envío por producto ("💬 Pedir"). Cada producto presenta exclusivamente el botón/icono para agregar al carrito (`+ Carrito`) o el selector de cantidad (`qty-stepper`).
+     - Al tocar la tarjeta o foto del producto, se abre `#modalDetalleProductoCliente` con ficha visual de características y botón de agregar al carrito.
+     - Para completar el pedido, el cliente accede al carrito de compras, ingresa sus datos de entrega (nombre, WhatsApp, dirección, barrio, notas) y medio de pago.
+     - **Soporte de pago sin fricción móvil:** se retiró el input de subir archivos web y se implementó un aviso informativo claro explicando que el soporte o captura de transferencia se envía a continuación directamente por el chat de WhatsApp.
+     - Al pulsar `Enviar Pedido por WhatsApp`, el pedido se guarda en Cloud Firestore y localStorage (apareciendo de inmediato en Zentra-Retail) y abre la conversación de WhatsApp con el desglose exacto de la compra.
+  5. **Paridad Total y Despliegue:**
+     - Sincronización idéntica en `retail.html`, `tienda.html`, `site/retail.html` y `site/tienda.html`.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

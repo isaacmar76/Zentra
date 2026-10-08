@@ -185,41 +185,130 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
 
-    .btn-header-tool {
+    .header-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       background: var(--surface-subtle);
       border: 1px solid var(--surface-border);
       color: var(--text);
-      padding: 6px 10px;
-      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .header-icon-btn:hover {
+      background: var(--card-bg);
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-icon-btn.btn-share {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(0, 108, 70, 0.08));
+      color: #059669;
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    .header-icon-btn.btn-share:hover {
+      background: #10B981;
+      color: #FFFFFF;
+      border-color: #10B981;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+    }
+
+    .header-icon-btn.btn-settings {
+      color: var(--text);
+    }
+
+    .header-icon-btn.btn-settings:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .header-icon-btn.btn-sync {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* PESTAÑAS DE CONFIGURACIÓN */
+    .cfg-tabs-bar {
+      display: flex;
+      gap: 6px;
+      background: var(--surface-subtle);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border: 1px solid var(--surface-border);
+    }
+
+    .cfg-tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      padding: 8px 6px;
+      border-radius: 9px;
       font-size: 11.5px;
       font-weight: 700;
+      color: var(--text-muted);
       cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 4px;
-      text-decoration: none;
+      justify-content: center;
+      gap: 5px;
       transition: all 0.15s ease;
     }
 
-    .btn-header-tool:hover {
-      filter: brightness(0.96);
+    .cfg-tab-btn.active {
+      background: var(--card-bg);
+      color: var(--primary);
+      font-weight: 800;
+      box-shadow: var(--shadow-sm);
     }
 
-    .btn-header-sync {
-      background: var(--primary-soft);
-      border: 1px solid var(--primary);
-      color: var(--primary);
-      padding: 6px 10px;
-      border-radius: 10px;
-      font-size: 11.5px;
-      font-weight: 700;
+    .cfg-section {
+      display: none;
+    }
+
+    .cfg-section.active {
+      display: block;
+    }
+
+    .theme-selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .theme-selector-grid .theme-card-option {
       cursor: pointer;
-      display: inline-flex;
+      padding: 10px;
+      border-radius: 12px;
+      border: 1.5px solid var(--surface-border);
+      background: var(--card-bg);
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .theme-selector-grid .theme-card-option:hover {
+      border-color: var(--primary);
+    }
+
+    .theme-selector-grid .theme-card-option.active {
+      border-color: var(--primary);
+      background: var(--primary-soft);
     }
 
     /* BARRA DE PESTAÑAS PRINCIPAL */
@@ -1122,24 +1211,24 @@
       </div>
 
       <div class="header-actions">
-        <button type="button" class="btn-header-share" onclick="abrirModalCompartirTienda()" title="Compartir Catálogo Online con Clientes">
-          <span class="material-symbols-outlined" style="font-size:16px;">share</span>
-          <span>Compartir Catálogo</span>
+        <!-- Ícono para Enviar / Compartir Catálogo -->
+        <button type="button" class="header-icon-btn btn-share" onclick="abrirModalCompartirTienda()" title="Enviar / Compartir Catálogo Online con Clientes">
+          <span class="material-symbols-outlined" style="font-size:20px;">share</span>
         </button>
 
-        <button type="button" class="btn-header-tool" onclick="abrirModalTemas()" title="Cambiar Tema Visual">
-          <span class="material-symbols-outlined" style="font-size:16px;">palette</span>
-          <span id="lblTemaActual">Tema</span>
+        <!-- Ícono de Configuración de la Tienda (datos del negocio, cuentas de pago, temas) -->
+        <button type="button" class="header-icon-btn btn-settings" onclick="abrirModalConfiguracionTienda()" title="Configuración de la Tienda (Datos, Cuentas, Temas)">
+          <span class="material-symbols-outlined" style="font-size:20px;">settings</span>
         </button>
 
-        <a href="index.html" class="btn-header-tool" title="Volver al Portal Universo Zentra">
-          <span class="material-symbols-outlined" style="font-size:16px;">apps</span>
-          <span>Hub</span>
+        <!-- Ícono Hub / Universo Zentra -->
+        <a href="index.html" class="header-icon-btn" title="Volver al Portal Universo Zentra">
+          <span class="material-symbols-outlined" style="font-size:20px;">apps</span>
         </a>
 
-        <button type="button" class="btn-header-sync" onclick="sincronizarConNube()" id="btnSyncCloud" title="Sincronizar Cloud Firestore">
-          <span class="material-symbols-outlined" style="font-size:16px;">cloud_sync</span>
-          <span id="syncText">Sincronizado</span>
+        <!-- Ícono Sincronización en la Nube -->
+        <button type="button" class="header-icon-btn btn-sync" onclick="sincronizarConNube()" id="btnSyncCloud" title="Sincronizar Cloud Firestore">
+          <span class="material-symbols-outlined" id="syncIcon" style="font-size:20px;">cloud_sync</span>
         </button>
       </div>
     </div>
@@ -1589,6 +1678,201 @@
         <button type="submit" class="btn-submit-modal">
           <span>Guardar Producto</span>
         </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: FICHA Y CARACTERÍSTICAS DEL PRODUCTO
+       ========================================== -->
+  <div class="modal-overlay" id="modalDetalleProducto">
+    <div class="modal-box" style="max-width:440px;">
+      <div class="modal-header">
+        <div class="modal-title" style="display:flex; align-items:center; gap:6px;">
+          <span class="material-symbols-outlined" style="color:var(--primary); font-size:20px;">info</span>
+          <span>Características del Producto</span>
+        </div>
+        <button type="button" class="modal-close" onclick="cerrarModalDetalleProducto()">✕</button>
+      </div>
+
+      <div style="text-align:center; margin-bottom:14px;">
+        <div id="detProdImgContainer" style="width:140px; height:140px; border-radius:18px; background:var(--surface-subtle); border:1.5px solid var(--surface-border); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:var(--shadow-sm);">
+          🛍️
+        </div>
+        <div id="detProdNombre" style="font-size:18px; font-weight:800; color:var(--text); line-height:1.25; margin-bottom:6px;"></div>
+        <div style="display:flex; justify-content:center; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
+          <span id="detProdCat" style="background:var(--surface-subtle); border:1px solid var(--surface-border); color:var(--text-muted); font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px;"></span>
+          <span id="detProdCodigo" style="background:var(--surface-subtle); border:1px solid var(--surface-border); color:var(--text-muted); font-size:11px; font-weight:600; padding:3px 9px; border-radius:10px;"></span>
+          <span id="detProdStockBadge"></span>
+        </div>
+      </div>
+
+      <!-- Precios y Rentabilidad -->
+      <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:14px; padding:12px; margin-bottom:14px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:8px;">
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Precio de Venta</div>
+            <div id="detProdPrecio" style="font-size:18px; font-weight:800; color:var(--primary); margin-top:2px;"></div>
+          </div>
+          <div>
+            <div style="font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Costo de Compra</div>
+            <div id="detProdCosto" style="font-size:15px; font-weight:700; color:var(--text-muted); margin-top:2px;"></div>
+          </div>
+        </div>
+        <div id="detProdGanancia" style="font-size:11.5px; font-weight:700; color:var(--success); border-top:1px dashed var(--surface-border); padding-top:6px;"></div>
+      </div>
+
+      <!-- Características & Descripción -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:4px; letter-spacing:0.04em;">Descripción / Características</div>
+        <div id="detProdDesc" style="font-size:12.5px; color:var(--text); line-height:1.45; background:var(--card-bg); border:1px solid var(--surface-border); border-radius:12px; padding:10px;"></div>
+      </div>
+
+      <!-- Botón para Editar Propiedades -->
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <button type="button" onclick="abrirEdicionDesdeDetalle()" style="width:100%; background:var(--primary); color:#FFFFFF; border:none; padding:12px; border-radius:12px; font-weight:800; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);">
+          <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
+          <span>Editar Propiedades</span>
+        </button>
+        <button type="button" onclick="agregarAlCarritoDesdeDetalle()" id="btnDetalleAgregarPOS" style="width:100%; background:var(--surface-subtle); color:var(--text); border:1px solid var(--surface-border); padding:10px; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+          <span class="material-symbols-outlined" style="font-size:18px;">add_shopping_cart</span>
+          <span>Agregar a la Venta (+1)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: CONFIGURACIÓN DE LA TIENDA RETAIL
+       ========================================== -->
+  <div class="modal-overlay" id="modalConfiguracionTienda">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-header">
+        <div class="modal-title" style="display:flex; align-items:center; gap:8px;">
+          <span class="material-symbols-outlined" style="color:var(--primary); font-size:22px;">settings</span>
+          <span>Configuración de la Tienda</span>
+        </div>
+        <button type="button" class="modal-close" onclick="cerrarModalConfiguracionTienda()">✕</button>
+      </div>
+
+      <div class="cfg-tabs-bar">
+        <button type="button" class="cfg-tab-btn active" id="tabCfgBiz" onclick="cambiarCfgTab('biz')">
+          <span class="material-symbols-outlined" style="font-size:16px;">storefront</span>
+          <span>Negocio</span>
+        </button>
+        <button type="button" class="cfg-tab-btn" id="tabCfgPagos" onclick="cambiarCfgTab('pagos')">
+          <span class="material-symbols-outlined" style="font-size:16px;">payments</span>
+          <span>Cuentas</span>
+        </button>
+        <button type="button" class="cfg-tab-btn" id="tabCfgTemas" onclick="cambiarCfgTab('temas')">
+          <span class="material-symbols-outlined" style="font-size:16px;">palette</span>
+          <span>Temas</span>
+        </button>
+      </div>
+
+      <form id="formConfiguracionTienda" onsubmit="event.preventDefault(); guardarConfiguracionTienda();">
+        <!-- 1. INFORMACIÓN DEL NEGOCIO -->
+        <div id="cfgSecBiz" class="cfg-section active">
+          <div class="form-group">
+            <label>Nombre del Negocio / Marca *</label>
+            <input type="text" id="cfgBizNameInp" placeholder="Ej: Tienda Don Pedro" required>
+          </div>
+          <div class="form-group">
+            <label>Propietario(a) / Administrador(a)</label>
+            <input type="text" id="cfgBizOwnerInp" placeholder="Tu nombre">
+          </div>
+          <div class="form-group">
+            <label>Teléfono WhatsApp de Pedidos *</label>
+            <input type="tel" id="cfgBizPhoneInp" placeholder="Ej: 312 456 7890">
+            <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">Número donde recibirás los pedidos enviados desde el catálogo web.</div>
+          </div>
+          <div class="form-group">
+            <label>Dirección / Ubicación Física</label>
+            <input type="text" id="cfgBizAddressInp" placeholder="Ej: Calle 45 # 12-34, Barrio El Poblado">
+          </div>
+        </div>
+
+        <!-- 2. CUENTAS DE PAGO -->
+        <div id="cfgSecPagos" class="cfg-section">
+          <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">
+            Cuentas visibles para tus clientes al momento de transferir y enviar el soporte de pago:
+          </div>
+          <div class="form-group">
+            <label>🟣 Nequi (Número de celular)</label>
+            <input type="text" id="cfgBizNequiInp" placeholder="Ej: 312 456 7890">
+          </div>
+          <div class="form-group">
+            <label>🟡 Daviplata (Número de celular)</label>
+            <input type="text" id="cfgBizDaviplataInp" placeholder="Ej: 310 987 6543">
+          </div>
+          <div class="form-group">
+            <label>🔵 Bancolombia (Cuenta o Ahorros a la Mano)</label>
+            <input type="text" id="cfgBizBancolombiaInp" placeholder="Ej: Ahorros 123-456789-01">
+          </div>
+          <div class="form-group">
+            <label>🟢 Bre-B / Llave Transfiya / Otros</label>
+            <input type="text" id="cfgBizBreBInp" placeholder="Ej: Llave Bre-B o Transfiya">
+          </div>
+        </div>
+
+        <!-- 3. TEMAS Y APARIENCIA -->
+        <div id="cfgSecTemas" class="cfg-section">
+          <div style="font-size:11.5px; color:var(--text-muted); margin-bottom:12px;">
+            Elige la apariencia visual para tu terminal de ventas:
+          </div>
+          <div class="theme-selector-grid">
+            <div class="theme-card-option" id="cfg-opt-clarity" onclick="seleccionarTemaEnConfiguracion('clarity')">
+              <div>
+                <div style="font-weight:800; font-size:13px;">Zentra Clarity</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Fintech Core</div>
+              </div>
+              <div class="theme-color-dots">
+                <div class="color-dot" style="background:#006C46;"></div>
+                <div class="color-dot" style="background:#00D68F;"></div>
+              </div>
+            </div>
+            <div class="theme-card-option" id="cfg-opt-esmeralda" onclick="seleccionarTemaEnConfiguracion('esmeralda')">
+              <div>
+                <div style="font-weight:800; font-size:13px;">Esmeralda & Menta</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Comercial Mostrador</div>
+              </div>
+              <div class="theme-color-dots">
+                <div class="color-dot" style="background:#2C7A7B;"></div>
+                <div class="color-dot" style="background:#38A169;"></div>
+              </div>
+            </div>
+            <div class="theme-card-option" id="cfg-opt-oceano" onclick="seleccionarTemaEnConfiguracion('oceano')">
+              <div>
+                <div style="font-weight:800; font-size:13px;">Océano & Azul</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Ejecutivo Contraste</div>
+              </div>
+              <div class="theme-color-dots">
+                <div class="color-dot" style="background:#1D4ED8;"></div>
+                <div class="color-dot" style="background:#38BDF8;"></div>
+              </div>
+            </div>
+            <div class="theme-card-option" id="cfg-opt-midnight" onclick="seleccionarTemaEnConfiguracion('midnight')">
+              <div>
+                <div style="font-weight:800; font-size:13px;">Midnight (Oscuro)</div>
+                <div style="font-size:10.5px; color:var(--text-muted);">Descanso visual</div>
+              </div>
+              <div class="theme-color-dots">
+                <div class="color-dot" style="background:#0B1C30;"></div>
+                <div class="color-dot" style="background:#00D68F;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:18px; display:flex; gap:10px;">
+          <button type="button" onclick="cerrarModalConfiguracionTienda()" style="flex:1; background:var(--surface-subtle); color:var(--text); border:1px solid var(--surface-border); padding:11px; border-radius:12px; font-weight:700; cursor:pointer;">
+            Cancelar
+          </button>
+          <button type="submit" style="flex:2; background:var(--primary); color:#FFFFFF; border:none; padding:11px; border-radius:12px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:18px;">save</span>
+            <span>Guardar Cambios</span>
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -2149,7 +2433,10 @@
           : '🛍️';
 
         return `
-          <div class="pos-product-card" onclick="agregarAlCarrito('${p.id}')">
+          <div class="pos-product-card" onclick="agregarAlCarrito('${p.id}')" style="position:relative;">
+            <button type="button" onclick="event.stopPropagation(); verDetallesProducto('${p.id}')" title="Ver características y margen de ganancia" style="position:absolute; top:6px; right:6px; width:26px; height:26px; border-radius:50%; background:var(--card-bg); border:1px solid var(--surface-border); display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; color:var(--text-muted); box-shadow:0 1px 4px rgba(0,0,0,0.1); z-index:2;">
+              🔍
+            </button>
             <div>
               <div class="pos-product-thumb">${imgHtml}</div>
               <div class="pos-product-name">${p.name}</div>
@@ -2556,14 +2843,14 @@
           : '🛍️';
 
         return `
-          <tr style="border-bottom:1px solid var(--surface-subtle);">
+          <tr style="border-bottom:1px solid var(--surface-subtle); cursor:pointer;" onclick="verDetallesProducto('${p.id}')">
             <td style="padding:10px;">
-              <div class="prod-table-clickable" onclick="editarProducto('${p.id}')" title="Toca el nombre o la foto para editar este producto">
+              <div class="prod-table-clickable" title="Toca para ver características y editar propiedades">
                 <div class="prod-table-img">${imgHtml}</div>
                 <div>
                   <div class="prod-clickable-name" style="font-weight:700; font-size:13px; color:var(--text);">${p.name}</div>
                   ${p.barcode ? `<div style="font-size:10px; color:var(--text-muted);">Cód: ${p.barcode}</div>` : ''}
-                  <div style="font-size:10.5px; color:var(--primary); font-weight:600; margin-top:2px;">✏️ Toca para editar</div>
+                  <div style="font-size:10.5px; color:var(--primary); font-weight:600; margin-top:2px;">🔍 Ver características</div>
                 </div>
               </div>
             </td>
@@ -2573,9 +2860,10 @@
             <td style="padding:10px;">
               <span style="font-weight:800; color:${badgeColor};">${stock} un.</span>
             </td>
-            <td style="padding:10px;">
+            <td style="padding:10px;" onclick="event.stopPropagation()">
               <div style="display:flex; gap:6px;">
-                <button type="button" onclick="editarProducto('${p.id}')" style="background:var(--surface-subtle); border:none; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Editar">✏️</button>
+                <button type="button" onclick="verDetallesProducto('${p.id}')" style="background:var(--surface-subtle); border:none; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Ver características y ficha">🔍</button>
+                <button type="button" onclick="editarProducto('${p.id}')" style="background:var(--surface-subtle); border:none; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Editar directamente">✏️</button>
                 <button type="button" onclick="eliminarProducto('${p.id}')" style="background:none; border:1px solid var(--alert); color:var(--alert); padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Eliminar">🗑️</button>
               </div>
             </td>
@@ -2647,6 +2935,150 @@
         box.innerHTML = '🛍️';
         if (btnQ) btnQ.style.display = 'none';
       }
+    }
+
+    // ==========================================
+    // DETALLES Y CARACTERÍSTICAS DEL PRODUCTO
+    // ==========================================
+    let productoSeleccionadoDetalle = null;
+
+    function verDetallesProducto(id) {
+      const p = inventory.find(x => String(x.id) === String(id));
+      if (!p) return;
+      productoSeleccionadoDetalle = p;
+
+      const img = p.image || p.photo || '';
+      const imgCont = document.getElementById('detProdImgContainer');
+      if (imgCont) {
+        if (img) {
+          imgCont.innerHTML = `<img src="${img}" alt="${p.name}" style="width:100%; height:100%; object-fit:contain; border-radius:14px;">`;
+        } else {
+          imgCont.innerHTML = `<div style="font-size:48px;">🛍️</div>`;
+        }
+      }
+
+      document.getElementById('detProdNombre').innerText = p.name || 'Sin nombre';
+      document.getElementById('detProdCat').innerText = p.cat || p.category || 'General';
+      document.getElementById('detProdCodigo').innerText = p.barcode ? `Cód: ${p.barcode}` : 'Sin código';
+
+      const precio = Number(p.price) || 0;
+      const costo = Number(p.cost) || 0;
+      const ganancia = precio - costo;
+      const margen = precio > 0 ? Math.round((ganancia / precio) * 100) : 0;
+
+      document.getElementById('detProdPrecio').innerText = `$${precio.toLocaleString('es-CO')} COP`;
+      document.getElementById('detProdCosto').innerText = `$${costo.toLocaleString('es-CO')} COP`;
+      document.getElementById('detProdGanancia').innerText = `Ganancia: +$${ganancia.toLocaleString('es-CO')} COP (${margen}%)`;
+
+      const stock = Number(p.stock) || 0;
+      const stockBadge = document.getElementById('detProdStockBadge');
+      if (stockBadge) {
+        if (stock <= 0) {
+          stockBadge.innerHTML = `<span style="background:rgba(239, 68, 68, 0.15); color:var(--alert); padding:3px 8px; border-radius:10px; font-weight:800; font-size:11px;">🛑 Agotado (0 un.)</span>`;
+        } else if (stock <= 5) {
+          stockBadge.innerHTML = `<span style="background:rgba(245, 158, 11, 0.15); color:var(--warning); padding:3px 8px; border-radius:10px; font-weight:800; font-size:11px;">⚠️ Bajo Stock (${stock} un.)</span>`;
+        } else {
+          stockBadge.innerHTML = `<span style="background:rgba(16, 185, 129, 0.15); color:var(--success); padding:3px 8px; border-radius:10px; font-weight:800; font-size:11px;">✓ Disponible (${stock} un.)</span>`;
+        }
+      }
+
+      const desc = p.desc || p.description || '';
+      document.getElementById('detProdDesc').innerText = desc || 'Este producto no cuenta con descripción o características adicionales registradas.';
+
+      document.getElementById('modalDetalleProducto').style.display = 'flex';
+    }
+
+    function cerrarModalDetalleProducto() {
+      const modal = document.getElementById('modalDetalleProducto');
+      if (modal) modal.style.display = 'none';
+      productoSeleccionadoDetalle = null;
+    }
+
+    function abrirEdicionDesdeDetalle() {
+      if (!productoSeleccionadoDetalle) return;
+      const id = productoSeleccionadoDetalle.id;
+      cerrarModalDetalleProducto();
+      editarProducto(id);
+    }
+
+    function agregarAlCarritoDesdeDetalle() {
+      if (!productoSeleccionadoDetalle) return;
+      agregarAlCarrito(productoSeleccionadoDetalle.id);
+      cerrarModalDetalleProducto();
+      mostrarRetailToast(`✓ ${productoSeleccionadoDetalle.name} agregado`);
+    }
+
+    // ==========================================
+    // CONFIGURACIÓN DE LA TIENDA RETAIL
+    // ==========================================
+    function abrirModalConfiguracionTienda() {
+      document.getElementById('cfgBizNameInp').value = bizProfile.name || '';
+      document.getElementById('cfgBizOwnerInp').value = bizProfile.owner || '';
+      document.getElementById('cfgBizPhoneInp').value = bizProfile.phone || '';
+      document.getElementById('cfgBizAddressInp').value = bizProfile.address || '';
+      document.getElementById('cfgBizNequiInp').value = bizProfile.nequi || '';
+      document.getElementById('cfgBizDaviplataInp').value = bizProfile.daviplata || '';
+      document.getElementById('cfgBizBancolombiaInp').value = bizProfile.bancolombia || '';
+      document.getElementById('cfgBizBreBInp').value = bizProfile.otherPayment || bizProfile.brebe || '';
+
+      cambiarCfgTab('biz');
+      actualizarSeleccionTemaEnConfiguracion(currentTheme);
+      document.getElementById('modalConfiguracionTienda').style.display = 'flex';
+    }
+
+    function cerrarModalConfiguracionTienda() {
+      const modal = document.getElementById('modalConfiguracionTienda');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function cambiarCfgTab(tabKey) {
+      const tabs = ['biz', 'pagos', 'temas'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tabCfg${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        const sec = document.getElementById(`cfgSec${t.charAt(0).toUpperCase() + t.slice(1)}`);
+        if (btn) btn.classList.toggle('active', t === tabKey);
+        if (sec) sec.style.display = (t === tabKey) ? 'block' : 'none';
+      });
+    }
+
+    function seleccionarTemaEnConfiguracion(tema) {
+      aplicarTemaRetail(tema, true);
+      actualizarSeleccionTemaEnConfiguracion(tema);
+    }
+
+    function actualizarSeleccionTemaEnConfiguracion(tema) {
+      ['clarity', 'esmeralda', 'oceano', 'midnight'].forEach(t => {
+        const el = document.getElementById(`cfg-opt-${t}`);
+        if (el) el.classList.toggle('active', t === tema);
+      });
+    }
+
+    async function guardarConfiguracionTienda() {
+      const name = document.getElementById('cfgBizNameInp').value.trim();
+      if (!name) {
+        mostrarRetailToast('El nombre del negocio es obligatorio');
+        cambiarCfgTab('biz');
+        return;
+      }
+
+      bizProfile.name = name;
+      bizProfile.owner = document.getElementById('cfgBizOwnerInp').value.trim();
+      bizProfile.phone = document.getElementById('cfgBizPhoneInp').value.trim();
+      bizProfile.address = document.getElementById('cfgBizAddressInp').value.trim();
+      bizProfile.nequi = document.getElementById('cfgBizNequiInp').value.trim();
+      bizProfile.daviplata = document.getElementById('cfgBizDaviplataInp').value.trim();
+      bizProfile.bancolombia = document.getElementById('cfgBizBancolombiaInp').value.trim();
+      bizProfile.otherPayment = document.getElementById('cfgBizBreBInp').value.trim();
+      bizProfile.brebe = bizProfile.otherPayment;
+      bizProfile.theme = currentTheme;
+
+      const hdrBiz = document.getElementById('hdrBizName');
+      if (hdrBiz) hdrBiz.innerText = bizProfile.name;
+
+      cerrarModalConfiguracionTienda();
+      mostrarRetailToast('✓ Configuración del negocio guardada');
+
+      await persistirDatosRetail();
     }
 
     function abrirModalNuevoProducto() {

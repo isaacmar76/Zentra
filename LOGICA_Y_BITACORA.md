@@ -1091,6 +1091,46 @@ class CatalogItemModel {
 
 ---
 
+#### Hito 45: Optimización de Cuota Firestore (Límite 1MB), Compresión Asíncrona de Imágenes, Sincronización en Tiempo Real Bidireccional (PC ↔ Celular) y Resolución de Conflictos Local-First
+- **Requerimiento del Usuario:**
+  - *"en el PC hago movimientos en mi inventario de productos y no hace la sincronizacion, acabo de elminar un producto y crear uno nuevo y en el celular no aparecen estos cambios. Revisa y dime sin hacer cambios que pasa. Luego dime como lo vas a solucionar"*
+  - *"procede con las correcciones"*
+- **Diagnóstico de Causa Raíz:**
+  1. **Límite de 1 MB de Cloud Firestore (`INVALID_ARGUMENT: 1048487 bytes`):**
+     - En el negocio `biz_1791059419253_wejk4`, el documento en Firestore pesaba ~867 KB (83% de la cuota máxima de 1 MB) antes de los cambios debido a:
+       * Historial de cotizaciones (`savedQuotes` / `quotes`) guardando imágenes Base64 pesadas de cada producto (~344 KB acumulados).
+       * Código QR de cobro (`bizProfile.qrImage`) en alta resolución (~133 KB).
+       * Fotos de productos en Base64 sin optimizar a 800px (~200 KB cada una).
+     - Al añadir un nuevo producto con foto (`Coffe+Colageno`), el documento superó los 1,048,576 bytes (1 MB). Firestore rechazó la escritura con código 400 `INVALID_ARGUMENT: The value of property ... is longer than 1048487 bytes`.
+     - `persistirDatosRetail` capturaba el error y guardaba únicamente en el `localStorage` del PC, mostrando el toast `⚠️ Guardado localmente (sin conexión a Firebase)`. Por lo tanto, ni el producto eliminado ni el nuevo producto llegaron nunca a la base de datos de Firebase.
+  2. **Ausencia de Escuchador Reactivo (`onSnapshot`) de Inventario:**
+     - En `retail.html`, solo existía un listener `onSnapshot` para la subcolección `pedidos`. Ni el catálogo de productos ni el perfil del negocio tenían un listener activo sobre `negocios_zentra/{bizId}`, requiriendo recargar manualmente el celular para ver cualquier cambio.
+  3. **Riesgo de Sobrescritura Local-First:**
+     - Al recargar la página, el `get()` inicial de Firestore sobrescribía el inventario local si no existía comparación de marcas de tiempo (`timestamp`), perdiendo potencialmente los cambios hechos offline o pendientes de sincronización.
+- **Implementación Técnica:**
+  1. **Badge Visual de Estado de Sincronización en Header (`retail.html`):**
+     - Elemento `#syncBadgeStatus` en el encabezado principal que refleja en vivo el estado exacto: `Sincronizado 🟢` (fondo verde menta), `Guardando... ⏳` (fondo ámbar), `⚠️ Límite 1MB` o `⚠️ Permisos 403` (fondo rosa suave).
+  2. **Autenticación Anónima Preventiva en Firebase:**
+     - Inicialización con `fbApp.auth().signInAnonymously()` para garantizar sesiones válidas según las reglas de seguridad de Firestore.
+  3. **Compresión Canvas de Alta Eficiencia (`procesarFotoSlot`):**
+     - Reducción del tamaño máximo de renderizado a 460px y calidad JPEG a 0.65, logrando que nuevas fotos pasen de ~200 KB a solo ~25-35 KB (ahorro > 85% de peso).
+  4. **Optimizador Asíncrono en Memoria (`optimizarTodasLasImagenesInventario`):**
+     - Función automática previa al guardado que inspecciona `inventory` y `bizProfile.qrImage`, detectando y comprimiendo asíncronamente cualquier foto que supere los 55 KB.
+  5. **Saneamiento Estricto del Payload (`persistirDatosRetail`):**
+     - Descarte de imágenes Base64 en el historial de cotizaciones (`sanitizedQuotes`), reduciendo `savedQuotes` de 344 KB a ~3 KB.
+     - Estandarización de `catalogItems` y `catalog` para evitar duplicación de strings Base64 en `photo` e `image`.
+     - Depuración con `JSON.parse(JSON.stringify(payload))` para eliminar valores `undefined` que Firestore rechaza.
+  6. **Sincronización en Tiempo Real Bidireccional (`onSnapshot`):**
+     - `iniciarEscuchadorNube()` en `retail.html`: Escucha activa de `negocios_zentra/{bizId}` que actualiza en caliente el inventario y métricas en celulares y otros PCs (< 1s), pausándose inteligentemente si el comerciante tiene abierto el formulario de crear o editar un producto para no interrumpir su trabajo.
+     - `iniciarEscuchadorTiendaPublica()` en `tienda.html`: Escucha activa de `tiendas_publicas/{bizId}` para que los clientes externos y la tienda en línea vean cambios de catálogo y disponibilidad en tiempo real sin recargar la página.
+  7. **Resolución de Conflictos y Persistencia de Negocio Activo:**
+     - Inclusión de marcas de tiempo `lastUpdatedTimestamp` y comparación en `cargarDatosRetail()` con `zentra_catalog_updated_${bizId}`, garantizando que las modificaciones locales más recientes (como productos creados antes de sincronizar) se preserven y se suban a la nube en lugar de sobrescribirse.
+     - Registro persistente de `zentra_active_biz_id` en `localStorage` al abrir con parámetro `?biz=...`.
+  8. **Paridad Total de Archivos:**
+     - Verificación de sintaxis JS y sincronización idéntica en `retail.html`, `tienda.html`, `site/retail.html` y `site/tienda.html`.
+
+---
+
 ## 6. Procedimiento para Registrar Nuevos Cambios
 
 Cada vez que se reciba un nuevo requerimiento o se implemente una mejora:

@@ -1459,6 +1459,53 @@ service cloud.firestore {
 
       // Verificar si la URL trae un producto específico (?p=... o ?prod=... o ?producto=...)
       verificarDeepLinkProducto();
+
+      // Escuchar cambios del catálogo en vivo desde Firebase Firestore
+      iniciarEscuchadorTiendaPublica(storeData.bizId);
+    }
+
+    // ==========================================
+    // ESCUCHADOR EN VIVO NUBE (TIENDA PÚBLICA)
+    // ==========================================
+    let unsubscribeTiendaPublica = null;
+
+    function iniciarEscuchadorTiendaPublica(bizId) {
+      if (!fbDb || !bizId || unsubscribeTiendaPublica) return;
+      try {
+        unsubscribeTiendaPublica = fbDb.collection('tiendas_publicas').doc(bizId)
+          .onSnapshot(snap => {
+            if (!snap || !snap.exists) return;
+            const data = snap.data();
+            if (Array.isArray(data.catalog)) {
+              const newCat = data.catalog.map((it, idx) => ({
+                id: String(it.id || `p_${idx}`),
+                name: it.name || 'Producto',
+                price: Number(it.price) || 0,
+                category: it.category || it.cat || 'General',
+                desc: it.desc || it.description || '',
+                dietaryInfo: it.dietaryInfo || it.dietary || null,
+                invima: it.invima || null,
+                images: Array.isArray(it.images) && it.images.length > 0 ? it.images : [it.photo || it.image].filter(Boolean),
+                photo: (Array.isArray(it.images) && it.images[0]) || it.photo || it.image || null
+              }));
+
+              const curSig = JSON.stringify(storeData.catalog.map(x => `${x.id}_${x.name}_${x.price}_${(x.images||[]).length}`));
+              const newSig = JSON.stringify(newCat.map(x => `${x.id}_${x.name}_${x.price}_${(x.images||[]).length}`));
+
+              if (curSig !== newSig) {
+                storeData.catalog = newCat;
+                if (data.name) storeData.name = data.name;
+                if (data.phone) storeData.phone = data.phone;
+                if (data.qrImage) storeData.qrImage = data.qrImage;
+                renderizarHeaderTienda();
+                renderizarCategorias();
+                renderizarProductos();
+              }
+            }
+          }, err => console.warn('Snapshot tienda_publica:', err));
+      } catch (e) {
+        console.warn('Listener tienda pública:', e);
+      }
     }
 
     // ==========================================

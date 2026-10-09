@@ -2436,11 +2436,31 @@
 
             if (data.bizProfile) bizProfile = { ...bizProfile, ...data.bizProfile };
 
-            // Si el PC tiene cambios locales más recientes que la nube (ej: producto recién creado antes de sincronizar):
+            // Si el PC tiene cambios locales (productos nuevos, eliminados o editados antes de sincronizar):
             const localSavedInv = JSON.parse(localStorage.getItem(`zentra_catalog_${currentBizId}`) || '[]');
-            if (localTimestamp > cloudTimestamp && localSavedInv.length > 0) {
+            let conservarLocal = false;
+
+            if (localSavedInv.length > 0) {
+              if (localTimestamp > cloudTimestamp) {
+                conservarLocal = true;
+              } else {
+                // Si el timestamp local es 0 (creado con versión previa) o menor, comparar si hay diferencias
+                const cloudIds = new Set((data.catalogItems || []).map(x => String(x.id)));
+                const localIds = new Set(localSavedInv.map(x => String(x.id)));
+                const hayNuevos = localSavedInv.some(x => !cloudIds.has(String(x.id)));
+                const hayEliminados = (data.catalogItems || []).some(x => !localIds.has(String(x.id)));
+                if (hayNuevos || hayEliminados) {
+                  conservarLocal = true;
+                }
+              }
+            }
+
+            if (conservarLocal) {
               inventory = localSavedInv;
-              console.log('Conservando inventario local más reciente que la nube');
+              console.log('Conservando inventario local con modificaciones pendientes de subir a la nube');
+              try {
+                localStorage.setItem(`zentra_catalog_updated_${currentBizId}`, String(Date.now()));
+              } catch (_) {}
             } else if (Array.isArray(data.catalogItems) && data.catalogItems.length > 0) {
               inventory = data.catalogItems;
             }

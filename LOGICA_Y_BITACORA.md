@@ -1131,6 +1131,25 @@ class CatalogItemModel {
 
 ---
 
+#### Hito 46: Unificación de Sincronización en Badge Hero, Reemplazo de Ícono por Logo de Tienda/Zentra y Descarga Prioritaria en Móvil
+- **Requerimiento del Usuario:**
+  - *"en el celular aun no se ven los productos nuevos creados en el PC, y aprovecha para quitar del hero, el boton de sincronizar, si al tocar el que esta al lado del nombre del negocio hace la sincronizacion para que quiero 2 botones haciendo lo mismo? otra cosa, ese icono del carrito de compra al lado del nombre reemplazar por el logo de la tienda, en caso que no lo tengas subido, coloca el logo de Zentra"*
+- **Implementación Técnica:**
+  1. **Unificación del Botón de Sincronización en el Hero:**
+     - Eliminado el botón redundante `#btnSyncCloud` de las acciones del encabezado (`.header-actions`).
+     - El badge de estado `#syncBadgeStatus` junto al nombre de la tienda es ahora interactivo (`onclick="sincronizarConNube()"` con cursor pointer y hover feedback).
+  2. **Logo de la Tienda / Zentra en el Encabezado:**
+     - Reemplazado el emoji fijo del carrito (`🛒`) por `#hdrLogoBadge` con una imagen responsiva `#hdrLogoImg`.
+     - Si el negocio tiene logo configurado (`bizProfile.logo` o `bizProfile.image`), se despliega su logo oficial. En su defecto, se muestra el isotipo oficial de Zentra (`img/icon.png`).
+     - Función reactiva `actualizarLogoHeader()` conectada al inicio, al listener en vivo y al modal de configuración.
+  3. **Descarga Prioritaria en Móvil y Sincronización Bidireccional Inteligente:**
+     - Corregido el algoritmo de replicación en `cargarDatosRetail()`: al abrir en el celular, si la nube tiene un timestamp más reciente que la caché local, el celular descarga de inmediato los productos creados en el PC en lugar de retener la caché local previa.
+     - En `sincronizarConNube()`, al tocar el badge `Sincronizado 🟢` desde el celular, consulta si la nube tiene cambios más nuevos; de ser así, descarga e inyecta el catálogo en caliente en menos de 1 segundo sin recargar la página. Si se toca en el dispositivo emisor, empuja los cambios pendientes a Firestore.
+  4. **Paridad Total de Archivos:**
+     - Replicado en `retail.html` y `site/retail.html`.
+
+---
+
 ## 6. Procedimiento para Registrar Nuevos Cambios
 
 Cada vez que se reciba un nuevo requerimiento o se implemente una mejora:

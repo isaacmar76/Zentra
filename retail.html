@@ -1202,14 +1202,16 @@
   <!-- CABECERA DE ZENTRA RETAIL -->
   <header class="retail-header">
     <div class="header-inner">
-      <div class="header-brand" onclick="location.reload()">
-        <div class="header-logo-badge">🛒</div>
+      <div class="header-brand">
+        <div class="header-logo-badge" id="hdrLogoBadge" onclick="location.reload()" title="Recargar tienda" style="overflow:hidden; display:flex; align-items:center; justify-content:center; padding:2px; cursor:pointer;">
+          <img id="hdrLogoImg" src="img/icon.png" alt="Logo" style="width:100%; height:100%; object-fit:contain; border-radius:10px;" onerror="this.onerror=null; this.src='img/icon.png';">
+        </div>
         <div class="header-titles">
           <div style="display:flex; align-items:center; gap:6px;">
-            <div class="retail-app-badge">Zentra Retail</div>
-            <span id="syncBadgeStatus" style="font-size:10px; font-weight:800; background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; padding:1px 6px; border-radius:8px;">Sincronizado 🟢</span>
+            <div class="retail-app-badge" onclick="location.reload()" style="cursor:pointer;">Zentra Retail</div>
+            <span id="syncBadgeStatus" onclick="sincronizarConNube()" title="Tocar para forzar sincronización con la nube" style="font-size:10px; font-weight:800; background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; padding:2px 8px; border-radius:8px; cursor:pointer; user-select:none; display:inline-flex; align-items:center; gap:3px; transition:all 0.2s;">Sincronizado 🟢</span>
           </div>
-          <div class="retail-biz-name" id="hdrBizName">Mi Comercio</div>
+          <div class="retail-biz-name" id="hdrBizName" onclick="location.reload()" style="cursor:pointer;">Mi Comercio</div>
         </div>
       </div>
 
@@ -1228,11 +1230,6 @@
         <a href="index.html" class="header-icon-btn" title="Volver al Portal Universo Zentra">
           <span class="material-symbols-outlined" style="font-size:20px;">apps</span>
         </a>
-
-        <!-- Ícono Sincronización en la Nube -->
-        <button type="button" class="header-icon-btn btn-sync" onclick="sincronizarConNube()" id="btnSyncCloud" title="Sincronizar Cloud Firestore">
-          <span class="material-symbols-outlined" id="syncIcon" style="font-size:20px;">cloud_sync</span>
-        </button>
       </div>
     </div>
   </header>
@@ -2362,6 +2359,19 @@
     }
 
     // ==========================================
+    // LOGO DEL ENCABEZADO (NEGOCIO / ZENTRA)
+    // ==========================================
+    function actualizarLogoHeader() {
+      const img = document.getElementById('hdrLogoImg');
+      if (!img) return;
+      if (bizProfile && (bizProfile.logo || bizProfile.image)) {
+        img.src = bizProfile.logo || bizProfile.image;
+      } else {
+        img.src = 'img/icon.png';
+      }
+    }
+
+    // ==========================================
     // ESCUCHADOR EN TIEMPO REAL NUBE (PC <-> CELULAR)
     // ==========================================
     let unsubscribeInventario = null;
@@ -2390,6 +2400,9 @@
                 inventory = data.catalogItems;
                 try {
                   localStorage.setItem(`zentra_catalog_${currentBizId}`, JSON.stringify(inventory));
+                  if (data.lastUpdatedTimestamp) {
+                    localStorage.setItem(`zentra_catalog_updated_${currentBizId}`, String(data.lastUpdatedTimestamp));
+                  }
                 } catch (_) {}
                 renderizarChipsCategorias();
                 renderizarPosGrid();
@@ -2410,6 +2423,7 @@
                 const elName = document.getElementById('hdrBizName');
                 if (elName) elName.innerText = bizProfile.name || 'Mi Comercio';
                 document.title = `${bizProfile.name || 'Mi Comercio'} • Zentra Retail`;
+                actualizarLogoHeader();
               }
             }
 
@@ -2431,38 +2445,24 @@
           const doc = await fbDb.collection('negocios_zentra').doc(currentBizId).get();
           if (doc.exists) {
             const data = doc.data();
-            const cloudTimestamp = data.lastUpdatedTimestamp || (data.updatedAt ? new Date(data.updatedAt).getTime() : 0);
+            const cloudTimestamp = Number(data.lastUpdatedTimestamp) || (data.updatedAt ? new Date(data.updatedAt).getTime() : 0);
             const localTimestamp = Number(localStorage.getItem(`zentra_catalog_updated_${currentBizId}`)) || 0;
+            const localSavedInv = JSON.parse(localStorage.getItem(`zentra_catalog_${currentBizId}`) || '[]');
 
             if (data.bizProfile) bizProfile = { ...bizProfile, ...data.bizProfile };
 
-            // Si el PC tiene cambios locales (productos nuevos, eliminados o editados antes de sincronizar):
-            const localSavedInv = JSON.parse(localStorage.getItem(`zentra_catalog_${currentBizId}`) || '[]');
-            let conservarLocal = false;
-
-            if (localSavedInv.length > 0) {
-              if (localTimestamp > cloudTimestamp) {
-                conservarLocal = true;
-              } else {
-                // Si el timestamp local es 0 (creado con versión previa) o menor, comparar si hay diferencias
-                const cloudIds = new Set((data.catalogItems || []).map(x => String(x.id)));
-                const localIds = new Set(localSavedInv.map(x => String(x.id)));
-                const hayNuevos = localSavedInv.some(x => !cloudIds.has(String(x.id)));
-                const hayEliminados = (data.catalogItems || []).some(x => !localIds.has(String(x.id)));
-                if (hayNuevos || hayEliminados) {
-                  conservarLocal = true;
-                }
-              }
-            }
-
-            if (conservarLocal) {
+            // Comparar marcas de tiempo: si la nube tiene fecha mayor o igual, la nube es la fuente de verdad (ej: celular)
+            if (localTimestamp > cloudTimestamp && localSavedInv.length > 0) {
               inventory = localSavedInv;
-              console.log('Conservando inventario local con modificaciones pendientes de subir a la nube');
-              try {
-                localStorage.setItem(`zentra_catalog_updated_${currentBizId}`, String(Date.now()));
-              } catch (_) {}
+              console.log('Conservando inventario local más reciente que la nube');
             } else if (Array.isArray(data.catalogItems) && data.catalogItems.length > 0) {
               inventory = data.catalogItems;
+              try {
+                localStorage.setItem(`zentra_catalog_${currentBizId}`, JSON.stringify(inventory));
+                localStorage.setItem(`zentra_catalog_updated_${currentBizId}`, String(cloudTimestamp));
+              } catch (_) {}
+            } else if (localSavedInv.length > 0) {
+              inventory = localSavedInv;
             }
 
             if (Array.isArray(data.finances)) finances = data.finances;
@@ -2579,6 +2579,7 @@
       // Sincronizar Header
       document.getElementById('hdrBizName').innerText = bizProfile.name || 'Zentra Minimarket';
       document.title = `${bizProfile.name || 'Mi Comercio'} • Zentra Retail`;
+      actualizarLogoHeader();
 
       // Renderizar UI
       renderizarChipsCategorias();
@@ -2589,10 +2590,10 @@
       actualizarBadgePedidos();
       renderizarCierres();
 
-      // Iniciar escuchador en tiempo real y persistir datos optimizados
+      // Iniciar escuchador en tiempo real
       if (fbDb && currentBizId) {
         iniciarEscuchadorNube();
-        persistirDatosRetail().catch(() => {});
+        actualizarIndicadorSync('Sincronizado 🟢');
       } else {
         actualizarIndicadorSync('🟠 Modo Local');
       }
@@ -2744,7 +2745,42 @@
     }
 
     async function sincronizarConNube() {
+      actualizarIndicadorSync('Sincronizando... ⏳');
       mostrarRetailToast('⏳ Sincronizando con Cloud Firestore...');
+
+      // 1. Si la nube tiene cambios más nuevos de otro dispositivo (ej: hechos en el PC), descargar en caliente
+      if (fbDb && currentBizId) {
+        try {
+          const doc = await fbDb.collection('negocios_zentra').doc(currentBizId).get();
+          if (doc.exists) {
+            const data = doc.data();
+            const cloudTimestamp = Number(data.lastUpdatedTimestamp) || (data.updatedAt ? new Date(data.updatedAt).getTime() : 0);
+            const localTimestamp = Number(localStorage.getItem(`zentra_catalog_updated_${currentBizId}`)) || 0;
+
+            if (cloudTimestamp > localTimestamp && Array.isArray(data.catalogItems) && data.catalogItems.length > 0) {
+              inventory = data.catalogItems;
+              if (data.bizProfile) bizProfile = { ...bizProfile, ...data.bizProfile };
+              try {
+                localStorage.setItem(`zentra_catalog_${currentBizId}`, JSON.stringify(inventory));
+                localStorage.setItem(`zentra_catalog_updated_${currentBizId}`, String(cloudTimestamp));
+                localStorage.setItem(`zentra_biz_profile_${currentBizId}`, JSON.stringify(bizProfile));
+              } catch (_) {}
+              renderizarChipsCategorias();
+              renderizarPosGrid();
+              renderizarInventarioTabla();
+              renderizarDashboardMetricas();
+              actualizarLogoHeader();
+              actualizarIndicadorSync('Sincronizado 🟢');
+              mostrarRetailToast('✓ Catálogo actualizado desde la nube');
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('Error comprobando nube:', e);
+        }
+      }
+
+      // 2. Si no hay cambios nuevos en la nube o este dispositivo tiene cambios pendientes: subir a la nube
       const res = await persistirDatosRetail();
       if (res.success) {
         mostrarRetailToast('☁️ Catálogo 100% sincronizado en la nube');
@@ -3681,6 +3717,7 @@
 
       const hdrBiz = document.getElementById('hdrBizName');
       if (hdrBiz) hdrBiz.innerText = bizProfile.name;
+      actualizarLogoHeader();
 
       cerrarModalConfiguracionTienda();
       mostrarRetailToast('✓ Configuración del negocio guardada');

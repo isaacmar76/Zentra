@@ -212,6 +212,8 @@ class CatalogItemModel {
 | **2026-10-05** | `982ce6d` | Multi-Tenant / Cloud | Hito 34: Gestión y Eliminación de Tiendas Duplicadas o No Deseadas (Local & Firebase Cloud) | ✅ Completado |
 | **2026-10-05** | `b901865` | UI / Catálogo / Cloud Sync | Hito 35: Tareas a Modal en Barra Inferior con Notificación Badge en Modo Clásico, Campo Descripción Breve en Catálogo y Auto-Cierre de Sincronización en la Nube | ✅ Completado |
 | **2026-10-05** | `current` | Resiliencia / Anti-Pérdida / Multi-Tienda | Hito 36: Blindaje de Arranque Anti-Pérdida, Auto-Recuperación de Proyectos/Catálogo, Selector Rápido Multi-Tienda (1-Tap Switch) y Banner Inteligente en Modo Clásico | ✅ Completado |
+| **2026-10-08** | `2938c25` | Cloud / Firestore / Fix | Hito 43: Corrección Integral de Persistencia en Cloud Firestore para Tienda Pública Multi-Dispositivo y Diagnóstico Visual de Permisos | ✅ Completado |
+| **2026-10-09** | `current` | Feature / Retail / Tienda | Hito 44: Deep Link de Producto Único, Galería de 3 Fotos, Información Dietaria y Registro INVIMA con Retención Post-Pedido en Catálogo | ✅ Completado |
 
 ---
 
@@ -1052,6 +1054,40 @@ class CatalogItemModel {
      - Generación inteligente de URLs mediante `new URL('tienda.html', window.location.href)` y detección de entorno: si se prueba en `localhost`, el modal provee el enlace web directo de producción para que los celulares puedan abrirlo sin restricciones de red local.
   3. **Paridad Total y Despliegue:**
      - Replicado y verificado byte a byte en `retail.html`, `tienda.html`, `site/retail.html` y `site/tienda.html`.
+
+---
+
+#### Hito 44: Deep Link de Producto Único, Galería de 3 Fotos, Información Dietaria y Registro INVIMA con Retención Post-Pedido en Catálogo
+- **Requerimiento del Usuario:**
+  1. **Compartir 1 Solo Producto (Deep Link Directo):** El comerciante debe poder enviar un enlace exclusivo a un cliente con un producto específico (`tienda.html?biz=[bizId]&p=[prodId]`), mostrando directamente sus fotos, precio, características y botón inmediato de pedido.
+  2. **Enlace a la Tienda y Retención Post-Pedido:** El cliente debe tener la opción de ver el resto del catálogo y, al completar su pedido por WhatsApp, el sistema debe dejarlo en la página del catálogo completo para que continúe explorando otros productos.
+  3. **Multi-Foto (Hasta 3 Imágenes por Producto):** Posibilidad de almacenar hasta 3 fotos por producto (1 principal obligatoria, 2 adicionales opcionales), sin forzar a cargar más si solo se tiene 1 foto.
+  4. **Información Dietaria / Nutricional y Registro Sanitario INVIMA:** Campos específicos en las propiedades del producto que, cuando estén presentes, deben ser visibles y destacados para el cliente en el catálogo y en la ficha del producto.
+- **Implementación Técnica:**
+  1. **Gestor Multi-Foto en Zentra-Retail (`retail.html`):**
+     - Selector responsivo de 3 ranuras fotográficas (`#slotPreview0`, `#slotPreview1`, `#slotPreview2`) en `#modalProductoRetail`, con soporte para cámara y galería (`input file`), compresión automática en cliente y carga de URLs.
+     - Preservación de retrocompatibilidad: almacena `images: [img1, img2, img3]` como array y mantiene `photo` e `image` apuntando a la foto principal para compatibilidad con pedidos antiguos y comprobantes.
+  2. **Campos Dietarios y Regulatorios (`dietaryInfo` y `invima`):**
+     - Inputs en `#modalProductoRetail`: `#prodDietaryInp` y `#prodInvimaInp`.
+     - Inclusión en Firestore (`tiendas_publicas/{bizId}` y `negocios_zentra/{bizId}`) y `localStorage`.
+  3. **Ficha del Producto en Retail (`#modalDetalleProducto`):**
+     - Galería con visor principal y fila de miniaturas intercambiables (`#detProdThumbsRow`).
+     - Badge azul de Registro INVIMA (`#detProdInvimaBox`) y tarjeta verde de Información Dietaria (`#detProdDietaryBox`).
+     - Botón de compartir: **`📲 Compartir este Producto con Cliente`**.
+  4. **Modal de Compartir Producto Único (`#modalCompartirProducto`):**
+     - Previsualización visual de la tarjeta con imagen, precio, INVIMA y dieta.
+     - Generación de deep link universal (`tienda.html?biz=[bizId]&p=[prodId]`).
+     - Botones de acción: `📋 Copiar Enlace`, `💬 Enviar por WhatsApp` (con mensaje enriquecido formateado) y `↗️ Abrir Ficha`.
+     - Botón de acceso directo `📲` agregado a cada fila de la tabla de inventario en Retail.
+  5. **Experiencia del Cliente en Tienda Pública (`tienda.html`):**
+     - **Detección Automática de Deep Link:** Lee parámetros `?p=`, `?prod=` o `?producto=`. Si se detecta un ID tras cargar la tienda, abre inmediatamente `#modalDetalleProductoCliente` con la ficha completa del producto y activa el badge *"⭐ Producto Seleccionado"*.
+     - **Galería Multi-Foto del Cliente:** Visor interactivo y selector táctil de miniaturas cuando el producto tiene 2 o 3 fotos (`renderizarGaleriaCliente`).
+     - **Badges Visuales en Catálogo y Modal:** Etiquetas estilizadas de `🌿 Información Dietaria` y `🛡️ INVIMA` visibles directamente en las tarjetas de la cuadrícula y en el modal.
+     - **Botón `⚡ Hacer Pedido Inmediato`:** Agrega el producto al carrito e inicia directamente el formulario de entrega en un toque.
+     - **Botón `🛍️ Explorar todos los demás productos de la tienda`:** Cierra la ficha, limpia el parámetro de URL mediante `history.replaceState` y hace scroll suave a la cuadrícula de catálogo.
+     - **Retención Post-Pedido en Catálogo:** Al pulsar *"🛍️ Seguir mirando los productos de la tienda"* tras despachar el pedido por WhatsApp (`cerrarModalExito`), se limpia el parámetro `?p=` de la URL sin recargar y se sitúa al cliente en el catálogo general completo.
+  6. **Paridad Total y Despliegue:**
+     - Sincronización idéntica y validación de sintaxis en `retail.html`, `tienda.html`, `site/retail.html` y `site/tienda.html`.
 
 ---
 

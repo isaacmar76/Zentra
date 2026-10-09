@@ -1098,28 +1098,52 @@
   </div>
 
   <!-- MODAL: DETALLES Y CARACTERÍSTICAS DEL PRODUCTO (CLIENTE) -->
-  <div class="product-detail-overlay" id="modalDetalleProductoCliente">
+  <div class="product-detail-overlay" id="modalDetalleProductoCliente" onclick="if(event.target===this) cerrarDetalleProductoCliente()">
     <div class="product-detail-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-        <span id="cliDetalleCat" style="background:var(--primary-soft); color:var(--primary); font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.04em;">Producto</span>
-        <button type="button" onclick="cerrarDetalleProductoCliente()" style="background:none; border:none; font-size:20px; cursor:pointer; color:var(--text-muted); padding:4px;">✕</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px;">
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <span id="cliDetalleCat" style="background:var(--primary-soft); color:var(--primary); font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.04em;">Producto</span>
+          <span id="cliDetalleDeepBadge" style="display:none; background:#FEF3C7; color:#92400E; border:1px solid #FCD34D; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:10px;">⭐ Producto Seleccionado</span>
+          <span id="cliDetalleInvimaBadge" style="display:none; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; font-size:10.5px; font-weight:800; padding:3px 8px; border-radius:10px;">
+            🛡️ INVIMA: <span id="cliDetalleInvimaText"></span>
+          </span>
+        </div>
+        <button type="button" onclick="cerrarDetalleProductoCliente()" style="background:#F1F5F9; border:none; width:30px; height:30px; border-radius:50%; font-size:16px; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center; flex-shrink:0;">✕</button>
       </div>
 
       <div style="text-align:center; margin-bottom:14px;">
-        <div id="cliDetalleImgBox" style="width:170px; height:170px; border-radius:20px; background:var(--bg); border:1.5px solid var(--border); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:var(--shadow-sm);">
+        <div id="cliDetalleImgBox" style="width:100%; max-width:240px; height:220px; border-radius:20px; background:var(--bg); border:1.5px solid var(--border); margin:0 auto 10px; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:var(--shadow-sm); position:relative;">
           🛍️
         </div>
+        <!-- Galería de miniaturas (1 a 3 fotos) -->
+        <div id="cliDetalleThumbsRow" style="display:none; justify-content:center; gap:8px; margin-bottom:12px;"></div>
+
         <h3 id="cliDetalleNombre" style="font-size:18px; font-weight:800; color:var(--text); line-height:1.25; margin-bottom:6px;"></h3>
-        <div id="cliDetallePrecio" style="font-size:21px; font-weight:800; color:var(--primary); margin-bottom:6px;"></div>
+        <div id="cliDetallePrecio" style="font-size:21px; font-weight:800; color:var(--primary); margin-bottom:4px;"></div>
       </div>
 
-      <div style="margin-bottom:18px;">
+      <!-- Tarjeta de Información Dietaria / Nutricional -->
+      <div id="cliDetalleDietaryBox" style="display:none; background:#F0FDF4; border:1.5px solid #BBF7D0; border-radius:14px; padding:12px; margin-bottom:14px; text-align:left;">
+        <div style="display:flex; align-items:center; gap:6px; font-size:11px; font-weight:800; color:#166534; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:4px;">
+          <span>🌿 Información Dietaria & Nutricional</span>
+        </div>
+        <div id="cliDetalleDietaryText" style="font-size:12.5px; color:#14532D; font-weight:600; line-height:1.45;"></div>
+      </div>
+
+      <div style="margin-bottom:18px; text-align:left;">
         <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px; letter-spacing:0.04em;">Características & Detalles</div>
         <div id="cliDetalleDesc" style="font-size:12.5px; color:var(--text); line-height:1.5; background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:12px;"></div>
       </div>
 
       <div id="cliDetalleAcciones">
-        <!-- Inyectado dinámicamente con botón para agregar al carrito -->
+        <!-- Inyectado dinámicamente -->
+      </div>
+
+      <div id="cliDetalleExplorarTienda" style="margin-top:14px; text-align:center; display:none;">
+        <button type="button" onclick="cerrarDetalleYVerTienda()" style="background:none; border:none; color:var(--primary); font-size:12.5px; font-weight:800; cursor:pointer; text-decoration:underline; display:inline-flex; align-items:center; gap:4px;">
+          <span>🛍️ Explorar todos los demás productos de la tienda</span>
+          <span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1153,8 +1177,8 @@
         <span>💬 Reabrir Pedido / Enviar Comprobante por WhatsApp</span>
       </button>
 
-      <button type="button" onclick="cerrarModalExito()" style="margin-top:10px; background:transparent; border:none; color:var(--text-muted); font-size:12px; font-weight:700; cursor:pointer;">
-        Volver a la tienda
+      <button type="button" onclick="cerrarModalExito()" style="margin-top:10px; background:var(--primary-soft); border:1px solid var(--primary-border); color:var(--primary); font-size:12.5px; font-weight:800; cursor:pointer; padding:11px 18px; border-radius:12px; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
+        <span>🛍️ Seguir mirando los productos de la tienda</span>
       </button>
     </div>
   </div>
@@ -1276,7 +1300,10 @@
                   price: Number(it.price) || 0,
                   category: it.cat || it.category || 'General',
                   desc: it.description || it.desc || '',
-                  photo: it.image || it.photo || null
+                  dietaryInfo: it.dietaryInfo || it.dietary || null,
+                  invima: it.invima || null,
+                  images: Array.isArray(it.images) && it.images.length > 0 ? it.images : [it.image || it.photo].filter(Boolean),
+                  photo: (Array.isArray(it.images) && it.images[0]) || it.image || it.photo || null
                 }))
               };
               activarVistaTienda();
@@ -1302,7 +1329,10 @@
                 price: Number(it.price) || 0,
                 category: it.category || it.cat || 'General',
                 desc: it.desc || it.description || '',
-                photo: it.photo || it.image || null
+                dietaryInfo: it.dietaryInfo || it.dietary || null,
+                invima: it.invima || null,
+                images: Array.isArray(it.images) && it.images.length > 0 ? it.images : [it.photo || it.image].filter(Boolean),
+                photo: (Array.isArray(it.images) && it.images[0]) || it.photo || it.image || null
               })) : []
             };
             activarVistaTienda();
@@ -1340,7 +1370,10 @@
               price: Number(it.price) || 0,
               category: it.cat || it.category || 'General',
               desc: it.description || it.desc || '',
-              photo: it.image || it.photo || null
+              dietaryInfo: it.dietaryInfo || it.dietary || null,
+              invima: it.invima || null,
+              images: Array.isArray(it.images) && it.images.length > 0 ? it.images : [it.image || it.photo].filter(Boolean),
+              photo: (Array.isArray(it.images) && it.images[0]) || it.image || it.photo || null
             }))
           };
           activarVistaTienda();
@@ -1423,6 +1456,47 @@ service cloud.firestore {
       renderizarHeaderTienda();
       renderizarCategorias();
       renderizarProductos();
+
+      // Verificar si la URL trae un producto específico (?p=... o ?prod=... o ?producto=...)
+      verificarDeepLinkProducto();
+    }
+
+    // ==========================================
+    // DEEP LINK DE PRODUCTO Y CONTROL DE URL
+    // ==========================================
+    function obtenerParametroProductoUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('p') || params.get('prod') || params.get('producto') || null;
+    }
+
+    function verificarDeepLinkProducto() {
+      const targetProdId = obtenerParametroProductoUrl();
+      if (!targetProdId) return;
+
+      const p = storeData.catalog.find(x => String(x.id) === String(targetProdId.trim()));
+      if (p) {
+        setTimeout(() => {
+          verDetalleProductoCliente(p.id, true);
+        }, 120);
+      } else {
+        console.warn('Producto deep link no encontrado en catálogo:', targetProdId);
+      }
+    }
+
+    function limpiarParametroProductoUrl() {
+      try {
+        const url = new URL(window.location.href);
+        let changed = false;
+        ['p', 'prod', 'producto'].forEach(k => {
+          if (url.searchParams.has(k)) {
+            url.searchParams.delete(k);
+            changed = true;
+          }
+        });
+        if (changed) {
+          window.history.replaceState({}, document.title, url.toString());
+        }
+      } catch (_) {}
     }
 
     function renderizarHeaderTienda() {
@@ -1500,9 +1574,19 @@ service cloud.firestore {
       grid.innerHTML = items.map(p => {
         const inCart = cart.find(c => String(c.id) === String(p.id));
         const qty = inCart ? inCart.cant : 0;
+        const totalFotos = (Array.isArray(p.images) && p.images.length > 0) ? p.images.length : (p.photo ? 1 : 0);
         const imgHtml = p.photo 
           ? `<img src="${p.photo}" alt="${p.name}">` 
           : `<span>🛍️</span>`;
+
+        const fotoBadgeHtml = totalFotos > 1 
+          ? `<span style="position:absolute; bottom:5px; right:5px; background:rgba(15,23,42,0.78); color:#FFFFFF; font-size:9.5px; font-weight:800; padding:2px 6px; border-radius:8px; display:inline-flex; align-items:center; gap:2px; backdrop-filter:blur(2px);">📷 ${totalFotos}</span>`
+          : '';
+
+        const badgesHtml = `
+          ${p.dietaryInfo ? `<span style="font-size:9.5px; font-weight:700; background:#ECFDF5; color:#065F46; border:1px solid #A7F3D0; padding:1.5px 6px; border-radius:8px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block;" title="Información Dietaria: ${p.dietaryInfo}">🌿 ${p.dietaryInfo}</span>` : ''}
+          ${p.invima ? `<span style="font-size:9.5px; font-weight:700; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; padding:1.5px 6px; border-radius:8px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block;" title="Registro INVIMA: ${p.invima}">🛡️ INVIMA: ${p.invima}</span>` : ''}
+        `;
 
         const btnHtml = qty > 0
           ? `<div class="qty-stepper" onclick="event.stopPropagation()">
@@ -1516,11 +1600,15 @@ service cloud.firestore {
              </button>`;
 
         return `
-          <div class="product-card" onclick="verDetalleProductoCliente('${p.id}')" style="cursor:pointer;" title="Toca para ver características del producto">
-            <div class="product-img-box">${imgHtml}</div>
+          <div class="product-card" onclick="verDetalleProductoCliente('${p.id}', false)" style="cursor:pointer;" title="Toca para ver características del producto">
+            <div class="product-img-box" style="position:relative;">
+              ${imgHtml}
+              ${fotoBadgeHtml}
+            </div>
             <div class="product-details">
               <div>
                 <div class="product-title">${p.name}</div>
+                ${(p.dietaryInfo || p.invima) ? `<div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:3px; margin-bottom:2px;">${badgesHtml}</div>` : ''}
                 <div class="product-desc">${p.desc || p.category || ''}</div>
               </div>
               <div class="product-bottom-row">
@@ -1534,30 +1622,105 @@ service cloud.firestore {
     }
 
     let prodClienteActivoId = null;
+    let cliFotoActivaIndex = 0;
+    let cliFotosLista = [];
+    let isDeepLinkActivo = false;
 
-    function verDetalleProductoCliente(prodId) {
+    function verDetalleProductoCliente(prodId, isDeepLink = false) {
       const p = storeData.catalog.find(x => String(x.id) === String(prodId));
       if (!p) return;
       prodClienteActivoId = p.id;
+      isDeepLinkActivo = isDeepLink;
 
       document.getElementById('cliDetalleCat').innerText = p.category || 'General';
       document.getElementById('cliDetalleNombre').innerText = p.name || '';
       document.getElementById('cliDetallePrecio').innerText = `$${(Number(p.price)||0).toLocaleString('es-CO')} COP`;
 
-      const imgBox = document.getElementById('cliDetalleImgBox');
-      const photo = p.photo || p.image;
-      if (imgBox) {
-        if (photo) {
-          imgBox.innerHTML = `<img src="${photo}" alt="${p.name}" style="width:100%; height:100%; object-fit:contain; border-radius:18px;">`;
+      // Badge de Producto Compartido / Deep Link
+      const deepBadge = document.getElementById('cliDetalleDeepBadge');
+      if (deepBadge) {
+        deepBadge.style.display = isDeepLink ? 'inline-block' : 'none';
+      }
+
+      // Registro INVIMA
+      const invimaBadge = document.getElementById('cliDetalleInvimaBadge');
+      const invimaText = document.getElementById('cliDetalleInvimaText');
+      if (invimaBadge && invimaText) {
+        if (p.invima && p.invima.trim()) {
+          invimaText.innerText = p.invima.trim();
+          invimaBadge.style.display = 'inline-block';
         } else {
-          imgBox.innerHTML = `<span style="font-size:52px;">🛍️</span>`;
+          invimaBadge.style.display = 'none';
         }
       }
 
+      // Información Dietaria / Nutricional
+      const dietaryBox = document.getElementById('cliDetalleDietaryBox');
+      const dietaryText = document.getElementById('cliDetalleDietaryText');
+      if (dietaryBox && dietaryText) {
+        if (p.dietaryInfo && p.dietaryInfo.trim()) {
+          dietaryText.innerText = p.dietaryInfo.trim();
+          dietaryBox.style.display = 'block';
+        } else {
+          dietaryBox.style.display = 'none';
+        }
+      }
+
+      // Galería de imágenes (1 a 3 fotos)
+      const imgs = (Array.isArray(p.images) && p.images.length > 0)
+        ? p.images
+        : [p.photo || p.image].filter(Boolean);
+
+      renderizarGaleriaCliente(imgs, 0);
+
+      // Descripción
       document.getElementById('cliDetalleDesc').innerText = p.desc || p.description || 'Producto disponible para pedido a domicilio o entrega inmediata en tienda.';
+
+      // Enlace para explorar el resto de la tienda
+      const linkExplorar = document.getElementById('cliDetalleExplorarTienda');
+      if (linkExplorar) {
+        linkExplorar.style.display = isDeepLink ? 'block' : 'none';
+      }
 
       actualizarBotonModalDetalleCliente();
       document.getElementById('modalDetalleProductoCliente').style.display = 'flex';
+    }
+
+    function renderizarGaleriaCliente(imgs, activeIdx = 0) {
+      cliFotosLista = Array.isArray(imgs) ? imgs.filter(Boolean) : [];
+      cliFotoActivaIndex = Math.min(activeIdx, Math.max(0, cliFotosLista.length - 1));
+
+      const imgBox = document.getElementById('cliDetalleImgBox');
+      const thumbsRow = document.getElementById('cliDetalleThumbsRow');
+
+      if (!imgBox) return;
+
+      if (cliFotosLista.length === 0) {
+        imgBox.innerHTML = '<span style="font-size:52px;">🛍️</span>';
+        if (thumbsRow) thumbsRow.style.display = 'none';
+        return;
+      }
+
+      const activeSrc = cliFotosLista[cliFotoActivaIndex];
+      imgBox.innerHTML = `<img src="${activeSrc}" alt="Foto producto" style="width:100%; height:100%; object-fit:contain; border-radius:18px;">`;
+
+      if (thumbsRow) {
+        if (cliFotosLista.length > 1) {
+          thumbsRow.style.display = 'flex';
+          thumbsRow.innerHTML = cliFotosLista.map((src, idx) => `
+            <div onclick="cambiarFotoDetalleCliente(${idx})" style="width:48px; height:48px; border-radius:12px; border:2px solid ${idx === cliFotoActivaIndex ? 'var(--primary)' : 'var(--border)'}; overflow:hidden; cursor:pointer; background:#FFFFFF; padding:2px; display:flex; align-items:center; justify-content:center; box-shadow:${idx === cliFotoActivaIndex ? '0 2px 8px rgba(0,108,70,0.3)' : 'none'}; transition:all 0.15s ease;">
+              <img src="${src}" style="width:100%; height:100%; object-fit:cover; border-radius:8px;">
+            </div>
+          `).join('');
+        } else {
+          thumbsRow.style.display = 'none';
+        }
+      }
+    }
+
+    function cambiarFotoDetalleCliente(idx) {
+      cliFotoActivaIndex = idx;
+      renderizarGaleriaCliente(cliFotosLista, idx);
     }
 
     function actualizarBotonModalDetalleCliente() {
@@ -1568,31 +1731,93 @@ service cloud.firestore {
       const inCart = cart.find(c => String(c.id) === String(prodClienteActivoId));
       const qty = inCart ? inCart.cant : 0;
 
-      if (qty > 0) {
+      if (isDeepLinkActivo) {
+        // En modo deep link (el cliente llegó con el enlace directo del producto)
         cont.innerHTML = `
-          <div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:8px 14px;">
-            <span style="font-size:12px; font-weight:700; color:var(--text-muted);">${qty} en tu carrito</span>
-            <div class="qty-stepper">
-              <button type="button" onclick="modificarCantidad('${prodClienteActivoId}', -1); actualizarBotonModalDetalleCliente();">-</button>
-              <span>${qty}</span>
-              <button type="button" onclick="modificarCantidad('${prodClienteActivoId}', 1); actualizarBotonModalDetalleCliente();">+</button>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button type="button" onclick="hacerPedidoInmediatoProducto('${prodClienteActivoId}')" style="width:100%; background:linear-gradient(135deg, #16A34A 0%, #22C55E 100%); color:#FFFFFF; border:none; padding:13px; border-radius:14px; font-weight:800; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 14px rgba(22,163,74,0.3);">
+              <span class="material-symbols-outlined" style="font-size:20px;">bolt</span>
+              <span>⚡ Hacer Pedido Inmediato</span>
+            </button>
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${qty > 0 ? `
+                <div style="flex:1; display:flex; align-items:center; justify-content:space-between; background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:8px 12px;">
+                  <span style="font-size:11.5px; font-weight:700; color:var(--text-muted);">${qty} en carrito</span>
+                  <div class="qty-stepper">
+                    <button type="button" onclick="modificarCantidad('${prodClienteActivoId}', -1); actualizarBotonModalDetalleCliente();">-</button>
+                    <span>${qty}</span>
+                    <button type="button" onclick="modificarCantidad('${prodClienteActivoId}', 1); actualizarBotonModalDetalleCliente();">+</button>
+                  </div>
+                </div>
+              ` : `
+                <button type="button" onclick="agregarAlCarrito('${prodClienteActivoId}'); actualizarBotonModalDetalleCliente();" style="flex:1; background:var(--primary-soft); color:var(--primary); border:1.5px solid var(--primary); padding:10px 14px; border-radius:14px; font-weight:800; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+                  <span class="material-symbols-outlined" style="font-size:18px;">add_shopping_cart</span>
+                  <span>+ Agregar al Carrito</span>
+                </button>
+              `}
             </div>
           </div>
         `;
       } else {
-        cont.innerHTML = `
-          <button type="button" onclick="agregarAlCarrito('${prodClienteActivoId}'); actualizarBotonModalDetalleCliente();" style="width:100%; background:var(--primary); color:#FFFFFF; border:none; padding:13px; border-radius:14px; font-weight:800; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);">
-            <span class="material-symbols-outlined" style="font-size:18px;">add_shopping_cart</span>
-            <span>Agregar al Carrito de Compra</span>
-          </button>
-        `;
+        // Modo normal desde la cuadrícula de catálogo
+        if (qty > 0) {
+          cont.innerHTML = `
+            <div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg); border:1px solid var(--border); border-radius:14px; padding:8px 14px;">
+              <span style="font-size:12px; font-weight:700; color:var(--text-muted);">${qty} en tu carrito</span>
+              <div class="qty-stepper">
+                <button type="button" onclick="modificarCantidad('${prodClienteActivoId}', -1); actualizarBotonModalDetalleCliente();">-</button>
+                <span>${qty}</span>
+                <button type="button" onclick="modificarCantidad('${prodClienteActivoId}', 1); actualizarBotonModalDetalleCliente();">+</button>
+              </div>
+            </div>
+          `;
+        } else {
+          cont.innerHTML = `
+            <button type="button" onclick="agregarAlCarrito('${prodClienteActivoId}'); actualizarBotonModalDetalleCliente();" style="width:100%; background:var(--primary); color:#FFFFFF; border:none; padding:13px; border-radius:14px; font-weight:800; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);">
+              <span class="material-symbols-outlined" style="font-size:18px;">add_shopping_cart</span>
+              <span>Agregar al Carrito de Compra</span>
+            </button>
+          `;
+        }
       }
+    }
+
+    function hacerPedidoInmediatoProducto(prodId) {
+      const prod = storeData.catalog.find(p => String(p.id) === String(prodId));
+      if (!prod) return;
+
+      const existing = cart.find(c => String(c.id) === String(prodId));
+      if (!existing) {
+        cart.push({
+          id: String(prod.id),
+          name: prod.name,
+          price: prod.price || 0,
+          cant: 1,
+          photo: prod.photo || null
+        });
+      }
+      actualizarBarraCarrito();
+      renderizarProductos();
+      cerrarDetalleProductoCliente();
+      abrirDrawerCarrito();
+      showStoreToast(`✓ Preparando pedido de ${prod.name}`);
     }
 
     function cerrarDetalleProductoCliente() {
       const modal = document.getElementById('modalDetalleProductoCliente');
       if (modal) modal.style.display = 'none';
       prodClienteActivoId = null;
+      isDeepLinkActivo = false;
+    }
+
+    function cerrarDetalleYVerTienda() {
+      cerrarDetalleProductoCliente();
+      limpiarParametroProductoUrl();
+      const catalogEl = document.getElementById('catalogGrid');
+      if (catalogEl) {
+        catalogEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      showStoreToast('🛍️ Explorando todos los productos del catálogo');
     }
 
     function agregarAlCarrito(prodId) {
@@ -1945,6 +2170,13 @@ service cloud.firestore {
 
     function cerrarModalExito() {
       document.getElementById('successModal').style.display = 'none';
+      cerrarDetalleProductoCliente();
+      limpiarParametroProductoUrl();
+      const catalogEl = document.getElementById('catalogGrid');
+      if (catalogEl) {
+        catalogEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      showStoreToast('🛍️ Explora más productos de nuestra tienda');
     }
 
     function notificarPorWhatsApp() {

@@ -1606,39 +1606,69 @@
       <form id="formProductoRetail" onsubmit="event.preventDefault(); guardarProducto();">
         <input type="hidden" id="prodIdHidden">
 
-        <!-- Imagen / Foto del Producto -->
+        <!-- Hasta 3 Fotos / Imágenes del Producto -->
         <div class="form-group">
-          <label>Foto / Imagen del Producto</label>
-          <div style="display:flex; gap:12px; align-items:center; margin-bottom:8px;">
-            <div id="prodImgPreviewBox" style="width:62px; height:62px; border-radius:12px; background:var(--surface-subtle); border:1px solid var(--surface-border); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:26px; flex-shrink:0;">
-              🛍️
-            </div>
-            <div style="flex:1;">
-              <label style="display:inline-flex; align-items:center; gap:6px; background:var(--surface-subtle); border:1px solid var(--surface-border); padding:7px 12px; border-radius:9px; font-size:11.5px; font-weight:700; cursor:pointer; color:var(--text);">
-                <span class="material-symbols-outlined" style="font-size:16px;">add_a_photo</span>
-                <span>Subir foto (celular o PC)</span>
-                <input type="file" id="prodImgFileInput" accept="image/*" style="display:none;" onchange="procesarFotoProductoLocal(this)">
+          <label style="display:flex; justify-content:space-between; align-items:center;">
+            <span>Fotos del Producto (Hasta 3 imágenes)</span>
+            <span style="font-size:10.5px; color:var(--text-muted); font-weight:normal;">1 principal, 2 opcionales</span>
+          </label>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; margin-top:6px;">
+            <!-- Slot 1 -->
+            <div style="border:1.5px dashed var(--surface-border); border-radius:12px; padding:8px; text-align:center; background:var(--surface-subtle);">
+              <div style="font-size:10px; font-weight:800; color:var(--primary); margin-bottom:4px; text-transform:uppercase;">1. Portada *</div>
+              <div id="slotPreview0" style="width:100%; height:68px; border-radius:8px; background:var(--card-bg); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:24px; margin-bottom:6px; border:1px solid var(--surface-border);">
+                🛍️
+              </div>
+              <label style="display:block; background:var(--card-bg); border:1px solid var(--surface-border); border-radius:8px; padding:5px 4px; font-size:10.5px; font-weight:700; cursor:pointer; color:var(--text);">
+                <span>📷 Subir</span>
+                <input type="file" accept="image/*" style="display:none;" onchange="procesarFotoSlot(0, this)">
               </label>
-              <button type="button" id="btnQuitarFotoProd" onclick="quitarFotoProducto()" style="display:none; background:none; border:none; color:var(--alert); font-size:11px; cursor:pointer; margin-left:6px; font-weight:700;">
-                ✕ Quitar
-              </button>
-              <div style="font-size:10.5px; color:var(--text-muted); margin-top:3px;">Puedes subir un archivo o pegar un enlace web abajo</div>
+              <button type="button" id="btnQuitarSlot0" onclick="quitarFotoSlot(0)" style="display:none; margin-top:3px; background:none; border:none; color:var(--alert); font-size:10px; font-weight:700; cursor:pointer;">✕ Quitar</button>
+            </div>
+
+            <!-- Slot 2 -->
+            <div style="border:1.5px dashed var(--surface-border); border-radius:12px; padding:8px; text-align:center; background:var(--surface-subtle);">
+              <div style="font-size:10px; font-weight:700; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase;">2. Detalle</div>
+              <div id="slotPreview1" style="width:100%; height:68px; border-radius:8px; background:var(--card-bg); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:22px; margin-bottom:6px; border:1px solid var(--surface-border);">
+                ➕
+              </div>
+              <label style="display:block; background:var(--card-bg); border:1px solid var(--surface-border); border-radius:8px; padding:5px 4px; font-size:10.5px; font-weight:700; cursor:pointer; color:var(--text);">
+                <span>📷 Subir</span>
+                <input type="file" accept="image/*" style="display:none;" onchange="procesarFotoSlot(1, this)">
+              </label>
+              <button type="button" id="btnQuitarSlot1" onclick="quitarFotoSlot(1)" style="display:none; margin-top:3px; background:none; border:none; color:var(--alert); font-size:10px; font-weight:700; cursor:pointer;">✕ Quitar</button>
+            </div>
+
+            <!-- Slot 3 -->
+            <div style="border:1.5px dashed var(--surface-border); border-radius:12px; padding:8px; text-align:center; background:var(--surface-subtle);">
+              <div style="font-size:10px; font-weight:700; color:var(--text-muted); margin-bottom:4px; text-transform:uppercase;">3. INVIMA/Info</div>
+              <div id="slotPreview2" style="width:100%; height:68px; border-radius:8px; background:var(--card-bg); display:flex; align-items:center; justify-content:center; overflow:hidden; font-size:22px; margin-bottom:6px; border:1px solid var(--surface-border);">
+                ➕
+              </div>
+              <label style="display:block; background:var(--card-bg); border:1px solid var(--surface-border); border-radius:8px; padding:5px 4px; font-size:10.5px; font-weight:700; cursor:pointer; color:var(--text);">
+                <span>📷 Subir</span>
+                <input type="file" accept="image/*" style="display:none;" onchange="procesarFotoSlot(2, this)">
+              </label>
+              <button type="button" id="btnQuitarSlot2" onclick="quitarFotoSlot(2)" style="display:none; margin-top:3px; background:none; border:none; color:var(--alert); font-size:10px; font-weight:700; cursor:pointer;">✕ Quitar</button>
             </div>
           </div>
-          <input type="url" id="prodImgUrlInp" placeholder="O pega el enlace URL de la foto (https://...)" oninput="actualizarPreviewFotoUrl(this.value)">
+          <div style="margin-top:8px;">
+            <input type="url" id="prodImgUrlInp" placeholder="O pega enlace URL de la foto principal (https://...)" oninput="actualizarPreviewFotoPrincipalUrl(this.value)">
+          </div>
         </div>
 
         <div class="form-group">
           <label>Nombre del Producto *</label>
-          <input type="text" id="prodNombreInp" placeholder="Ej: Arroz Diana 1kg, Coca Cola 400ml" required>
+          <input type="text" id="prodNombreInp" placeholder="Ej: Granola Artesanal 500g, Café Especial" required>
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
           <div class="form-group">
             <label>Categoría</label>
-            <input type="text" id="prodCatInp" placeholder="Ej: Abarrotes, Bebidas, Lácteos" list="catSugeridas">
+            <input type="text" id="prodCatInp" placeholder="Ej: Abarrotes, Saludables, Bebidas" list="catSugeridas">
             <datalist id="catSugeridas">
               <option value="Abarrotes">
+              <option value="Saludables & Dietarios">
               <option value="Bebidas">
               <option value="Lácteos">
               <option value="Snacks & Dulces">
@@ -1670,9 +1700,22 @@
           <input type="number" id="prodStockInp" placeholder="24" min="0" required>
         </div>
 
+        <!-- Información Dietaria & Registro INVIMA -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>🌿 Info Dietaria / Nutricional</label>
+            <input type="text" id="prodDietaryInp" placeholder="Ej: Sin gluten, 0% azúcar, Vegano">
+          </div>
+
+          <div class="form-group">
+            <label>🛡️ Registro Sanitario INVIMA</label>
+            <input type="text" id="prodInvimaInp" placeholder="Ej: RSA-0012345-2023">
+          </div>
+        </div>
+
         <div class="form-group">
           <label>Descripción para catálogo en línea (Opcional)</label>
-          <input type="text" id="prodDescInp" placeholder="Ej: Arroz blanco seleccionado de primera">
+          <input type="text" id="prodDescInp" placeholder="Ej: Producto seleccionado de primera calidad con registro y tabla nutricional">
         </div>
 
         <button type="submit" class="btn-submit-modal">
@@ -1696,15 +1739,23 @@
       </div>
 
       <div style="text-align:center; margin-bottom:14px;">
-        <div id="detProdImgContainer" style="width:140px; height:140px; border-radius:18px; background:var(--surface-subtle); border:1.5px solid var(--surface-border); margin:0 auto 12px; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:var(--shadow-sm);">
+        <!-- Visor principal de fotos -->
+        <div id="detProdImgContainer" style="width:160px; height:160px; border-radius:18px; background:var(--surface-subtle); border:1.5px solid var(--surface-border); margin:0 auto 10px; display:flex; align-items:center; justify-content:center; overflow:hidden; box-shadow:var(--shadow-sm);">
           🛍️
         </div>
+        <!-- Miniaturas interactivas (cuando hay 2 o 3 fotos) -->
+        <div id="detProdThumbsRow" style="display:none; justify-content:center; gap:8px; margin-bottom:12px;"></div>
+
         <div id="detProdNombre" style="font-size:18px; font-weight:800; color:var(--text); line-height:1.25; margin-bottom:6px;"></div>
         <div style="display:flex; justify-content:center; gap:6px; flex-wrap:wrap; margin-bottom:4px;">
           <span id="detProdCat" style="background:var(--surface-subtle); border:1px solid var(--surface-border); color:var(--text-muted); font-size:11px; font-weight:700; padding:3px 9px; border-radius:10px;"></span>
           <span id="detProdCodigo" style="background:var(--surface-subtle); border:1px solid var(--surface-border); color:var(--text-muted); font-size:11px; font-weight:600; padding:3px 9px; border-radius:10px;"></span>
           <span id="detProdStockBadge"></span>
         </div>
+
+        <!-- Badges de INVIMA e Info Dietaria -->
+        <div id="detProdInvimaBox" style="display:none; margin-top:6px;"></div>
+        <div id="detProdDietaryBox" style="display:none; margin-top:6px; text-align:left;"></div>
       </div>
 
       <!-- Precios y Rentabilidad -->
@@ -1723,21 +1774,64 @@
       </div>
 
       <!-- Características & Descripción -->
-      <div style="margin-bottom:18px;">
+      <div style="margin-bottom:16px;">
         <div style="font-size:11px; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:4px; letter-spacing:0.04em;">Descripción / Características</div>
         <div id="detProdDesc" style="font-size:12.5px; color:var(--text); line-height:1.45; background:var(--card-bg); border:1px solid var(--surface-border); border-radius:12px; padding:10px;"></div>
       </div>
 
-      <!-- Botón para Editar Propiedades -->
+      <!-- Botones de Acción -->
       <div style="display:flex; flex-direction:column; gap:8px;">
-        <button type="button" onclick="abrirEdicionDesdeDetalle()" style="width:100%; background:var(--primary); color:#FFFFFF; border:none; padding:12px; border-radius:12px; font-weight:800; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);">
-          <span class="material-symbols-outlined" style="font-size:18px;">edit</span>
-          <span>Editar Propiedades</span>
+        <button type="button" onclick="compartirProductoDesdeDetalle()" style="width:100%; background:#25D366; color:#FFFFFF; border:none; padding:12px; border-radius:12px; font-weight:800; font-size:13.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:var(--shadow-sm);">
+          <span style="font-size:17px;">📲</span>
+          <span>Compartir este Producto con Cliente</span>
         </button>
-        <button type="button" onclick="agregarAlCarritoDesdeDetalle()" id="btnDetalleAgregarPOS" style="width:100%; background:var(--surface-subtle); color:var(--text); border:1px solid var(--surface-border); padding:10px; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
-          <span class="material-symbols-outlined" style="font-size:18px;">add_shopping_cart</span>
-          <span>Agregar a la Venta (+1)</span>
-        </button>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <button type="button" onclick="abrirEdicionDesdeDetalle()" style="background:var(--primary); color:#FFFFFF; border:none; padding:11px; border-radius:12px; font-weight:800; font-size:13px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:17px;">edit</span>
+            <span>Editar</span>
+          </button>
+          <button type="button" onclick="agregarAlCarritoDesdeDetalle()" id="btnDetalleAgregarPOS" style="background:var(--surface-subtle); color:var(--text); border:1px solid var(--surface-border); padding:11px; border-radius:12px; font-weight:700; font-size:12.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+            <span class="material-symbols-outlined" style="font-size:17px;">add_shopping_cart</span>
+            <span>+ Venta POS</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL: COMPARTIR UN SOLO PRODUCTO CON CLIENTE (DEEP LINK)
+       ========================================== -->
+  <div class="modal-overlay" id="modalCompartirProducto">
+    <div class="modal-box" style="max-width:440px;">
+      <div class="modal-header">
+        <div class="modal-title" style="display:flex; align-items:center; gap:6px;">
+          <span>📲</span>
+          <span>Enviar Producto a Cliente</span>
+        </div>
+        <button type="button" class="modal-close" onclick="cerrarModalCompartirProducto()">✕</button>
+      </div>
+      <div style="padding:10px 0;">
+        <div id="compProdCardPreview" style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:14px; padding:12px; margin-bottom:14px; display:flex; gap:12px; align-items:center;">
+          <!-- Preview dinámico -->
+        </div>
+        <p style="font-size:12px; color:var(--text-muted); line-height:1.45; margin-bottom:12px;">
+          Tu cliente abrirá directamente la ficha con sus fotos, precio, información dietaria y registro INVIMA, con un botón para <b>hacer el pedido de inmediato</b>:
+        </p>
+        <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:12px; padding:10px; display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+          <input type="text" id="inpEnlaceProductoDirecto" readonly style="flex:1; background:transparent; border:none; font-size:12px; color:var(--text); font-weight:600; outline:none;">
+          <button type="button" onclick="copiarEnlaceProductoDirecto()" style="background:var(--primary); color:#fff; border:none; border-radius:8px; padding:7px 12px; font-size:11.5px; font-weight:700; cursor:pointer;">
+            Copiar
+          </button>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <button type="button" onclick="enviarProductoPorWhatsApp()" style="background:#25D366; color:#fff; border:none; border-radius:12px; padding:12px; font-weight:700; font-size:12.5px; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
+            <span style="font-size:16px;">📲</span> WhatsApp
+          </button>
+          <button type="button" onclick="abrirProductoPestana()" style="background:var(--surface-subtle); color:var(--text); border:1px solid var(--surface-border); border-radius:12px; padding:12px; font-weight:700; font-size:12.5px; display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer;">
+            <span style="font-size:16px;">🌐</span> Ver Ficha
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -2371,8 +2465,11 @@
               stock: Number(it.stock) || 0,
               category: it.cat || it.category || 'General',
               desc: it.desc || it.description || '',
-              photo: it.image || it.photo || null,
-              image: it.image || it.photo || null
+              dietaryInfo: it.dietaryInfo || null,
+              invima: it.invima || null,
+              images: Array.isArray(it.images) && it.images.length > 0 ? it.images : [it.photo || it.image].filter(Boolean),
+              photo: it.image || it.photo || (Array.isArray(it.images) && it.images[0]) || null,
+              image: it.image || it.photo || (Array.isArray(it.images) && it.images[0]) || null
             })),
             updatedAt: new Date().toISOString()
           }, { merge: true });
@@ -2927,6 +3024,7 @@
             </td>
             <td style="padding:10px;" onclick="event.stopPropagation()">
               <div style="display:flex; gap:6px;">
+                <button type="button" onclick="compartirProductoDirecto('${p.id}')" style="background:#25D366; color:#fff; border:none; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Compartir este producto con cliente">📲</button>
                 <button type="button" onclick="verDetallesProducto('${p.id}')" style="background:var(--surface-subtle); border:none; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Ver características y ficha">🔍</button>
                 <button type="button" onclick="editarProducto('${p.id}')" style="background:var(--surface-subtle); border:none; padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Editar directamente">✏️</button>
                 <button type="button" onclick="eliminarProducto('${p.id}')" style="background:none; border:1px solid var(--alert); color:var(--alert); padding:5px 9px; border-radius:6px; cursor:pointer; font-size:12px;" title="Eliminar">🗑️</button>
@@ -2937,8 +3035,12 @@
       }).join('');
     }
 
-    // GESTIÓN DE FOTOS DE PRODUCTO
-    function procesarFotoProductoLocal(input) {
+    // ==========================================
+    // GESTIÓN DE HASTA 3 FOTOS POR PRODUCTO
+    // ==========================================
+    let prodFotosSlots = [null, null, null]; // [foto1, foto2, foto3]
+
+    function procesarFotoSlot(slotIdx, input) {
       if (!input.files || !input.files[0]) return;
       const file = input.files[0];
       const reader = new FileReader();
@@ -2946,7 +3048,7 @@
         const img = new Image();
         img.onload = function() {
           const canvas = document.createElement('canvas');
-          const maxDim = 600;
+          const maxDim = 800;
           let w = img.width;
           let h = img.height;
           if (w > maxDim || h > maxDim) {
@@ -2962,43 +3064,44 @@
           canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
-          prodFotoActualBase64 = canvas.toDataURL('image/jpeg', 0.8);
-          actualizarPreviewFotoElemento(prodFotoActualBase64);
-          mostrarRetailToast('✓ Foto cargada con éxito');
+          const b64 = canvas.toDataURL('image/jpeg', 0.8);
+          prodFotosSlots[slotIdx] = b64;
+          renderizarPreviewSlot(slotIdx, b64);
+          mostrarRetailToast(`✓ Foto #${slotIdx + 1} cargada`);
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
 
-    function quitarFotoProducto() {
-      prodFotoActualBase64 = null;
-      const fileInp = document.getElementById('prodImgFileInput');
-      if (fileInp) fileInp.value = '';
-      const urlInp = document.getElementById('prodImgUrlInp');
-      if (urlInp) urlInp.value = '';
-      actualizarPreviewFotoElemento(null);
-    }
-
-    function actualizarPreviewFotoUrl(url) {
-      if (url && url.trim().startsWith('http')) {
-        prodFotoActualBase64 = null;
-        actualizarPreviewFotoElemento(url.trim());
-      } else if (!url) {
-        actualizarPreviewFotoElemento(prodFotoActualBase64);
+    function quitarFotoSlot(slotIdx) {
+      prodFotosSlots[slotIdx] = null;
+      renderizarPreviewSlot(slotIdx, null);
+      if (slotIdx === 0) {
+        const uInp = document.getElementById('prodImgUrlInp');
+        if (uInp) uInp.value = '';
       }
     }
 
-    function actualizarPreviewFotoElemento(src) {
-      const box = document.getElementById('prodImgPreviewBox');
-      const btnQ = document.getElementById('btnQuitarFotoProd');
+    function renderizarPreviewSlot(slotIdx, src) {
+      const box = document.getElementById(`slotPreview${slotIdx}`);
+      const btnQ = document.getElementById(`btnQuitarSlot${slotIdx}`);
       if (!box) return;
       if (src) {
         box.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover;" onerror="this.onerror=null;this.parentNode.innerHTML='🛍️';">`;
         if (btnQ) btnQ.style.display = 'inline-block';
       } else {
-        box.innerHTML = '🛍️';
+        box.innerHTML = (slotIdx === 0) ? '🛍️' : '➕';
         if (btnQ) btnQ.style.display = 'none';
+      }
+    }
+
+    function actualizarPreviewFotoPrincipalUrl(url) {
+      if (url && url.trim().startsWith('http')) {
+        prodFotosSlots[0] = url.trim();
+        renderizarPreviewSlot(0, url.trim());
+      } else if (!url) {
+        renderizarPreviewSlot(0, prodFotosSlots[0]);
       }
     }
 
@@ -3006,21 +3109,19 @@
     // DETALLES Y CARACTERÍSTICAS DEL PRODUCTO
     // ==========================================
     let productoSeleccionadoDetalle = null;
+    let fotoDetalleActivaIndex = 0;
 
     function verDetallesProducto(id) {
       const p = inventory.find(x => String(x.id) === String(id));
       if (!p) return;
       productoSeleccionadoDetalle = p;
+      fotoDetalleActivaIndex = 0;
 
-      const img = p.image || p.photo || '';
-      const imgCont = document.getElementById('detProdImgContainer');
-      if (imgCont) {
-        if (img) {
-          imgCont.innerHTML = `<img src="${img}" alt="${p.name}" style="width:100%; height:100%; object-fit:contain; border-radius:14px;">`;
-        } else {
-          imgCont.innerHTML = `<div style="font-size:48px;">🛍️</div>`;
-        }
-      }
+      const imgs = Array.isArray(p.images) && p.images.length > 0 
+        ? p.images 
+        : [p.photo || p.image].filter(Boolean);
+
+      renderizarGaleriaDetalle(imgs, 0);
 
       document.getElementById('detProdNombre').innerText = p.name || 'Sin nombre';
       document.getElementById('detProdCat').innerText = p.cat || p.category || 'General';
@@ -3047,10 +3148,76 @@
         }
       }
 
+      // Registro INVIMA
+      const invimaBox = document.getElementById('detProdInvimaBox');
+      if (invimaBox) {
+        if (p.invima) {
+          invimaBox.innerHTML = `
+            <div style="display:inline-flex; align-items:center; gap:6px; background:#EFF6FF; border:1px solid #BFDBFE; color:#1D4ED8; padding:5px 12px; border-radius:10px; font-size:11.5px; font-weight:800;">
+              <span>🛡️ INVIMA:</span> <span>${p.invima}</span>
+            </div>
+          `;
+          invimaBox.style.display = 'block';
+        } else {
+          invimaBox.style.display = 'none';
+        }
+      }
+
+      // Información Dietaria
+      const dietaryBox = document.getElementById('detProdDietaryBox');
+      if (dietaryBox) {
+        if (p.dietaryInfo) {
+          dietaryBox.innerHTML = `
+            <div style="background:#ECFDF5; border:1px solid #A7F3D0; color:#065F46; padding:9px 12px; border-radius:12px; font-size:12px; line-height:1.45;">
+              <b style="font-size:12px; display:flex; align-items:center; gap:5px;">🌿 Información Dietaria / Nutricional:</b>
+              <div style="margin-top:3px;">${p.dietaryInfo}</div>
+            </div>
+          `;
+          dietaryBox.style.display = 'block';
+        } else {
+          dietaryBox.style.display = 'none';
+        }
+      }
+
       const desc = p.desc || p.description || '';
       document.getElementById('detProdDesc').innerText = desc || 'Este producto no cuenta con descripción o características adicionales registradas.';
 
       document.getElementById('modalDetalleProducto').style.display = 'flex';
+    }
+
+    function renderizarGaleriaDetalle(imgs, activeIdx) {
+      const imgCont = document.getElementById('detProdImgContainer');
+      const thumbsCont = document.getElementById('detProdThumbsRow');
+      if (!imgCont) return;
+
+      const currentImg = imgs[activeIdx] || imgs[0] || null;
+      if (currentImg) {
+        imgCont.innerHTML = `<img src="${currentImg}" alt="Foto producto" style="width:100%; height:100%; object-fit:contain; border-radius:14px;">`;
+      } else {
+        imgCont.innerHTML = `<div style="font-size:48px;">🛍️</div>`;
+      }
+
+      if (thumbsCont) {
+        if (imgs.length > 1) {
+          thumbsCont.innerHTML = imgs.map((im, idx) => `
+            <div onclick="cambiarFotoDetalle(${idx})" style="width:44px; height:44px; border-radius:8px; border:2.5px solid ${idx === activeIdx ? 'var(--primary)' : 'var(--surface-border)'}; overflow:hidden; cursor:pointer; opacity:${idx === activeIdx ? '1' : '0.6'}; transition:all 0.2s; background:#fff;">
+              <img src="${im}" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+          `).join('');
+          thumbsCont.style.display = 'flex';
+        } else {
+          thumbsCont.style.display = 'none';
+        }
+      }
+    }
+
+    function cambiarFotoDetalle(idx) {
+      if (!productoSeleccionadoDetalle) return;
+      const imgs = Array.isArray(productoSeleccionadoDetalle.images) && productoSeleccionadoDetalle.images.length > 0 
+        ? productoSeleccionadoDetalle.images 
+        : [productoSeleccionadoDetalle.photo || productoSeleccionadoDetalle.image].filter(Boolean);
+      fotoDetalleActivaIndex = idx;
+      renderizarGaleriaDetalle(imgs, idx);
     }
 
     function cerrarModalDetalleProducto() {
@@ -3071,6 +3238,107 @@
       agregarAlCarrito(productoSeleccionadoDetalle.id);
       cerrarModalDetalleProducto();
       mostrarRetailToast(`✓ ${productoSeleccionadoDetalle.name} agregado`);
+    }
+
+    function compartirProductoDesdeDetalle() {
+      if (!productoSeleccionadoDetalle) return;
+      compartirProductoDirecto(productoSeleccionadoDetalle.id);
+    }
+
+    // ==========================================
+    // COMPARTIR 1 SOLO PRODUCTO CON CLIENTE (DEEP LINK)
+    // ==========================================
+    let prodParaCompartir = null;
+
+    function compartirProductoDirecto(prodId) {
+      const p = inventory.find(x => String(x.id) === String(prodId));
+      if (!p) return;
+      prodParaCompartir = p;
+
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      
+      const localUrl = new URL('tienda.html', window.location.href);
+      localUrl.searchParams.set('biz', currentBizId);
+      localUrl.searchParams.set('p', p.id);
+
+      const publicUrl = `https://isaacmar76.github.io/Zentra/tienda.html?biz=${currentBizId}&p=${p.id}`;
+      const finalUrl = isLocalhost ? publicUrl : localUrl.href;
+
+      const inp = document.getElementById('inpEnlaceProductoDirecto');
+      if (inp) inp.value = finalUrl;
+
+      const prevBox = document.getElementById('compProdCardPreview');
+      if (prevBox) {
+        const photo = p.photo || p.image || (Array.isArray(p.images) && p.images[0]) || '';
+        prevBox.innerHTML = `
+          <div style="width:54px; height:54px; border-radius:10px; background:var(--card-bg); border:1px solid var(--surface-border); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
+            ${photo ? `<img src="${photo}" style="width:100%; height:100%; object-fit:contain;">` : '🛍️'}
+          </div>
+          <div style="flex:1; min-width:0;">
+            <div style="font-weight:800; font-size:13.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
+            <div style="font-weight:800; font-size:13.5px; color:var(--primary); margin-top:2px;">$${(Number(p.price)||0).toLocaleString('es-CO')} COP</div>
+            ${p.invima ? `<div style="font-size:10.5px; color:#1D4ED8; font-weight:700;">🛡️ INVIMA: ${p.invima}</div>` : ''}
+            ${p.dietaryInfo ? `<div style="font-size:10.5px; color:#059669; font-weight:700;">🌿 ${p.dietaryInfo}</div>` : ''}
+          </div>
+        `;
+      }
+
+      document.getElementById('modalCompartirProducto').style.display = 'flex';
+    }
+
+    function cerrarModalCompartirProducto() {
+      document.getElementById('modalCompartirProducto').style.display = 'none';
+      prodParaCompartir = null;
+    }
+
+    function copiarEnlaceProductoDirecto() {
+      const inp = document.getElementById('inpEnlaceProductoDirecto');
+      if (!inp) return;
+      const link = inp.value;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link).then(() => {
+          mostrarRetailToast('✓ Enlace del producto copiado');
+        }).catch(() => {
+          copiarFallback(link);
+        });
+      } else {
+        copiarFallback(link);
+      }
+    }
+
+    function enviarProductoPorWhatsApp() {
+      if (!prodParaCompartir) return;
+      const p = prodParaCompartir;
+      const inp = document.getElementById('inpEnlaceProductoDirecto');
+      const link = inp ? inp.value : '';
+
+      let msg = `¡Hola! 👋 Te comparto la información y fotos de este producto:\n\n` +
+                `🛍️ *${p.name}*\n` +
+                `💰 *Precio:* $${(Number(p.price)||0).toLocaleString('es-CO')} COP\n`;
+      if (p.invima) msg += `🛡️ *Registro INVIMA:* ${p.invima}\n`;
+      if (p.dietaryInfo) msg += `🌿 *Información Dietaria:* ${p.dietaryInfo}\n`;
+      if (p.desc || p.description) msg += `📝 ${p.desc || p.description}\n`;
+      msg += `\n🔗 *Puedes ver sus fotos y pedirlo directamente aquí:*\n${link}\n\n` +
+             `¡Quedo atento(a) para despachártelo de inmediato! 🛵💨`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: p.name,
+          text: msg,
+          url: link
+        }).catch(() => {
+          window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+        });
+      } else {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+    }
+
+    function abrirProductoPestana() {
+      const inp = document.getElementById('inpEnlaceProductoDirecto');
+      if (inp && inp.value) {
+        window.open(inp.value, '_blank');
+      }
     }
 
     // ==========================================
@@ -3150,7 +3418,10 @@
       document.getElementById('lblModalProdTitle').innerText = '+ Nuevo Producto';
       document.getElementById('prodIdHidden').value = '';
       document.getElementById('formProductoRetail').reset();
-      quitarFotoProducto();
+      prodFotosSlots = [null, null, null];
+      for (let i = 0; i < 3; i++) {
+        renderizarPreviewSlot(i, null);
+      }
       document.getElementById('modalProductoRetail').style.display = 'flex';
       setTimeout(() => document.getElementById('prodNombreInp')?.focus(), 100);
     }
@@ -3172,11 +3443,20 @@
       document.getElementById('prodPrecioInp').value = p.price || 0;
       document.getElementById('prodStockInp').value = p.stock || 0;
       document.getElementById('prodDescInp').value = p.desc || p.description || '';
+      document.getElementById('prodDietaryInp').value = p.dietaryInfo || '';
+      document.getElementById('prodInvimaInp').value = p.invima || '';
 
-      const img = p.image || p.photo || '';
-      prodFotoActualBase64 = img;
-      document.getElementById('prodImgUrlInp').value = (img && img.startsWith('http')) ? img : '';
-      actualizarPreviewFotoElemento(img);
+      const imgs = Array.isArray(p.images) && p.images.length > 0 
+        ? p.images 
+        : [p.photo || p.image].filter(Boolean);
+
+      prodFotosSlots = [imgs[0] || null, imgs[1] || null, imgs[2] || null];
+      for (let i = 0; i < 3; i++) {
+        renderizarPreviewSlot(i, prodFotosSlots[i]);
+      }
+
+      const uInp = document.getElementById('prodImgUrlInp');
+      if (uInp) uInp.value = (prodFotosSlots[0] && prodFotosSlots[0].startsWith('http')) ? prodFotosSlots[0] : '';
 
       document.getElementById('modalProductoRetail').style.display = 'flex';
     }
@@ -3190,7 +3470,11 @@
       const price = Number(document.getElementById('prodPrecioInp').value) || 0;
       const stock = Number(document.getElementById('prodStockInp').value) || 0;
       const desc = document.getElementById('prodDescInp').value.trim();
-      const imageToSave = prodFotoActualBase64 || document.getElementById('prodImgUrlInp').value.trim() || null;
+      const dietaryInfo = document.getElementById('prodDietaryInp').value.trim();
+      const invima = document.getElementById('prodInvimaInp').value.trim();
+
+      const activePhotos = prodFotosSlots.filter(Boolean);
+      const primaryPhoto = activePhotos[0] || null;
 
       const pData = {
         id: idExistente || `r_${Date.now()}`,
@@ -3203,8 +3487,11 @@
         stock,
         desc,
         description: desc,
-        image: imageToSave,
-        photo: imageToSave,
+        dietaryInfo: dietaryInfo || null,
+        invima: invima || null,
+        images: activePhotos,
+        image: primaryPhoto,
+        photo: primaryPhoto,
         updatedAt: new Date().toISOString()
       };
 

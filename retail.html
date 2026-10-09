@@ -1887,9 +1887,16 @@
         <button type="button" class="modal-close" onclick="cerrarModalCompartirTienda()">✕</button>
       </div>
       <div style="padding:10px 0;">
-        <p style="font-size:12.5px; color:var(--text-muted); line-height:1.45; margin-bottom:14px;">
+        <p style="font-size:12.5px; color:var(--text-muted); line-height:1.45; margin-bottom:12px;">
           Tus clientes pueden abrir este enlace en su celular para ver todos tus productos con fotos, agregarlos al carrito y enviarte el pedido con sus datos de entrega por WhatsApp:
         </p>
+
+        <!-- Estado de sincronización con la nube -->
+        <div id="boxEstadoCompartirNube" style="margin-bottom:12px; padding:10px 12px; background:var(--surface-subtle); border-radius:10px; border:1px solid var(--surface-border);">
+          <div style="font-size:11.5px; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+            <span>☁️</span> Verificando estado en la nube...
+          </div>
+        </div>
 
         <div style="background:var(--surface-subtle); border:1px solid var(--surface-border); border-radius:12px; padding:10px; display:flex; align-items:center; gap:8px; margin-bottom:14px;">
           <input type="text" id="inpEnlaceTiendaPublica" readonly style="flex:1; background:transparent; border:none; font-size:12px; color:var(--text); font-weight:600; outline:none;">
@@ -2159,7 +2166,12 @@
     window.addEventListener('DOMContentLoaded', async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const urlBiz = urlParams.get('biz');
-      if (urlBiz) currentBizId = urlBiz.trim();
+      if (urlBiz) {
+        currentBizId = urlBiz.trim();
+      } else {
+        const storedBiz = localStorage.getItem('zentra_active_biz_id');
+        if (storedBiz) currentBizId = storedBiz.trim();
+      }
 
       // Cargar tema guardado
       const savedTheme = localStorage.getItem('zentra_retail_theme');
@@ -2175,6 +2187,7 @@
 
       // 1. Cargar desde Firestore (Single Source of Truth)
       let loadedFromCloud = false;
+      let cloudError = null;
       if (fbDb && currentBizId) {
         try {
           const doc = await fbDb.collection('negocios_zentra').doc(currentBizId).get();
@@ -2187,6 +2200,28 @@
             if (Array.isArray(data.cashClosures)) cashClosures = data.cashClosures;
             if (Array.isArray(data.clients)) clients = data.clients;
             loadedFromCloud = true;
+          } else {
+            // Consulta fallback en tiendas_publicas
+            const snapPub = await fbDb.collection('tiendas_publicas').doc(currentBizId).get();
+            if (snapPub.exists) {
+              const pData = snapPub.data();
+              if (pData.name) bizProfile.name = pData.name;
+              if (pData.phone) bizProfile.phone = pData.phone;
+              if (Array.isArray(pData.catalog) && pData.catalog.length > 0) {
+                inventory = pData.catalog.map(it => ({
+                  id: it.id,
+                  name: it.name,
+                  price: it.price || 0,
+                  cost: it.cost || 0,
+                  stock: it.stock || 0,
+                  cat: it.category || 'General',
+                  desc: it.desc || '',
+                  image: it.photo || it.image || null,
+                  photo: it.photo || it.image || null
+                }));
+              }
+              loadedFromCloud = true;
+            }
           }
 
           // Cargar pedidos online desde la subcolección
@@ -2194,9 +2229,9 @@
           if (!snapPedidos.empty) {
             onlineOrders = snapPedidos.docs.map(d => d.data());
           } else {
-            const snapPub = await fbDb.collection('tiendas_publicas').doc(currentBizId).collection('pedidos').orderBy('createdAt', 'desc').limit(50).get();
-            if (!snapPub.empty) {
-              onlineOrders = snapPub.docs.map(d => d.data());
+            const snapPubPeds = await fbDb.collection('tiendas_publicas').doc(currentBizId).collection('pedidos').orderBy('createdAt', 'desc').limit(50).get();
+            if (!snapPubPeds.empty) {
+              onlineOrders = snapPubPeds.docs.map(d => d.data());
             }
           }
 
@@ -2214,6 +2249,7 @@
 
         } catch (e) {
           console.warn('Firestore Retail Load:', e);
+          cloudError = e;
         }
       }
 
@@ -2279,11 +2315,19 @@
       renderizarPedidosOnline();
       actualizarBadgePedidos();
       renderizarCierres();
-      actualizarIndicadorSync('Sincronizado');
+
+      // Auto-publicar en Cloud Firestore para asegurar que la tienda pública en línea exista en Firebase
+      if (fbDb && currentBizId) {
+        persistirDatosRetail().catch(() => {});
+      } else {
+        actualizarIndicadorSync('🟠 Modo Local');
+      }
     }
 
     async function persistirDatosRetail() {
       actualizarIndicadorSync('Guardando...');
+      let cloudOk = false;
+      let firestoreError = null;
 
       // 1. Local
       try {
@@ -2333,18 +2377,39 @@
             updatedAt: new Date().toISOString()
           }, { merge: true });
 
+          cloudOk = true;
         } catch (e) {
           console.warn('Firestore Retail Save:', e);
+          firestoreError = e;
         }
       }
 
-      actualizarIndicadorSync('Sincronizado');
+      if (cloudOk) {
+        actualizarIndicadorSync('Sincronizado 🟢');
+      } else if (firestoreError) {
+        if (firestoreError.code === 'permission-denied' || String(firestoreError).includes('permission')) {
+          actualizarIndicadorSync('⚠️ Permisos Nube 403');
+        } else {
+          actualizarIndicadorSync('🟠 Sin Nube');
+        }
+      } else {
+        actualizarIndicadorSync('Guardado');
+      }
+
+      return { success: cloudOk, error: firestoreError };
     }
 
     async function sincronizarConNube() {
       mostrarRetailToast('⏳ Sincronizando con Cloud Firestore...');
-      await persistirDatosRetail();
-      mostrarRetailToast('☁️ Datos 100% sincronizados en la nube');
+      const res = await persistirDatosRetail();
+      if (res.success) {
+        mostrarRetailToast('☁️ Catálogo 100% sincronizado en la nube');
+      } else if (res.error && (res.error.code === 'permission-denied' || String(res.error).includes('permission'))) {
+        mostrarRetailToast('⚠️ Error: Firestore bloqueó el guardado (Reglas 403)');
+        alert('⚠️ ATENCIÓN FIREBASE:\n\nCloud Firestore rechazó el guardado con error "permission-denied" (403).\n\nPara que la tienda se guarde en la base de datos de Firebase y cualquier cliente pueda abrirla desde su celular sin iniciar sesión, debes habilitar los permisos en Firebase Console:\nhttps://console.firebase.google.com/project/zentra-d2b9e/firestore/rules');
+      } else {
+        mostrarRetailToast('⚠️ Guardado localmente (sin conexión a Firebase)');
+      }
     }
 
     function actualizarIndicadorSync(txt) {
@@ -3175,11 +3240,53 @@
     // ==========================================
     // COMPARTIR CATÁLOGO ONLINE
     // ==========================================
-    function abrirModalCompartirTienda() {
-      const origin = window.location.origin;
-      const link = `${origin}/tienda.html?biz=${currentBizId}`;
+    async function abrirModalCompartirTienda() {
+      // 1. Sincronizar catálogo con Cloud Firestore antes de abrir el modal
+      actualizarIndicadorSync('Sincronizando...');
+      const syncRes = await persistirDatosRetail();
+
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+      // Resolver URL absoluta de la tienda (compatible con subcarpetas de GitHub Pages)
+      const localTiendaUrl = new URL('tienda.html', window.location.href);
+      localTiendaUrl.searchParams.set('biz', currentBizId);
+      const linkLocal = localTiendaUrl.href;
+
+      // Enlace público en producción
+      const linkPublico = `https://isaacmar76.github.io/Zentra/tienda.html?biz=${currentBizId}`;
+      const linkParaCompartir = isLocalhost ? linkPublico : linkLocal;
+
       const inp = document.getElementById('inpEnlaceTiendaPublica');
-      if (inp) inp.value = link;
+      if (inp) inp.value = linkParaCompartir;
+
+      // Actualizar tarjeta de diagnóstico de la nube
+      const box = document.getElementById('boxEstadoCompartirNube');
+      if (box) {
+        if (syncRes.success) {
+          box.innerHTML = `
+            <div style="font-size:11.5px; color:var(--success); font-weight:700; display:flex; align-items:center; gap:6px;">
+              <span>🟢</span> Catálogo sincronizado en Firebase Firestore
+            </div>
+            ${isLocalhost ? `<div style="font-size:11px; color:#D97706; margin-top:4px;">💡 <b>Prueba en Celular:</b> Enlace público web configurado para compartir por WhatsApp.</div>` : ''}
+          `;
+        } else if (syncRes.error && (syncRes.error.code === 'permission-denied' || String(syncRes.error).includes('permission'))) {
+          box.innerHTML = `
+            <div style="font-size:11.5px; color:#DC2626; font-weight:700;">
+              ⚠️ Firebase bloqueó el guardado en la nube (Reglas 403).
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">
+              Configura las Reglas de Seguridad en Firebase Console para permitir que otros dispositivos lean tu tienda.
+            </div>
+          `;
+        } else {
+          box.innerHTML = `
+            <div style="font-size:11.5px; color:var(--text-muted); display:flex; align-items:center; gap:6px;">
+              <span>☁️</span> Catálogo listo para compartir.
+            </div>
+          `;
+        }
+      }
+
       document.getElementById('modalCompartirTienda').style.display = 'flex';
     }
 
@@ -3188,8 +3295,8 @@
     }
 
     function copiarEnlaceTiendaPublica() {
-      const origin = window.location.origin;
-      const link = `${origin}/tienda.html?biz=${currentBizId}`;
+      const inp = document.getElementById('inpEnlaceTiendaPublica');
+      const link = inp ? inp.value : `https://isaacmar76.github.io/Zentra/tienda.html?biz=${currentBizId}`;
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(link).then(() => {
           mostrarRetailToast('✓ Enlace copiado al portapapeles');
@@ -3216,8 +3323,8 @@
     }
 
     function compartirTiendaWhatsApp() {
-      const origin = window.location.origin;
-      const link = `${origin}/tienda.html?biz=${currentBizId}`;
+      const inp = document.getElementById('inpEnlaceTiendaPublica');
+      const link = inp ? inp.value : `https://isaacmar76.github.io/Zentra/tienda.html?biz=${currentBizId}`;
       const msg = `¡Hola! 👋 Te invito a conocer nuestro catálogo en línea y hacer tus pedidos directamente aquí:\n\n` +
                   `🛍️ *${bizProfile.name || 'Mi Comercio'}*\n` +
                   `🔗 ${link}\n\n` +
@@ -3237,7 +3344,8 @@
     }
 
     function abrirTiendaPublicaPestana() {
-      const link = `tienda.html?biz=${currentBizId}`;
+      const inp = document.getElementById('inpEnlaceTiendaPublica');
+      const link = inp ? inp.value : `tienda.html?biz=${currentBizId}`;
       window.open(link, '_blank');
     }
 

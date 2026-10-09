@@ -1012,6 +1012,47 @@ class CatalogItemModel {
   5. **Paridad Total y Despliegue:**
      - Sincronización idéntica en `retail.html`, `tienda.html`, `site/retail.html` y `site/tienda.html`.
 
+#### Hito 43: Corrección Integral de Persistencia en Cloud Firestore para Tienda Pública Multi-Dispositivo y Diagnóstico Visual de Permisos
+- **Requerimiento del Usuario:**
+  - *"quiero volver a revisar el catalogo en linea, al compartir el link y abrirlo en otro dispositivo me sale que la tienda no existe o no se encuentra. Se supone que la base de datos ya no se va a almacenar en la memoria del telefono si no en Firebase"*
+- **Diagnóstico de Causa Raíz:**
+  1. **Reglas de Seguridad en Cloud Firestore (Error 403 `PERMISSION_DENIED`):**
+     - El proyecto Firebase `zentra-d2b9e` tenía bloqueada la lectura anónima/pública sin autenticación previa de Google. Al abrir el enlace `tienda.html` en un dispositivo de un cliente externo, la consulta a `fbDb.collection('tiendas_publicas').doc(bizId).get()` era rechazada con código `403 permission-denied`.
+     - El bloque `catch (err)` en `tienda.html` capturaba el error silenciosamente, caía en el fallback de `localStorage` (inexistente en el celular del cliente) y mostraba la pantalla de "Tienda no encontrada".
+  2. **Persistencia Silenciosa y Falso Positivo de Nube en Zentra-Retail:**
+     - En `retail.html`, los errores al persistir en Firestore se capturaban con `console.warn` sin notificar al usuario, indicando falsamente *"Sincronizado"* o *"☁️ Datos 100% sincronizados en la nube"* a pesar del rechazo de Firestore.
+  3. **Falta de Auto-Publicación Inicial y Resolución de Enlaces:**
+     - Al cargar `retail.html` por primera vez no se forzaba la publicación a Firestore, y al compartir el enlace se generaba mediante `window.location.origin` (fallando en localhost frente a dispositivos externos o perdiendo el subpath en GitHub Pages).
+- **Implementación Técnica:**
+  1. **Diagnóstico Visual y Manejo Explícito de Errores en `tienda.html`:**
+     - Detección precisa de excepciones `permission-denied` o errores 403 de Firestore.
+     - En lugar de mostrar un engañoso "Tienda no encontrada", presenta una tarjeta de diagnóstico limpia y accionable explicando la causa exacta y proporcionando la regla de seguridad lista para copiar en Firebase Console:
+       ```
+       rules_version = '2';
+       service cloud.firestore {
+         match /databases/{database}/documents {
+           match /tiendas_publicas/{bizId} {
+             allow read, write: if true;
+             match /pedidos/{pedidoId} {
+               allow read, write: if true;
+             }
+           }
+           match /negocios_zentra/{bizId} {
+             allow read, write: if true;
+             match /pedidos/{pedidoId} {
+               allow read, write: if true;
+             }
+           }
+         }
+       }
+       ```
+  2. **Auto-Publicación y Verificación de Nube en Zentra-Retail (`retail.html`):**
+     - En `cargarDatosRetail()`, auto-publica el catálogo y perfil en Cloud Firestore (`tiendas_publicas/{bizId}` y `negocios_zentra/{bizId}`) de forma desatendida.
+     - En `abrirModalCompartirTienda()`, ejecuta y espera la sincronización con Firestore antes de mostrar los botones de compartir, y reporta en tiempo real si el catálogo está sincronizado en la nube (`🟢`) o si Firestore requiere actualizar reglas (`⚠️`).
+     - Generación inteligente de URLs mediante `new URL('tienda.html', window.location.href)` y detección de entorno: si se prueba en `localhost`, el modal provee el enlace web directo de producción para que los celulares puedan abrirlo sin restricciones de red local.
+  3. **Paridad Total y Despliegue:**
+     - Replicado y verificado byte a byte en `retail.html`, `tienda.html`, `site/retail.html` y `site/tienda.html`.
+
 ---
 
 ## 6. Procedimiento para Registrar Nuevos Cambios

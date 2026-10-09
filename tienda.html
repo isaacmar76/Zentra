@@ -1245,6 +1245,7 @@
       }
 
       // 2. Intentar cargar desde Firestore (Colección de tiendas públicas en la nube)
+      let firestoreError = null;
       if (fbDb) {
         try {
           const docRef = fbDb.collection('tiendas_publicas').doc(bizId);
@@ -1309,6 +1310,7 @@
           }
         } catch (err) {
           console.warn('Error leyendo tienda en Firestore:', err);
+          firestoreError = err;
         }
       }
 
@@ -1351,8 +1353,46 @@
       if (loadingEl) loadingEl.style.display = 'none';
       if (mainEl) mainEl.style.display = 'none';
       if (notFoundEl) {
-        document.getElementById('storeNotFoundTitle').innerText = 'Tienda no encontrada';
-        document.getElementById('storeNotFoundMsg').innerText = `No encontramos una tienda pública activa con el identificador "${bizId}". Asegúrate de que el comercio haya publicado su catálogo en línea o solicita el enlace actualizado.`;
+        if (firestoreError && (firestoreError.code === 'permission-denied' || String(firestoreError).includes('permission') || String(firestoreError).includes('403'))) {
+          document.getElementById('storeNotFoundTitle').innerText = 'Acceso Restringido en Firebase';
+          document.getElementById('storeNotFoundMsg').innerHTML = `
+            <div style="margin-bottom:12px; font-weight:700; color:#DC2626; font-size:13.5px;">
+              ⚠️ Cloud Firestore rechazó la consulta de esta tienda pública (Error: permission-denied / 403).
+            </div>
+            <div style="font-size:12.5px; color:var(--text-muted); line-height:1.55; margin-bottom:16px;">
+              Las Reglas de Seguridad en Firebase (proyecto <b>zentra-d2b9e</b>) están bloqueando la lectura a clientes externos que no han iniciado sesión con Google.
+            </div>
+            <div style="background:#FFF1F2; border:1px solid #FECDD3; border-radius:12px; padding:14px; text-align:left; font-size:12px; color:#9F1239; margin-bottom:18px;">
+              <div style="font-weight:800; font-size:13px; margin-bottom:6px;">🛠️ Solución en 1 minuto en Firebase Console:</div>
+              1. Entra a <a href="https://console.firebase.google.com/project/zentra-d2b9e/firestore/rules" target="_blank" style="color:#E11D48; font-weight:800; text-decoration:underline;">Firebase Console > Firestore Database > Reglas</a><br>
+              2. Reemplaza o agrega la regla para tiendas públicas:<br>
+              <pre style="background:#881337; color:#FFF; padding:8px 10px; border-radius:8px; margin:8px 0; font-size:11px; overflow-x:auto;">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /tiendas_publicas/{bizId} {
+      allow read, write: if true;
+      match /pedidos/{pedidoId} {
+        allow read, write: if true;
+      }
+    }
+    match /negocios_zentra/{bizId} {
+      allow read, write: if true;
+      match /pedidos/{pedidoId} {
+        allow read, write: if true;
+      }
+    }
+  }
+}</pre>
+              3. Haz clic en <b>Publicar (Publish)</b> y pulsa el botón Reintentar abajo.
+            </div>
+            <button type="button" onclick="location.reload()" style="background:var(--primary); color:#FFF; border:none; padding:10px 22px; border-radius:12px; font-weight:800; font-size:13px; cursor:pointer; box-shadow:var(--shadow-sm);">
+              🔄 Reintentar Carga
+            </button>
+          `;
+        } else {
+          document.getElementById('storeNotFoundTitle').innerText = 'Tienda no encontrada';
+          document.getElementById('storeNotFoundMsg').innerText = `No encontramos una tienda pública activa con el identificador "${bizId}". Asegúrate de que el comercio haya publicado su catálogo en línea desde Zentra Retail o solicita el enlace actualizado.`;
+        }
         notFoundEl.style.display = 'block';
       }
       return false;
